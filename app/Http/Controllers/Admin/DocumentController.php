@@ -18,7 +18,9 @@ class DocumentController extends Controller
         $folderId = $request->integer('folder');
         $search = trim((string) $request->input('q'));
 
-        $folder = $folderId ? DocumentFolder::where('id', $folderId)->where('user_id', $user->id)->firstOrFail() : null;
+        $folder = $folderId
+            ? DocumentFolder::where('id', $folderId)->where('user_id', $user->id)->firstOrFail()
+            : null;
 
         $folders = DocumentFolder::query()
             ->where('user_id', $user->id)
@@ -34,7 +36,20 @@ class DocumentController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        return view('admin.documents.index', compact('folder', 'folders', 'documents', 'search'));
+        $storageFiles = Storage::disk('local')->allFiles("private/{$user->id}");
+        $usedBytes = 0;
+        foreach ($storageFiles as $storageFile) {
+            $usedBytes += (int) Storage::disk('local')->size($storageFile);
+        }
+
+        $quotaBytes = (int) config('fuelfree.storage.quota_bytes', 0);
+        $usedPercent = $quotaBytes > 0 ? min(100, round(($usedBytes / $quotaBytes) * 100, 1)) : 0;
+        $availableBytes = $quotaBytes > $usedBytes ? $quotaBytes - $usedBytes : 0;
+
+        return view('admin.documents.index', compact(
+            'folder', 'folders', 'documents', 'search',
+            'usedBytes', 'availableBytes', 'quotaBytes', 'usedPercent'
+        ));
     }
 
     public function storeFolder(Request $request): RedirectResponse
@@ -61,7 +76,8 @@ class DocumentController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'file' => ['required', 'file', 'max:51200', 'mimetypes:application/pdf,image/jpeg,image/png,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip'],
+            // No application-level file-size or MIME whitelist: the hosting/PHP limits remain the hard boundary.
+            'file' => ['required', 'file'],
             'folder_id' => ['nullable', 'integer', 'exists:document_folders,id'],
         ]);
 
@@ -87,7 +103,7 @@ class DocumentController extends Controller
             'extension' => strtolower($file->getClientOriginalExtension()),
         ]);
 
-        return back()->with('success', 'Document uploaded securely.');
+        return back()->with('success', 'File uploaded securely.');
     }
 
     public function download(Request $request, Document $document): mixed
@@ -104,6 +120,6 @@ class DocumentController extends Controller
         Storage::disk($document->disk)->delete($document->path);
         $document->delete();
 
-        return back()->with('success', 'Document deleted.');
+        return back()->with('success', 'File deleted.');
     }
 }
