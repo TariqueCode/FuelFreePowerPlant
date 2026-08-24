@@ -12,6 +12,11 @@ return [
         'default_route' => env('DASHBOARD_ROUTE', 'dashboard'),
     ],
 
+    'storage' => [
+        // Hosting plan capacity. This is a display/quota reference, not a PHP upload limit.
+        'quota_bytes' => (int) env('FUELFREE_STORAGE_QUOTA_BYTES', 53687091200), // 50 GiB
+    ],
+
     'roles' => [
         'super_admin' => 'super-admin',
         'administrator' => 'administrator',
