@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Document;
 use App\Models\DocumentFolder;
+use App\Models\PlantPerformance;
+use App\Models\PowerPlant;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -21,6 +23,29 @@ class AdminDashboardController extends Controller
             ->reject(fn (string $path) => str_contains($path, '/.uploads/'))
             ->sum(fn (string $path) => (int) Storage::disk('local')->size($path));
 
-        return view('admin.dashboard', compact('users', 'documents', 'folders', 'storageBytes'));
+        $plantStats = [
+            'total' => PowerPlant::count(),
+            'operational' => PowerPlant::where('status', 'operational')->count(),
+            'planned' => PowerPlant::where('status', 'planned')->count(),
+            'maintenance' => PowerPlant::where('status', 'maintenance')->count(),
+            'offline' => PowerPlant::where('status', 'offline')->count(),
+        ];
+
+        $latestPerformance = PlantPerformance::query()
+            ->whereIn('data_status', ['verified', 'real-time'])
+            ->latest('measured_at')
+            ->first();
+
+        $performanceSummary = [
+            'output_kw' => $latestPerformance?->power_output_kw,
+            'energy_kwh' => $latestPerformance?->energy_generated_kwh,
+            'efficiency' => $latestPerformance?->efficiency_percent,
+            'uptime' => $latestPerformance?->uptime_percent,
+        ];
+
+        return view('admin.dashboard', compact(
+            'users', 'documents', 'folders', 'storageBytes',
+            'plantStats', 'performanceSummary', 'latestPerformance'
+        ));
     }
 }
