@@ -38,30 +38,35 @@ Route::middleware('auth')->group(function () {
             Route::get('/users/create', [UserController::class, 'create'])->name('admin.users.create');
             Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
         });
+    });
 
-        Route::middleware('permission:documents.view')->group(function () {
-            Route::get('/documents', [DocumentController::class, 'index'])->name('admin.documents');
-            Route::post('/documents/folders', [DocumentController::class, 'storeFolder'])->name('admin.documents.folders.store');
-            Route::post('/documents', [DocumentController::class, 'store'])->name('admin.documents.store');
-            Route::post('/documents/chunks', [DocumentController::class, 'chunkUpload'])->name('admin.documents.chunks');
-            Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('admin.documents.download');
-            Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->name('admin.documents.destroy');
-            Route::post('/documents/folders/{folder}/rename', [DocumentController::class, 'renameFolder'])->name('admin.documents.folders.rename');
-            Route::post('/documents/folders/{folder}/move', [DocumentController::class, 'moveFolder'])->name('admin.documents.folders.move');
-            Route::post('/documents/folders/{folder}/copy', [DocumentController::class, 'copyFolder'])->name('admin.documents.folders.copy');
-            Route::delete('/documents/folders/{folder}', [DocumentController::class, 'destroyFolder'])->name('admin.documents.folders.destroy');
-            Route::post('/documents/{document}/rename', [DocumentController::class, 'rename'])->name('admin.documents.rename');
-            Route::post('/documents/{document}/move', [DocumentController::class, 'move'])->name('admin.documents.move');
-            Route::post('/documents/{document}/copy', [DocumentController::class, 'copy'])->name('admin.documents.copy');
-        });
+    // Document read access is permission-driven so clients can use their private vault too.
+    Route::prefix('admin')->middleware('permission:documents.view')->group(function () {
+        Route::get('/documents', [DocumentController::class, 'index'])->name('admin.documents');
+        Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('admin.documents.download');
+    });
 
-        Route::get('/email', [AdminModuleController::class, 'email'])
-            ->name('admin.email')
-            ->middleware('permission:email.view');
+    // Document mutations require the stronger manage permission.
+    Route::prefix('admin')->middleware('permission:documents.manage')->group(function () {
+        Route::post('/documents/folders', [DocumentController::class, 'storeFolder'])->name('admin.documents.folders.store');
+        Route::post('/documents', [DocumentController::class, 'store'])->name('admin.documents.store');
+        Route::post('/documents/chunks', [DocumentController::class, 'chunkUpload'])->name('admin.documents.chunks');
+        Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->name('admin.documents.destroy');
+        Route::post('/documents/folders/{folder}/rename', [DocumentController::class, 'renameFolder'])->name('admin.documents.folders.rename');
+        Route::post('/documents/folders/{folder}/move', [DocumentController::class, 'moveFolder'])->name('admin.documents.folders.move');
+        Route::post('/documents/folders/{folder}/copy', [DocumentController::class, 'copyFolder'])->name('admin.documents.folders.copy');
+        Route::delete('/documents/folders/{folder}', [DocumentController::class, 'destroyFolder'])->name('admin.documents.folders.destroy');
+        Route::post('/documents/{document}/rename', [DocumentController::class, 'rename'])->name('admin.documents.rename');
+        Route::post('/documents/{document}/move', [DocumentController::class, 'move'])->name('admin.documents.move');
+        Route::post('/documents/{document}/copy', [DocumentController::class, 'copy'])->name('admin.documents.copy');
+    });
 
-        Route::get('/support', [AdminModuleController::class, 'support'])
-            ->name('admin.support')
-            ->middleware('permission:support.view');
+    Route::prefix('admin')->middleware('permission:email.view')->group(function () {
+        Route::get('/email', [AdminModuleController::class, 'email'])->name('admin.email');
+    });
+
+    Route::prefix('admin')->middleware('permission:support.view')->group(function () {
+        Route::get('/support', [AdminModuleController::class, 'support'])->name('admin.support');
     });
 
     Route::get('/portal', ClientPortalController::class)
