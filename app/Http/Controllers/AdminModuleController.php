@@ -18,22 +18,11 @@ class AdminModuleController extends Controller
     {
         $user = $request->user();
         $isStaff = $user->hasRole(['super-admin', 'administrator', 'project-manager', 'support-agent']);
-        $tickets = SupportTicket::query()
-            ->with('user')
-            ->withCount('messages')
-            ->when(!$isStaff, fn ($query) => $query->where('user_id', $user->id))
-            ->latest()
-            ->paginate(15);
+        $scope = SupportTicket::query()->when(!$isStaff, fn ($query) => $query->where('user_id', $user->id));
 
-        $openCount = (clone $tickets->getCollection()->isNotEmpty() ? SupportTicket::query() : SupportTicket::query())
-            ->when(!$isStaff, fn ($query) => $query->where('user_id', $user->id))
-            ->whereIn('status', ['open', 'in-progress'])
-            ->count();
-        $priorityCount = (clone $tickets->getCollection()->isNotEmpty() ? SupportTicket::query() : SupportTicket::query())
-            ->when(!$isStaff, fn ($query) => $query->where('user_id', $user->id))
-            ->where('priority', 'high')
-            ->whereNotIn('status', ['closed'])
-            ->count();
+        $tickets = (clone $scope)->with('user')->withCount('messages')->latest()->paginate(15);
+        $openCount = (clone $scope)->whereIn('status', ['open', 'in-progress'])->count();
+        $priorityCount = (clone $scope)->where('priority', 'high')->where('status', '!=', 'closed')->count();
 
         return view('admin.modules.support', compact('tickets', 'openCount', 'priorityCount', 'isStaff'));
     }
@@ -85,7 +74,10 @@ class AdminModuleController extends Controller
     public function updateTicket(Request $request, SupportTicket $ticket): RedirectResponse
     {
         abort_unless($request->user()->hasPermission('support.manage'), 403);
-        $data = $request->validate(['status' => ['required', 'in:open,in-progress,closed'], 'priority' => ['required', 'in:low,normal,high']]);
+        $data = $request->validate([
+            'status' => ['required', 'in:open,in-progress,closed'],
+            'priority' => ['required', 'in:low,normal,high'],
+        ]);
         $ticket->update($data);
         return back()->with('status', 'Ticket updated successfully.');
     }
