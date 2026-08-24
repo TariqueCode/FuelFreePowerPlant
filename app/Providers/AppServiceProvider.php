@@ -2,23 +2,28 @@
 
 namespace App\Providers;
 
+use App\Models\SystemSetting;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        //
+        if (! Schema::hasTable('system_settings')) {
+            return;
+        }
+
+        $settings = SystemSetting::query()->pluck('value', 'key');
+        if ($settings->has('company.name')) config(['fuelfree.company.name' => $settings['company.name']]);
+        if ($settings->has('company.domain')) config(['fuelfree.company.domain' => $settings['company.domain']]);
+        if ($settings->has('company.tagline')) config(['fuelfree.company.tagline' => $settings['company.tagline']]);
+        if ($settings->has('company.timezone')) config(['fuelfree.company.timezone' => $settings['company.timezone']]);
+        if ($settings->has('storage.quota_gib')) config(['fuelfree.storage.quota_bytes' => (int) round((float) $settings['storage.quota_gib'] * 1073741824)]);
     }
 }
