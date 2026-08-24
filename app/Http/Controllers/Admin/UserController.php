@@ -40,7 +40,6 @@ class UserController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
-
         $user->roles()->sync([$data['role_id']]);
 
         return redirect()->route('admin.users.index')->with('status', 'User account created successfully.');
@@ -79,12 +78,13 @@ class UserController extends Controller
         abort_if($request->user()->is($user), 422, 'You cannot delete your own account.');
 
         if ($user->hasRole('super-admin')) {
-            $remaining = User::whereKeyNot($user->id)->get()->filter(fn (User $candidate) => $candidate->hasRole('super-admin'))->count();
+            $remaining = User::where('id', '!=', $user->id)->get()
+                ->filter(fn (User $candidate) => $candidate->hasRole('super-admin'))
+                ->count();
             abort_if($remaining === 0, 422, 'The last super-admin account cannot be deleted.');
         }
 
         $user->delete();
-
         return back()->with('status', 'User account deleted successfully.');
     }
 }
