@@ -15,10 +15,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientPortalController;
 use App\Http\Controllers\CmsPageController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => view('welcome'))->name('home');
+Route::get('/', HomeController::class)->name('home');
 Route::get('/pages/{slug}', [CmsPageController::class, 'show'])->name('cms.page');
 Route::middleware('guest')->group(function () { Route::get('/login', [AuthController::class, 'showLogin'])->name('login'); Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,1')->name('login.store'); });
 Route::middleware('auth')->group(function () {
