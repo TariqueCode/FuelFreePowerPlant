@@ -25,9 +25,10 @@ Route::middleware('auth')->group(function () {
         ->name('dashboard')
         ->middleware('permission:dashboard.view');
 
-    Route::middleware('role:super-admin,administrator')->prefix('admin')->group(function () {
+    Route::middleware('role:super-admin,administrator,project-manager,support-agent')->prefix('admin')->group(function () {
         Route::get('/', AdminDashboardController::class)
-            ->name('admin.dashboard');
+            ->name('admin.dashboard')
+            ->middleware('permission:dashboard.view');
 
         Route::middleware('permission:users.view')->group(function () {
             Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
