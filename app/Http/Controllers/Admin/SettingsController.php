@@ -18,6 +18,7 @@ class SettingsController extends Controller
             'company.tagline' => config('fuelfree.company.tagline'),
             'company.timezone' => config('fuelfree.company.timezone'),
             'storage.quota_gib' => (string) round(config('fuelfree.storage.quota_bytes', 53687091200) / 1073741824),
+            'energy.real_data_enabled' => '0',
         ];
         $saved = SystemSetting::query()->pluck('value', 'key')->all();
         $settings = array_merge($defaults, $saved);
@@ -32,12 +33,14 @@ class SettingsController extends Controller
             'company.tagline' => ['nullable', 'string', 'max:255'],
             'company.timezone' => ['required', 'timezone'],
             'storage.quota_gib' => ['required', 'numeric', 'min:1', 'max:1048576'],
+            'energy.real_data_enabled' => ['nullable', 'boolean'],
         ]);
 
+        $data['energy.real_data_enabled'] = $request->boolean('energy.real_data_enabled') ? '1' : '0';
         foreach ($data as $key => $value) {
             SystemSetting::updateOrCreate(['key' => $key], ['value' => (string) $value, 'is_sensitive' => false]);
         }
 
-        return back()->with('status', 'System settings saved. Clear the application config cache after deployment if environment-backed values are changed.');
+        return back()->with('status', 'System settings saved. Real energy-data integration remains disabled until you explicitly enable it.');
     }
 }
