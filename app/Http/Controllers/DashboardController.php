@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Support\Platform;
-use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class DashboardController extends Controller
 {
-    public function __invoke(): View
+    public function __invoke(): RedirectResponse
     {
-        return view('dashboard', [
-            'platform' => Platform::name(),
-            'user' => request()->user(),
-        ]);
+        $user = request()->user();
+
+        if ($user->hasRole('client')) {
+            return redirect()->route('portal.dashboard');
+        }
+
+        return redirect()->route('admin.dashboard');
     }
 }
