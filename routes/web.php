@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminModuleController;
@@ -37,9 +38,13 @@ Route::middleware('auth')->group(function () {
             Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
         });
 
-        Route::get('/documents', [AdminModuleController::class, 'documents'])
-            ->name('admin.documents')
-            ->middleware('permission:documents.view');
+        Route::middleware('permission:documents.view')->group(function () {
+            Route::get('/documents', [DocumentController::class, 'index'])->name('admin.documents');
+            Route::post('/documents/folders', [DocumentController::class, 'storeFolder'])->name('admin.documents.folders.store');
+            Route::post('/documents', [DocumentController::class, 'store'])->name('admin.documents.store');
+            Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('admin.documents.download');
+            Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->name('admin.documents.destroy');
+        });
 
         Route::get('/email', [AdminModuleController::class, 'email'])
             ->name('admin.email')
