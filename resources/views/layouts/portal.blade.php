@@ -44,6 +44,91 @@
         <div class="content">@yield('content')</div>
     </main>
 </div>
+<script>
+(function () {
+    const uploadUrl = @json(route('admin.documents.chunks'));
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    const CHUNK_SIZE = 524288;
+
+    function jsonError(response, payload) {
+        if (payload?.message) return payload.message;
+        if (payload?.errors) return Object.values(payload.errors).flat().join(' ');
+        return 'Upload failed. Please try again.';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.querySelector('#upload-modal input[type="file"]');
+        const form = input?.closest('form');
+        if (!input || !form) return;
+
+        const submit = form.querySelector('button.primary[type="submit"]');
+        const note = form.querySelector('.modal-note');
+        const progress = document.createElement('div');
+        progress.style.cssText = 'display:none;margin-top:4px;padding:12px;border:1px solid rgba(104,204,235,.13);border-radius:12px;background:rgba(67,194,229,.05);font-size:12px;color:#86a5b4;line-height:1.7';
+        progress.innerHTML = '<div style="display:flex;justify-content:space-between;gap:12px"><span class="upload-status">Preparing upload…</span><strong class="upload-percent">0%</strong></div><div style="height:7px;margin-top:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden"><span class="upload-bar" style="display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#229fd0,#54d4ee)"></span></div>';
+        form.insertBefore(progress, form.querySelector('.modal-actions'));
+
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const file = input.files?.[0];
+            if (!file) return;
+            const folder = form.querySelector('input[name="folder_id"]')?.value || '';
+            const status = progress.querySelector('.upload-status');
+            const percent = progress.querySelector('.upload-percent');
+            const bar = progress.querySelector('.upload-bar');
+            progress.style.display = 'block';
+            submit.disabled = true;
+            submit.style.opacity = '.65';
+            input.disabled = true;
+            try {
+                status.textContent = 'Preparing secure upload…';
+                const startBody = new URLSearchParams({ filename: file.name, size: String(file.size), mime_type: file.type || 'application/octet-stream' });
+                if (folder) startBody.set('folder_id', folder);
+                const startResponse = await fetch(uploadUrl, { method: 'POST', credentials: 'same-origin', headers: { 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }, body: startBody });
+                const startPayload = await startResponse.json().catch(() => ({}));
+                if (!startResponse.ok) throw new Error(jsonError(startResponse, startPayload));
+                const uploadId = startPayload.upload_id;
+                const chunkSize = Number(startPayload.chunk_size) || CHUNK_SIZE;
+                const totalChunks = Math.ceil(file.size / chunkSize);
+
+                for (let index = 0; index < totalChunks; index++) {
+                    const offset = index * chunkSize;
+                    const blob = file.slice(offset, Math.min(offset + chunkSize, file.size));
+                    let uploaded = false;
+                    for (let attempt = 1; attempt <= 3 && !uploaded; attempt++) {
+                        status.textContent = `Uploading chunk ${index + 1} of ${totalChunks}…`;
+                        const response = await fetch(uploadUrl, { method: 'POST', credentials: 'same-origin', headers: { 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'Content-Type': 'application/octet-stream', 'X-Upload-Id': uploadId, 'X-Chunk-Index': String(index), 'X-Chunk-Offset': String(offset) }, body: blob });
+                        const payload = await response.json().catch(() => ({}));
+                        if (response.ok) uploaded = true;
+                        else if (attempt === 3) throw new Error(jsonError(response, payload));
+                        else await new Promise(resolve => setTimeout(resolve, 600 * attempt));
+                    }
+                    const done = Math.min(offset + blob.size, file.size);
+                    const value = Math.round((done / file.size) * 100);
+                    percent.textContent = value + '%';
+                    bar.style.width = value + '%';
+                }
+
+                status.textContent = 'Finalizing and securing file…';
+                const finalResponse = await fetch(uploadUrl + '?finalize=1', { method: 'POST', credentials: 'same-origin', headers: { 'X-CSRF-TOKEN': csrf, 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-Upload-Id': uploadId } });
+                const finalPayload = await finalResponse.json().catch(() => ({}));
+                if (!finalResponse.ok) throw new Error(jsonError(finalResponse, finalPayload));
+                status.textContent = 'Upload complete.';
+                percent.textContent = '100%';
+                bar.style.width = '100%';
+                setTimeout(() => window.location.reload(), 500);
+            } catch (error) {
+                status.textContent = error?.message || 'Upload failed. Please try again.';
+                status.style.color = '#ffb7b7';
+                bar.style.background = '#b14a5a';
+                submit.disabled = false;
+                submit.style.opacity = '1';
+                input.disabled = false;
+            }
+        });
+    });
+})();
+</script>
 @stack('scripts')
 </body>
 </html>
