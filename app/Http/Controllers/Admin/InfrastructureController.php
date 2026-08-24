@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\EmailAccount;
 use App\Models\Subdomain;
 use App\Models\User;
+use App\Services\CpanelEmailService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Throwable;
 
 class InfrastructureController extends Controller
 {
@@ -19,27 +21,59 @@ class InfrastructureController extends Controller
         return view('admin.modules.email', compact('accounts','isStaff'));
     }
 
-    public function createEmail(): View
+    public function createEmail(CpanelEmailService $cpanel): View
     {
-        return view('admin.modules.email-form', ['account' => new EmailAccount(), 'users' => User::orderBy('name')->get()]);
+        return view('admin.modules.email-form', [
+            'account' => new EmailAccount(),
+            'users' => User::orderBy('name')->get(),
+            'cpanelConfigured' => $cpanel->configured(),
+        ]);
     }
 
-    public function storeEmail(Request $request): RedirectResponse
+    public function storeEmail(Request $request, CpanelEmailService $cpanel): RedirectResponse
     {
-        $data = $request->validate([
+        $rules = [
             'user_id' => ['required','integer','exists:users,id'], 'address' => ['required','email','max:255','unique:email_accounts,address'],
             'display_name' => ['nullable','string','max:150'], 'status' => ['required','in:active,suspended'],
             'imap_host' => ['nullable','string','max:255'], 'imap_port' => ['required','integer','min:1','max:65535'],
             'smtp_host' => ['nullable','string','max:255'], 'smtp_port' => ['required','integer','min:1','max:65535'],
-            'username' => ['nullable','string','max:255'], 'password' => ['nullable','string','max:500'],
-        ]);
+            'username' => ['nullable','string','max:255'], 'password' => ['nullable','string','min:8','max:500'],
+        ];
+        if ($cpanel->configured()) $rules['password'][] = 'required';
+        $data = $request->validate($rules);
+
+        $provisioned = false;
+        $providerMessage = 'Mailbox record saved. cPanel provisioning is not configured yet.';
+        if ($cpanel->configured()) {
+            try {
+                $providerMessage = $cpanel->create($data['address'], $data['password']);
+                $provisioned = true;
+            } catch (Throwable $e) {
+                report($e);
+                return back()->withErrors(['address' => 'The mailbox could not be created on the mail server: '.$e->getMessage()])->withInput($request->except('password'));
+            }
+        }
+
+        $data['provisioned'] = $provisioned;
+        $data['provider_message'] = $providerMessage;
+        if (! $data['username']) $data['username'] = $data['address'];
+        if (! $data['imap_host']) $data['imap_host'] = config('cpanel.mail_host') ?: 'mail.'.(config('cpanel.domain') ?: $request->getHost());
+        if (! $data['smtp_host']) $data['smtp_host'] = $data['imap_host'];
         EmailAccount::create($data);
-        return redirect()->route('admin.email')->with('status','Mailbox configuration saved. Connect it to the hosting mail service to provision the real mailbox.');
+
+        return redirect()->route('admin.email')->with('status', $provisioned ? 'Mailbox created successfully on the hosting mail server.' : 'Mailbox record saved. Add cPanel API settings to enable real mailbox provisioning.');
     }
 
-    public function destroyEmail(EmailAccount $account): RedirectResponse
+    public function destroyEmail(EmailAccount $account, CpanelEmailService $cpanel): RedirectResponse
     {
-        $account->delete(); return back()->with('status','Mailbox record removed.');
+        try {
+            $message = $cpanel->delete($account);
+            $account->delete();
+            return back()->with('status', $message);
+        } catch (Throwable $e) {
+            report($e);
+            return back()->withErrors(['email' => 'The mailbox could not be removed from the mail server: '.$e->getMessage()]);
+        }
     }
 
     public function subdomains(Request $request): View
