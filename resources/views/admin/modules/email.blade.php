@@ -1,16 +1,9 @@
 @extends('layouts.portal')
-
-@section('title', 'Email Management')
+@section('title','Email Management')
 @section('content')
-<section class="hero">
-    <div class="eyebrow">MANAGED EMAIL SERVICES</div>
-    <h1>Email</h1>
-    <p>Create, manage and connect FuelFree PowerPlant mailboxes across Android, Windows, Linux and standard IMAP/SMTP clients.</p>
-</section>
-<div class="grid">
-    <article class="card"><span class="card-label">Mailboxes</span><strong class="card-value">—</strong><span class="card-note">Managed accounts.</span></article>
-    <article class="card"><span class="card-label">Domains</span><strong class="card-value">—</strong><span class="card-note">Domain mailbox configuration.</span></article>
-    <article class="card"><span class="card-label">Connections</span><strong class="card-value">—</strong><span class="card-note">IMAP / SMTP setup.</span></article>
-</div>
-<section class="section card"><h2>Mailbox management</h2><p>The email-management engine will be connected in the infrastructure phase. The dashboard is already permission-aware so only authorized accounts can access it.</p></section>
+<section class="hero"><div class="eyebrow">MANAGED EMAIL SERVICES</div><h1>Email</h1><p>Manage mailbox records and connection details. Actual mailbox provisioning depends on your hosting/mail server integration.</p></section>
+@if(session('status'))<div class="notice">{{ session('status') }}</div>@endif
+<div class="toolbar">@if(auth()->user()->hasPermission('email.manage'))<a class="action" href="{{ route('admin.email.create') }}">＋ Add mailbox</a>@endif</div>
+<div class="table-card"><div class="table-wrap"><table><thead><tr><th>Mailbox</th><th>Owner</th><th>Status</th><th>IMAP</th><th>SMTP</th><th>Actions</th></tr></thead><tbody>@forelse($accounts as $account)<tr><td><strong>{{ $account->address }}</strong><small>{{ $account->display_name }}</small></td><td>{{ $account->user->name }}</td><td>{{ ucfirst($account->status) }}</td><td>{{ $account->imap_host ?: '—' }}:{{ $account->imap_port }}</td><td>{{ $account->smtp_host ?: '—' }}:{{ $account->smtp_port }}</td><td>@if(auth()->user()->hasPermission('email.manage'))<form method="POST" action="{{ route('admin.email.destroy',$account) }}" onsubmit="return confirm('Remove this mailbox record?')">@csrf @method('DELETE')<button class="danger">Remove</button></form>@endif</td></tr>@empty<tr><td colspan="6">No mailbox records yet.</td></tr>@endforelse</tbody></table></div><div class="pagination">{{ $accounts->links() }}</div></div>
 @endsection
+@push('styles')<style>.toolbar{display:flex;justify-content:flex-end;margin-bottom:14px}.action{padding:11px 15px;border-radius:11px;background:#31afd2;color:#fff;text-decoration:none;font-weight:700;font-size:13px}.notice{padding:12px 14px;border-radius:12px;margin-bottom:14px;background:rgba(67,194,137,.1);border:1px solid rgba(67,194,137,.2);color:#a8e5ca}.table-card{background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:18px;overflow:hidden}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:850px}th,td{text-align:left;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06);font-size:12px}th{color:#74cce9;font-size:10px;text-transform:uppercase;letter-spacing:.08em}td{color:#b5cbd4}td small{display:block;color:#718f9d;margin-top:4px}.danger{border:0;background:transparent;color:#ff9eaa;cursor:pointer}.pagination{padding:12px}</style>@endpush
