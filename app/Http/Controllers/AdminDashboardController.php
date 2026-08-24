@@ -29,10 +29,13 @@ class AdminDashboardController extends Controller
             'planned' => PowerPlant::where('status', 'planned')->count(),
             'maintenance' => PowerPlant::where('status', 'maintenance')->count(),
             'offline' => PowerPlant::where('status', 'offline')->count(),
+            'capacity_kw' => (float) PowerPlant::sum('capacity_kw'),
         ];
 
-        $latestPerformance = PlantPerformance::query()
-            ->whereIn('data_status', ['verified', 'real-time'])
+        $verifiedQuery = PlantPerformance::query()
+            ->whereIn('data_status', ['verified', 'real-time']);
+
+        $latestPerformance = (clone $verifiedQuery)
             ->latest('measured_at')
             ->first();
 
@@ -43,9 +46,26 @@ class AdminDashboardController extends Controller
             'uptime' => $latestPerformance?->uptime_percent,
         ];
 
+        $performanceTrend = (clone $verifiedQuery)
+            ->where('measured_at', '>=', now()->subDays(13)->startOfDay())
+            ->orderBy('measured_at')
+            ->get(['measured_at', 'power_output_kw', 'energy_generated_kwh'])
+            ->groupBy(fn (PlantPerformance $record) => $record->measured_at->format('Y-m-d'))
+            ->map(fn ($records, $date) => [
+                'date' => $date,
+                'label' => date('d M', strtotime($date)),
+                'output_kw' => (float) $records->avg('power_output_kw'),
+                'energy_kwh' => (float) $records->sum('energy_generated_kwh'),
+            ])
+            ->values();
+
+        $performanceTrendMax = max(1, (float) $performanceTrend->max('output_kw'));
+        $verifiedRecordCount = (clone $verifiedQuery)->count();
+
         return view('admin.dashboard', compact(
             'users', 'documents', 'folders', 'storageBytes',
-            'plantStats', 'performanceSummary', 'latestPerformance'
+            'plantStats', 'performanceSummary', 'latestPerformance',
+            'performanceTrend', 'performanceTrendMax', 'verifiedRecordCount'
         ));
     }
 }
