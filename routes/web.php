@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\HealthController;
 use App\Http\Controllers\Admin\InfrastructureController;
+use App\Http\Controllers\Admin\PowerPlantController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AdminDashboardController;
@@ -28,6 +29,8 @@ Route::middleware('auth')->group(function () {
         Route::middleware('permission:users.view')->group(function () { Route::get('/users', [UserController::class, 'index'])->name('admin.users.index'); });
         Route::middleware('permission:users.manage')->group(function () { Route::get('/users/create', [UserController::class, 'create'])->name('admin.users.create'); Route::post('/users', [UserController::class, 'store'])->name('admin.users.store'); Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('admin.users.edit'); Route::patch('/users/{user}', [UserController::class, 'update'])->name('admin.users.update'); Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy'); });
     });
+    Route::prefix('admin')->middleware('permission:plants.view')->group(function () { Route::get('/plants', [PowerPlantController::class, 'index'])->name('admin.plants.index'); });
+    Route::prefix('admin')->middleware('permission:plants.manage')->group(function () { Route::get('/plants/create', [PowerPlantController::class, 'create'])->name('admin.plants.create'); Route::post('/plants', [PowerPlantController::class, 'store'])->name('admin.plants.store'); Route::get('/plants/{plant}/edit', [PowerPlantController::class, 'edit'])->name('admin.plants.edit'); Route::patch('/plants/{plant}', [PowerPlantController::class, 'update'])->name('admin.plants.update'); });
     Route::prefix('admin')->middleware('permission:audit.view')->group(function () { Route::get('/audit', [AuditLogController::class, 'index'])->name('admin.audit'); });
     Route::prefix('admin')->middleware('permission:health.view')->group(function () { Route::get('/health', HealthController::class)->name('admin.health'); });
     Route::prefix('admin')->middleware('permission:documents.view')->group(function () { Route::get('/documents', [DocumentController::class, 'index'])->name('admin.documents'); Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('admin.documents.download'); });
