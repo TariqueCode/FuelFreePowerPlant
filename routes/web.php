@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdminModuleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientPortalController;
 use App\Http\Controllers\DashboardController;
@@ -35,6 +36,18 @@ Route::middleware('auth')->group(function () {
             Route::get('/users/create', [UserController::class, 'create'])->name('admin.users.create');
             Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
         });
+
+        Route::get('/documents', [AdminModuleController::class, 'documents'])
+            ->name('admin.documents')
+            ->middleware('permission:documents.view');
+
+        Route::get('/email', [AdminModuleController::class, 'email'])
+            ->name('admin.email')
+            ->middleware('permission:email.view');
+
+        Route::get('/support', [AdminModuleController::class, 'support'])
+            ->name('admin.support')
+            ->middleware('permission:support.view');
     });
 
     Route::get('/portal', ClientPortalController::class)
