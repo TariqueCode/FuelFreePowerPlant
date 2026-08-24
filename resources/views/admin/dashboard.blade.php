@@ -45,4 +45,10 @@
 @media(prefers-reduced-motion:reduce){.hero-orbit,.hero-orbit i,.status-dot,.quick-card{animation:none!important}}
 </style>
 @endpush
+
+@push('styles')
+<style>
+@media(max-width:620px){.mobile-nav-hint{display:none!important}}
+</style>
+@endpush
 @endsection
