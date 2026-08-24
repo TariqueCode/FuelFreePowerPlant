@@ -1,17 +1,21 @@
 <?php
 
+use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\DocumentController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminModuleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientPortalController;
+use App\Http\Controllers\CmsPageController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+Route::get('/pages/{slug}', [CmsPageController::class, 'show'])->name('cms.page');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -21,19 +25,13 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', DashboardController::class)
-        ->name('dashboard')
-        ->middleware('permission:dashboard.view');
+    Route::get('/dashboard', DashboardController::class)->name('dashboard')->middleware('permission:dashboard.view');
 
     Route::middleware('role:super-admin,administrator,project-manager,support-agent')->prefix('admin')->group(function () {
-        Route::get('/', AdminDashboardController::class)
-            ->name('admin.dashboard')
-            ->middleware('permission:dashboard.view');
-
+        Route::get('/', AdminDashboardController::class)->name('admin.dashboard')->middleware('permission:dashboard.view');
         Route::middleware('permission:users.view')->group(function () {
             Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
         });
-
         Route::middleware('permission:users.manage')->group(function () {
             Route::get('/users/create', [UserController::class, 'create'])->name('admin.users.create');
             Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
@@ -43,13 +41,10 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    // Document read access is permission-driven so clients can use their private vault too.
     Route::prefix('admin')->middleware('permission:documents.view')->group(function () {
         Route::get('/documents', [DocumentController::class, 'index'])->name('admin.documents');
         Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('admin.documents.download');
     });
-
-    // Document mutations require the stronger manage permission.
     Route::prefix('admin')->middleware('permission:documents.manage')->group(function () {
         Route::post('/documents/folders', [DocumentController::class, 'storeFolder'])->name('admin.documents.folders.store');
         Route::post('/documents', [DocumentController::class, 'store'])->name('admin.documents.store');
@@ -70,25 +65,29 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('admin')->middleware('permission:support.view')->group(function () {
         Route::get('/support', [AdminModuleController::class, 'support'])->name('admin.support');
-        Route::get('/support/create', [AdminModuleController::class, 'createTicket'])
-            ->name('admin.support.create')
-            ->middleware('permission:support.create');
-        Route::post('/support', [AdminModuleController::class, 'storeTicket'])
-            ->name('admin.support.store')
-            ->middleware('permission:support.create');
-        Route::get('/support/{ticket}', [AdminModuleController::class, 'showTicket'])
-            ->name('admin.support.ticket');
-        Route::post('/support/{ticket}/reply', [AdminModuleController::class, 'replyTicket'])
-            ->name('admin.support.reply')
-            ->middleware('permission:support.reply');
-        Route::patch('/support/{ticket}', [AdminModuleController::class, 'updateTicket'])
-            ->name('admin.support.update')
-            ->middleware('permission:support.manage');
+        Route::get('/support/create', [AdminModuleController::class, 'createTicket'])->name('admin.support.create')->middleware('permission:support.create');
+        Route::post('/support', [AdminModuleController::class, 'storeTicket'])->name('admin.support.store')->middleware('permission:support.create');
+        Route::get('/support/{ticket}', [AdminModuleController::class, 'showTicket'])->name('admin.support.ticket');
+        Route::post('/support/{ticket}/reply', [AdminModuleController::class, 'replyTicket'])->name('admin.support.reply')->middleware('permission:support.reply');
+        Route::patch('/support/{ticket}', [AdminModuleController::class, 'updateTicket'])->name('admin.support.update')->middleware('permission:support.manage');
     });
 
-    Route::get('/portal', ClientPortalController::class)
-        ->name('portal.dashboard')
-        ->middleware('role:client');
+    Route::prefix('admin')->middleware('permission:cms.view')->group(function () {
+        Route::get('/cms', [CmsController::class, 'index'])->name('admin.cms.index');
+    });
+    Route::prefix('admin')->middleware('permission:cms.manage')->group(function () {
+        Route::get('/cms/create', [CmsController::class, 'create'])->name('admin.cms.create');
+        Route::post('/cms', [CmsController::class, 'store'])->name('admin.cms.store');
+        Route::get('/cms/{page}/edit', [CmsController::class, 'edit'])->name('admin.cms.edit');
+        Route::patch('/cms/{page}', [CmsController::class, 'update'])->name('admin.cms.update');
+        Route::delete('/cms/{page}', [CmsController::class, 'destroy'])->name('admin.cms.destroy');
+    });
 
+    Route::prefix('admin')->middleware('permission:settings.manage')->group(function () {
+        Route::get('/settings', [SettingsController::class, 'index'])->name('admin.settings');
+        Route::post('/settings', [SettingsController::class, 'update'])->name('admin.settings.update');
+    });
+
+    Route::get('/portal', ClientPortalController::class)->name('portal.dashboard')->middleware('role:client');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
