@@ -1,0 +1,1 @@
+PHP upload limits are server configuration, not application validation.
