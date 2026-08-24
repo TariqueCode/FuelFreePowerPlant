@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ClientPortalController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,7 +24,7 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:dashboard.view');
 
     Route::middleware('role:super-admin,administrator')->prefix('admin')->group(function () {
-        Route::get('/', DashboardController::class)
+        Route::get('/', AdminDashboardController::class)
             ->name('admin.dashboard');
 
         Route::middleware('permission:users.view')->group(function () {
@@ -35,7 +37,7 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    Route::get('/portal', DashboardController::class)
+    Route::get('/portal', ClientPortalController::class)
         ->name('portal.dashboard')
         ->middleware('role:client');
 
