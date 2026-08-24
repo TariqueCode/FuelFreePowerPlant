@@ -25,6 +25,10 @@ class AuthController extends Controller
         $remember = $request->boolean('remember');
 
         if (! Auth::attempt($credentials, $remember)) {
+            Audit::record($request, 'login_failed', 'authentication', null, [
+                'email' => $credentials['email'],
+            ]);
+
             return back()->withErrors([
                 'email' => 'The provided credentials are incorrect.',
             ])->onlyInput('email');
