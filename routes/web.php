@@ -13,12 +13,15 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientPortalController;
 use App\Http\Controllers\CmsPageController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => view('welcome'))->name('home');
 Route::get('/pages/{slug}', [CmsPageController::class, 'show'])->name('cms.page');
 Route::middleware('guest')->group(function () { Route::get('/login', [AuthController::class, 'showLogin'])->name('login'); Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,1')->name('login.store'); });
 Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/dashboard', DashboardController::class)->name('dashboard')->middleware('permission:dashboard.view');
     Route::middleware('role:super-admin,administrator,project-manager,support-agent')->prefix('admin')->group(function () {
         Route::get('/', AdminDashboardController::class)->name('admin.dashboard')->middleware('permission:dashboard.view');
