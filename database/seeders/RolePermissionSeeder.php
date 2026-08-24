@@ -88,7 +88,7 @@ class RolePermissionSeeder extends Seeder
             ->permissions()->sync(array_values(array_filter(
                 $permissionModels,
                 fn ($p, $slug) => in_array($slug, [
-                    'dashboard.view','documents.view','email.view','subdomains.view',
+                    'dashboard.view','documents.view','documents.manage','email.view','subdomains.view',
                     'support.view','support.create','support.reply','notifications.view'
                 ], true),
                 ARRAY_FILTER_USE_BOTH
