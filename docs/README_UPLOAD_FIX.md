@@ -1,0 +1,1 @@
+The current local error is a PHP configuration limit, not a Laravel validation error.
