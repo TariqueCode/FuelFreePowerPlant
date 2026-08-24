@@ -27,7 +27,7 @@ class SettingsController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'company.name' => ['required', 'string', 'max:150'],
             'company.domain' => ['required', 'string', 'max:255'],
             'company.tagline' => ['nullable', 'string', 'max:255'],
@@ -36,9 +36,22 @@ class SettingsController extends Controller
             'energy.real_data_enabled' => ['nullable', 'boolean'],
         ]);
 
-        $data['energy.real_data_enabled'] = $request->boolean('energy.real_data_enabled') ? '1' : '0';
+        $data = [
+            'company.name' => data_get($validated, 'company.name'),
+            'company.domain' => data_get($validated, 'company.domain'),
+            'company.tagline' => data_get($validated, 'company.tagline'),
+            'company.timezone' => data_get($validated, 'company.timezone'),
+            'storage.quota_gib' => data_get($validated, 'storage.quota_gib'),
+            'energy.real_data_enabled' => $request->boolean('energy.real_data_enabled') ? '1' : '0',
+        ];
+
         foreach ($data as $key => $value) {
-            SystemSetting::updateOrCreate(['key' => $key], ['value' => (string) $value, 'is_sensitive' => false]);
+            SystemSetting::updateOrCreate([
+                'key' => $key,
+            ], [
+                'value' => (string) ($value ?? ''),
+                'is_sensitive' => false,
+            ]);
         }
 
         return back()->with('status', 'System settings saved. Real energy-data integration remains disabled until you explicitly enable it.');
