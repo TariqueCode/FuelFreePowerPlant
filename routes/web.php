@@ -70,6 +70,20 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('admin')->middleware('permission:support.view')->group(function () {
         Route::get('/support', [AdminModuleController::class, 'support'])->name('admin.support');
+        Route::get('/support/create', [AdminModuleController::class, 'createTicket'])
+            ->name('admin.support.create')
+            ->middleware('permission:support.create');
+        Route::post('/support', [AdminModuleController::class, 'storeTicket'])
+            ->name('admin.support.store')
+            ->middleware('permission:support.create');
+        Route::get('/support/{ticket}', [AdminModuleController::class, 'showTicket'])
+            ->name('admin.support.ticket');
+        Route::post('/support/{ticket}/reply', [AdminModuleController::class, 'replyTicket'])
+            ->name('admin.support.reply')
+            ->middleware('permission:support.reply');
+        Route::patch('/support/{ticket}', [AdminModuleController::class, 'updateTicket'])
+            ->name('admin.support.update')
+            ->middleware('permission:support.manage');
     });
 
     Route::get('/portal', ClientPortalController::class)
