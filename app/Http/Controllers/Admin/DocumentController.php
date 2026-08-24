@@ -51,6 +51,80 @@ class DocumentController extends Controller
         if ($folderId && ! DocumentFolder::whereKey($folderId)->where('user_id', $user->id)->exists()) abort(403); $file = $data['file']; $storedName = $file->hashName(); $path = $file->storeAs("private/{$user->id}", $storedName, 'local');
         Document::create(['user_id' => $user->id, 'folder_id' => $folderId, 'original_name' => $file->getClientOriginalName(), 'stored_name' => $storedName, 'disk' => 'local', 'path' => $path, 'mime_type' => $file->getMimeType(), 'size' => $file->getSize(), 'extension' => strtolower($file->getClientOriginalExtension())]); return back()->with('success', 'File uploaded securely.');
     }
+
+    public function chunkUpload(Request $request)
+    {
+        $user = $request->user();
+        $uploadId = (string) $request->header('X-Upload-Id');
+        $uploadsDir = "private/{$user->id}/.uploads";
+        Storage::disk('local')->makeDirectory($uploadsDir);
+
+        if ($uploadId === '') {
+            $data = $request->validate([
+                'filename' => ['required', 'string', 'max:255'],
+                'size' => ['required', 'integer', 'min:1'],
+                'folder_id' => ['nullable', 'integer', 'exists:document_folders,id'],
+            ]);
+            if (! empty($data['folder_id']) && ! DocumentFolder::whereKey($data['folder_id'])->where('user_id', $user->id)->exists()) abort(403);
+            $usedBytes = collect(Storage::disk('local')->allFiles("private/{$user->id}"))->sum(fn ($file) => (int) Storage::disk('local')->size($file));
+            $quotaBytes = (int) config('fuelfree.storage.quota_bytes', 50 * 1024 * 1024 * 1024);
+            abort_if($usedBytes + (int) $data['size'] > $quotaBytes, 422, 'There is not enough storage space for this file.');
+            $uploadId = (string) str()->uuid();
+            $metaPath = "{$uploadsDir}/{$uploadId}.json";
+            $partPath = "{$uploadsDir}/{$uploadId}.part";
+            Storage::disk('local')->put($metaPath, json_encode([
+                'user_id' => $user->id,
+                'folder_id' => $data['folder_id'] ?? null,
+                'filename' => basename($data['filename']),
+                'size' => (int) $data['size'],
+                'mime_type' => (string) $request->input('mime_type', 'application/octet-stream'),
+                'chunk_size' => 524288,
+                'part_path' => $partPath,
+            ], JSON_THROW_ON_ERROR));
+            return response()->json(['upload_id' => $uploadId, 'chunk_size' => 524288]);
+        }
+
+        $metaPath = "{$uploadsDir}/{$uploadId}.json";
+        $partPath = "{$uploadsDir}/{$uploadId}.part";
+        abort_unless(Storage::disk('local')->exists($metaPath), 404, 'Upload session not found.');
+        $meta = json_decode(Storage::disk('local')->get($metaPath), true, 512, JSON_THROW_ON_ERROR);
+        abort_unless((int) ($meta['user_id'] ?? 0) === (int) $user->id, 403);
+
+        if ($request->boolean('finalize')) {
+            $currentSize = Storage::disk('local')->exists($partPath) ? Storage::disk('local')->size($partPath) : 0;
+            abort_unless($currentSize === (int) $meta['size'], 422, 'The upload is incomplete.');
+            $extension = strtolower(pathinfo($meta['filename'], PATHINFO_EXTENSION));
+            $storedName = (string) str()->uuid().($extension ? '.'.$extension : '');
+            $finalPath = "private/{$user->id}/{$storedName}";
+            Storage::disk('local')->move($partPath, $finalPath);
+            $mime = 'application/octet-stream';
+            $absolute = Storage::disk('local')->path($finalPath);
+            if (function_exists('finfo_open')) { $finfo = finfo_open(FILEINFO_MIME_TYPE); $detected = finfo_file($finfo, $absolute); finfo_close($finfo); if ($detected) $mime = $detected; }
+            Document::create(['user_id' => $user->id, 'folder_id' => $meta['folder_id'], 'original_name' => $meta['filename'], 'stored_name' => $storedName, 'disk' => 'local', 'path' => $finalPath, 'mime_type' => $mime, 'size' => (int) $meta['size'], 'extension' => $extension]);
+            Storage::disk('local')->delete($metaPath);
+            return response()->json(['ok' => true, 'message' => 'File uploaded securely.']);
+        }
+
+        $index = (int) $request->header('X-Chunk-Index', '-1');
+        $offset = (int) $request->header('X-Chunk-Offset', '-1');
+        $length = (int) $request->header('Content-Length', '0');
+        $chunkSize = (int) $meta['chunk_size'];
+        abort_if($index < 0 || $offset < 0 || $length < 1 || $length > $chunkSize, 422, 'Invalid upload chunk.');
+        abort_if($offset + $length > (int) $meta['size'], 422, 'Upload chunk exceeds the declared file size.');
+
+        $absolute = Storage::disk('local')->path($partPath);
+        $handle = fopen($absolute, 'c+b');
+        abort_unless($handle !== false, 500, 'Unable to open upload buffer.');
+        if (! flock($handle, LOCK_EX)) { fclose($handle); abort(423, 'Upload is busy.'); }
+        fseek($handle, $offset);
+        $input = fopen('php://input', 'rb');
+        $written = $input ? stream_copy_to_stream($input, $handle) : false;
+        if ($input) fclose($input);
+        fflush($handle); flock($handle, LOCK_UN); fclose($handle);
+        abort_unless($written === $length, 422, 'The upload chunk was incomplete.');
+        return response()->json(['ok' => true, 'uploaded' => $offset + $length]);
+    }
+
     public function rename(Request $request, Document $document): RedirectResponse
     {
         $this->ownDocument($request, $document); $data = $request->validate(['name' => ['required', 'string', 'max:255']]); $name = trim($data['name']); abort_if($name === '' || str_contains($name, '/') || str_contains($name, '\\'), 422, 'Invalid file name.');
