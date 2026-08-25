@@ -18,9 +18,15 @@ The dashboard must eventually allow the client to create, edit, reorder, publish
 4. **Power Plants/Projects** — complete manual project data entry and public project presentation.
 5. **Resources/Documents** — public-safe resources separated from private admin documents.
 6. **Gallery** — albums, multiple images, video/media, ordering and publishing.
-7. **Contact/Office information** — fully dashboard-controlled.
+7. **Contact & Inquiries** — public visitors do not create accounts or support tickets. The public website will provide a no-login contact/inquiry form; administrators manage incoming inquiries and contact details from the dashboard.
 8. **Branding/Settings** — logo, company name, tagline, favicon and related public identity.
 9. **Manual import center** — templates/import for modules where automatic data providers are not available; include preview, validation, duplicate detection and error reporting.
+
+## Deliberately excluded
+
+- **Public support ticket/account system:** removed. The public website has no visitor account registration, so authenticated support tickets are unnecessary. Use Contact & Inquiries instead.
+- **Dashboard subdomain provisioning:** excluded; cPanel handles DNS/subdomains.
+- **Dashboard mailbox provisioning for visitors:** excluded; only administrators create company mail accounts, while webmail lives at `mail.fuelfreepowerplant.com`.
 
 ## Reference-feature coverage target
 
@@ -65,11 +71,12 @@ Target areas include: Home, Company/About, Vision, Mission, Values, Management, 
 - [x] Rich content editor foundation + media upload endpoint
 - [x] Rich multi-image gallery insertion UX
 - [x] Dashboard navigation/control-center simplification foundation
+- [x] Support ticket system removed; Contact & Inquiry is the replacement
 - [ ] Finish Company/About public presentation
 - [ ] Finish Management/Team public presentation
 - [ ] Complete Resources public-safe management
 - [ ] Complete Gallery management
-- [ ] Complete Contact/Office management
+- [ ] Build Contact & Inquiry management
 - [ ] Manual import center
 - [ ] Reference-site feature parity audit
 - [ ] Final global navigation/footer consistency pass
@@ -78,11 +85,12 @@ Target areas include: Home, Company/About, Vision, Mission, Values, Management, 
 ## Dashboard navigation rules
 
 - Dashboard Home contains only shortcuts backed by real routes/workflows; do not expose planned-but-unimplemented modules as if they were complete.
-- The main desktop navigation is organized around client operations: Website Content, Power Plants, Highlights, Email, Documents, Users, Support and Settings.
+- The main desktop navigation is organized around client operations: Website Content, Power Plants, Highlights, Email, Documents, Users and Settings.
 - The legacy CMS route is not presented as a primary navigation item because Website Content is the unified public-content control surface.
 - Email account creation remains a required admin function and is visible in both desktop navigation and the dashboard control center.
 - Subdomain creation is not presented in navigation; cPanel handles subdomains/DNS.
 - Technical audit/health tools remain separate from the client-facing website controls unless an authorised role explicitly needs them.
+- Support tickets are not a dashboard module.
 
 ## Responsive dashboard rules
 
