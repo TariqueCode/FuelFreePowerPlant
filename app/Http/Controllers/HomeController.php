@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CmsPage;
 use App\Models\PowerPlant;
+use App\Models\SiteContentItem;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -27,12 +28,18 @@ class HomeController extends Controller
             ->orderBy('title')
             ->get(['title', 'slug']);
 
+        $content = SiteContentItem::published()
+            ->orderBy('sort_order')
+            ->latest('published_at')
+            ->get()
+            ->groupBy('type');
+
         $stats = [
             'projects' => PowerPlant::query()->count(),
             'capacity_mw' => round((float) PowerPlant::query()->sum('capacity_kw') / 1000, 2),
             'operational' => PowerPlant::query()->whereRaw('LOWER(status) = ?', ['operational'])->count(),
         ];
 
-        return view('home', compact('plants', 'homePage', 'pages', 'stats'));
+        return view('home', compact('plants', 'homePage', 'pages', 'stats', 'content'));
     }
 }
