@@ -20,11 +20,13 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PowerPlantPageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SustainabilityController;
 use Illuminate\Support\Facades\Route;
 Route::get('/', HomeController::class)->name('home');
 Route::get('/projects/{slug}', [PowerPlantPageController::class, 'show'])->name('projects.show');
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');
 Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.show');
+Route::get('/sustainability', SustainabilityController::class)->name('sustainability');
 Route::get('/pages/{slug}', [CmsPageController::class, 'show'])->name('cms.page');
 Route::middleware('guest')->group(function () { Route::get('/login', [AuthController::class, 'showLogin'])->name('login'); Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:6,1')->name('login.store'); });
 Route::middleware('auth')->group(function () {
