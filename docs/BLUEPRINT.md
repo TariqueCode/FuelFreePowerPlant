@@ -20,7 +20,7 @@ Build a premium, energy-focused corporate website whose public content is contro
 2. Public Power Plant detail pages — route/design foundation added at `/projects/{slug}`.
 3. Company/About page — CMS content foundation exists; next: premium public presentation and navigation integration.
 4. Management/Team — CMS content foundation exists; next: structured professional presentation.
-5. News & Updates — **listing/detail implementation complete; uses published `SiteContentItem` records and dynamic company branding.**
+5. News & Updates — listing/detail implementation complete; uses published `SiteContentItem` records and dynamic company branding.
 6. Sustainability — **NEXT: structured public presentation with approved energy/environment data only.**
 7. Resources/Documents — public-safe resources only; private admin documents remain protected.
 8. Gallery — dynamic media presentation.
@@ -38,9 +38,9 @@ Build a premium, energy-focused corporate website whose public content is contro
 - [x] Mobile hamburger navigation foundation
 - [x] Admin Website Content category/filter foundation
 - [x] Webmail architecture decision documented; provisioning remains Admin-only
+- [x] Build News & Updates listing + detail views
 - [ ] Finish Company/About public presentation
 - [ ] Finish Management/Team public presentation
-- [x] Build News & Updates listing + detail views
 - [ ] Build Sustainability presentation
 - [ ] Build Resources public-safe listing/detail views
 - [ ] Build Gallery
