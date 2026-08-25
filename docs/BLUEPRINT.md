@@ -32,8 +32,8 @@ Target areas include: Home, Company/About, Vision, Mission, Values, Management, 
 
 - `SiteContentItem.content` stores trusted rich HTML authored by authorised administrators.
 - Editor supports formatting, links, headings, lists and quotes.
-- Media upload endpoint stores public article media securely through Laravel's configured public disk.
-- Multiple images can be inserted into one article and arranged as a gallery.
+- Media upload endpoint stores public article media through Laravel's configured public disk.
+- Multiple images can be selected together and inserted into one responsive gallery block.
 - Video files can be embedded with native HTML5 controls.
 - YouTube and Facebook video embeds are supported through URL-based insertion.
 - Public news/notice detail pages render the authored rich content responsively.
@@ -63,21 +63,34 @@ Target areas include: Home, Company/About, Vision, Mission, Values, Management, 
 - [x] Sustainability presentation foundation
 - [x] Announcement popup database/admin/public rendering foundation
 - [x] Rich content editor foundation + media upload endpoint
-- [ ] Finish rich multi-image gallery UX
+- [x] Rich multi-image gallery insertion UX
+- [x] Dashboard navigation/control-center simplification foundation
 - [ ] Finish Company/About public presentation
 - [ ] Finish Management/Team public presentation
 - [ ] Complete Resources public-safe management
 - [ ] Complete Gallery management
 - [ ] Complete Contact/Office management
 - [ ] Manual import center
-- [ ] Dashboard navigation/control-center simplification
 - [ ] Reference-site feature parity audit
 - [ ] Final global navigation/footer consistency pass
 - [ ] End-to-end Dashboard → Database → Public Website integrity verification
 
-## Dashboard simplification rule
+## Dashboard navigation rules
 
-Keep modules that directly support the client’s website/energy operations. Reorganize or remove/relegate internal developer-oriented modules that do not help the client manage the public site. The client should see clear groups such as **Website**, **Projects**, **Content**, **Media/Resources**, **Contact**, **Settings**, **Users**, and **System** rather than a confusing collection of unrelated technical tools.
+- Dashboard Home contains only shortcuts backed by real routes/workflows; do not expose planned-but-unimplemented modules as if they were complete.
+- The main desktop navigation is organized around client operations: Website Content, Power Plants, Highlights, Email, Documents, Users, Support and Settings.
+- The legacy CMS route is not presented as a primary navigation item because Website Content is the unified public-content control surface.
+- Email account creation remains a required admin function and is visible in both desktop navigation and the dashboard control center.
+- Subdomain creation is not presented in navigation; cPanel handles subdomains/DNS.
+- Technical audit/health tools remain separate from the client-facing website controls unless an authorised role explicitly needs them.
+
+## Responsive dashboard rules
+
+- No page-level horizontal overflow on phone, tablet or desktop.
+- Mobile navigation shows a small fixed primary set plus a **More** hamburger drawer; it must not require horizontal swiping.
+- Tables may scroll only inside their own bounded table container when their columns genuinely require it.
+- Dashboard branding uses the same database-controlled company name and logo as the public website.
+- Cards, grids, forms, editors and charts must collapse at appropriate breakpoints rather than forcing a desktop layout onto mobile.
 
 ## UX rules
 
