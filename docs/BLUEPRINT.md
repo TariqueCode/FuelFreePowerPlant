@@ -21,7 +21,7 @@ Build a premium, energy-focused corporate website whose public content is contro
 3. Company/About page — CMS content foundation exists; next: premium public presentation and navigation integration.
 4. Management/Team — CMS content foundation exists; next: structured professional presentation.
 5. News & Updates — listing/detail implementation complete; uses published `SiteContentItem` records and dynamic company branding.
-6. Sustainability — **NEXT: structured public presentation with approved energy/environment data only.**
+6. Sustainability — **IMPLEMENTING NOW: structured public presentation with approved energy/environment data only.**
 7. Resources/Documents — public-safe resources only; private admin documents remain protected.
 8. Gallery — dynamic media presentation.
 9. Contact/Inquiry — controlled contact information and enquiry workflow.
@@ -47,6 +47,17 @@ Build a premium, energy-focused corporate website whose public content is contro
 - [ ] Build Contact/Inquiry
 - [ ] Final global navigation/footer consistency pass
 - [ ] End-to-end dashboard/public data integrity verification
+
+## Sustainability implementation specification
+
+- Public route: `/sustainability`.
+- Sustainability editorial content comes only from published `SiteContentItem` records with `type = sustainability`.
+- Plant metrics are calculated from the existing `PowerPlant` model; no duplicate sustainability table is introduced.
+- Capacity uses `capacity_kw`; annual generation uses `annual_generation_mwh`; CO₂ reduction uses `co2_reduction_tonnes`; efficiency uses `efficiency_percent`.
+- Aggregate metrics ignore null values and must not fabricate zeroes for missing business data.
+- If a metric has no approved source data, the public UI displays an explicit unavailable state.
+- Individual plant environmental cards link to the existing public project detail route.
+- Presentation is mobile-first, premium and energy-themed, with lightweight motion and reduced-motion support.
 
 ## News implementation
 
