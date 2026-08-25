@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\CmsPage;
 use App\Models\PowerPlant;
+use App\Models\SiteContentItem;
+use App\Models\SystemSetting;
 use Illuminate\View\View;
 
 class CmsPageController extends Controller
@@ -27,6 +29,17 @@ class CmsPageController extends Controller
             ->take(6)
             ->get(['name', 'slug', 'location', 'capacity_kw', 'technology', 'status', 'overview']);
 
-        return view('cms.page', compact('page', 'pages', 'projects'));
+        $companyItems = SiteContentItem::query()
+            ->published()
+            ->where('type', 'company')
+            ->orderBy('sort_order')
+            ->orderBy('title')
+            ->get(['title', 'slug', 'excerpt', 'content', 'image_path']);
+
+        $brand = SystemSetting::query()
+            ->whereIn('key', ['company.name', 'company.logo_path', 'company.tagline'])
+            ->pluck('value', 'key');
+
+        return view('cms.page', compact('page', 'pages', 'projects', 'companyItems', 'brand'));
     }
 }
