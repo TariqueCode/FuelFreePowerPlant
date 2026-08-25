@@ -10,14 +10,24 @@ class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        $roles = ['super-admin'=>['Super Admin','Full platform access.'],'administrator'=>['Administrator','Operational administration access.'],'project-manager'=>['Project Manager','Project and client operations.'],'support-agent'=>['Support Agent','Support and communication operations.'],'client'=>['Client','Client portal access.']];
-        $permissions = ['dashboard.view'=>'View dashboard','plants.view'=>'View power plants','plants.manage'=>'Manage power plants','cms.view'=>'View CMS','cms.manage'=>'Manage CMS','users.view'=>'View users','users.manage'=>'Manage users','documents.view'=>'View documents','documents.manage'=>'Manage documents','email.view'=>'View email management','email.manage'=>'Manage email accounts','support.view'=>'View support','support.create'=>'Create support tickets','support.reply'=>'Reply to support tickets','support.manage'=>'Manage support','notifications.view'=>'View notifications','settings.manage'=>'Manage system settings','audit.view'=>'View audit log','health.view'=>'View system health'];
+        $roles = [
+            'super-admin'=>['Super Admin','Full platform access.'],
+            'administrator'=>['Administrator','Operational administration access.'],
+            'project-manager'=>['Project Manager','Project and client operations.'],
+            'client'=>['Client','Client portal access.'],
+        ];
+        $permissions = [
+            'dashboard.view'=>'View dashboard','plants.view'=>'View power plants','plants.manage'=>'Manage power plants',
+            'cms.view'=>'View CMS','cms.manage'=>'Manage CMS','users.view'=>'View users','users.manage'=>'Manage users',
+            'documents.view'=>'View documents','documents.manage'=>'Manage documents','email.view'=>'View email management','email.manage'=>'Manage email accounts',
+            'notifications.view'=>'View notifications','settings.manage'=>'Manage system settings','audit.view'=>'View audit log','health.view'=>'View system health',
+            'inquiries.view'=>'View website inquiries','inquiries.manage'=>'Manage website inquiries',
+        ];
         foreach ($roles as $slug => [$name,$description]) Role::updateOrCreate(['slug'=>$slug],['name'=>$name,'description'=>$description,'is_system'=>true]);
         $models=[]; foreach ($permissions as $slug=>$name) $models[$slug]=Permission::updateOrCreate(['slug'=>$slug],['name'=>$name]);
         Role::where('slug','super-admin')->firstOrFail()->permissions()->sync(array_values($models));
         Role::where('slug','administrator')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>!in_array($s,['settings.manage','health.view'],true),ARRAY_FILTER_USE_BOTH)));
-        Role::where('slug','project-manager')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>in_array($s,['dashboard.view','plants.view','plants.manage','users.view','documents.view','documents.manage','support.view','support.create','support.reply','support.manage','notifications.view'],true),ARRAY_FILTER_USE_BOTH)));
-        Role::where('slug','support-agent')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>in_array($s,['dashboard.view','support.view','support.reply','support.manage','notifications.view'],true),ARRAY_FILTER_USE_BOTH)));
-        Role::where('slug','client')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>in_array($s,['dashboard.view','documents.view','documents.manage','email.view','support.view','support.create','support.reply','notifications.view'],true),ARRAY_FILTER_USE_BOTH)));
+        Role::where('slug','project-manager')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>in_array($s,['dashboard.view','plants.view','plants.manage','users.view','documents.view','documents.manage','inquiries.view','inquiries.manage','notifications.view'],true),ARRAY_FILTER_USE_BOTH)));
+        Role::where('slug','client')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>in_array($s,['dashboard.view','documents.view','documents.manage','email.view','notifications.view'],true),ARRAY_FILTER_USE_BOTH)));
     }
 }
