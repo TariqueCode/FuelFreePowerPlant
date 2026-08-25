@@ -74,7 +74,7 @@ Target areas include: Home, Company/About, Vision, Mission, Values, Management, 
 - [x] Support ticket system retired; Contact & Inquiry is the replacement
 - [x] Public no-login Contact & Inquiry form
 - [x] Dedicated inquiry database and admin management workflow
-- [ ] Finish Company/About public presentation
+- [x] Finish Company/About public presentation
 - [ ] Finish Management/Team public presentation
 - [ ] Complete Resources public-safe management
 - [ ] Complete Gallery management
