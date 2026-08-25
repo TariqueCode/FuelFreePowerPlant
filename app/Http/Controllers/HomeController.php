@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\CmsPage;
 use App\Models\PowerPlant;
 use App\Models\SiteContentItem;
+use App\Models\SitePopup;
 use App\Models\SystemSetting;
 use Illuminate\View\View;
 
-class HomeController extends Controller
+class HomeController
 {
     public function __invoke(): View
     {
@@ -19,6 +20,7 @@ class HomeController extends Controller
         $settings=SystemSetting::query()->pluck('value','key')->all();
         $brand=['name'=>$settings['company.name']??config('fuelfree.company.name'),'domain'=>$settings['company.domain']??config('fuelfree.company.domain'),'tagline'=>$settings['company.tagline']??config('fuelfree.company.tagline'),'logo_path'=>$settings['company.logo_path']??null];
         $stats=['projects'=>PowerPlant::query()->count(),'capacity_mw'=>round((float)PowerPlant::query()->sum('capacity_kw')/1000,2),'operational'=>PowerPlant::query()->whereRaw('LOWER(status)=?', ['operational'])->count()];
-        return view('home',compact('plants','homePage','pages','stats','content','brand'));
+        $announcementPopup=SitePopup::active()->first();
+        return view('home',compact('plants','homePage','pages','stats','content','brand','announcementPopup'));
     }
 }
