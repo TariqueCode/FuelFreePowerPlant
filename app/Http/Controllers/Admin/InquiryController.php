@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Inquiry;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+
+class InquiryController extends Controller
+{
+    public function index(Request $request): View
+    {
+        $status = $request->string('status')->toString();
+        $inquiries = Inquiry::query()
+            ->when($status, fn ($q) => $q->where('status', $status))
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+        return view('admin.inquiries.index', compact('inquiries', 'status'));
+    }
+
+    public function show(Inquiry $inquiry): View
+    {
+        if (!$inquiry->read_at) $inquiry->update(['read_at' => now(), 'status' => $inquiry->status === 'new' ? 'read' : $inquiry->status]);
+        return view('admin.inquiries.show', compact('inquiry'));
+    }
+
+    public function update(Request $request, Inquiry $inquiry): RedirectResponse
+    {
+        $data = $request->validate([
+            'status' => ['required', 'in:new,read,in_progress,resolved,archived'],
+            'admin_note' => ['nullable', 'string', 'max:5000'],
+        ]);
+        $data['resolved_at'] = $data['status'] === 'resolved' ? ($inquiry->resolved_at ?? now()) : null;
+        $inquiry->update($data);
+        return back()->with('status', 'Inquiry updated successfully.');
+    }
+}
