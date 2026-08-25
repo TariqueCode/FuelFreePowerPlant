@@ -4,35 +4,32 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SiteContentItem;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class SiteContentController extends Controller
 {
+    private array $types = ['company', 'management', 'news', 'sustainability', 'gallery', 'resource', 'announcement'];
+
     public function index(Request $request): View
     {
         $type = $request->string('type')->toString();
         $items = SiteContentItem::query()->when($type, fn ($q) => $q->where('type', $type))->orderBy('sort_order')->latest()->paginate(20)->withQueryString();
-        $types = ['company', 'management', 'news', 'sustainability', 'gallery', 'resource', 'announcement'];
-        return view('admin.site-content.index', compact('items', 'types', 'type'));
+        return view('admin.site-content.index', compact('items', 'type'))->with('types', $this->types);
     }
 
-    public function create(): View
-    {
-        return view('admin.site-content.create', ['item' => new SiteContentItem(), 'types' => ['company', 'management', 'news', 'sustainability', 'gallery', 'resource', 'announcement']]);
-    }
+    public function create(): View { return view('admin.site-content.create', ['item' => new SiteContentItem(), 'types' => $this->types]); }
 
     public function store(Request $request): RedirectResponse
     {
-        $item = $this->saveItem(new SiteContentItem(), $request);
+        $this->saveItem(new SiteContentItem(), $request);
         return redirect()->route('admin.site-content.index')->with('status', 'Website content created successfully.');
     }
 
-    public function edit(SiteContentItem $item): View
-    {
-        return view('admin.site-content.create', ['item' => $item, 'types' => ['company', 'management', 'news', 'sustainability', 'gallery', 'resource', 'announcement']]);
-    }
+    public function edit(SiteContentItem $item): View { return view('admin.site-content.create', ['item' => $item, 'types' => $this->types]); }
 
     public function update(Request $request, SiteContentItem $item): RedirectResponse
     {
@@ -44,6 +41,13 @@ class SiteContentController extends Controller
     {
         $item->delete();
         return back()->with('status', 'Website content deleted.');
+    }
+
+    public function uploadMedia(Request $request): JsonResponse
+    {
+        $data = $request->validate(['media' => ['required','file','mimes:jpg,jpeg,png,webp,gif,mp4,webm','max:20480']]);
+        $file = $data['media']->store('site-content/media', 'public');
+        return response()->json(['url' => Storage::disk('public')->url($file), 'mime' => $data['media']->getMimeType(), 'name' => $data['media']->getClientOriginalName()]);
     }
 
     private function saveItem(SiteContentItem $item, Request $request): SiteContentItem
