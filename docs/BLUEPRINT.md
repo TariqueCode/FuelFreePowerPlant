@@ -21,8 +21,8 @@ Build a premium, energy-focused corporate website whose public content is contro
 3. Company/About page — CMS content foundation exists; next: premium public presentation and navigation integration.
 4. Management/Team — CMS content foundation exists; next: structured professional presentation.
 5. News & Updates — listing/detail implementation complete; uses published `SiteContentItem` records and dynamic company branding.
-6. Sustainability — **IMPLEMENTING NOW: structured public presentation with approved energy/environment data only.**
-7. Resources/Documents — public-safe resources only; private admin documents remain protected.
+6. Sustainability — **presentation implementation complete; next: consistency/navigation integration.**
+7. Resources/Documents — **NEXT: public-safe resources only; private admin documents remain protected.**
 8. Gallery — dynamic media presentation.
 9. Contact/Inquiry — controlled contact information and enquiry workflow.
 10. Global navigation/footer — dynamic CMS links, mobile hamburger navigation and webmail access; continue consistency pass across all public pages.
@@ -41,23 +41,23 @@ Build a premium, energy-focused corporate website whose public content is contro
 - [x] Build News & Updates listing + detail views
 - [ ] Finish Company/About public presentation
 - [ ] Finish Management/Team public presentation
-- [ ] Build Sustainability presentation
+- [x] Build Sustainability presentation
 - [ ] Build Resources public-safe listing/detail views
 - [ ] Build Gallery
 - [ ] Build Contact/Inquiry
 - [ ] Final global navigation/footer consistency pass
 - [ ] End-to-end dashboard/public data integrity verification
 
-## Sustainability implementation specification
+## Sustainability implementation
 
 - Public route: `/sustainability`.
-- Sustainability editorial content comes only from published `SiteContentItem` records with `type = sustainability`.
+- Editorial content comes only from published `SiteContentItem` records with `type = sustainability`.
 - Plant metrics are calculated from the existing `PowerPlant` model; no duplicate sustainability table is introduced.
 - Capacity uses `capacity_kw`; annual generation uses `annual_generation_mwh`; CO₂ reduction uses `co2_reduction_tonnes`; efficiency uses `efficiency_percent`.
-- Aggregate metrics ignore null values and must not fabricate zeroes for missing business data.
-- If a metric has no approved source data, the public UI displays an explicit unavailable state.
-- Individual plant environmental cards link to the existing public project detail route.
-- Presentation is mobile-first, premium and energy-themed, with lightweight motion and reduced-motion support.
+- Aggregate metrics ignore null values and do not fabricate zeroes for missing business data.
+- Missing approved metrics render as an explicit unavailable state.
+- Individual plant cards link to the existing public project detail route.
+- Presentation is mobile-first, premium, energy-themed and reduced-motion aware.
 
 ## News implementation
 
