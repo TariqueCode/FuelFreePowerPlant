@@ -1,35 +1,56 @@
-# FuelFree PowerPlant — Dynamic Website Blueprint
+# FuelFree PowerPlant — Client-First Dynamic Website Blueprint
 
 ## Product direction
 
-Build a premium, energy-focused corporate website whose public content is controlled from the Laravel administration system. The Coming Soon banner is not part of the production website and must not be reintroduced.
+Build a premium, energy-focused corporate website with a dashboard that gives the client practical control over the complete public website. The reference site `https://deshenergy.com.bd/` is a feature/page reference only; its visual design, colors and branding must not be copied. The production site must not contain a Coming Soon banner/message.
 
-## Current architecture
+## Non-negotiable architecture
 
-- Public homepage: database-driven company branding, CMS content, statistics and power-plant records.
-- CMS pages: published pages are loaded dynamically.
-- Power Plants: manually entered by authorised administrators; public project data comes from the same records.
-- Admin Website Content: structured company, management, news, sustainability, gallery, resource and announcement content.
-- Company branding: name, domain, tagline and logo are managed through Settings.
-- Mail: administrator creates mail accounts; mailbox access is a separate webmail entry point at `mail.fuelfreepowerplant.com`. Login is intended to use mail address + mail password; users may change their own mail password after login. No public mailbox provisioning or self-registration is required. Subdomain/DNS is configured in cPanel.
-- No dashboard feature for creating/managing subdomains is required.
+**Dashboard → Database → Public Website** is the primary source-of-truth flow. Every public-editable feature must have an understandable admin control. Avoid duplicate business data structures when an existing model can own the data.
 
-## Public website roadmap
+The dashboard must eventually allow the client to create, edit, reorder, publish/unpublish, schedule and remove public website content without developer intervention, including text, images, galleries, videos, links, documents, contact information, branding and announcements.
 
-1. Dynamic premium homepage — foundation complete.
-2. Public Power Plant detail pages — route/design foundation added at `/projects/{slug}`.
-3. Company/About page — CMS content foundation exists; next: premium public presentation and navigation integration.
-4. Management/Team — CMS content foundation exists; next: structured professional presentation.
-5. News & Updates — listing/detail implementation complete; uses published `SiteContentItem` records and dynamic company branding.
-6. Sustainability — **presentation implementation complete; next: consistency/navigation integration.**
-7. Resources/Documents — **NEXT: public-safe resources only; private admin documents remain protected.**
-8. Gallery — dynamic media presentation.
-9. Contact/Inquiry — controlled contact information and enquiry workflow.
-10. Global navigation/footer — dynamic CMS links, mobile hamburger navigation and webmail access; continue consistency pass across all public pages.
-11. Dashboard ↔ public-site integrity — every public statistic/content block must have a clear admin/database source.
-12. Real-data integration — remain disabled until a real provider/API is configured and verified; settings must control activation.
+## Client-facing control center priorities
 
-## Current implementation order
+1. **Website Content** — company profile, about/history, vision, mission, values, chairman/MD message, management/team, announcements, news, sustainability, resources, gallery and other public sections.
+2. **News/Notice Editor** — WordPress-style rich editor with headings, lists, quotes, links, multiple image uploads, image galleries, uploaded videos, YouTube embeds, Facebook video embeds and mixed media inside one article/notice.
+3. **Homepage Announcement Popup** — admin uploads an image banner, optionally links it to a URL, schedules its active period, and chooses either an automatic close duration (e.g. 3/5/10 seconds or custom seconds) or visitor-controlled close with an X button.
+4. **Power Plants/Projects** — complete manual project data entry and public project presentation.
+5. **Resources/Documents** — public-safe resources separated from private admin documents.
+6. **Gallery** — albums, multiple images, video/media, ordering and publishing.
+7. **Contact/Office information** — fully dashboard-controlled.
+8. **Branding/Settings** — logo, company name, tagline, favicon and related public identity.
+9. **Manual import center** — templates/import for modules where automatic data providers are not available; include preview, validation, duplicate detection and error reporting.
+
+## Reference-feature coverage target
+
+The client requested the useful pages/functions available on the Desh Energy reference website. Therefore the implementation must cover the equivalent corporate information and publishing capabilities, while allowing the client to control them from the dashboard. Feature coverage takes priority over cosmetic work.
+
+Target areas include: Home, Company/About, Vision, Mission, Values, Management, Projects/Power Plants, Project details, News/Notices, Sustainability, Resources/Downloads, Gallery, Contact/Office information, important announcement banners/popups and other public corporate content discovered during the reference-site audit.
+
+## Rich publishing specification
+
+- `SiteContentItem.content` stores trusted rich HTML authored by authorised administrators.
+- Editor supports formatting, links, headings, lists and quotes.
+- Media upload endpoint stores public article media securely through Laravel's configured public disk.
+- Multiple images can be inserted into one article and arranged as a gallery.
+- Video files can be embedded with native HTML5 controls.
+- YouTube and Facebook video embeds are supported through URL-based insertion.
+- Public news/notice detail pages render the authored rich content responsively.
+- Future-dated and draft content remains private.
+- Do not require the client to edit HTML for ordinary publishing tasks.
+
+## Announcement popup specification
+
+- Stored separately in `site_popups` because it is a global presentation control rather than article content.
+- Admin can upload a banner image and optionally specify a destination URL.
+- Publish state and optional start/end schedule are controlled from admin.
+- `display_seconds` null/empty = visitor closes with X; a positive value = automatic close after that many seconds.
+- Popup is shown on the homepage only while active.
+- Escape key and close button dismiss it immediately.
+- Reduced-motion support is required.
+
+## Current implementation status
 
 - [x] Premium dynamic homepage foundation
 - [x] Dynamic public CMS page foundation
@@ -37,54 +58,46 @@ Build a premium, energy-focused corporate website whose public content is contro
 - [x] Company branding settings foundation
 - [x] Mobile hamburger navigation foundation
 - [x] Admin Website Content category/filter foundation
-- [x] Webmail architecture decision documented; provisioning remains Admin-only
-- [x] Build News & Updates listing + detail views
+- [x] Webmail architecture documented; provisioning remains Admin-only
+- [x] News listing/detail foundation
+- [x] Sustainability presentation foundation
+- [x] Announcement popup database/admin/public rendering foundation
+- [x] Rich content editor foundation + media upload endpoint
+- [ ] Finish rich multi-image gallery UX
 - [ ] Finish Company/About public presentation
 - [ ] Finish Management/Team public presentation
-- [x] Build Sustainability presentation
-- [ ] Build Resources public-safe listing/detail views
-- [ ] Build Gallery
-- [ ] Build Contact/Inquiry
+- [ ] Complete Resources public-safe management
+- [ ] Complete Gallery management
+- [ ] Complete Contact/Office management
+- [ ] Manual import center
+- [ ] Dashboard navigation/control-center simplification
+- [ ] Reference-site feature parity audit
 - [ ] Final global navigation/footer consistency pass
-- [ ] End-to-end dashboard/public data integrity verification
+- [ ] End-to-end Dashboard → Database → Public Website integrity verification
 
-## Sustainability implementation
+## Dashboard simplification rule
 
-- Public route: `/sustainability`.
-- Editorial content comes only from published `SiteContentItem` records with `type = sustainability`.
-- Plant metrics are calculated from the existing `PowerPlant` model; no duplicate sustainability table is introduced.
-- Capacity uses `capacity_kw`; annual generation uses `annual_generation_mwh`; CO₂ reduction uses `co2_reduction_tonnes`; efficiency uses `efficiency_percent`.
-- Aggregate metrics ignore null values and do not fabricate zeroes for missing business data.
-- Missing approved metrics render as an explicit unavailable state.
-- Individual plant cards link to the existing public project detail route.
-- Presentation is mobile-first, premium, energy-themed and reduced-motion aware.
-
-## News implementation
-
-- Public listing: `/news`
-- Public detail: `/news/{slug}`
-- Source of truth: `SiteContentItem` where `type = news` and status is published.
-- Publication respects `published_at`; future-dated or draft content is not exposed.
-- Images use the existing stored media path when present.
-- Admin continues to create/edit/publish news through Website Content; no duplicate news table is introduced.
+Keep modules that directly support the client’s website/energy operations. Reorganize or remove/relegate internal developer-oriented modules that do not help the client manage the public site. The client should see clear groups such as **Website**, **Projects**, **Content**, **Media/Resources**, **Contact**, **Settings**, **Users**, and **System** rather than a confusing collection of unrelated technical tools.
 
 ## UX rules
 
 - Mobile-first and responsive across phone, tablet and desktop.
-- Use Font Awesome icons rather than fragile custom icon glyphs.
-- Mobile secondary navigation lives inside the professional hamburger menu.
-- Do not use `SWIPE LEFT / RIGHT` helper text.
-- Energy motion should be premium and lightweight: CSS-based ambient motion, responsive intensity and reduced-motion support.
-- Customer-provided banner is a visual reference only; do not copy its Coming Soon messaging into the production website.
+- Font Awesome icons for interface icons.
+- Mobile secondary navigation uses the professional hamburger/navigation system.
+- Never use `SWIPE LEFT / RIGHT` helper text.
+- Premium energy motion should be lightweight and reduced-motion aware.
+- The reference site's design is not copied; only useful feature/page requirements are mirrored.
 
 ## Data integrity rules
 
-- Do not invent plant statistics.
-- Manual plant data is valid only after administrator entry.
-- Public pages should gracefully show unavailable fields instead of fake values.
-- Do not duplicate the same business data into separate public-only tables when an existing model already owns it.
-- Before each feature, verify its source of truth in the database/model and keep Dashboard → Database → Public Website as the primary data flow.
+- Never invent plant, financial, environmental or operational statistics.
+- Missing approved data must render as unavailable rather than fake zeroes.
+- Public content must have a clear admin/database source.
+- Manual data remains the source until a verified provider/API is configured.
+- Real-data integration remains OFF by default and is controlled from Settings.
+- Subdomain creation/management is not a dashboard feature; cPanel handles DNS/subdomains.
+- Webmail remains `mail.fuelfreepowerplant.com`; admin creates accounts and users manage their own mail password in webmail.
 
 ## Development rule
 
-Before each major implementation step, review and update this blueprint, then implement the next unchecked item. If a new requirement changes architecture, record it here before proceeding.
+Before every major implementation step: review this blueprint, update it if requirements changed, inspect the existing implementation, preserve working features, implement the next highest-priority unchecked item, and report the exact commit/change. Feature parity and client control take priority over adding unrelated modules.
