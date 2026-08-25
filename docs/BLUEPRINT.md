@@ -20,8 +20,8 @@ Build a premium, energy-focused corporate website whose public content is contro
 2. Public Power Plant detail pages — route/design foundation added at `/projects/{slug}`.
 3. Company/About page — CMS content foundation exists; next: premium public presentation and navigation integration.
 4. Management/Team — CMS content foundation exists; next: structured professional presentation.
-5. News & Updates — **NEXT: build listing/detail presentation driven by published content.**
-6. Sustainability — structured content with energy/environment metrics where approved data exists.
+5. News & Updates — **listing/detail implementation complete; uses published `SiteContentItem` records and dynamic company branding.**
+6. Sustainability — **NEXT: structured public presentation with approved energy/environment data only.**
 7. Resources/Documents — public-safe resources only; private admin documents remain protected.
 8. Gallery — dynamic media presentation.
 9. Contact/Inquiry — controlled contact information and enquiry workflow.
@@ -40,13 +40,22 @@ Build a premium, energy-focused corporate website whose public content is contro
 - [x] Webmail architecture decision documented; provisioning remains Admin-only
 - [ ] Finish Company/About public presentation
 - [ ] Finish Management/Team public presentation
-- [ ] Build News & Updates listing + detail views
+- [x] Build News & Updates listing + detail views
 - [ ] Build Sustainability presentation
 - [ ] Build Resources public-safe listing/detail views
 - [ ] Build Gallery
 - [ ] Build Contact/Inquiry
 - [ ] Final global navigation/footer consistency pass
 - [ ] End-to-end dashboard/public data integrity verification
+
+## News implementation
+
+- Public listing: `/news`
+- Public detail: `/news/{slug}`
+- Source of truth: `SiteContentItem` where `type = news` and status is published.
+- Publication respects `published_at`; future-dated or draft content is not exposed.
+- Images use the existing stored media path when present.
+- Admin continues to create/edit/publish news through Website Content; no duplicate news table is introduced.
 
 ## UX rules
 
