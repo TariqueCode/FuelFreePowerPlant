@@ -75,7 +75,7 @@ Target areas include: Home, Company/About, Vision, Mission, Values, Management, 
 - [x] Public no-login Contact & Inquiry form
 - [x] Dedicated inquiry database and admin management workflow
 - [x] Finish Company/About public presentation
-- [ ] Finish Management/Team public presentation
+- [x] Finish Management/Team public presentation foundation
 - [ ] Complete Resources public-safe management
 - [ ] Complete Gallery management
 - [ ] Manual import center
@@ -96,7 +96,7 @@ Target areas include: Home, Company/About, Vision, Mission, Values, Management, 
 ## Responsive dashboard rules
 
 - No page-level horizontal overflow on phone, tablet or desktop.
-- Mobile navigation shows a small fixed primary set plus a **More** hamburger drawer; it must not require horizontal swiping.
+- Mobile dashboard navigation uses a fixed, compact, horizontally scrollable navigation strip with dedicated left/right arrow zones; menu items never pass underneath the arrow controls. Arrow availability reflects the current scroll position.
 - Tables may scroll only inside their own bounded table container when their columns genuinely require it.
 - Dashboard branding uses the same database-controlled company name and logo as the public website.
 - Cards, grids, forms, editors and charts must collapse at appropriate breakpoints rather than forcing a desktop layout onto mobile.
@@ -105,7 +105,7 @@ Target areas include: Home, Company/About, Vision, Mission, Values, Management, 
 
 - Mobile-first and responsive across phone, tablet and desktop.
 - Font Awesome icons for interface icons.
-- Mobile secondary navigation uses the professional hamburger/navigation system.
+- Mobile secondary navigation uses the professional compact scrolling navigation system agreed for the dashboard.
 - Never use `SWIPE LEFT / RIGHT` helper text.
 - Premium energy motion should be lightweight and reduced-motion aware.
 - The reference site's design is not copied; only useful feature/page requirements are mirrored.
