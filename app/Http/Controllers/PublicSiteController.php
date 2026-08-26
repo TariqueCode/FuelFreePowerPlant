@@ -12,7 +12,7 @@ class PublicSiteController
 {
     public function show(string $section): View
     {
-        $allowed=['about-us','plants','future-project','career','solutions'];
+        $allowed=['about-us','plants','future-project','career','solutions','gallery'];
         abort_unless(in_array($section,$allowed,true),404);
         $settings=SystemSetting::query()->whereIn('key',['company.name','company.logo_path','company.tagline'])->pluck('value','key');
         $brand=['name'=>$settings->get('company.name')?:config('fuelfree.company.name'),'logo_path'=>$settings->get('company.logo_path'),'tagline'=>$settings->get('company.tagline')?:config('fuelfree.company.tagline')];
@@ -24,7 +24,8 @@ class PublicSiteController
         elseif($section==='future-project'){$projects=PowerPlant::query()->whereRaw("LOWER(status) != 'operational'")->orderBy('name')->get();$items=SiteContentItem::published()->whereIn('type',['future-project','project'])->orderBy('sort_order')->orderBy('title')->get();}
         elseif($section==='career'){$items=SiteContentItem::published()->whereIn('type',['career','careers','job'])->orderBy('sort_order')->orderBy('title')->get();}
         elseif($section==='solutions'){$items=SiteContentItem::published()->where('type','solution')->orderBy('sort_order')->orderBy('title')->get();}
-        $titles=['about-us'=>'About Us','plants'=>'Plants','future-project'=>'Future Project','career'=>'Career','solutions'=>'Solutions'];
+        elseif($section==='gallery'){$items=SiteContentItem::published()->where('type','gallery')->orderBy('sort_order')->latest('published_at')->get();}
+        $titles=['about-us'=>'About Us','plants'=>'Plants','future-project'=>'Future Project','career'=>'Career','solutions'=>'Solutions','gallery'=>'Gallery'];
         return view('site.section',compact('section','titles','page','pages','brand','companyItems','items','projects'));
     }
 }
