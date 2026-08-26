@@ -27,17 +27,20 @@ class SecurityHeaders
             $response->headers->set('Pragma', 'no-cache');
         }
 
-        // The logo configured in Admin > Settings is also the universal favicon.
+        // The logo configured in Admin > Settings is the universal favicon for every HTML page,
+        // including the public website, authentication pages and admin dashboard.
         if ($response->headers->get('Content-Type') && str_contains(strtolower($response->headers->get('Content-Type')), 'text/html')) {
             $logoPath = SystemSetting::query()->where('key', 'company.logo_path')->value('value');
-            if ($logoPath) {
+            $content = $response->getContent();
+
+            if ($logoPath && is_string($content) && stripos($content, '</head>') !== false) {
                 $faviconUrl = asset('storage/' . ltrim($logoPath, '/'));
-                $content = $response->getContent();
-                if (is_string($content) && stripos($content, '</head>') !== false && stripos($content, 'rel="icon"') === false && stripos($content, "rel='icon'") === false) {
-                    $favicon = '<link rel="icon" href="' . e($faviconUrl) . '"><link rel="apple-touch-icon" href="' . e($faviconUrl) . '">';
-                    $content = preg_replace('/<\/head>/i', $favicon . '</head>', $content, 1);
-                    $response->setContent($content);
-                }
+
+                // Remove any stale/default icon declarations so the configured logo is authoritative.
+                $content = preg_replace('/<link\b[^>]*\brel=["\'](?:shortcut icon|icon|apple-touch-icon)["\'][^>]*>\s*/i', '', $content);
+                $favicon = '<link rel="icon" type="image/png" href="' . e($faviconUrl) . '"><link rel="apple-touch-icon" href="' . e($faviconUrl) . '">';
+                $content = preg_replace('/<\/head>/i', $favicon . '</head>', $content, 1);
+                $response->setContent($content);
             }
         }
 
