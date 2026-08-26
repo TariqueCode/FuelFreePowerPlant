@@ -19,6 +19,14 @@ class HomeController
         $settings=SystemSetting::query()->pluck('value','key')->all();
         $brand=['name'=>$settings['company.name']??config('fuelfree.company.name'),'domain'=>$settings['company.domain']??config('fuelfree.company.domain'),'tagline'=>$settings['company.tagline']??config('fuelfree.company.tagline'),'logo_path'=>$settings['company.logo_path']??null];
         $stats=['projects'=>PowerPlant::query()->count(),'capacity_mw'=>round((float)PowerPlant::query()->sum('capacity_kw')/1000,2),'operational'=>PowerPlant::query()->whereRaw('LOWER(status)=?', ['operational'])->count()];
-        return response(view('home-v3',compact('plants','homePage','stats','content','brand','gallery'))->render());
+
+        $html=view('home-v3',compact('plants','homePage','stats','content','brand','gallery'))->render();
+        $sharedHeader=view('partials.home-header')->render();
+        $sharedFooter=view('partials.home-footer')->render();
+
+        $html=preg_replace('~<header class="header">.*?</header>~s',$sharedHeader,$html,1);
+        $html=preg_replace('~<footer class="footer">.*?</footer>~s',$sharedFooter,$html,1);
+
+        return response($html);
     }
 }
