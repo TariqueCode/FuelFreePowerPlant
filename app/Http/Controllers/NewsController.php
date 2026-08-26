@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SiteContentItem;
 use App\Models\SystemSetting;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class NewsController extends Controller
@@ -19,28 +20,48 @@ class NewsController extends Controller
         ];
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $base = SiteContentItem::published()->whereIn('type', ['news','announcement']);
+        $base = SiteContentItem::published()->whereIn('type', ['news', 'announcement']);
+
+        if ($request->filled('q')) {
+            $term = trim((string) $request->input('q'));
+            $base->where(function ($query) use ($term) {
+                $query->where('title', 'like', "%{$term}%")
+                    ->orWhere('excerpt', 'like', "%{$term}%")
+                    ->orWhere('content', 'like', "%{$term}%");
+            });
+        }
+
+        if (in_array($request->input('type'), ['news', 'announcement'], true)) {
+            $base->where('type', $request->input('type'));
+        }
+
         $featured = (clone $base)->where('is_featured', true)->orderByDesc('published_at')->first();
-        $news = $base->orderByDesc('published_at')->orderBy('sort_order')->paginate(9);
+
+        $sort = $request->input('sort', 'newest') === 'oldest' ? 'asc' : 'desc';
+        $newsQuery = (clone $base)->when($featured, fn ($query) => $query->whereKeyNot($featured->id));
+        $news = $newsQuery->orderBy('published_at', $sort)->orderBy('sort_order')->paginate(8)->withQueryString();
+
+        $publishedCount = (clone $base)->count();
         $brand = $this->brand();
-        return view('news.index', compact('news','featured','brand'));
+
+        return view('news.index', compact('news', 'featured', 'brand', 'publishedCount'));
     }
 
     public function show(string $slug): View
     {
         $article = SiteContentItem::published()
-            ->whereIn('type', ['news','announcement'])
+            ->whereIn('type', ['news', 'announcement'])
             ->where('slug', $slug)
             ->firstOrFail();
         $related = SiteContentItem::published()
-            ->whereIn('type', ['news','announcement'])
+            ->whereIn('type', ['news', 'announcement'])
             ->where('id', '!=', $article->id)
             ->orderByDesc('published_at')
             ->limit(3)
             ->get();
         $brand = $this->brand();
-        return view('news.show', compact('article','related','brand'));
+        return view('news.show', compact('article', 'related', 'brand'));
     }
 }
