@@ -20,9 +20,14 @@ class SiteContentController extends Controller
         abort_unless($type===''||in_array($type,$this->types,true),404);
         $items=SiteContentItem::query()
             ->when($type,function($q)use($type){return $type==='news'?$q->whereIn('type',['news','announcement']):$q->where('type',$type);})
-            ->orderBy('sort_order')->latest()->paginate(20)->withQueryString();
+            ->when($type==='company',fn($q)=>$q->orderBy('navigation_order')->orderByDesc('created_at'))
+            ->when($type!=='company',fn($q)=>$q->latest('created_at'))
+            ->paginate(20)->withQueryString();
+        $navigationPages=$type==='company'
+            ? SiteContentItem::query()->where('type','company')->where('show_in_navigation',true)->orderBy('navigation_order')->orderByDesc('created_at')->get(['id','title','slug','show_in_navigation','navigation_order'])
+            : collect();
         $title=$type?($this->labels[$type]??ucfirst($type)).' CMS':'Website Content';
-        return view('admin.site-content.index',compact('items','type','title'))->with('types',$this->types)->with('labels',$this->labels);
+        return view('admin.site-content.index',compact('items','type','title','navigationPages'))->with('types',$this->types)->with('labels',$this->labels);
     }
 
     public function create(Request $request): View|RedirectResponse
@@ -64,6 +69,15 @@ class SiteContentController extends Controller
         return redirect()->route('admin.site-content.index',['type'=>$type])->with('status','Content deleted successfully.');
     }
 
+    public function reorderNavigation(Request $request): JsonResponse
+    {
+        $data=$request->validate(['ids'=>['required','array'],'ids.*'=>['integer','distinct','exists:site_content_items,id']]);
+        $items=SiteContentItem::query()->where('type','company')->whereIn('id',$data['ids'])->get()->keyBy('id');
+        abort_unless($items->count()===count($data['ids']),422,'Invalid navigation items.');
+        foreach($data['ids'] as $position=>$id){$items[$id]->update(['navigation_order'=>$position+1]);}
+        return response()->json(['ok'=>true]);
+    }
+
     public function uploadMedia(Request $request): JsonResponse
     {
         $data=$request->validate(['media'=>['required','file','mimes:jpg,jpeg,png,webp,gif,mp4,webm,mov','max:102400']]);
@@ -81,13 +95,14 @@ class SiteContentController extends Controller
             'content'=>['nullable','string'],
             'image_path'=>['nullable','string','max:500'],
             'status'=>['required','in:draft,published'],
-            'sort_order'=>['nullable','integer','min:0'],
             'published_at'=>['nullable','date'],
             'show_in_navigation'=>['nullable','boolean'],
         ]);
         if(($data['slug']??'')==='') $data['slug']=str($data['title'])->slug();
-        $data['sort_order']??=0;
         $data['show_in_navigation']=($data['type']==='company') && (bool)($data['show_in_navigation']??false);
+        if($data['type']==='company' && $data['show_in_navigation'] && !$item->exists){
+            $data['navigation_order']=(int)(SiteContentItem::query()->where('type','company')->min('navigation_order') ?? 1)-1;
+        }
         $item->fill($data)->save();
         return $item;
     }
