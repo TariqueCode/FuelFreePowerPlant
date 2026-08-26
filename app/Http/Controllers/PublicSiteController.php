@@ -12,7 +12,7 @@ class PublicSiteController
 {
     public function show(string $section): View
     {
-        $allowed = ['about-us', 'plants', 'future-project', 'career'];
+        $allowed = ['about-us', 'plants', 'future-project', 'career', 'solutions'];
         abort_unless(in_array($section, $allowed, true), 404);
 
         $settings = SystemSetting::query()->whereIn('key', ['company.name', 'company.logo_path', 'company.tagline'])->pluck('value', 'key');
@@ -34,9 +34,11 @@ class PublicSiteController
             $items = SiteContentItem::published()->whereIn('type', ['future-project', 'project'])->orderBy('sort_order')->orderBy('title')->get();
         } elseif ($section === 'career') {
             $items = SiteContentItem::published()->whereIn('type', ['career', 'careers', 'job'])->orderBy('sort_order')->orderBy('title')->get();
+        } elseif ($section === 'solutions') {
+            $items = SiteContentItem::published()->where('type', 'solution')->orderBy('sort_order')->orderBy('title')->get();
         }
 
-        $titles = ['about-us' => 'About Us', 'plants' => 'Plants', 'future-project' => 'Future Project', 'career' => 'Career'];
+        $titles = ['about-us' => 'About Us', 'plants' => 'Plants', 'future-project' => 'Future Project', 'career' => 'Career', 'solutions' => 'Solutions'];
         return view('site.section', compact('section', 'titles', 'page', 'pages', 'brand', 'companyItems', 'items', 'projects'));
     }
 }
