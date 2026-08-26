@@ -21,28 +21,26 @@ class NewsController extends Controller
 
     public function index(): View
     {
-        $news = SiteContentItem::published()
-            ->where('type', 'news')
-            ->orderByDesc('published_at')
-            ->orderBy('sort_order')
-            ->paginate(9);
+        $base = SiteContentItem::published()->whereIn('type', ['news','announcement']);
+        $featured = (clone $base)->where('is_featured', true)->orderByDesc('published_at')->first();
+        $news = $base->orderByDesc('published_at')->orderBy('sort_order')->paginate(9);
         $brand = $this->brand();
-        return view('news.index', compact('news', 'brand'));
+        return view('news.index', compact('news','featured','brand'));
     }
 
     public function show(string $slug): View
     {
         $article = SiteContentItem::published()
-            ->where('type', 'news')
+            ->whereIn('type', ['news','announcement'])
             ->where('slug', $slug)
             ->firstOrFail();
         $related = SiteContentItem::published()
-            ->where('type', 'news')
+            ->whereIn('type', ['news','announcement'])
             ->where('id', '!=', $article->id)
             ->orderByDesc('published_at')
             ->limit(3)
             ->get();
         $brand = $this->brand();
-        return view('news.show', compact('article', 'related', 'brand'));
+        return view('news.show', compact('article','related','brand'));
     }
 }
