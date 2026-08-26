@@ -19,6 +19,7 @@ use App\Http\Controllers\CmsPageController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ManagementController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PowerPlantPageController;
 use App\Http\Controllers\ProfileController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\SustainabilityController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('/management', ManagementController::class)->name('management');
 Route::get('/projects/{slug}', [PowerPlantPageController::class, 'show'])->name('projects.show');
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');
 Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.show');
