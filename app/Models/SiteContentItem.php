@@ -10,7 +10,7 @@ class SiteContentItem extends Model
     protected $fillable = [
         'type', 'title', 'slug', 'excerpt', 'designation', 'phone', 'email',
         'content', 'image_path', 'visiting_card_path', 'status', 'sort_order', 'published_at',
-        'show_in_navigation',
+        'show_in_navigation', 'navigation_order',
     ];
 
     protected function casts(): array
@@ -19,6 +19,7 @@ class SiteContentItem extends Model
             'published_at' => 'datetime',
             'sort_order' => 'integer',
             'show_in_navigation' => 'boolean',
+            'navigation_order' => 'integer',
         ];
     }
 
