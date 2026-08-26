@@ -23,11 +23,8 @@ class SiteContentController extends Controller
             ->when($type==='company',fn($q)=>$q->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')->orderBy('navigation_order')->orderByDesc('created_at'))
             ->when($type!=='company',fn($q)=>$q->latest('created_at'))
             ->paginate(20)->withQueryString();
-        $navigationPages=$type==='company'
-            ? SiteContentItem::query()->where('type','company')->where('show_in_navigation',true)->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')->orderBy('navigation_order')->orderByDesc('created_at')->get(['id','title','slug','show_in_navigation','navigation_order'])
-            : collect();
         $title=$type?($this->labels[$type]??ucfirst($type)).' CMS':'Website Content';
-        return view('admin.site-content.index',compact('items','type','title','navigationPages'))->with('types',$this->types)->with('labels',$this->labels);
+        return view('admin.site-content.index',compact('items','type','title'))->with('types',$this->types)->with('labels',$this->labels);
     }
 
     public function create(Request $request): View|RedirectResponse
@@ -67,6 +64,20 @@ class SiteContentController extends Controller
         $type=in_array($item->type,['news','announcement'],true)?'news':$item->type;
         $item->delete();
         return redirect()->route('admin.site-content.index',['type'=>$type])->with('status','Content deleted successfully.');
+    }
+
+    public function toggleNavigation(Request $request,SiteContentItem $item): JsonResponse
+    {
+        abort_unless($item->type==='company',404);
+        $enabled=$request->boolean('enabled');
+        $item->show_in_navigation=$enabled;
+        if($enabled){
+            $item->navigation_order=(int)(SiteContentItem::query()->where('type','company')->where('show_in_navigation',true)->whereKeyNot($item->id)->min('navigation_order') ?? 1)-1;
+        }else{
+            $item->navigation_order=null;
+        }
+        $item->save();
+        return response()->json(['ok'=>true,'enabled'=>$enabled]);
     }
 
     public function reorderNavigation(Request $request): JsonResponse
