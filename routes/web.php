@@ -34,6 +34,7 @@ Route::get('/about-us', [PublicSiteController::class, 'show'])->defaults('sectio
 Route::get('/plants', [PublicSiteController::class, 'show'])->defaults('section', 'plants')->name('site.plants');
 Route::get('/future-project', [PublicSiteController::class, 'show'])->defaults('section', 'future-project')->name('site.future-project');
 Route::get('/career', [PublicSiteController::class, 'show'])->defaults('section', 'career')->name('site.career');
+Route::get('/solutions', [PublicSiteController::class, 'show'])->defaults('section', 'solutions')->name('site.solutions');
 Route::get('/sections/{section}', [PublicSiteController::class, 'show'])->name('site.section');
 Route::get('/management', ManagementController::class)->name('management');
 Route::get('/management/{member}/contact.vcf', [ManagementController::class, 'vcard'])->name('management.vcard');
