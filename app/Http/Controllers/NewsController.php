@@ -37,13 +37,16 @@ class NewsController extends Controller
             $base->where('type', $request->input('type'));
         }
 
+        $publishedCount = (clone $base)->count();
         $featured = (clone $base)->where('is_featured', true)->orderByDesc('published_at')->first();
 
         $sort = $request->input('sort', 'newest') === 'oldest' ? 'asc' : 'desc';
-        $newsQuery = (clone $base)->when($featured, fn ($query) => $query->whereKeyNot($featured->id));
+        $newsQuery = clone $base;
+        if ($featured) {
+            $newsQuery->where('id', '!=', $featured->id);
+        }
         $news = $newsQuery->orderBy('published_at', $sort)->orderBy('sort_order')->paginate(8)->withQueryString();
 
-        $publishedCount = (clone $base)->count();
         $brand = $this->brand();
 
         return view('news.index', compact('news', 'featured', 'brand', 'publishedCount'));
