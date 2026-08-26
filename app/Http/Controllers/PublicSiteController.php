@@ -9,11 +9,22 @@ use Illuminate\View\View;
 
 class PublicSiteController
 {
+    private function brand(): array
+    {
+        $settings=SystemSetting::query()->whereIn('key',['company.name','company.logo_path','company.tagline'])->pluck('value','key');
+        return ['name'=>$settings->get('company.name')?:config('fuelfree.company.name'),'logo_path'=>$settings->get('company.logo_path'),'tagline'=>$settings->get('company.tagline')?:config('fuelfree.company.tagline')];
+    }
+
+    public function showCompanyPage(string $slug): View
+    {
+        $item=SiteContentItem::query()->where('type','company')->where('status','published')->where('slug',$slug)->firstOrFail();
+        return view('site.company-page',['item'=>$item,'brand'=>$this->brand()]);
+    }
+
     public function show(string $section): View
     {
         $allowed=['about-us','plants','future-project','career','solutions','gallery'];abort_unless(in_array($section,$allowed,true),404);
-        $settings=SystemSetting::query()->whereIn('key',['company.name','company.logo_path','company.tagline'])->pluck('value','key');
-        $brand=['name'=>$settings->get('company.name')?:config('fuelfree.company.name'),'logo_path'=>$settings->get('company.logo_path'),'tagline'=>$settings->get('company.tagline')?:config('fuelfree.company.tagline')];
+        $brand=$this->brand();
         if($section==='gallery'){$galleries=SiteContentItem::query()->where('type','gallery')->where('status','published')->withCount('galleryMedia')->orderBy('sort_order')->latest('created_at')->get();return view('gallery.index',compact('galleries','brand'));}
         $pages=CmsPage::query()->where('is_published',true)->where('slug','!=','home')->orderBy('title')->get(['title','slug']);$page=CmsPage::query()->where('slug',$section)->where('is_published',true)->first();$companyItems=collect();$items=collect();$projects=collect();
         if($section==='about-us'){$companyItems=SiteContentItem::published()->where('type','company')->orderBy('sort_order')->orderBy('title')->get();}elseif($section==='plants'){$items=SiteContentItem::published()->where('type','plants')->orderBy('sort_order')->orderBy('title')->get();}elseif($section==='future-project'){$items=SiteContentItem::published()->where('type','future-project')->orderBy('sort_order')->orderBy('title')->get();}elseif($section==='career'){$items=SiteContentItem::published()->whereIn('type',['career','careers','job'])->orderBy('sort_order')->orderBy('title')->get();}elseif($section==='solutions'){$items=SiteContentItem::published()->where('type','solution')->orderBy('sort_order')->orderBy('title')->get();}
@@ -24,6 +35,6 @@ class PublicSiteController
     {
         $item=SiteContentItem::query()->where('type','gallery')->where(function($q)use($key){$q->where('slug',$key);if(ctype_digit($key))$q->orWhereKey((int)$key);})->firstOrFail();
         abort_unless($item->status==='published',404);
-        $settings=SystemSetting::query()->whereIn('key',['company.name','company.logo_path','company.tagline'])->pluck('value','key');$brand=['name'=>$settings->get('company.name')?:config('fuelfree.company.name'),'logo_path'=>$settings->get('company.logo_path'),'tagline'=>$settings->get('company.tagline')?:config('fuelfree.company.tagline')];$item->load('galleryMedia');return view('gallery.show',compact('item','brand'));
+        $brand=$this->brand();$item->load('galleryMedia');return view('gallery.show',compact('item','brand'));
     }
 }
