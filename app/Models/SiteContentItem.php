@@ -9,7 +9,8 @@ class SiteContentItem extends Model
 {
     protected $fillable = [
         'type', 'title', 'slug', 'excerpt', 'designation', 'phone', 'email',
-        'content', 'image_path', 'visiting_card_path', 'status', 'sort_order', 'published_at',
+        'content', 'image_path', 'cover_alt', 'visiting_card_path', 'status', 'sort_order', 'published_at',
+        'is_featured', 'meta_title', 'meta_description',
         'show_in_navigation', 'navigation_order',
     ];
 
@@ -20,6 +21,7 @@ class SiteContentItem extends Model
             'sort_order' => 'integer',
             'show_in_navigation' => 'boolean',
             'navigation_order' => 'integer',
+            'is_featured' => 'boolean',
         ];
     }
 
