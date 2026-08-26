@@ -24,7 +24,7 @@ class PublicSiteController
         elseif($section==='future-project'){$projects=PowerPlant::query()->whereRaw("LOWER(status) != 'operational'")->orderBy('name')->get();$items=SiteContentItem::published()->whereIn('type',['future-project','project'])->orderBy('sort_order')->orderBy('title')->get();}
         elseif($section==='career'){$items=SiteContentItem::published()->whereIn('type',['career','careers','job'])->orderBy('sort_order')->orderBy('title')->get();}
         elseif($section==='solutions'){$items=SiteContentItem::published()->where('type','solution')->orderBy('sort_order')->orderBy('title')->get();}
-        elseif($section==='gallery'){$items=SiteContentItem::published()->where('type','gallery')->orderBy('sort_order')->latest('published_at')->get();}
+        elseif($section==='gallery'){$items=SiteContentItem::published()->where('type','gallery')->orderBy('sort_order')->latest('published_at')->get();return view('gallery.index',compact('items','brand'));}
         $titles=['about-us'=>'About Us','plants'=>'Plants','future-project'=>'Future Project','career'=>'Career','solutions'=>'Solutions','gallery'=>'Gallery'];
         return view('site.section',compact('section','titles','page','pages','brand','companyItems','items','projects'));
     }
