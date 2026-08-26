@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SiteContentItem extends Model
 {
@@ -14,6 +15,11 @@ class SiteContentItem extends Model
     protected function casts(): array
     {
         return ['published_at' => 'datetime', 'sort_order' => 'integer'];
+    }
+
+    public function galleryMedia(): HasMany
+    {
+        return $this->hasMany(GalleryMedia::class, 'gallery_id')->orderBy('sort_order')->orderBy('id');
     }
 
     public function scopePublished($query)
