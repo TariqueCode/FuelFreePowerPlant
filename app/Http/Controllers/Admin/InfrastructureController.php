@@ -16,52 +16,77 @@ class InfrastructureController extends Controller
 {
     public function email(Request $request): View
     {
-        $isStaff = $request->user()->hasRole(['super-admin','administrator','project-manager','support-agent']);
-        $accounts = EmailAccount::with('user')->when(!$isStaff, fn($q) => $q->where('user_id',$request->user()->id))->latest()->paginate(20);
-        return view('admin.modules.email', compact('accounts','isStaff'));
+        $accounts = EmailAccount::latest()->paginate(20);
+        return view('admin.modules.email', compact('accounts'));
     }
 
     public function createEmail(CpanelEmailService $cpanel): View
     {
         return view('admin.modules.email-form', [
             'account' => new EmailAccount(),
-            'users' => User::orderBy('name')->get(),
             'cpanelConfigured' => $cpanel->configured(),
+            'domain' => config('cpanel.domain', 'fuelfreepowerplant.com'),
         ]);
     }
 
     public function storeEmail(Request $request, CpanelEmailService $cpanel): RedirectResponse
     {
-        $rules = [
-            'user_id' => ['required','integer','exists:users,id'], 'address' => ['required','email','max:255','unique:email_accounts,address'],
-            'display_name' => ['nullable','string','max:150'], 'status' => ['required','in:active,suspended'],
-            'imap_host' => ['nullable','string','max:255'], 'imap_port' => ['required','integer','min:1','max:65535'],
-            'smtp_host' => ['nullable','string','max:255'], 'smtp_port' => ['required','integer','min:1','max:65535'],
-            'username' => ['nullable','string','max:255'], 'password' => ['nullable','string','min:8','max:500'],
-        ];
-        if ($cpanel->configured()) $rules['password'][] = 'required';
-        $data = $request->validate($rules);
-
-        $provisioned = false;
-        $providerMessage = 'Mailbox record saved. cPanel provisioning is not configured yet.';
-        if ($cpanel->configured()) {
-            try {
-                $providerMessage = $cpanel->create($data['address'], $data['password']);
-                $provisioned = true;
-            } catch (Throwable $e) {
-                report($e);
-                return back()->withErrors(['address' => 'The mailbox could not be created on the mail server: '.$e->getMessage()])->withInput($request->except('password'));
-            }
+        $domain = strtolower((string) config('cpanel.domain', 'fuelfreepowerplant.com'));
+        $local = strtolower(trim((string) $request->input('local_part')));
+        $address = $local.'@'.$domain;
+        $data = $request->validate([
+            'local_part' => ['required','string','max:64','regex:/^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$/i'],
+            'display_name' => ['nullable','string','max:150'],
+            'password' => ['required','string','min:10','max:500','confirmed'],
+        ]);
+        if (EmailAccount::where('address',$address)->exists()) return back()->withErrors(['local_part'=>'That mailbox already exists.'])->withInput($request->except(['password','password_confirmation']));
+        try {
+            $providerMessage = $cpanel->create($address, $data['password']);
+            EmailAccount::create([
+                'user_id' => $request->user()->id,
+                'address' => $address,
+                'display_name' => $data['display_name'] ?: null,
+                'status' => 'active',
+                'provisioned' => true,
+                'provider_message' => $providerMessage,
+                'imap_host' => config('cpanel.mail_host', 'mail.'.$domain),
+                'imap_port' => 993,
+                'smtp_host' => config('cpanel.mail_host', 'mail.'.$domain),
+                'smtp_port' => 465,
+                'username' => $address,
+                'password' => $data['password'],
+            ]);
+            return redirect()->route('admin.email')->with('status', 'Mailbox '.$address.' created successfully.');
+        } catch (Throwable $e) {
+            report($e);
+            return back()->withErrors(['local_part'=>'The mailbox could not be created: '.$e->getMessage()])->withInput($request->except(['password','password_confirmation']));
         }
+    }
 
-        $data['provisioned'] = $provisioned;
-        $data['provider_message'] = $providerMessage;
-        if (! $data['username']) $data['username'] = $data['address'];
-        if (! $data['imap_host']) $data['imap_host'] = config('cpanel.mail_host') ?: 'mail.'.(config('cpanel.domain') ?: $request->getHost());
-        if (! $data['smtp_host']) $data['smtp_host'] = $data['imap_host'];
-        EmailAccount::create($data);
+    public function changeEmailPassword(Request $request, EmailAccount $account, CpanelEmailService $cpanel): RedirectResponse
+    {
+        $data = $request->validate(['password'=>['required','string','min:10','max:500','confirmed']]);
+        try {
+            $message = $cpanel->changePassword($account, $data['password']);
+            $account->update(['password'=>$data['password'], 'provider_message'=>$message, 'provisioned'=>true]);
+            return back()->with('status', 'Password changed for '.$account->address.'.');
+        } catch (Throwable $e) {
+            report($e);
+            return back()->withErrors(['email'=>'Password could not be changed: '.$e->getMessage()]);
+        }
+    }
 
-        return redirect()->route('admin.email')->with('status', $provisioned ? 'Mailbox created successfully on the hosting mail server.' : 'Mailbox record saved. Add cPanel API settings to enable real mailbox provisioning.');
+    public function toggleEmailStatus(EmailAccount $account, CpanelEmailService $cpanel): RedirectResponse
+    {
+        $active = $account->status !== 'active';
+        try {
+            $message = $cpanel->setActive($account, $active);
+            $account->update(['status'=>$active ? 'active' : 'suspended', 'provider_message'=>$message]);
+            return back()->with('status', $account->address.' is now '.($active ? 'active.' : 'inactive.'));
+        } catch (Throwable $e) {
+            report($e);
+            return back()->withErrors(['email'=>'Mailbox status could not be changed: '.$e->getMessage()]);
+        }
     }
 
     public function destroyEmail(EmailAccount $account, CpanelEmailService $cpanel): RedirectResponse
@@ -72,7 +97,7 @@ class InfrastructureController extends Controller
             return back()->with('status', $message);
         } catch (Throwable $e) {
             report($e);
-            return back()->withErrors(['email' => 'The mailbox could not be removed from the mail server: '.$e->getMessage()]);
+            return back()->withErrors(['email'=>'The mailbox could not be removed from the mail server: '.$e->getMessage()]);
         }
     }
 
