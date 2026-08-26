@@ -72,7 +72,7 @@ class SiteContentController extends Controller
         $enabled=$request->boolean('enabled');
         $item->show_in_navigation=$enabled;
         if($enabled){
-            $item->navigation_order=(int)(SiteContentItem::query()->where('type','company')->where('show_in_navigation',true)->whereKeyNot($item->id)->min('navigation_order') ?? 1)-1;
+            $item->navigation_order=(int)(SiteContentItem::query()->where('type','company')->where('show_in_navigation',true)->where('id','!=',$item->id)->min('navigation_order') ?? 1)-1;
         }else{
             $item->navigation_order=null;
         }
