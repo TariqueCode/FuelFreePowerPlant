@@ -47,7 +47,11 @@ class SiteContentController extends Controller
             ->paginate(20)->withQueryString();
 
         $title = $type ? ($this->labels[$type] ?? ucfirst($type)).' CMS' : 'Website Content';
-        return view('admin.site-content.index', compact('items','type','title'))
+        $publishedCount = $type === 'news'
+            ? SiteContentItem::query()->whereIn('type', ['news','announcement'])->where('status', 'published')->count()
+            : 0;
+
+        return view('admin.site-content.index', compact('items','type','title','publishedCount'))
             ->with('types', $this->types)->with('labels', $this->labels);
     }
 
