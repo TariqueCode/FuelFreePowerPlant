@@ -10,11 +10,16 @@ class SiteContentItem extends Model
     protected $fillable = [
         'type', 'title', 'slug', 'excerpt', 'designation', 'phone', 'email',
         'content', 'image_path', 'visiting_card_path', 'status', 'sort_order', 'published_at',
+        'show_in_navigation',
     ];
 
     protected function casts(): array
     {
-        return ['published_at' => 'datetime', 'sort_order' => 'integer'];
+        return [
+            'published_at' => 'datetime',
+            'sort_order' => 'integer',
+            'show_in_navigation' => 'boolean',
+        ];
     }
 
     public function galleryMedia(): HasMany
