@@ -12,7 +12,7 @@ use Illuminate\View\View;
 
 class SiteContentController extends Controller
 {
-    private array $types = ['company', 'management', 'news', 'sustainability', 'gallery', 'resource', 'announcement'];
+    private array $types = ['company', 'management', 'news', 'sustainability', 'gallery', 'resource', 'announcement', 'solution'];
 
     public function index(Request $request): View
     {
@@ -53,7 +53,7 @@ class SiteContentController extends Controller
     private function saveItem(SiteContentItem $item, Request $request): SiteContentItem
     {
         $data = $request->validate([
-            'type' => ['required', 'in:company,management,news,sustainability,gallery,resource,announcement'],
+            'type' => ['required', 'in:company,management,news,sustainability,gallery,resource,announcement,solution'],
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255'],
             'excerpt' => ['nullable', 'string', 'max:1000'],
