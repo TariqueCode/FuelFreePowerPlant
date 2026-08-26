@@ -17,6 +17,12 @@
         <link rel="icon" type="image/png" href="{{ asset('storage/'.ltrim($publicLogo,'/')) }}">
         <link rel="apple-touch-icon" href="{{ asset('storage/'.ltrim($publicLogo,'/')) }}">
     @endif
+    <style>
+        html{font-size:16px;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+        body{font-size:1rem;line-height:1.6}
+        button,input,select,textarea{font:inherit}
+        @media(max-width:600px){body{font-size:1rem}}
+    </style>
     @stack('head')
 </head>
 <body>
