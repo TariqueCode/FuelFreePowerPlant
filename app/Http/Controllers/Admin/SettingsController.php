@@ -29,7 +29,8 @@ class SettingsController extends Controller
             'company.name'=>['required','string','max:150'],'company.domain'=>['required','string','max:255'],
             'company.tagline'=>['nullable','string','max:255'],'company.timezone'=>['required','timezone'],
             'storage.quota_gib'=>['required','numeric','min:1','max:1048576'],'energy.real_data_enabled'=>['nullable','boolean'],
-            'company.logo'=>['nullable','image','mimes:jpg,jpeg,png,webp,svg','max:5120'],
+            // No application-level size cap: actual server/storage limits remain the only constraint.
+            'company.logo'=>['nullable','image','mimes:jpg,jpeg,png,webp,svg'],
         ]);
         $data=['company.name'=>data_get($validated,'company.name'),'company.domain'=>data_get($validated,'company.domain'),
             'company.tagline'=>data_get($validated,'company.tagline'),'company.timezone'=>data_get($validated,'company.timezone'),
