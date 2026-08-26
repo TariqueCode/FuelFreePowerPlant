@@ -35,6 +35,11 @@ class SitePopupController extends Controller
 
     public function update(Request $request, SitePopup $popup): RedirectResponse
     {
+        if ($request->boolean('toggle')) {
+            $popup->update(['is_published' => !$popup->is_published]);
+            return redirect()->route('admin.site-popups.index')->with('status', $popup->is_published ? 'Highlight activated.' : 'Highlight deactivated.');
+        }
+
         $this->save($popup, $request);
         return redirect()->route('admin.site-popups.index')->with('status','Announcement banner updated.');
     }
