@@ -1,0 +1,77 @@
+@php
+    $publicBrand = $brand ?? [];
+    $publicName = is_object($publicBrand) ? ($publicBrand->get('name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? config('fuelfree.company.name'));
+    $publicLogo = is_object($publicBrand) ? $publicBrand->get('logo_path') : ($publicBrand['logo_path'] ?? null);
+@endphp
+<style>
+.public-header{position:sticky;top:0;z-index:100;background:rgba(2,10,16,.78);backdrop-filter:blur(20px);border-bottom:1px solid rgba(86,210,238,.15)}
+.public-nav{height:70px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.public-brand{display:flex;align-items:center;gap:10px;font-weight:850;min-width:0;color:#effcff!important;text-decoration:none!important}
+.public-brand:visited,.public-brand:hover,.public-brand:active{color:#effcff!important;text-decoration:none!important}
+.public-brand img{width:40px;height:40px;object-fit:contain;border-radius:10px}
+.public-brand-fallback{width:40px;height:40px;display:grid;place-items:center;border-radius:10px;color:#43d1f0;border:1px solid rgba(86,210,238,.15)}
+.public-brand span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.public-menu{display:flex;gap:3px}
+.public-menu a,.public-menu a:visited{font-size:10px;color:#9bb5be!important;padding:10px;border-radius:9px;text-decoration:none!important}
+.public-menu a:hover,.public-menu a:active{color:#fff!important;background:rgba(67,209,240,.08);text-decoration:none!important}
+.public-menu-toggle{display:none;width:42px;height:42px;border:1px solid rgba(86,210,238,.15);border-radius:11px;background:#06141d;color:#fff;align-items:center;justify-content:center;cursor:pointer}
+.public-menu-toggle svg{width:19px;height:19px;display:block}
+@media(max-width:720px){
+ .public-menu-toggle{display:flex}
+ .public-menu{display:none;position:absolute;top:70px;left:12px;right:12px;flex-direction:column;padding:8px;background:rgba(4,18,26,.98);border:1px solid rgba(86,210,238,.15);border-radius:14px;box-shadow:0 20px 55px rgba(0,0,0,.3)}
+ .public-menu.is-open{display:flex}
+ .public-menu a,.public-menu a:visited{padding:12px}
+}
+</style>
+<header class="public-header">
+    <div class="shell public-nav">
+        <a class="public-brand" href="{{ route('home') }}">
+            @if($publicLogo)
+                <img src="{{ asset('storage/'.ltrim($publicLogo,'/')) }}" alt="{{ $publicName }}">
+            @else
+                <span class="public-brand-fallback" aria-hidden="true">⚡</span>
+            @endif
+            <span>{{ $publicName }}</span>
+        </a>
+        <button class="public-menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false">
+            <svg class="public-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <nav class="public-menu" aria-label="Primary navigation">
+            <a href="{{ route('home') }}">Home</a>
+            <a href="{{ route('site.about') }}">About Us</a>
+            <a href="{{ route('site.solutions') }}">Solutions</a>
+            <a href="{{ route('site.plants') }}">Plants</a>
+            <a href="{{ route('site.future-project') }}">Future Project</a>
+            <a href="{{ route('management') }}">Management Team</a>
+            <a href="{{ route('news.index') }}">News</a>
+            <a href="{{ route('site.career') }}">Career</a>
+            <a href="{{ route('contact') }}">Contact</a>
+        </nav>
+    </div>
+</header>
+<script>
+(function(){
+    const buttons=document.querySelectorAll('.public-menu-toggle');
+    buttons.forEach(button=>{
+        if(button.dataset.bound==='1') return;
+        button.dataset.bound='1';
+        const menu=button.parentElement?.querySelector('.public-menu');
+        if(!menu) return;
+        const icon=button.querySelector('.public-menu-icon');
+        const bars='<path d="M4 6h16M4 12h16M4 18h16"/>';
+        const close='<path d="M6 6l12 12M18 6L6 18"/>';
+        button.addEventListener('click',()=>{
+            const open=menu.classList.toggle('is-open');
+            button.setAttribute('aria-expanded',open?'true':'false');
+            button.setAttribute('aria-label',open?'Close navigation':'Open navigation');
+            if(icon) icon.innerHTML=open?close:bars;
+        });
+        menu.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{
+            menu.classList.remove('is-open');
+            button.setAttribute('aria-expanded','false');
+            button.setAttribute('aria-label','Open navigation');
+            if(icon) icon.innerHTML=bars;
+        }));
+    });
+})();
+</script>
