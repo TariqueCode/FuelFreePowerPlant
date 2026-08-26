@@ -19,6 +19,11 @@ class SiteContentItem extends Model
     public function scopePublished($query)
     {
         return $query->where('status', 'published')
-            ->where(function ($q) { $q->whereNull('published_at')->orWhere('published_at', '<=', now()); });
+            ->where(function ($q) {
+                $q->where('type', 'gallery')
+                    ->orWhere(function ($q) {
+                        $q->whereNull('published_at')->orWhere('published_at', '<=', now());
+                    });
+            });
     }
 }
