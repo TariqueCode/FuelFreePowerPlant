@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class SiteContentItem extends Model
 {
     protected $fillable = [
-        'type', 'title', 'slug', 'excerpt', 'content', 'image_path',
-        'status', 'sort_order', 'published_at',
+        'type', 'title', 'slug', 'excerpt', 'designation', 'phone', 'email',
+        'content', 'image_path', 'visiting_card_path', 'status', 'sort_order', 'published_at',
     ];
 
     protected function casts(): array
