@@ -24,11 +24,17 @@ use App\Http\Controllers\ManagementController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PowerPlantPageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SustainabilityController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('/about-us', [PublicSiteController::class, 'show'])->defaults('section', 'about-us')->name('site.about');
+Route::get('/plants', [PublicSiteController::class, 'show'])->defaults('section', 'plants')->name('site.plants');
+Route::get('/future-project', [PublicSiteController::class, 'show'])->defaults('section', 'future-project')->name('site.future-project');
+Route::get('/career', [PublicSiteController::class, 'show'])->defaults('section', 'career')->name('site.career');
+Route::get('/sections/{section}', [PublicSiteController::class, 'show'])->name('site.section');
 Route::get('/management', ManagementController::class)->name('management');
 Route::get('/management/{member}/contact.vcf', [ManagementController::class, 'vcard'])->name('management.vcard');
 Route::get('/projects/{slug}', [PowerPlantPageController::class, 'show'])->name('projects.show');
