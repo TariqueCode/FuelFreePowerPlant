@@ -20,11 +20,11 @@ class SiteContentController extends Controller
         abort_unless($type===''||in_array($type,$this->types,true),404);
         $items=SiteContentItem::query()
             ->when($type,function($q)use($type){return $type==='news'?$q->whereIn('type',['news','announcement']):$q->where('type',$type);})
-            ->when($type==='company',fn($q)=>$q->orderBy('navigation_order')->orderByDesc('created_at'))
+            ->when($type==='company',fn($q)=>$q->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')->orderBy('navigation_order')->orderByDesc('created_at'))
             ->when($type!=='company',fn($q)=>$q->latest('created_at'))
             ->paginate(20)->withQueryString();
         $navigationPages=$type==='company'
-            ? SiteContentItem::query()->where('type','company')->where('show_in_navigation',true)->orderBy('navigation_order')->orderByDesc('created_at')->get(['id','title','slug','show_in_navigation','navigation_order'])
+            ? SiteContentItem::query()->where('type','company')->where('show_in_navigation',true)->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')->orderBy('navigation_order')->orderByDesc('created_at')->get(['id','title','slug','show_in_navigation','navigation_order'])
             : collect();
         $title=$type?($this->labels[$type]??ucfirst($type)).' CMS':'Website Content';
         return view('admin.site-content.index',compact('items','type','title','navigationPages'))->with('types',$this->types)->with('labels',$this->labels);
@@ -72,7 +72,7 @@ class SiteContentController extends Controller
     public function reorderNavigation(Request $request): JsonResponse
     {
         $data=$request->validate(['ids'=>['required','array'],'ids.*'=>['integer','distinct','exists:site_content_items,id']]);
-        $items=SiteContentItem::query()->where('type','company')->whereIn('id',$data['ids'])->get()->keyBy('id');
+        $items=SiteContentItem::query()->where('type','company')->where('show_in_navigation',true)->whereIn('id',$data['ids'])->get()->keyBy('id');
         abort_unless($items->count()===count($data['ids']),422,'Invalid navigation items.');
         foreach($data['ids'] as $position=>$id){$items[$id]->update(['navigation_order'=>$position+1]);}
         return response()->json(['ok'=>true]);
@@ -100,9 +100,11 @@ class SiteContentController extends Controller
         ]);
         if(($data['slug']??'')==='') $data['slug']=str($data['title'])->slug();
         $data['show_in_navigation']=($data['type']==='company') && (bool)($data['show_in_navigation']??false);
-        if($data['type']==='company' && $data['show_in_navigation'] && !$item->exists){
-            $data['navigation_order']=(int)(SiteContentItem::query()->where('type','company')->min('navigation_order') ?? 1)-1;
+        $wasInNavigation=$item->exists && $item->type==='company' && (bool)$item->show_in_navigation;
+        if($data['type']==='company' && $data['show_in_navigation'] && !$wasInNavigation){
+            $data['navigation_order']=(int)(SiteContentItem::query()->where('type','company')->where('show_in_navigation',true)->min('navigation_order') ?? 1)-1;
         }
+        if($data['type']!=='company') $data['show_in_navigation']=false;
         $item->fill($data)->save();
         return $item;
     }
