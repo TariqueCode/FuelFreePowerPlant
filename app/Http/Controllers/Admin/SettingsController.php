@@ -18,7 +18,7 @@ class SettingsController
             'company.tagline'=>config('fuelfree.company.tagline'),'company.timezone'=>config('fuelfree.company.timezone'),
             'company.logo_path'=>'','storage.quota_gib'=>(string) round(config('fuelfree.storage.quota_bytes',53687091200)/1073741824),
             'home.news_limit'=>'3','home.gallery_limit'=>'4',
-            'home.slider_enabled'=>'1','home.welcome_enabled'=>'1','home.news_enabled'=>'1','home.gallery_enabled'=>'1','home.stats_enabled'=>'1',
+            'home.slider_enabled'=>'1','home.welcome_enabled'=>'1','home.news_enabled'=>'1','home.gallery_enabled'=>'1',
         ];
         $saved=SystemSetting::query()->pluck('value','key')->all();
         $settings=array_merge($defaults,$saved);
@@ -33,7 +33,7 @@ class SettingsController
             'storage.quota_gib'=>['required','numeric','min:1','max:1048576'],
             'home.news_limit'=>['required','integer','min:1','max:12'],'home.gallery_limit'=>['required','integer','min:1','max:12'],
             'home.slider_enabled'=>['nullable','boolean'],'home.welcome_enabled'=>['nullable','boolean'],
-            'home.news_enabled'=>['nullable','boolean'],'home.gallery_enabled'=>['nullable','boolean'],'home.stats_enabled'=>['nullable','boolean'],
+            'home.news_enabled'=>['nullable','boolean'],'home.gallery_enabled'=>['nullable','boolean'],
             'company.logo'=>['nullable','image','mimes:jpg,jpeg,png,webp,svg'],
         ]);
 
@@ -46,7 +46,6 @@ class SettingsController
             'home.welcome_enabled'=>$request->boolean('home.welcome_enabled')?'1':'0',
             'home.news_enabled'=>$request->boolean('home.news_enabled')?'1':'0',
             'home.gallery_enabled'=>$request->boolean('home.gallery_enabled')?'1':'0',
-            'home.stats_enabled'=>$request->boolean('home.stats_enabled')?'1':'0',
         ];
 
         if($request->hasFile('company.logo')){
