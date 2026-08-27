@@ -11,18 +11,18 @@ class WebmailService
         return function_exists('imap_open');
     }
 
-    public function login(string $email, string $password): bool
+    public function login(string $email, string $password, array $config = []): bool
     {
         $this->ensureExtension();
-        $connection = @imap_open($this->mailbox(), $email, $password, OP_HALFOPEN, 1, ['DISABLE_AUTHENTICATOR' => 'GSSAPI']);
+        $connection = @imap_open($this->mailbox($config), $email, $password, OP_HALFOPEN, 1, ['DISABLE_AUTHENTICATOR' => 'GSSAPI']);
         if (!$connection) throw new RuntimeException($this->imapError() ?: 'The email address or password is incorrect.');
         imap_close($connection);
         return true;
     }
 
-    public function messages(string $email, string $password, int $limit = 40): array
+    public function messages(string $email, string $password, int $limit = 40, array $config = []): array
     {
-        $connection = $this->open($email, $password);
+        $connection = $this->open($email, $password, $config);
         $numbers = imap_search($connection, 'ALL') ?: [];
         rsort($numbers);
         $numbers = array_slice($numbers, 0, $limit);
@@ -44,9 +44,9 @@ class WebmailService
         return $messages;
     }
 
-    public function message(string $email, string $password, int $uid): array
+    public function message(string $email, string $password, int $uid, array $config = []): array
     {
-        $connection = $this->open($email, $password);
+        $connection = $this->open($email, $password, $config);
         $number = imap_msgno($connection, $uid);
         if ($number < 1) {
             imap_close($connection);
@@ -71,10 +71,10 @@ class WebmailService
         ];
     }
 
-    public function send(string $email, string $password, string $to, string $subject, string $body): void
+    public function send(string $email, string $password, string $to, string $subject, string $body, array $config = []): void
     {
-        $host = config('cpanel.mail_host', 'mail.fuelfreepowerplant.com');
-        $socket = @stream_socket_client('ssl://'.$host.':465', $errno, $errstr, 20, STREAM_CLIENT_CONNECT);
+        $host = $config['smtp_host'] ?? config('cpanel.mail_host', 'mail.fuelfreepowerplant.com');
+        $socket = @stream_socket_client('ssl://'.$host.':'.($config['smtp_port'] ?? 465), $errno, $errstr, 20, STREAM_CLIENT_CONNECT);
         if (!$socket) throw new RuntimeException('SMTP connection failed: '.($errstr ?: 'Unable to connect.'));
 
         stream_set_timeout($socket, 20);
@@ -110,17 +110,19 @@ class WebmailService
         fclose($socket);
     }
 
-    private function open(string $email, string $password)
+    private function open(string $email, string $password, array $config = [])
     {
         $this->ensureExtension();
-        $connection = @imap_open($this->mailbox(), $email, $password, 0, 1, ['DISABLE_AUTHENTICATOR' => 'GSSAPI']);
+        $connection = @imap_open($this->mailbox($config), $email, $password, 0, 1, ['DISABLE_AUTHENTICATOR' => 'GSSAPI']);
         if (!$connection) throw new RuntimeException($this->imapError() ?: 'Unable to connect to the mailbox.');
         return $connection;
     }
 
-    private function mailbox(): string
+    private function mailbox(array $config = []): string
     {
-        return '{'.config('cpanel.mail_host', 'mail.fuelfreepowerplant.com').':993/imap/ssl}INBOX';
+        $host = $config['imap_host'] ?? config('cpanel.mail_host', 'mail.fuelfreepowerplant.com');
+        $port = $config['imap_port'] ?? 993;
+        return '{'.$host.':'.$port.'/imap/ssl}INBOX';
     }
 
     private function ensureExtension(): void
