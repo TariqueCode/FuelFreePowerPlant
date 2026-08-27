@@ -16,8 +16,9 @@
 .public-brand-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;line-height:1.2;font-weight:800;letter-spacing:-.02em}
 .public-header-nav{display:flex;align-items:center;justify-content:center;min-width:0;height:40px}.public-menu{width:100%;}.public-menu{display:flex;align-items:center;justify-content:center;gap:1px;min-width:0;overflow-x:auto;overflow-y:hidden;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}.public-menu::-webkit-scrollbar{display:none}
 .public-menu a,.public-menu a:visited{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:5px 8px;border-radius:7px;color:#92adb6!important;font-size:10px;line-height:1.15;font-weight:600;text-decoration:none!important;white-space:nowrap;flex:0 0 auto;transition:color .18s,background .18s}.public-menu a:hover,.public-menu a:active{color:#effcff!important;background:rgba(67,209,240,.08);text-decoration:none!important}.public-menu a[aria-current=page]{color:#8bf3ff!important;background:rgba(67,209,240,.07)}
-.public-header-tools{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0;flex:0 0 auto}.public-portal{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:31px;padding:0 10px;border:1px solid rgba(86,210,238,.18);border-radius:9px;background:rgba(67,209,240,.055);color:#c8e9ef!important;font-size:10px;font-weight:750;text-decoration:none!important;white-space:nowrap;transition:background .18s,border-color .18s,color .18s,transform .18s}.public-portal:hover{color:#fff!important;background:rgba(67,209,240,.11);border-color:rgba(86,210,238,.32);transform:translateY(-1px)}.public-portal i{color:#55d8f1;font-size:10px}.mobile-portal-separator,.mobile-menu-portal{display:none}
+.public-header-tools{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0;flex:0 0 auto}.public-header-socials{display:flex;align-items:center;gap:5px}.public-header-social{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;color:#8faeb8!important;background:rgba(67,209,240,.035);border:1px solid rgba(86,210,238,.11);text-decoration:none!important;transition:color .18s,background .18s,border-color .18s,transform .18s}.public-header-social:hover{color:#8bf3ff!important;background:rgba(67,209,240,.09);border-color:rgba(86,210,238,.25);transform:translateY(-1px)}.public-header-social i{font-size:12px}.public-header-divider{width:1px;height:34px;background:linear-gradient(to bottom,transparent,rgba(86,210,238,.38),transparent);margin:0 4px}.public-portal{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:31px;padding:0 10px;border:1px solid rgba(86,210,238,.18);border-radius:9px;background:rgba(67,209,240,.055);color:#c8e9ef!important;font-size:10px;font-weight:750;text-decoration:none!important;white-space:nowrap;transition:background .18s,border-color .18s,color .18s,transform .18s}.public-portal:hover{color:#fff!important;background:rgba(67,209,240,.11);border-color:rgba(86,210,238,.32);transform:translateY(-1px)}.public-portal i{color:#55d8f1;font-size:10px}.mobile-portal-separator,.mobile-menu-portal{display:none}
 @media(max-width:720px){
+  .public-header-socials,.public-header-divider{display:none!important}
   .public-header-tools .public-portal{display:none!important}
   .public-header-tools{margin-left:auto}
   .public-header-nav{top:58px}
@@ -40,6 +41,16 @@ body{font-size:16px!important}main p,main li,main td,main th,main label,main .bo
                 <span class="public-brand-name">{{ $publicName }}</span>
             </a>
             <div class="public-header-tools">
+                @if($publicSocials)
+                    <div class="public-header-socials" aria-label="Social media">
+                        @foreach($publicSocials as $social)
+                            <a class="public-header-social" href="{{ $social['url'] }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $social['label'] }}" title="{{ $social['label'] }}">
+                                <i class="{{ $social['icon'] ?: 'fa-solid fa-link' }}" aria-hidden="true"></i>
+                            </a>
+                        @endforeach
+                    </div>
+                    <span class="public-header-divider" aria-hidden="true"></span>
+                @endif
                 @if($isPortalUser)
                     <a class="public-portal" href="{{ $publicPortalUrl }}"><i class="fa-solid fa-circle-user" aria-hidden="true"></i><span>Portal</span></a>
                 @else
