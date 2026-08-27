@@ -19,7 +19,7 @@
     @endif
     <style>
         html{font-size:16px;-webkit-text-size-adjust:100%;text-size-adjust:100%}
-        body{font-size:1rem;line-height:1.6}
+        body{font-size:1rem;line-height:1.6;background:linear-gradient(180deg,#020a10 0%,#061721 52%,#020a10 100%);color:#effcff;min-height:100vh}
         button,input,select,textarea{font:inherit}
         @media(max-width:600px){body{font-size:1rem}}
     </style>
