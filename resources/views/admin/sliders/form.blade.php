@@ -1,0 +1,21 @@
+@extends('layouts.portal')
+@section('title',$slider->exists?'Edit Slider':'Add Slider')
+@section('content')
+<section class="hero"><div><span class="eyebrow">HOMEPAGE SLIDER</span><h1>{{ $slider->exists?'Edit':'Add' }} slider image</h1><p>Use a high-quality company image. Published images rotate automatically above the homepage welcome message.</p></div><a class="back" href="{{ route('admin.sliders.index') }}"><i class="fa-solid fa-arrow-left"></i> Back</a></section>
+@if($errors->any())<div class="errors">{{ $errors->first() }}</div>@endif
+<div class="card"><form method="POST" enctype="multipart/form-data" action="{{ $slider->exists?route('admin.sliders.update',$slider):route('admin.sliders.store') }}">
+@csrf @if($slider->exists) @method('PATCH') @endif
+<div class="grid">
+<div class="full"><label>Slider image {{ $slider->exists?'(leave empty to keep current)':'' }}</label><input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/avif" {{ $slider->exists?'':'required' }}></div>
+<div class="full">@if($slider->image_path)<img class="preview" src="{{ asset('storage/'.$slider->image_path) }}" alt="Current slider image">@endif</div>
+<div class="full"><label>Title (optional)</label><input name="title" value="{{ old('title',$slider->title) }}" maxlength="255" placeholder="e.g. Our power project"></div>
+<div><label>Display order</label><input type="number" name="sort_order" value="{{ old('sort_order',$slider->sort_order ?? 0) }}" min="0" max="9999" required><small>Lower numbers appear first.</small></div>
+<div><label>Destination URL (optional)</label><input type="url" name="link_url" value="{{ old('link_url',$slider->link_url) }}" placeholder="https://example.com"></div>
+<div><label>Start time (optional)</label><input type="datetime-local" name="starts_at" value="{{ old('starts_at',$slider->starts_at?->format('Y-m-d\\TH:i')) }}"></div>
+<div><label>End time (optional)</label><input type="datetime-local" name="ends_at" value="{{ old('ends_at',$slider->ends_at?->format('Y-m-d\\TH:i')) }}"></div>
+<div class="full check"><label><input type="checkbox" name="is_published" value="1" @checked(old('is_published',$slider->is_published))> Show this image on the homepage slider</label></div>
+</div>
+<div class="actions"><a class="back" href="{{ route('admin.sliders.index') }}">Cancel</a><button class="save" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save slider</button></div>
+</form></div>
+@endsection
+@push('styles')<style>.card{max-width:900px;padding:20px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.02)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.full{grid-column:1/-1}label{display:block;color:#89a7b2;font-size:10px;margin-bottom:7px}input{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;background:#061923;color:#e4f3f7;padding:11px;font:inherit;font-size:11px}.check label{display:flex;align-items:center;gap:8px;color:#b5cbd4}.check input{width:auto}.preview{max-width:100%;max-height:320px;border-radius:14px;border:1px solid var(--line);display:block}.actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}.back{display:inline-flex;align-items:center;gap:7px;padding:10px 13px;border:1px solid var(--line);border-radius:11px;color:#9db9c2;text-decoration:none;font-size:10px}.save{border:0;border-radius:11px;padding:12px 16px;background:#29aaca;color:#fff;font-weight:700}@media(max-width:650px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.actions{justify-content:stretch}.actions>*{flex:1;justify-content:center;text-align:center}.save{width:100%}}</style>@endpush
