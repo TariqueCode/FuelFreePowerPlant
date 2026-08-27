@@ -9,7 +9,7 @@
     </div>
     <div class="highlight-header-actions">
         <a class="action highlight-create" href="{{ route('admin.site-popups.create') }}"><i class="fa-solid fa-plus"></i><span>New highlight</span></a>
-        <div class="highlight-published"><strong>{{ $popups->total() }}</strong><span>published</span></div>
+        <div class="highlight-published"><strong>{{ $publishedCount }}</strong><span>published</span></div>
     </div>
 </section>
 @if(session('status'))<div class="notice">{{ session('status') }}</div>@endif
