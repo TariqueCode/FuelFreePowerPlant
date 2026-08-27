@@ -14,15 +14,40 @@ class WebmailService
     public function login(string $email, string $password, array $config = []): bool
     {
         $this->ensureExtension();
-        $connection = @imap_open($this->mailbox($config), $email, $password, OP_HALFOPEN, 1, ['DISABLE_AUTHENTICATOR' => 'GSSAPI']);
-        if (!$connection) throw new RuntimeException($this->imapError() ?: 'The email address or password is incorrect.');
+        $connection = @imap_open($this->mailbox($config, 'INBOX'), $email, $password, OP_HALFOPEN, 1, ['DISABLE_AUTHENTICATOR' => 'GSSAPI']);
+        if (!$connection) {
+            throw new RuntimeException($this->imapError() ?: 'The email address or password is incorrect.');
+        }
         imap_close($connection);
         return true;
     }
 
-    public function messages(string $email, string $password, int $limit = 40, array $config = []): array
+    public function folders(string $email, string $password, array $config = []): array
     {
-        $connection = $this->open($email, $password, $config);
+        $this->ensureExtension();
+        $connection = @imap_open($this->mailbox($config, ''), $email, $password, OP_HALFOPEN, 1, ['DISABLE_AUTHENTICATOR' => 'GSSAPI']);
+        if (!$connection) throw new RuntimeException($this->imapError() ?: 'Unable to connect to the mailbox.');
+
+        $list = imap_list($connection, $this->serverPrefix($config), '*') ?: [];
+        imap_close($connection);
+
+        $folders = [['name' => 'INBOX', 'label' => 'Inbox', 'icon' => 'fa-inbox']];
+        foreach ($list as $raw) {
+            $name = $this->decodeFolderName(str_replace($this->serverPrefix($config), '', $raw));
+            if (strtoupper($name) === 'INBOX') continue;
+            $upper = strtoupper($name);
+            if (str_contains($upper, 'SENT')) $folders[] = ['name' => $name, 'label' => 'Sent', 'icon' => 'fa-paper-plane'];
+            elseif (str_contains($upper, 'DRAFT')) $folders[] = ['name' => $name, 'label' => 'Drafts', 'icon' => 'fa-file-pen'];
+        }
+
+        $unique = [];
+        foreach ($folders as $folder) $unique[$folder['label']] = $folder;
+        return array_values($unique);
+    }
+
+    public function messages(string $email, string $password, int $limit = 40, array $config = [], string $folder = 'INBOX'): array
+    {
+        $connection = $this->open($email, $password, $config, $folder);
         $numbers = imap_search($connection, 'ALL') ?: [];
         rsort($numbers);
         $numbers = array_slice($numbers, 0, $limit);
@@ -35,6 +60,7 @@ class WebmailService
                 'number' => $number,
                 'subject' => $this->decodeHeader($header->subject ?? '(No subject)'),
                 'from' => $this->address($header->from[0] ?? null),
+                'to' => $this->addressList($header->to ?? []),
                 'date' => $header->date ?? '',
                 'seen' => empty($header->Unseen),
             ];
@@ -44,9 +70,9 @@ class WebmailService
         return $messages;
     }
 
-    public function message(string $email, string $password, int $uid, array $config = []): array
+    public function message(string $email, string $password, int $uid, array $config = [], string $folder = 'INBOX'): array
     {
-        $connection = $this->open($email, $password, $config);
+        $connection = $this->open($email, $password, $config, $folder);
         $number = imap_msgno($connection, $uid);
         if ($number < 1) {
             imap_close($connection);
@@ -74,7 +100,9 @@ class WebmailService
     public function send(string $email, string $password, string $to, string $subject, string $body, array $config = [], ?array $attachment = null): void
     {
         $host = $config['smtp_host'] ?? config('cpanel.mail_host', 'mail.fuelfreepowerplant.com');
-        $socket = @stream_socket_client('ssl://'.$host.':'.($config['smtp_port'] ?? 465), $errno, $errstr, 20, STREAM_CLIENT_CONNECT);
+        $port = (int) ($config['smtp_port'] ?? 465);
+        $ssl = $port === 465 ? 'ssl://' : 'tcp://';
+        $socket = @stream_socket_client($ssl.$host.':'.$port, $errno, $errstr, 20, STREAM_CLIENT_CONNECT);
         if (!$socket) throw new RuntimeException('SMTP connection failed: '.($errstr ?: 'Unable to connect.'));
 
         stream_set_timeout($socket, 20);
@@ -114,26 +142,52 @@ class WebmailService
         $this->smtpExpect($socket, 250);
         fwrite($socket, "QUIT\r\n");
         fclose($socket);
+
+        // Keep a copy in the provider's Sent folder when IMAP permits it.
+        try {
+            $sent = $this->findFolder($email, $password, $config, 'SENT');
+            if ($sent) {
+                $append = implode("\r\n", $headers)."\r\n\r\n".$this->dotStuff($html)."\r\n";
+                $connection = $this->open($email, $password, $config, $sent);
+                @imap_append($connection, $this->mailbox($config, $sent), $append, '\\Seen');
+                imap_close($connection);
+            }
+        } catch (\Throwable) {
+            // Sending succeeded even if the provider does not expose a writable Sent folder.
+        }
     }
 
-    private function open(string $email, string $password, array $config = [])
+    private function open(string $email, string $password, array $config = [], string $folder = 'INBOX')
     {
         $this->ensureExtension();
-        $connection = @imap_open($this->mailbox($config), $email, $password, 0, 1, ['DISABLE_AUTHENTICATOR' => 'GSSAPI']);
+        $connection = @imap_open($this->mailbox($config, $folder), $email, $password, 0, 1, ['DISABLE_AUTHENTICATOR' => 'GSSAPI']);
         if (!$connection) throw new RuntimeException($this->imapError() ?: 'Unable to connect to the mailbox.');
         return $connection;
     }
 
-    private function mailbox(array $config = []): string
+    private function mailbox(array $config, string $folder): string
+    {
+        return $this->serverPrefix($config).$folder;
+    }
+
+    private function serverPrefix(array $config): string
     {
         $host = $config['imap_host'] ?? config('cpanel.mail_host', 'mail.fuelfreepowerplant.com');
-        $port = $config['imap_port'] ?? 993;
-        return '{'.$host.':'.$port.'/imap/ssl}INBOX';
+        $port = (int) ($config['imap_port'] ?? 993);
+        return '{'.$host.':'.$port.'/imap/ssl}';
+    }
+
+    private function findFolder(string $email, string $password, array $config, string $needle): ?string
+    {
+        foreach ($this->folders($email, $password, $config) as $folder) {
+            if (strtoupper($needle) === 'SENT' && $folder['label'] === 'Sent') return $folder['name'];
+        }
+        return null;
     }
 
     private function ensureExtension(): void
     {
-        if (!$this->extensionAvailable()) throw new RuntimeException('PHP IMAP extension is not enabled on this server. Please enable IMAP in the hosting PHP extensions.');
+        if (!$this->extensionAvailable()) throw new RuntimeException('PHP IMAP extension is not enabled on this server. Enable IMAP in PHP extensions.');
     }
 
     private function imapError(): string
@@ -142,6 +196,11 @@ class WebmailService
     }
 
     private function decodeHeader(string $value): string
+    {
+        return function_exists('imap_utf8') ? imap_utf8($value) : $value;
+    }
+
+    private function decodeFolderName(string $value): string
     {
         return function_exists('imap_utf8') ? imap_utf8($value) : $value;
     }
@@ -156,7 +215,7 @@ class WebmailService
 
     private function addressList(array $addresses): string
     {
-        return implode(', ', array_map(fn($address) => $this->address($address), $addresses));
+        return implode(', ', array_map(fn ($address) => $this->address($address), $addresses));
     }
 
     private function decodeBody(string $body, ?object $structure): string
@@ -174,8 +233,7 @@ class WebmailService
         $body = preg_replace('/\s+on[a-z]+\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $body) ?? $body;
         $body = preg_replace('/\s+(?:href|src)\s*=\s*(?:"|\')\s*javascript:[^"\']*(?:"|\')/i', '', $body) ?? $body;
         $allowed = '<p><br><div><span><strong><b><em><i><u><s><blockquote><ul><ol><li><a><img><table><thead><tbody><tfoot><tr><th><td><h1><h2><h3><h4><hr><pre><code>';
-        if ($body !== strip_tags($body)) return strip_tags($body, $allowed);
-        return nl2br(e($body));
+        return $body !== strip_tags($body) ? strip_tags($body, $allowed) : nl2br(e($body));
     }
 
     private function safeBodyForSend(string $body): string
