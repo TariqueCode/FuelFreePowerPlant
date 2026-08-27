@@ -15,7 +15,8 @@ class MailController extends Controller
     public function index(Request $request, WebmailService $webmail): View
     {
         $accounts = $this->accounts($request);
-        $selected = $accounts->firstWhere('id', (int) $request->query('account')) ?: $accounts->first();
+        $activeAccounts = $accounts->where('status', 'active');
+        $selected = $activeAccounts->firstWhere('id', (int) $request->query('account')) ?: $activeAccounts->first();
         $folder = $request->query('folder', 'INBOX');
         $folders = [];
         $messages = [];
