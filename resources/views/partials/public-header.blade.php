@@ -3,7 +3,7 @@
     $publicName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
     $publicLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
     $publicNavPages = \App\Models\SiteContentItem::query()->where('type','company')->where('status','published')->where('show_in_navigation',true)->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')->orderBy('navigation_order')->orderByDesc('created_at')->get(['title','slug']);
-    $publicSocials = \Illuminate\Support\Facades\Cache::remember('public.social-links', 600, fn () => \App\Models\SocialLink::active()->get(['label','url','icon']));
+    $publicSocials = \Illuminate\Support\Facades\Cache::remember('public.social-links.v2', 600, fn () => \App\Models\SocialLink::active()->get(['label','url','icon'])->map(fn ($social) => ['label' => $social->label, 'url' => $social->url, 'icon' => $social->icon])->values()->all());
     $isPortalUser = auth()->check() && auth()->user()->hasRole('client');
 @endphp
 <style>
@@ -33,10 +33,10 @@ body{font-size:16px!important}main p,main li,main td,main th,main label,main .bo
                 <span class="public-brand-name">{{ $publicName }}</span>
             </a>
             <div class="public-header-tools">
-                @if($publicSocials->isNotEmpty())
+                @if(!empty($publicSocials))
                     <div class="public-socials" aria-label="Social media">
                         @foreach($publicSocials as $social)
-                            <a class="public-social" href="{{ $social->url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $social->label }}" title="{{ $social->label }}"><i class="{{ $social->icon }}" aria-hidden="true"></i></a>
+                            <a class="public-social" href="{{ $social['url'] }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $social['label'] }}" title="{{ $social['label'] }}"><i class="{{ $social['icon'] }}" aria-hidden="true"></i></a>
                         @endforeach
                     </div>
                     <span class="public-header-divider" aria-hidden="true"></span>
