@@ -19,6 +19,9 @@ class HomeController
         $gallery=SiteContentItem::published()->where('type','gallery')->whereNotNull('image_path')->withCount('galleryMedia')->orderBy('sort_order')->latest('published_at')->get();
         $settings=SystemSetting::query()->pluck('value','key')->all();
         $brand=['name'=>$settings['company.name']??config('fuelfree.company.name'),'domain'=>$settings['company.domain']??config('fuelfree.company.domain'),'tagline'=>$settings['company.tagline']??config('fuelfree.company.tagline'),'logo_path'=>$settings['company.logo_path']??null];
+        $newsLimit=max(1,min(12,(int)($settings['home.news_limit']??3))); $galleryLimit=max(1,min(12,(int)($settings['home.gallery_limit']??4)));
+        $content['news']=$content['news']->take($newsLimit);
+        $gallery=$gallery->take($galleryLimit);
         $stats=['projects'=>PowerPlant::query()->count(),'capacity_mw'=>round((float)PowerPlant::query()->sum('capacity_kw')/1000,2),'operational'=>PowerPlant::query()->whereRaw('LOWER(status)=?', ['operational'])->count()];
 
         return response(view('home-v3',compact('plants','homePage','stats','content','brand','gallery'))->render());
