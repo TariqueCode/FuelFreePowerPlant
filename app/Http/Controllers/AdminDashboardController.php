@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\EmailAccount;
 use App\Models\PowerPlant;
 use App\Models\SiteContentItem;
 use App\Models\SitePopup;
@@ -24,7 +23,7 @@ class AdminDashboardController extends Controller
             'contentTotal'=>$contentTotal,'published'=>$published,'drafts'=>$drafts,
             'news'=>$news,'resources'=>$resources,'gallery'=>$gallery,'management'=>$management,
             'sustainability'=>$sustainability,'plants'=>PowerPlant::count(),
-            'popups'=>SitePopup::count(),'mailAccounts'=>EmailAccount::count(),
+            'popups'=>SitePopup::count(),'mailAccounts'=>0,
         ]);
     }
 }
