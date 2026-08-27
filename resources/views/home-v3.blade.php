@@ -94,34 +94,75 @@
 
 </style>
 <main class="shell">
-    @if($sliders->isNotEmpty())
-@if($home['slider'] && $sliders->isNotEmpty())
-<section class="home-slider" aria-label="Company highlights">
-    <div class="slider-track">
-        @foreach($sliders as $index => $slider)
-            @php $sliderUrl=$slider->link_url; @endphp
-            @if($sliderUrl)<a class="slide {{ $index===0?'is-active':'' }}" href="{{ $sliderUrl }}" target="_blank" rel="noopener">@else<div class="slide {{ $index===0?'is-active':'' }}">@endif
-                <img src="{{ asset('storage/'.ltrim($slider->image_path,'/')) }}" alt="{{ $slider->title ?: $siteName }}" @if($index>0)loading="lazy"@endif>
-                <div class="slide-shade"></div>
-                @if($slider->title)<div class="slide-caption"><span>{{ $siteName }}</span><strong>{{ $slider->title }}</strong></div>@endif
-            @if($sliderUrl)</a>@else</div>@endif
-        @endforeach
-    </div>
-    @if($sliders->count()>1)<div class="slider-dots" role="tablist" aria-label="Slider navigation">@foreach($sliders as $index => $slider)<button type="button" class="{{ $index===0?'is-active':'' }}" aria-label="Show slide {{ $index+1 }}" data-slide="{{ $index }}"></button>@endforeach</div>@endif
-</section>
-@endif
-<section class="welcome">
-    <div class="welcome-heading"><span class="eyebrow">Welcome to {{ $siteName }}</span><h1>Building a <em>stronger</em> energy future.</h1><div class="welcome-rule"></div></div>
-    <div class="welcome-copy">
-        <p><strong>{{ $siteName }}</strong> is a forward-thinking energy company committed to contributing to Bangladesh’s sustainable energy future. Our vision is to develop efficient, reliable, and innovative power solutions that support the country’s growing energy needs and economic development.</p>
-        <p>We are dedicated to building a cleaner and smarter energy future through innovation, responsible development, and world-class management practices. We aim to strengthen our capabilities, expand our projects, embrace modern technologies, and deliver dependable energy solutions while maintaining our commitment to quality, sustainability, and excellence.</p>
-        <div class="welcome-signoff">{{ $siteName }} <span>— Powering a cleaner, smarter future.</span></div>
-    </div>
-</section>
+    @if($home['slider'] && $sliders->isNotEmpty())
+    <section class="home-slider" aria-label="Company highlights">
+        <div class="slider-track">
+            @foreach($sliders as $index => $slider)
+                @php $sliderUrl=$slider->link_url; @endphp
+                @if($sliderUrl)<a class="slide {{ $index===0?'is-active':'' }}" href="{{ $sliderUrl }}" @if(str_starts_with($sliderUrl,'http')) target="_blank" rel="noopener" @endif>@else<div class="slide {{ $index===0?'is-active':'' }}">@endif
+                    <img src="{{ asset('storage/'.ltrim($slider->image_path,'/')) }}" alt="{{ $slider->title ?: $siteName }}" @if($index>0)loading="lazy"@endif>
+                    <div class="slide-shade"></div>
+                    @if($slider->title)<div class="slide-caption"><span>{{ $siteName }}</span><strong>{{ $slider->title }}</strong></div>@endif
+                @if($sliderUrl)</a>@else</div>@endif
+            @endforeach
+        </div>
+        @if($sliders->count()>1)
+        <div class="slider-dots" role="tablist" aria-label="Slider navigation">
+            @foreach($sliders as $index => $slider)<button type="button" class="{{ $index===0?'is-active':'' }}" aria-label="Show slide {{ $index+1 }}" data-slide="{{ $index }}"></button>@endforeach
+        </div>
+        @endif
+    </section>
+    @endif
+
+    @if($home['welcome'])
+    <section class="welcome">
+        <div class="welcome-heading"><span class="eyebrow">Welcome to {{ $siteName }}</span><h1>Building a <em>stronger</em> energy future.</h1><div class="welcome-rule"></div></div>
+        <div class="welcome-copy">
+            <p><strong>{{ $siteName }}</strong> is a forward-thinking energy company committed to contributing to Bangladesh’s sustainable energy future. Our vision is to develop efficient, reliable, and innovative power solutions that support the country’s growing energy needs and economic development.</p>
+            <p>We are dedicated to building a cleaner and smarter energy future through innovation, responsible development, and world-class management practices. We aim to strengthen our capabilities, expand our projects, embrace modern technologies, and deliver dependable energy solutions while maintaining our commitment to quality, sustainability, and excellence.</p>
+            <div class="welcome-signoff">{{ $siteName }} <span>— Powering a cleaner, smarter future.</span></div>
+        </div>
+    </section>
+    @endif
+
+    @if($home['news'])
     <section class="section"><div class="head"><div><span class="eyebrow">Latest updates</span><h2>News &amp; Notices</h2></div><a class="more" href="{{ route('news.index') }}">View all →</a></div><div class="news-grid">@if(($content['news']??collect())->isNotEmpty())@foreach(($content['news']??collect())->take(6) as $item)<a class="news" href="{{ route('news.show',$item->slug) }}"><div class="news-media">@if($item->image_path)<img src="{{ asset('storage/'.$item->image_path) }}" alt="{{ $item->cover_alt ?: $item->title }}" loading="lazy">@else<div class="news-placeholder">▣</div>@endif</div><div class="news-kind {{ $item->type==='announcement'?'notice':'' }}">{{ $item->type==='announcement'?'Notice':'News' }}</div><div class="news-body"><h3>{{ $item->title }}</h3><p>{{ $item->excerpt ?: \Illuminate\Support\Str::limit(strip_tags((string) $item->content), 180) }}</p><div class="news-footer"><span class="date">{{ $item->published_at?->format('d F Y') }}</span><span class="read">Read more →</span></div></div></a>@endforeach @else<div class="empty" style="grid-column:1/-1">No news has been published yet.</div>@endif</div></section>
     @endif
+
     @if($home['gallery'])
     <section class="section"><div class="head"><div><span class="eyebrow">Photo collections</span><h2>Gallery</h2></div><a class="more" href="{{ route('site.gallery') }}">View all →</a></div><div class="folders">@if($gallery->isNotEmpty())@foreach($gallery->take(8) as $item)<a class="folder" href="{{ route('gallery.show',['item'=>$item->slug ?: $item->id]) }}"><div class="folder-media">@if($item->image_path)<img src="{{ asset('storage/'.ltrim($item->image_path,'/')) }}" alt="{{ $item->cover_alt ?: $item->title }}" loading="lazy">@else<div class="folder-placeholder"><i class="fa-regular fa-images"></i></div>@endif</div><div class="folder-body"><h3>{{ $item->title }}</h3><div class="folder-meta"><span class="folder-date"><i class="fa-regular fa-calendar"></i>{{ $item->published_at?->format('d F Y') ?? $item->created_at?->format('d F Y') }}</span><span class="folder-count"><i class="fa-regular fa-images"></i>{{ $item->gallery_media_count }} {{ $item->gallery_media_count === 1 ? 'photo' : 'photos' }}</span></div></div></a>@endforeach @else<div class="empty" style="grid-column:1/-1">No photo galleries have been published yet.</div>@endif</div></section>
     @endif
 </main>
+@push('scripts')
+<script>
+(() => {
+    const root = document.querySelector('.home-slider');
+    if (!root) return;
+    const slides = [...root.querySelectorAll('.slide')];
+    const dots = [...root.querySelectorAll('.slider-dots button')];
+    if (slides.length < 2) return;
+    let index = 0;
+    let timer;
+    const show = (next) => {
+        index = (next + slides.length) % slides.length;
+        slides.forEach((s,i) => s.classList.toggle('is-active', i === index));
+        dots.forEach((d,i) => { d.classList.toggle('is-active', i === index); d.setAttribute('aria-selected', i === index ? 'true' : 'false'); });
+    };
+    const start = () => { clearInterval(timer); timer = setInterval(() => show(index + 1), 5000); };
+    dots.forEach((dot,i) => dot.addEventListener('click', () => { show(i); start(); }));
+    root.addEventListener('mouseenter', () => clearInterval(timer));
+    root.addEventListener('mouseleave', start);
+    root.addEventListener('focusin', () => clearInterval(timer));
+    root.addEventListener('focusout', start);
+    let touchStartX = 0;
+    root.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; }, {passive:true});
+    root.addEventListener('touchend', e => {
+        const delta = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(delta) > 45) { show(index + (delta < 0 ? 1 : -1)); start(); }
+    }, {passive:true});
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    start();
+})();
+</script>
+@endpush
 @endsection
