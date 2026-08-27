@@ -553,3 +553,200 @@ main{padding:72px 0 88px}
 <div class="lightbox" id="photoLightbox"><button class="lightbox-close" id="lightboxClose" type="button"><i class="fa-solid fa-xmark"></i></button><div class="lightbox-content"><img id="lightboxImage" src="" alt=""></div><div class="zoom-controls"><button id="zoomOut" type="button"><i class="fa-solid fa-minus"></i></button><span class="zoom-level" id="zoomLevel">100%</span><button id="zoomIn" type="button"><i class="fa-solid fa-plus"></i></button><button id="zoomReset" type="button"><i class="fa-solid fa-rotate-left"></i></button></div></div>
 <script>(function(){const buttons=[...document.querySelectorAll('.bio-more')];function closeOther(except){buttons.forEach(btn=>{if(btn===except)return;const id=btn.dataset.more,full=document.getElementById('bio-full-'+id),preview=document.getElementById('bio-preview-'+id);if(full&&full.classList.contains('open')){full.classList.remove('open');preview.style.display='';btn.querySelector('span').textContent='More';btn.querySelector('i').className='fa-solid fa-chevron-down'}})}const bioModal=document.getElementById('bioModal'),bioModalTitle=document.getElementById('bioModalTitle'),bioModalRole=document.getElementById('bioModalRole'),bioModalBody=document.getElementById('bioModalBody'),bioModalPhoto=document.getElementById('bioModalPhoto'),bioModalContacts=document.getElementById('bioModalContacts'),bioModalActions=document.getElementById('bioModalActions'),bioModalClose=document.getElementById('bioModalClose');const desktopProfiles=[...document.querySelectorAll('.desktop-profile-button')];function shutBioModal(){if(!bioModal)return;bioModal.classList.remove('open');bioModal.setAttribute('aria-hidden','true');document.body.style.overflow=''}function openBioModal(btn){const card=btn.closest('.card'),body=card.querySelector('.body'),title=body.querySelector('h2'),role=body.querySelector('.role'),full=body.querySelector('.bio-full'),photo=card.querySelector('.photo img'),contacts=[...body.querySelectorAll('.contact')],actions=[...body.querySelectorAll('.actions .action')];bioModalTitle.textContent=title?title.textContent:'';bioModalRole.textContent=role?role.textContent:'';bioModalBody.innerHTML=full?full.innerHTML:'<p>No additional profile information is available.</p>';bioModalPhoto.innerHTML=photo?'<img src="'+photo.src.replace(/"/g,'&quot;')+'" alt="'+(title?title.textContent.replace(/"/g,'&quot;'):'')+'">':'<div class="bio-modal-photo-fallback"><i class="fa-solid fa-user-tie"></i></div>';bioModalContacts.innerHTML=contacts.map(a=>'<a class="bio-modal-contact" href="'+a.getAttribute('href')+'">'+a.innerHTML+'</a>').join('');bioModalActions.innerHTML=actions.map(a=>'<a class="bio-modal-action '+(a.classList.contains('primary')?'primary':'')+'" href="'+a.getAttribute('href')+'" '+(a.target?'target="'+a.target+'"':'')+'>'+a.innerHTML+'</a>').join('');bioModal.classList.add('open');bioModal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';bioModalClose.focus()}desktopProfiles.forEach(btn=>btn.addEventListener('click',()=>openBioModal(btn)));buttons.forEach(btn=>btn.addEventListener('click',()=>{if(window.matchMedia('(min-width:851px) and (hover:hover) and (pointer:fine)').matches){openBioModal(btn);return}const id=btn.dataset.more,full=document.getElementById('bio-full-'+id),preview=document.getElementById('bio-preview-'+id),open=!full.classList.contains('open');if(open)closeOther(btn);full.classList.toggle('open',open);preview.style.display=open?'none':'';btn.querySelector('span').textContent=open?'Less':'More';btn.querySelector('i').className=open?'fa-solid fa-chevron-up':'fa-solid fa-chevron-down'}));if(bioModal){bioModalClose.addEventListener('click',shutBioModal);bioModal.addEventListener('click',e=>{if(e.target===bioModal)shutBioModal})}const box=document.getElementById('photoLightbox'),img=document.getElementById('lightboxImage'),close=document.getElementById('lightboxClose'),level=document.getElementById('zoomLevel');let zoom=1;function render(){zoom=Math.min(4,Math.max(1,zoom));img.style.transform='scale('+zoom+')';level.textContent=Math.round(zoom*100)+'%'}function open(p){img.src=p.dataset.image;img.alt=p.dataset.name||'';zoom=1;render();box.classList.add('open');document.body.style.overflow='hidden'}function shut(){box.classList.remove('open');img.src='';document.body.style.overflow=''}document.querySelectorAll('.photo[data-image]').forEach(p=>{p.onclick=()=>open(p);p.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open(p)}}});document.getElementById('zoomIn').onclick=()=>{zoom+=.25;render()};document.getElementById('zoomOut').onclick=()=>{zoom-=.25;render()};document.getElementById('zoomReset').onclick=()=>{zoom=1;render()};close.onclick=shut;box.onclick=e=>{if(e.target===box)shut()};document.addEventListener('keydown',e=>{if(e.key==='Escape'){shut();shutBioModal()}})})();</script>
 @endsection
+
+
+<!-- Final desktop-only executive profile refinement.
+     Mobile/tablet (850px and below) intentionally untouched. -->
+<style>
+@media (min-width:851px) and (hover:hover) and (pointer:fine){
+    /* Keep the team grid clean and uniform on desktop. */
+    .grid{
+        align-items:stretch;
+    }
+    .card{
+        height:100%;
+    }
+    .card .body{
+        min-height:250px;
+    }
+    .desktop-profile-button{
+        margin-top:15px;
+    }
+
+    /* Executive profile modal */
+    .bio-modal{
+        padding:24px;
+        background:
+            radial-gradient(900px 600px at 50% 45%,rgba(28,139,170,.10),transparent 65%),
+            rgba(0,5,9,.84);
+        backdrop-filter:blur(22px) saturate(125%);
+    }
+    .bio-modal-panel{
+        width:min(1180px,94vw);
+        height:min(790px,88vh);
+        min-height:560px;
+        grid-template-columns:minmax(380px,43%) minmax(0,57%);
+        border-radius:26px;
+        border:1px solid rgba(91,214,239,.24);
+        background:
+            radial-gradient(650px 500px at 0 0,rgba(67,209,240,.105),transparent 68%),
+            linear-gradient(145deg,#082633 0%,#041923 52%,#021119 100%);
+        box-shadow:
+            0 45px 130px rgba(0,0,0,.72),
+            0 0 0 1px rgba(255,255,255,.025) inset,
+            0 0 90px rgba(23,137,164,.09);
+    }
+
+    /* Full portrait area — never crop the original management photo. */
+    .bio-modal-photo{
+        padding:28px;
+        background:
+            radial-gradient(520px 520px at 50% 38%,rgba(67,209,240,.09),transparent 70%),
+            #e9eef0;
+        border-right:1px solid rgba(91,214,239,.13);
+    }
+    .bio-modal-photo:before{
+        inset:20px;
+        border-radius:19px;
+        border-color:rgba(67,209,240,.16);
+    }
+    .bio-modal-photo:after{
+        inset:28px;
+        border-radius:16px;
+        background:linear-gradient(180deg,transparent 72%,rgba(0,10,15,.10));
+    }
+    .bio-modal-photo img{
+        width:auto;
+        height:auto;
+        max-width:100%;
+        max-height:100%;
+        object-fit:contain;
+        border-radius:14px;
+    }
+
+    .bio-modal-info{
+        background:linear-gradient(180deg,rgba(255,255,255,.008),transparent 35%);
+    }
+    .bio-modal-head{
+        padding:30px 32px 22px;
+    }
+    .bio-modal-kicker{
+        margin-bottom:7px;
+        font-size:9px;
+        letter-spacing:.20em;
+    }
+    .bio-modal-title{
+        font-size:31px;
+        line-height:1.15;
+    }
+    .bio-modal-role{
+        margin-top:9px;
+        font-size:11px;
+    }
+    .bio-modal-close{
+        width:42px;
+        height:42px;
+        flex-basis:42px;
+        border-radius:12px;
+    }
+    .bio-modal-divider{
+        margin:0 32px;
+    }
+
+    /* Only this region scrolls. Header/footer remain visible at all times. */
+    .bio-modal-scroll{
+        padding:25px 32px 20px;
+        overscroll-behavior:contain;
+        scrollbar-width:thin;
+    }
+    .bio-modal-scroll::-webkit-scrollbar{
+        width:6px;
+    }
+    .bio-modal-scroll::-webkit-scrollbar-thumb{
+        background:rgba(67,209,240,.24);
+        border-radius:99px;
+    }
+    .bio-modal-section-title{
+        margin-bottom:12px;
+        color:#72dced;
+        font-size:9px;
+        letter-spacing:.18em;
+    }
+    .bio-modal-body{
+        max-width:760px;
+        color:#a9c1c9;
+        font-size:13px;
+        line-height:1.95;
+    }
+    .bio-modal-body p{
+        margin:0 0 16px;
+    }
+    .bio-modal-body p:last-child{
+        margin-bottom:0;
+    }
+
+    /* Fixed contact/action area — no information disappears when the bio is long. */
+    .bio-modal-footer{
+        padding:17px 32px 24px;
+        background:
+            linear-gradient(180deg,rgba(2,14,21,.18),rgba(2,14,21,.62));
+        box-shadow:0 -12px 30px rgba(0,0,0,.10);
+    }
+    .bio-modal-footer .bio-modal-section-title{
+        margin-bottom:10px;
+    }
+    .bio-modal-contacts{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:9px;
+    }
+    .bio-modal-contact{
+        min-height:44px;
+        padding:8px 10px;
+        font-size:10px;
+        background:rgba(1,12,18,.40);
+    }
+    .bio-modal-actions{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:9px;
+        margin-top:10px;
+    }
+    .bio-modal-action{
+        min-height:42px;
+        font-size:10px;
+        border-radius:11px;
+    }
+}
+
+@media (min-width:851px) and (max-width:1100px) and (hover:hover) and (pointer:fine){
+    .bio-modal-panel{
+        width:min(1000px,96vw);
+        height:min(720px,90vh);
+        min-height:520px;
+        grid-template-columns:minmax(315px,40%) minmax(0,60%);
+    }
+    .bio-modal-photo{
+        padding:20px;
+    }
+    .bio-modal-photo:before{inset:14px}
+    .bio-modal-photo:after{inset:20px}
+    .bio-modal-head{
+        padding:23px 25px 18px;
+    }
+    .bio-modal-title{
+        font-size:26px;
+    }
+    .bio-modal-divider{
+        margin:0 25px;
+    }
+    .bio-modal-scroll{
+        padding:19px 25px 15px;
+    }
+    .bio-modal-body{
+        font-size:12px;
+        line-height:1.85;
+    }
+    .bio-modal-footer{
+        padding:13px 25px 18px;
+    }
+}
+</style>
