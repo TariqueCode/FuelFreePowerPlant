@@ -104,7 +104,7 @@
     <div class="home-options">
         @foreach([
             'slider_enabled'=>['Slider','Rotating company highlights at the top.','fa-images',null],
-            'welcome_enabled'=>['Welcome message','Company introduction displayed below the slider.','fa-comment-dots',null],
+            'welcome_enabled'=>['Welcome message','Company introduction displayed below the slider.','fa-comment',null],
             'news_enabled'=>['News & Notices','Latest news and notices shown on the homepage.','fa-newspaper','news_limit'],
             'gallery_enabled'=>['Gallery','Photo collections and albums shown on the homepage.','fa-photo-film','gallery_limit'],
         ] as $key=>$item)
