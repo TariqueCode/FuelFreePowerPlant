@@ -135,6 +135,7 @@ class SiteContentController extends Controller
     {
         $data = $request->validate([
             'type'=>['required','in:company,management,news,announcement,gallery'],
+            'publication_type'=>['nullable','in:news,announcement'],
             'title'=>['required','string','max:255'],
             'slug'=>['nullable','string','max:255'],
             'excerpt'=>['nullable','string','max:1000'],
@@ -148,6 +149,9 @@ class SiteContentController extends Controller
             'meta_description'=>['nullable','string','max:1000'],
             'show_in_navigation'=>['nullable','boolean'],
         ]);
+
+        if (in_array($data['type'], ['news','announcement'], true) && !empty($data['publication_type'])) $data['type'] = $data['publication_type'];
+        unset($data['publication_type']);
 
         if (($data['slug'] ?? '') === '') $data['slug'] = str($data['title'])->slug();
         $data['is_featured'] = in_array($data['type'], ['news','announcement'], true) && (bool)($data['is_featured'] ?? false);
