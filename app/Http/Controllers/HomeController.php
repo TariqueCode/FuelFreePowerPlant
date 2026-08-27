@@ -27,7 +27,6 @@ class HomeController
             'welcome' => filter_var($settings['home.welcome_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
             'news' => filter_var($settings['home.news_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
             'gallery' => filter_var($settings['home.gallery_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
-            'stats' => filter_var($settings['home.stats_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
         ];
 
         $newsLimit=max(1,min(12,(int)($settings['home.news_limit']??3)));
