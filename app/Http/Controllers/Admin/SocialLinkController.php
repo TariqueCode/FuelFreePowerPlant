@@ -30,7 +30,7 @@ class SocialLinkController extends Controller
             'label' => $platform['label'],
             'url' => $data['url'],
             'icon' => $platform['icon'],
-            'sort_order' => $data['sort_order'] ?? $this->nextOrder(),
+            'sort_order' => $this->nextOrder(),
             'is_active' => $request->boolean('is_active'),
         ]);
 
@@ -49,7 +49,7 @@ class SocialLinkController extends Controller
             'label' => $platform['label'],
             'url' => $data['url'],
             'icon' => $platform['icon'],
-            'sort_order' => $data['sort_order'] ?? $socialLink->sort_order,
+            'sort_order' => $socialLink->sort_order,
             'is_active' => $request->boolean('is_active'),
         ]);
 
@@ -95,7 +95,6 @@ class SocialLinkController extends Controller
         return $request->validate([
             'platform' => ['required','string','in:'.implode(',', array_keys(config('fuelfree.social.platforms')))],
             'url' => ['required','url','max:500'],
-            'sort_order' => ['nullable','integer','min:0','max:9999'],
             'is_active' => ['nullable','boolean'],
         ]);
     }
