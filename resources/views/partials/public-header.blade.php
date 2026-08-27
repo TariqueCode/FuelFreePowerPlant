@@ -3,6 +3,12 @@
     $publicName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
     $publicLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
     $publicNavPages = \App\Models\SiteContentItem::query()->where('type','company')->where('status','published')->where('show_in_navigation',true)->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')->orderBy('navigation_order')->orderByDesc('created_at')->get(['title','slug']);
+    $publicSocials = collect([
+        ['label' => 'Facebook',  'icon' => 'fa-brands fa-facebook-f', 'url' => env('SOCIAL_FACEBOOK_URL')],
+        ['label' => 'Instagram', 'icon' => 'fa-brands fa-instagram',    'url' => env('SOCIAL_INSTAGRAM_URL')],
+        ['label' => 'YouTube',   'icon' => 'fa-brands fa-youtube',      'url' => env('SOCIAL_YOUTUBE_URL')],
+        ['label' => 'LinkedIn',  'icon' => 'fa-brands fa-linkedin-in',  'url' => env('SOCIAL_LINKEDIN_URL')],
+    ])->filter(fn ($social) => filled($social['url']));
 @endphp
 <style>
 .public-shell{width:min(1180px,calc(100% - 32px));margin:auto}
