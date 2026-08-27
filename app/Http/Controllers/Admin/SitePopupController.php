@@ -13,7 +13,10 @@ class SitePopupController extends Controller
 {
     public function index(): View
     {
-        return view('admin.site-popups.index', ['popups'=>SitePopup::latest()->paginate(20)]);
+        $popups = SitePopup::latest()->paginate(20);
+        $publishedCount = SitePopup::where('is_published', true)->count();
+
+        return view('admin.site-popups.index', compact('popups', 'publishedCount'));
     }
 
     public function create(): View
