@@ -33,6 +33,8 @@ class SocialLinkController extends Controller
             'is_active' => $request->boolean('is_active'),
         ]);
 
+        Cache::forget('public.social-links');
+
         return back()->with('status', 'Social media link added.');
     }
 
@@ -52,12 +54,15 @@ class SocialLinkController extends Controller
             'is_active' => $request->boolean('is_active'),
         ]);
 
+        Cache::forget('public.social-links');
+
         return back()->with('status', 'Social media link updated.');
     }
 
     public function destroy(SocialLink $socialLink): RedirectResponse
     {
         $socialLink->delete();
+        Cache::forget('public.social-links');
 
         return back()->with('status', 'Social media link removed.');
     }
@@ -65,6 +70,7 @@ class SocialLinkController extends Controller
     public function toggle(SocialLink $socialLink): RedirectResponse
     {
         $socialLink->update(['is_active' => ! $socialLink->is_active]);
+        Cache::forget('public.social-links');
 
         return back()->with('status', 'Social media visibility updated.');
     }
