@@ -748,6 +748,46 @@ main{padding:72px 0 88px}
         padding:13px 25px 18px;
     }
 }
+/* Desktop modal visual polish — mobile/tablet remains unchanged. */
+@media (min-width:851px){
+    .bio-modal-photo{
+        background:
+            radial-gradient(520px 520px at 50% 38%,rgba(67,209,240,.12),transparent 70%),
+            linear-gradient(145deg,#061923 0%,#04131d 58%,#020d14 100%);
+        border-right:1px solid rgba(67,209,240,.16);
+    }
+    .bio-modal-photo:before{
+        inset:20px;
+        border:1px solid rgba(67,209,240,.12);
+        border-radius:19px;
+        box-shadow:inset 0 0 30px rgba(67,209,240,.025);
+    }
+    .bio-modal-photo:after{
+        inset:28px;
+        border-radius:16px;
+        background:linear-gradient(180deg,transparent 72%,rgba(0,10,15,.16));
+    }
+    .bio-modal-photo img{
+        border:1px solid rgba(67,209,240,.58);
+        box-shadow:
+            0 0 0 3px rgba(67,209,240,.045),
+            0 18px 45px rgba(0,0,0,.35),
+            0 0 24px rgba(67,209,240,.08);
+    }
+    .bio-modal-photo-fallback{
+        color:#48cde9;
+    }
+}
+@media (min-width:851px) and (max-width:1100px){
+    .bio-modal-photo{
+        background:
+            radial-gradient(420px 420px at 50% 38%,rgba(67,209,240,.11),transparent 70%),
+            linear-gradient(145deg,#061923 0%,#04131d 58%,#020d14 100%);
+    }
+    .bio-modal-photo img{
+        border-color:rgba(67,209,240,.58);
+    }
+}
 </style>
 
 @endsection
