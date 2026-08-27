@@ -1,12 +1,12 @@
 <?php
 
-namespace App\\Http\\Controllers\\Admin;
+namespace App\Http\Controllers\Admin;
 
-use App\\Http\\Controllers\\Controller;
-use App\\Models\\SocialLink;
-use Illuminate\\Http\\RedirectResponse;
-use Illuminate\\Http\\Request;
-use Illuminate\\View\\View;
+use App\Http\Controllers\Controller;
+use App\Models\SocialLink;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class SocialLinkController extends Controller
 {
@@ -22,7 +22,7 @@ class SocialLinkController extends Controller
         $validated = $request->validate([
             'label' => ['required', 'string', 'max:80'],
             'url' => ['required', 'url', 'max:500'],
-            'icon' => ['required', 'string', 'max:100', 'regex:/^[a-z0-9\\s-]+$/i'],
+            'icon' => ['required', 'string', 'max:100', 'regex:/^[a-z0-9\s-]+$/i'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
             'is_active' => ['nullable', 'boolean'],
         ]);
@@ -41,7 +41,7 @@ class SocialLinkController extends Controller
         $validated = $request->validate([
             'label' => ['required', 'string', 'max:80'],
             'url' => ['required', 'url', 'max:500'],
-            'icon' => ['required', 'string', 'max:100', 'regex:/^[a-z0-9\\s-]+$/i'],
+            'icon' => ['required', 'string', 'max:100', 'regex:/^[a-z0-9\s-]+$/i'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
             'is_active' => ['nullable', 'boolean'],
         ]);
