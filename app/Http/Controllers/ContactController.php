@@ -41,7 +41,11 @@ class ContactController extends Controller
         unset($data['website']);
         Inquiry::create($data);
 
-        $infoMailbox = EmailAccount::query()->where('address','info@fuelfreepowerplant.com')->where('status','active')->first();
+        $settings = SystemSetting::query()->pluck('value', 'key')->all();
+        $configuredMailboxId = (int) ($settings['mail.contact_account_id'] ?? 0);
+        $infoMailbox = $configuredMailboxId
+            ? EmailAccount::query()->whereKey($configuredMailboxId)->where('status','active')->first()
+            : EmailAccount::query()->where('address','info@fuelfreepowerplant.com')->where('status','active')->first();
         if ($infoMailbox) {
             try {
                 app(WebmailService::class)->send(
