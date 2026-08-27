@@ -4,8 +4,8 @@
     $publicLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
     $publicNavPages = \App\Models\SiteContentItem::query()->where('type','company')->where('status','published')->where('show_in_navigation',true)->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')->orderBy('navigation_order')->orderByDesc('created_at')->get(['title','slug']);
     $publicSocials = \Illuminate\Support\Facades\Cache::remember('public.social-links', 600, fn () => \App\Models\SocialLink::active()->get(['label','url','icon'])->map(fn ($social) => ['label' => $social->label, 'url' => $social->url, 'icon' => $social->icon])->values()->all());
-    $isPortalUser = auth()->check() && auth()->user()->hasRole('client');
-    $publicPortalUrl = $isPortalUser ? route('portal.dashboard') : route('login');
+    $isPortalUser = auth()->check();
+    $publicPortalUrl = $isPortalUser ? route('dashboard') : route('login');
 @endphp
 <style>
 .public-shell{width:min(1180px,calc(100% - 32px));margin:auto}
