@@ -23,15 +23,15 @@
   .public-header-tools{margin-left:auto}
   .public-header-nav{top:58px}
   .mobile-portal-separator{display:block;height:1px;margin:10px 12px;background:linear-gradient(90deg,transparent,rgba(86,210,238,.38),transparent)}
-  .public-menu a.mobile-menu-portal{display:flex;align-items:center;justify-content:center;min-height:48px!important;margin:2px 8px 4px;padding:10px 14px!important;border:1px solid rgba(86,210,238,.24);border-radius:12px;background:rgba(67,209,240,.06);color:#8bf3ff!important;font-size:15px;font-weight:800}
-  .public-menu a.mobile-menu-portal i{color:#55d8f1}
+  .public-menu a.mobile-menu-portal{display:flex;align-items:center;justify-content:center;gap:10px;min-height:48px!important;margin:2px 8px 4px;padding:10px 16px!important;border:1px solid rgba(86,210,238,.24);border-radius:12px;background:rgba(67,209,240,.06);color:#8bf3ff!important;font-size:15px;font-weight:800}
+  .public-menu a.mobile-menu-portal i{color:#55d8f1;flex:0 0 auto}.public-menu a.mobile-menu-portal span{display:inline-block;margin-left:1px}
 }
 @media(min-width:721px){.mobile-menu-portal,.mobile-portal-separator{display:none!important}}
 .public-menu-toggle{display:none;width:42px;height:42px;border:1px solid rgba(86,210,238,.15);border-radius:11px;background:#06141d;color:#fff;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}.public-menu-toggle svg{width:19px;height:19px;display:block}
 body{font-size:16px!important}main p,main li,main td,main th,main label,main .body,main .rich,main .bio,main .bio-full,main .contact,main .action,main .empty,main .date,main .more,main .head p{font-size:16px!important;line-height:1.75!important}main button,main input,main select,main textarea{font-size:16px!important;line-height:1.4}main small{font-size:14px!important;line-height:1.6}.eyebrow{font-size:12px!important}
 @media(min-width:1001px){.public-social-label{display:inline-block}.public-brand img,.public-brand-fallback{width:42px;height:42px;flex-basis:42px}.public-brand-name{font-size:16px}.public-menu{gap:4px}.public-menu a,.public-menu a:visited{font-size:12px;padding-left:11px;padding-right:11px}}\n@media(max-width:1000px) and (min-width:721px){.public-shell{width:min(1280px,calc(100% - 28px))}.public-header-top{gap:12px;min-height:58px}.public-brand img,.public-brand-fallback{width:38px;height:38px;flex-basis:38px}.public-brand-name{font-size:14px}.public-header-divider{height:36px;margin:0 5px}.public-portal{font-size:10px;padding:0 10px}.public-menu{justify-content:flex-start}.public-menu a,.public-menu a:visited{font-size:11px;padding-left:8px;padding-right:8px}}
 @media(max-width:720px){.public-shell{width:calc(100% - 20px)}.public-header-top{min-height:58px;border-bottom:0}.public-header-nav{display:none;position:absolute;top:58px;left:12px;right:12px;height:auto;min-height:auto;padding:8px;background:rgba(4,18,26,.98);border:1px solid rgba(86,210,238,.15);border-radius:14px;box-shadow:0 20px 55px rgba(0,0,0,.3)}.public-header-nav.is-open{display:flex}.public-header-tools{display:flex;gap:3px}.public-socials{max-width:30vw;gap:1px}.public-social{width:28px;height:28px;border-radius:7px}.public-social i{font-size:11px}.public-header-divider{height:34px;margin:0 5px}.public-portal{min-height:30px;padding:0 8px;border-radius:8px;font-size:10px;gap:5px}.public-brand-name{font-size:14px}.public-brand img,.public-brand-fallback{width:34px;height:34px;flex-basis:34px}.public-menu-toggle{display:flex;width:38px;height:38px;border-radius:10px}.public-menu{flex-direction:column;align-items:stretch;justify-content:flex-start;overflow:visible;white-space:normal}.public-menu a,.public-menu a:visited{justify-content:flex-start;min-height:44px;padding:10px 13px;font-size:15px}}
-@media(max-width:400px){.public-brand-name{font-size:13px}.public-brand img,.public-brand-fallback{width:32px;height:32px;flex-basis:32px}.public-social{width:26px;height:26px}.public-portal span{display:none}.public-portal{width:30px;padding:0;justify-content:center}}
+@media(max-width:400px){.public-brand-name{font-size:13px}.public-brand img,.public-brand-fallback{width:32px;height:32px;flex-basis:32px}.public-social{width:26px;height:26px}.public-portal span{display:none}.public-portal{width:auto;min-width:30px;padding:0 9px;justify-content:center;gap:6px}.public-portal span{display:inline-block}}
 </style>
 <header class="public-header">
     <div class="public-shell">
@@ -52,9 +52,9 @@ body{font-size:16px!important}main p,main li,main td,main th,main label,main .bo
                     <span class="public-header-divider" aria-hidden="true"></span>
                 @endif
                 @if($isPortalUser)
-                    <a class="public-portal" href="{{ $publicPortalUrl }}"><i class="fa-solid fa-circle-user" aria-hidden="true"></i><span>Portal</span></a>
+                    <a class="public-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-circle-user" aria-hidden="true"></i><span>Portal</span></a>
                 @else
-                    <a class="public-portal" href="{{ $publicPortalUrl }}"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i><span>Login</span></a>
+                    <a class="public-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i><span>Login</span></a>
                 @endif
             </div>
             <button class="public-menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="public-navigation">
@@ -72,7 +72,7 @@ body{font-size:16px!important}main p,main li,main td,main th,main label,main .bo
                 <a href="{{ route('contact') }}" @if(request()->routeIs('contact*')) aria-current="page" @endif>Contact</a>
                 <a href="{{ route('webmail.redirect') }}">Webmail</a>
                 <span class="mobile-portal-separator" aria-hidden="true"></span>
-                <a class="mobile-menu-portal" href="{{ $publicPortalUrl }}">
+                <a class="mobile-menu-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid {{ $isPortalUser ? 'fa-circle-user' : 'fa-right-to-bracket' }}" aria-hidden="true"></i>
                     <span>{{ $isPortalUser ? 'Portal' : 'Login' }}</span>
                 </a>
