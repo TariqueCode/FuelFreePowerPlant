@@ -1,0 +1,7 @@
+@extends('layouts.portal')
+@section('title','Mail — '.$emailAccount->address)
+@section('content')
+<a class="back" href="{{ route('admin.mail',['account'=>$emailAccount->id]) }}"><i class="fa-solid fa-arrow-left"></i> {{ $emailAccount->address }}</a>
+<article class="message-card"><div class="message-head"><div><span class="eyebrow">MESSAGE</span><h1>{{ $message['subject'] }}</h1><p>From: {{ $message['from'] }} · {{ $message['date'] }}</p></div><a class="add-btn" href="{{ route('admin.mail.compose',[$emailAccount,'reply'=>$message['uid']]) }}"><i class="fa-solid fa-reply"></i> Reply</a></div><div class="message-body">{!! $message['body'] !!}</div></article>
+@endsection
+@push('styles')<style>.back{display:inline-flex;gap:7px;color:#7898a5;text-decoration:none;font-size:10px;margin-bottom:14px}.message-card{border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,rgba(9,38,54,.86),rgba(5,22,32,.9));overflow:hidden}.message-head{display:flex;justify-content:space-between;gap:15px;padding:20px;border-bottom:1px solid rgba(255,255,255,.05)}.message-head h1{font-size:clamp(20px,4vw,32px);margin:7px 0}.message-head p{color:#718f9c;font-size:10px}.message-body{padding:20px;line-height:1.8;color:#cfe1e6;overflow:auto}.message-body img{max-width:100%}@media(max-width:600px){.message-head{display:block}.message-head .add-btn{margin-top:12px}}</style>@endpush
