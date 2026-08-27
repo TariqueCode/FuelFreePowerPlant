@@ -1,9 +1,9 @@
 <?php
 
-use IlluminateDatabaseMigrationsMigration;
-use IlluminateDatabaseSchemaBlueprint;
-use IlluminateSupportFacadesDB;
-use IlluminateSupportFacadesSchema;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -14,15 +14,20 @@ return new class extends Migration
         });
 
         $platforms = config('fuelfree.social.platforms', []);
+
         foreach (DB::table('social_links')->get() as $link) {
             $platform = 'website';
+
             foreach ($platforms as $key => $meta) {
                 if (strcasecmp($link->label, $meta['label']) === 0) {
                     $platform = $key;
                     break;
                 }
             }
-            DB::table('social_links')->where('id', $link->id)->update(['platform' => $platform]);
+
+            DB::table('social_links')->where('id', $link->id)->update([
+                'platform' => $platform,
+            ]);
         }
 
         Schema::table('social_links', function (Blueprint $table) {
