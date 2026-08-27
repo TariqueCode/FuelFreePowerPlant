@@ -33,8 +33,19 @@ class PublicSiteController
 
     public function showGallery(string $key): View
     {
-        $item=SiteContentItem::query()->where('type','gallery')->where(function($q)use($key){$q->where('slug',$key);if(ctype_digit($key))$q->orWhereKey((int)$key);})->firstOrFail();
+        $item=SiteContentItem::query()
+            ->where('type','gallery')
+            ->where(function($q) use ($key) {
+                $q->where('slug', $key);
+                if (ctype_digit($key)) {
+                    $q->orWhere('id', (int) $key);
+                }
+            })
+            ->firstOrFail();
+
         abort_unless($item->status==='published',404);
-        $brand=$this->brand();$item->load('galleryMedia');return view('gallery.show',compact('item','brand'));
+        $brand=$this->brand();
+        $item->load('galleryMedia');
+        return view('gallery.show',compact('item','brand'));
     }
 }
