@@ -1,18 +1,10 @@
 @php
     $publicBrand = $brand ?? null;
-    $publicSettings = \App\Models\SystemSetting::query()->pluck('value','key');
-
     if (!$publicBrand || (is_countable($publicBrand) && count($publicBrand) === 0)) {
-        $publicBrand = $publicSettings;
+        $publicBrand = \App\Models\SystemSetting::query()->whereIn('key',['company.name','company.logo_path','company.tagline'])->pluck('value','key');
     }
-
-    $publicName = is_object($publicBrand)
-        ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name'))
-        : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
-
-    $publicLogo = is_object($publicBrand)
-        ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path'))
-        : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
+    $publicName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
+    $publicLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
 @endphp
 <!doctype html>
 <html lang="{{ str_replace('_','-',app()->getLocale()) }}">
@@ -36,9 +28,9 @@
     @stack('head')
 </head>
 <body>
-    @include('partials.public-header', ['brand' => $publicBrand, 'settings' => $publicSettings])
+    @include('partials.public-header', ['brand' => $publicBrand])
     @yield('content')
-    @include('partials.public-footer', ['brand' => $publicBrand, 'settings' => $publicSettings])
+    @include('partials.public-footer', ['brand' => $publicBrand])
     @stack('scripts')
 </body>
 </html>
