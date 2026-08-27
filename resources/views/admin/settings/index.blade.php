@@ -40,6 +40,57 @@
     </div>
 </div>
 
+<div class="form-card mail-routing-card">
+    <div class="section-heading">
+        <div>
+            <div class="eyebrow">PUBLIC EMAIL</div>
+            <h2>Website email routing</h2>
+            <p>Choose which connected company mailbox receives Contact and Career submissions.</p>
+        </div>
+        <i class="fa-solid fa-envelope-circle-check"></i>
+    </div>
+
+    <div class="mail-routing-grid">
+        <div class="mail-route">
+            <label for="mail-contact-account">Contact page mailbox</label>
+            <select id="mail-contact-account" name="mail[contact_account_id]">
+                <option value="">— Select a mailbox —</option>
+                @foreach($mailboxes as $mailbox)
+                    <option value="{{ $mailbox->id }}" @selected((string) old('mail.contact_account_id',$settings['mail.contact_account_id']) === (string) $mailbox->id)>
+                        {{ $mailbox->display_name ?: $mailbox->address }} — {{ $mailbox->address }}
+                    </option>
+                @endforeach
+            </select>
+            <small>New messages submitted from the public Contact page will be forwarded here.</small>
+        </div>
+
+        <div class="mail-route">
+            <label for="mail-career-account">Career page mailbox</label>
+            <select id="mail-career-account" name="mail[career_account_id]">
+                <option value="">— Select a mailbox —</option>
+                @foreach($mailboxes as $mailbox)
+                    <option value="{{ $mailbox->id }}" @selected((string) old('mail.career_account_id',$settings['mail.career_account_id']) === (string) $mailbox->id)>
+                        {{ $mailbox->display_name ?: $mailbox->address }} — {{ $mailbox->address }}
+                    </option>
+                @endforeach
+            </select>
+            <small>New CV applications submitted from the public Career page will be forwarded here.</small>
+        </div>
+    </div>
+
+    @if($mailboxes->isEmpty())
+        <div class="mail-routing-empty">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>No active company mailboxes are available. Add and activate a mailbox from <strong>Help Desk → Mail list</strong> first.</span>
+        </div>
+    @else
+        <div class="mail-routing-note">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Routing uses the connected mailbox account stored in the Help Desk. You can change the destination anytime without editing code or <code>.env</code>.</span>
+        </div>
+    @endif
+</div>
+
 <div class="form-card homepage-card">
     <div class="section-heading">
         <div>
@@ -94,6 +145,16 @@
 @push('styles')
 <style>
 .settings-stack{max-width:980px;display:grid;gap:18px}
+.mail-routing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mail-route{padding:15px;border:1px solid rgba(76,205,233,.11);border-radius:15px;background:rgba(76,205,233,.025)}
+.mail-route label{font-size:11px;color:#a9c2ca;font-weight:700}
+.mail-route select{width:100%;box-sizing:border-box;padding:12px;border-radius:11px;border:1px solid var(--line);background:#071c29;color:#e9f7fb;outline:none}
+.mail-route select:focus{border-color:rgba(81,216,240,.35);box-shadow:0 0 0 3px rgba(81,216,240,.06)}
+.mail-route small{display:block;color:#678692;font-size:8px;line-height:1.5;margin-top:8px}
+.mail-routing-note,.mail-routing-empty{display:flex;gap:9px;align-items:flex-start;margin-top:14px;padding:12px 13px;border-radius:12px;background:rgba(72,216,241,.035);border:1px solid rgba(72,216,241,.08);color:#718f9a;font-size:9px;line-height:1.55}
+.mail-routing-note i{color:#58cfe9}.mail-routing-empty i{color:#f2b85b}
+.mail-routing-note strong,.mail-routing-empty strong{color:#9bc4ce}
+.mail-routing-note code{color:#9bc4ce}
 .form-card{background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:20px;padding:24px}
 .section-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:20px}
 .section-heading h2{margin:5px 0 5px;color:#eaf8fb;font-size:21px}
@@ -135,6 +196,8 @@ input:not([type=checkbox]){width:100%;box-sizing:border-box;padding:13px;border-
 .actions{display:flex;justify-content:flex-end}
 .actions button{border:0;border-radius:12px;padding:13px 20px;background:#31afd2;color:#fff;font-weight:700;box-shadow:0 8px 24px rgba(49,175,210,.14)}
 @media(max-width:650px){
+.mail-routing-grid{grid-template-columns:1fr}
+
 .form-card{padding:18px}
 .section-heading{margin-bottom:16px}
 .section-heading h2{font-size:19px}
