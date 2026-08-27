@@ -16,8 +16,8 @@ class GalleryController extends Controller
 {
     public function index(): View
     {
-        $galleries=SiteContentItem::query()->where('type','gallery')->withCount('galleryMedia')->orderBy('sort_order')->latest('created_at')->paginate(20);
-        return view('admin.gallery.index',compact('galleries'));
+        $galleries=SiteContentItem::query()->where('type','gallery')->withCount('galleryMedia')->orderBy('sort_order')->latest('created_at')->paginate(20);$publishedGalleries=SiteContentItem::query()->where('type','gallery')->where('status','published')->count();
+        return view('admin.gallery.index',compact('galleries','publishedGalleries'));
     }
     public function create(): View{return view('admin.gallery.form',['gallery'=>new SiteContentItem(['type'=>'gallery','status'=>'draft'])]);}
     public function store(Request $request): RedirectResponse{$gallery=new SiteContentItem();$this->saveGallery($gallery,$request);return redirect()->route('admin.gallery.index')->with('status','Gallery created successfully.');}
