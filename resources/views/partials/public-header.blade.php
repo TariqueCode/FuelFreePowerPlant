@@ -3,7 +3,7 @@
     $publicName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
     $publicLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
     $publicNavPages = \App\Models\SiteContentItem::query()->where('type','company')->where('status','published')->where('show_in_navigation',true)->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')->orderBy('navigation_order')->orderByDesc('created_at')->get(['title','slug']);
-    $publicSocials = \App\Models\SocialLink::active()->get(['label','url','icon']);
+    $publicSocials = \Illuminate\Support\Facades\Cache::remember('public.social-links', 600, fn () => \App\Models\SocialLink::active()->get(['label','url','icon']));
     $isPortalUser = auth()->check() && auth()->user()->hasRole('client');
 @endphp
 <style>
