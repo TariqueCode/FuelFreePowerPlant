@@ -71,7 +71,7 @@ class WebmailService
         ];
     }
 
-    public function send(string $email, string $password, string $to, string $subject, string $body, array $config = []): void
+    public function send(string $email, string $password, string $to, string $subject, string $body, array $config = [], ?array $attachment = null): void
     {
         $host = $config['smtp_host'] ?? config('cpanel.mail_host', 'mail.fuelfreepowerplant.com');
         $socket = @stream_socket_client('ssl://'.$host.':'.($config['smtp_port'] ?? 465), $errno, $errstr, 20, STREAM_CLIENT_CONNECT);
@@ -102,6 +102,12 @@ class WebmailService
         $payload = implode("\r\n", $headers)."\r\n\r\n";
         $payload .= '--'.$boundary."\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n".$this->dotStuff($plain)."\r\n";
         $payload .= '--'.$boundary."\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n".$this->dotStuff($html)."\r\n";
+        if ($attachment && !empty($attachment['path']) && is_file($attachment['path'])) {
+            $name = $attachment['name'] ?? basename($attachment['path']);
+            $mime = $attachment['mime'] ?? 'application/octet-stream';
+            $data = chunk_split(base64_encode((string) file_get_contents($attachment['path'])));
+            $payload .= '--'.$boundary."\r\nContent-Type: ".$mime."; name=\"".$name."\"\r\nContent-Disposition: attachment; filename=\"".$name."\"\r\nContent-Transfer-Encoding: base64\r\n\r\n".$data."\r\n";
+        }
         $payload .= '--'.$boundary."--\r\n.\r\n";
 
         fwrite($socket, $payload);
