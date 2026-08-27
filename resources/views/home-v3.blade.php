@@ -40,7 +40,7 @@
 </section>
 @endif
 <section class="welcome">
-    <div class="welcome-heading"><span class="eyebrow">Welcome</span><h1>Welcome to <em>{{ $siteName }}</em></h1><div class="welcome-rule"></div></div>
+    <div class="welcome-heading"><span class="eyebrow">Welcome to {{ $siteName }}</span><h1>Building a <em>stronger</em> energy future.</h1><div class="welcome-rule"></div></div>
     <div class="welcome-copy">
         <p><strong>{{ $siteName }}</strong> is a forward-thinking energy company committed to contributing to Bangladesh’s sustainable energy future. Our vision is to develop efficient, reliable, and innovative power solutions that support the country’s growing energy needs and economic development.</p>
         <p>We are dedicated to building a cleaner and smarter energy future through innovation, responsible development, and world-class management practices. We aim to strengthen our capabilities, expand our projects, embrace modern technologies, and deliver dependable energy solutions while maintaining our commitment to quality, sustainability, and excellence.</p>
