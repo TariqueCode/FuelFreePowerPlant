@@ -19,6 +19,27 @@ return new class extends Migration
 
             $table->index(['is_active', 'sort_order']);
         });
+
+        $defaults = [
+            ['Facebook', env('SOCIAL_FACEBOOK_URL'), 'fa-brands fa-facebook-f', 10],
+            ['Instagram', env('SOCIAL_INSTAGRAM_URL'), 'fa-brands fa-instagram', 20],
+            ['YouTube', env('SOCIAL_YOUTUBE_URL'), 'fa-brands fa-youtube', 30],
+            ['LinkedIn', env('SOCIAL_LINKEDIN_URL'), 'fa-brands fa-linkedin-in', 40],
+        ];
+
+        foreach ($defaults as [$label, $url, $icon, $sortOrder]) {
+            if (filled($url)) {
+                \Illuminate\Support\Facades\DB::table('social_links')->insert([
+                    'label' => $label,
+                    'url' => $url,
+                    'icon' => $icon,
+                    'sort_order' => $sortOrder,
+                    'is_active' => true,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
     }
 
     public function down(): void
