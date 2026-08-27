@@ -107,7 +107,16 @@ class WebmailService
 
         stream_set_timeout($socket, 20);
         $this->smtpExpect($socket, 220);
-        $this->smtpCommand($socket, 'EHLO '.(parse_url(config('app.url'), PHP_URL_HOST) ?: 'localhost'), 250);
+        $ehlo = 'EHLO '.(parse_url(config('app.url'), PHP_URL_HOST) ?: 'localhost');
+        $this->smtpCommand($socket, $ehlo, 250);
+        if ($port === 587) {
+            $this->smtpCommand($socket, 'STARTTLS', 220);
+            if (!stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
+                fclose($socket);
+                throw new RuntimeException('SMTP STARTTLS negotiation failed.');
+            }
+            $this->smtpCommand($socket, $ehlo, 250);
+        }
         $this->smtpCommand($socket, 'AUTH LOGIN', 334);
         $this->smtpCommand($socket, base64_encode($email), 334);
         $this->smtpCommand($socket, base64_encode($password), 235);
