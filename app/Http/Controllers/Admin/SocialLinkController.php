@@ -1,69 +1,83 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace AppHttpControllersAdmin;
 
-use App\Http\Controllers\Controller;
-use App\Models\SocialLink;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\View\View;
+use AppHttpControllersController;
+use AppModelsSocialLink;
+use IlluminateHttpJsonResponse;
+use IlluminateHttpRedirectResponse;
+use IlluminateHttpRequest;
+use IlluminateSupportFacadesCache;
+use IlluminateViewView;
 
 class SocialLinkController extends Controller
 {
     public function index(): View
     {
         $links = SocialLink::query()->orderBy('sort_order')->orderBy('id')->get();
+        $platforms = config('fuelfree.social.platforms');
 
-        return view('admin.social-links.index', compact('links'));
+        return view('admin.social-links.index', compact('links', 'platforms'));
     }
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'label' => ['required', 'string', 'max:80'],
-            'url' => ['required', 'url', 'max:500'],
-            'icon' => ['required', 'string', 'max:100', 'regex:/^[a-z0-9\s-]+$/i'],
-            'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
-            'is_active' => ['nullable', 'boolean'],
-        ]);
+        $data = $this->validateLink($request);
+        $platform = config('fuelfree.social.platforms.'.$data['platform']);
 
         SocialLink::create([
-            ...$validated,
-            'sort_order' => $validated['sort_order'] ?? 0,
+            'platform' => $data['platform'],
+            'label' => $platform['label'],
+            'url' => $data['url'],
+            'icon' => $platform['icon'],
+            'sort_order' => $data['sort_order'] ?? $this->nextOrder(),
             'is_active' => $request->boolean('is_active'),
         ]);
 
-        Cache::forget('public.social-links');
+        $this->clearCache();
 
-        return back()->with('status', 'Social media link added.');
+        return back()->with('status', $platform['label'].' link added.');
     }
 
     public function update(Request $request, SocialLink $socialLink): RedirectResponse
     {
-        $validated = $request->validate([
-            'label' => ['required', 'string', 'max:80'],
-            'url' => ['required', 'url', 'max:500'],
-            'icon' => ['required', 'string', 'max:100', 'regex:/^[a-z0-9\s-]+$/i'],
-            'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
-            'is_active' => ['nullable', 'boolean'],
-        ]);
+        $data = $this->validateLink($request);
+        $platform = config('fuelfree.social.platforms.'.$data['platform']);
 
         $socialLink->update([
-            ...$validated,
-            'sort_order' => $validated['sort_order'] ?? 0,
+            'platform' => $data['platform'],
+            'label' => $platform['label'],
+            'url' => $data['url'],
+            'icon' => $platform['icon'],
+            'sort_order' => $data['sort_order'] ?? $socialLink->sort_order,
             'is_active' => $request->boolean('is_active'),
         ]);
 
-        Cache::forget('public.social-links');
+        $this->clearCache();
 
-        return back()->with('status', 'Social media link updated.');
+        return back()->with('status', $platform['label'].' link updated.');
+    }
+
+    public function reorder(Request $request): JsonResponse
+    {
+        $data = $request->validate(['order' => ['required','array'],'order.*' => ['integer']]);
+        $links = SocialLink::query()->whereIn('id', $data['order'])->get()->keyBy('id');
+
+        foreach ($data['order'] as $position => $id) {
+            if (isset($links[$id])) {
+                $links[$id]->update(['sort_order' => $position + 1]);
+            }
+        }
+
+        $this->clearCache();
+
+        return response()->json(['ok' => true]);
     }
 
     public function destroy(SocialLink $socialLink): RedirectResponse
     {
         $socialLink->delete();
-        Cache::forget('public.social-links');
+        $this->clearCache();
 
         return back()->with('status', 'Social media link removed.');
     }
@@ -71,8 +85,28 @@ class SocialLinkController extends Controller
     public function toggle(SocialLink $socialLink): RedirectResponse
     {
         $socialLink->update(['is_active' => ! $socialLink->is_active]);
-        Cache::forget('public.social-links');
+        $this->clearCache();
 
         return back()->with('status', 'Social media visibility updated.');
+    }
+
+    private function validateLink(Request $request): array
+    {
+        return $request->validate([
+            'platform' => ['required','string','in:'.implode(',', array_keys(config('fuelfree.social.platforms')))],
+            'url' => ['required','url','max:500'],
+            'sort_order' => ['nullable','integer','min:0','max:9999'],
+            'is_active' => ['nullable','boolean'],
+        ]);
+    }
+
+    private function nextOrder(): int
+    {
+        return ((int) SocialLink::query()->max('sort_order')) + 1;
+    }
+
+    private function clearCache(): void
+    {
+        Cache::forget('public.social-links');
     }
 }
