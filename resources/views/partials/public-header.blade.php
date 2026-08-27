@@ -41,13 +41,7 @@ body{font-size:16px!important}main p,main li,main td,main th,main label,main .bo
                 <span class="public-brand-name">{{ $publicName }}</span>
             </a>
             <div class="public-header-tools">
-                @if($isPortalUser)
-                    <a class="public-portal" href="{{ $publicPortalUrl }}"><i class="fa-solid fa-circle-user" aria-hidden="true"></i><span>Portal</span></a>
-                @else
-                    <a class="public-portal" href="{{ $publicPortalUrl }}"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i><span>Login</span></a>
-                @endif
                 @if($publicSocials)
-                    <span class="public-header-divider" aria-hidden="true"></span>
                     <div class="public-header-socials" aria-label="Social media">
                         @foreach($publicSocials as $social)
                             <a class="public-header-social" href="{{ $social['url'] }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $social['label'] }}" title="{{ $social['label'] }}">
@@ -55,6 +49,12 @@ body{font-size:16px!important}main p,main li,main td,main th,main label,main .bo
                             </a>
                         @endforeach
                     </div>
+                    <span class="public-header-divider" aria-hidden="true"></span>
+                @endif
+                @if($isPortalUser)
+                    <a class="public-portal" href="{{ $publicPortalUrl }}"><i class="fa-solid fa-circle-user" aria-hidden="true"></i><span>Portal</span></a>
+                @else
+                    <a class="public-portal" href="{{ $publicPortalUrl }}"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i><span>Login</span></a>
                 @endif
             </div>
             <button class="public-menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="public-navigation">
