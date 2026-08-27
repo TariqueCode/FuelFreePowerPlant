@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\CareerApplication;
+use App\Models\EmailAccount;
+use App\Services\WebmailService;
 use App\Models\SiteContentItem;
 use App\Models\SystemSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 use Illuminate\Validation\Rules\File;
 use Illuminate\View\View;
 
@@ -48,12 +51,29 @@ class CareerController extends Controller
         $file = $request->file('cv');
         $path = $file->store('career/cv', 'local');
 
-        CareerApplication::create([
+        $application = CareerApplication::create([
             ...$data,
             'cv_path' => $path,
             'cv_original_name' => $file->getClientOriginalName(),
             'status' => 'new',
         ]);
+
+        $careerMailbox = EmailAccount::query()->where('address','career@fuelfreepowerplant.com')->where('status','active')->first();
+        if ($careerMailbox) {
+            try {
+                app(WebmailService::class)->send(
+                    $careerMailbox->address,
+                    $careerMailbox->password,
+                    $careerMailbox->address,
+                    'New career application: '.$application->name,
+                    '<p><strong>New career application received.</strong></p><p>Name: '.e($application->name).'<br>Email: '.e($application->email).'<br>Phone: '.e($application->phone ?: 'Not provided').'<br>Position: '.e($application->position ?: 'General application').'</p><p>The full candidate profile is available in the admin Career section.</p>',
+                    ['imap_host'=>$careerMailbox->imap_host,'imap_port'=>$careerMailbox->imap_port,'smtp_host'=>$careerMailbox->smtp_host,'smtp_port'=>$careerMailbox->smtp_port],
+                    ['path'=>Storage::disk('local')->path($path),'name'=>$application->cv_original_name,'mime'=>$file->getMimeType() ?: 'application/octet-stream']
+                );
+            } catch (Throwable $e) {
+                report($e);
+            }
+        }
 
         return back()->with('career_status', 'Your application has been received. Our career team will review your information and contact you if your profile matches an opportunity.');
     }
