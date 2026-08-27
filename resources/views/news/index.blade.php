@@ -4,101 +4,21 @@
 @section('title', 'News & Notices — '.$siteName)
 @section('content')
 <style>
-.news-page{--line:var(--public-line);--text:var(--public-text);--muted:var(--public-muted);--accent:var(--public-accent);width:min(var(--public-max),calc(100% - (var(--public-gutter) * 2)));margin-inline:auto;padding:var(--public-space-7) 0 72px;color:var(--text)}
-.news-page *{box-sizing:border-box}.news-page a{text-decoration:none;color:inherit}
-.news-mast{border-bottom:1px solid var(--line);padding-bottom:var(--public-space-5);margin-bottom:var(--public-space-5)}
-.news-kicker{display:flex;align-items:center;gap:var(--public-space-3);color:var(--accent);font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
-.news-kicker:after{content:"";height:1px;background:var(--line);flex:1}
-.news-mast h1{font-size:clamp(42px,6vw,76px);line-height:.96;letter-spacing:-.055em;margin:10px 0 16px}
-.news-mast p{max-width:720px;color:var(--muted);font-size:16px;line-height:1.7;margin:0}
-.news-tools{display:grid;grid-template-columns:minmax(0,1fr) 140px 140px auto;gap:10px;margin:0 0 34px}
-.search,.filter{height:48px;border:1px solid var(--line);border-radius:12px;background:rgba(7,27,37,.78)}
-.search{display:flex;align-items:center;padding:0 15px;gap:10px}.search i{color:var(--accent)}
-.search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--text);font:500 14px Inter,system-ui,sans-serif}.search input::placeholder{color:#718d98}
-.filter{position:relative;display:flex;align-items:center;padding:0 13px}.filter:after{content:"⌄";margin-left:auto;color:#86a7b1;pointer-events:none}
-.filter select{appearance:none;border:0;outline:0;background:transparent;color:var(--text);font:500 14px Inter,system-ui,sans-serif;width:100%;cursor:pointer}.filter select option{background:#071b25;color:var(--text)}
-.view-switch{display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--line);border-radius:12px;background:rgba(7,27,37,.8)}
-.view-btn{width:40px;height:38px;border:0;border-radius:8px;background:transparent;color:#75939e;cursor:pointer;display:grid;place-items:center}.view-btn.active,.view-btn:hover{background:rgba(79,210,238,.1);color:var(--accent)}
-.news-head{display:flex;align-items:end;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:16px}
-.news-head h2{font-size:clamp(30px,4vw,46px);line-height:1.05;letter-spacing:-.04em;margin:6px 0 0}
-.news-head small{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
-.news-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.news-card{min-width:0;display:grid;grid-template-columns:220px 32px minmax(0,1fr);min-height:220px;overflow:hidden;border:1px solid var(--line);border-radius:var(--public-radius);background:linear-gradient(145deg,rgba(8,37,50,.9),rgba(3,19,27,.94));transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
-.news-card:hover{transform:translateY(-2px);border-color:rgba(72,216,241,.38);box-shadow:0 16px 36px rgba(0,0,0,.16)}
-.news-media{width:220px;height:220px;background:#061923;overflow:hidden}.news-media img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .35s ease}.news-card:hover .news-media img{transform:scale(1.025)}
-.media-fallback{width:100%;height:100%;display:grid;place-items:center;color:var(--accent);font-size:30px}
-.news-kind{display:flex;align-items:center;justify-content:center;border-inline:1px solid rgba(72,216,241,.1);color:var(--accent);font-size:8px;font-weight:800;letter-spacing:.16em;writing-mode:vertical-rl;transform:rotate(180deg);text-transform:uppercase}.news-kind.notice{color:#f0c58e}
-.news-body{min-width:0;padding:20px;display:flex;flex-direction:column}
-.news-title{margin:0;color:var(--text);font-size:18px;line-height:1.4;font-weight:780;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.news-excerpt{color:var(--muted);font-size:13px;line-height:1.65;margin:9px 0 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.news-footer{margin-top:auto;padding-top:16px;display:flex;align-items:center;justify-content:space-between;gap:10px}.news-date{color:#789aa5;font-size:11px}.read{color:var(--accent);font-size:11px;font-weight:750;white-space:nowrap}
-.news-list{display:grid;gap:12px}.news-list .news-card{grid-template-columns:150px 26px minmax(0,1fr);min-height:150px}.news-list .news-media{width:150px;height:150px}.news-list .news-body{padding:17px 19px}.news-list .news-title{font-size:17px;-webkit-line-clamp:2}.news-list .news-excerpt{display:none}.news-list .news-footer{padding-top:8px}.news-list .news-kind{font-size:7px}
-.pager{padding-top:28px}.empty{padding:56px 24px;border:1px dashed var(--line);border-radius:var(--public-radius);color:var(--muted);background:rgba(7,27,37,.35);text-align:center}
-@media(max-width:1024px){.news-page{padding-top:40px}.news-grid{grid-template-columns:1fr}.news-tools{grid-template-columns:minmax(0,1fr) 1fr 1fr}.view-switch{display:none}.news-card{grid-template-columns:180px 28px minmax(0,1fr);min-height:180px}.news-media{width:180px;height:180px}}
-@media(max-width:640px){.news-page{width:calc(100% - 24px);padding:30px 0 54px}.news-mast{padding-bottom:20px;margin-bottom:18px}.news-kicker{font-size:9px}.news-mast h1{font-size:clamp(38px,11vw,48px);margin:9px 0 13px}.news-mast p{font-size:14px;line-height:1.65}.news-tools{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:25px}.search{grid-column:1/-1;height:46px}.filter{height:46px}.filter select{font-size:13px}.news-head{align-items:end;margin-bottom:13px;padding-bottom:12px}.news-head h2{font-size:28px}.news-head small{font-size:9px}.news-card,.news-list .news-card{display:flex;flex-direction:column;min-height:0;height:auto;border-radius:15px}.news-media,.news-list .news-media{width:100%;height:auto;aspect-ratio:16/9}.news-kind,.news-list .news-kind{writing-mode:horizontal-tb;transform:none;border:0;border-bottom:1px solid rgba(72,216,241,.1);justify-content:flex-start;padding:8px 13px;font-size:8px}.news-body,.news-list .news-body{height:auto;padding:14px}.news-title,.news-list .news-title{font-size:17px;line-height:1.4;-webkit-line-clamp:3}.news-excerpt{display:-webkit-box;font-size:13px;line-height:1.6;margin-top:8px;-webkit-line-clamp:3}.news-footer,.news-list .news-footer{padding-top:14px}.news-date,.read{font-size:10px}}
-@media(max-width:380px){.news-page{width:calc(100% - 20px)}.news-tools{gap:6px}.news-head h2{font-size:26px}.news-head small{font-size:8px}.news-body,.news-list .news-body{padding:12px}.news-title,.news-list .news-title{font-size:16px}.news-excerpt{font-size:12px}}
+:root{color-scheme:dark;--bg:#031019;--surface:#071b25;--line:rgba(96,216,239,.16);--text:#edfaff;--muted:#8eaab4;--cyan:#51d8f0;--green:#64e0b2}
+html,body{background:var(--bg)!important;color:var(--text)!important}
+.newsroom{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:52px 0 90px;background:var(--bg)!important;color:var(--text)!important}.newsroom *{box-sizing:border-box}.newsroom a,.newsroom a:visited,.newsroom a:hover,.newsroom a:active{color:inherit!important;text-decoration:none!important}
+.news-mast{border-bottom:1px solid var(--line);padding-bottom:26px;margin-bottom:24px}.news-kicker{display:flex;align-items:center;gap:12px;color:var(--cyan)!important;font:800 11px/1.2 Arial,sans-serif;letter-spacing:.22em;text-transform:uppercase}.news-kicker:after{content:"";height:1px;background:var(--line);flex:1}.news-mast h1{color:var(--text)!important;font:800 clamp(42px,7vw,76px)/.96 Arial,sans-serif;letter-spacing:-.055em;margin:10px 0 14px}.news-mast p{max-width:720px;color:var(--muted)!important;font:400 15px/1.75 Arial,sans-serif;margin:0}
+.news-tools{display:grid;grid-template-columns:minmax(0,1fr) 125px 125px 125px;gap:10px;margin:22px 0 30px;align-items:stretch}.news-tools>*{min-height:48px;border:1px solid var(--line);border-radius:13px;background:rgba(7,27,37,.88)!important;color:var(--text)!important;display:flex;align-items:center;min-width:0}.search{padding:0 15px;gap:10px}.search i{color:var(--cyan)!important}.search input{width:100%;min-width:0;border:0!important;outline:0;background:transparent!important;color:var(--text)!important;font:500 14px Arial,sans-serif}.search input::placeholder{color:#718d98!important}.filter{padding:0 13px;position:relative}.filter:after{content:"⌄";margin-left:auto;color:#86a7b1}.filter select{appearance:none;-webkit-appearance:none;border:0!important;outline:0;background:transparent!important;color:var(--text)!important;font:500 13px Arial,sans-serif;width:100%;min-width:0}.filter select option{background:#071b25;color:#edfaff}.published-count{padding:0 12px;justify-content:center;color:var(--green)!important;white-space:nowrap;border-color:rgba(100,224,178,.22)!important;font:700 11px Arial,sans-serif}.published-count i{margin-right:7px}
+.lead{display:grid;grid-template-columns:minmax(300px,1fr) minmax(320px,1fr);border:1px solid var(--line);border-radius:22px;overflow:hidden;background:linear-gradient(145deg,#092632,#04141c)!important;margin-bottom:38px}.lead-media{aspect-ratio:1/1;background:#061923;position:relative;overflow:hidden}.lead-media img{width:100%;height:100%;object-fit:cover;display:block}.media-fallback{height:100%;display:grid;place-items:center;color:var(--cyan)!important;font-size:46px}.lead-copy{padding:34px;display:flex;flex-direction:column;justify-content:center}.label{display:inline-flex;align-self:flex-start;padding:7px 10px;border-radius:999px;background:rgba(81,216,240,.09)!important;border:1px solid rgba(81,216,240,.18)!important;color:var(--cyan)!important;font:800 9px Arial,sans-serif;letter-spacing:.08em}.lead-copy h2{color:var(--text)!important;font:800 clamp(30px,4vw,48px)/1.08 Arial,sans-serif;letter-spacing:-.035em;margin:15px 0}.lead-copy p{color:var(--muted)!important;font:400 14px/1.8 Arial,sans-serif;margin:0 0 18px}.meta{display:flex;align-items:center;gap:12px;color:#789aa5!important;font:500 10px Arial,sans-serif}.read{display:inline-flex;align-items:center;gap:8px;color:var(--cyan)!important;font:800 11px Arial,sans-serif;margin-top:18px}
+.section-head{display:flex;align-items:end;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:12px}.section-head h2{color:var(--text)!important;font:800 26px/1.2 Arial,sans-serif;letter-spacing:-.025em;margin:5px 0 0}.section-head span{color:var(--cyan)!important;font:800 9px/1.2 Arial,sans-serif;letter-spacing:.15em;text-transform:uppercase}.paper-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.story{display:grid;grid-template-columns:220px 32px minmax(0,1fr);width:100%;height:220px;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,rgba(8,37,50,.9),rgba(3,19,27,.94));transition:transform .25s,border-color .25s;min-width:0}.story:hover{transform:translateY(-3px);border-color:rgba(72,216,241,.4)}.story-media{width:220px;height:220px;aspect-ratio:1/1;background:radial-gradient(circle at 50% 50%,rgba(72,216,241,.16),transparent 50%),#061923;overflow:hidden;border:0;border-radius:0}.story-media img{width:100%;height:100%;object-fit:cover;display:block}.story-body{height:220px;overflow:hidden;padding:18px 18px 16px;display:flex;flex-direction:column;min-width:0}.story-kind{height:100%;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(72,216,241,.1);border-right:1px solid rgba(72,216,241,.1);color:var(--cyan)!important;font:800 8px/1 Arial,sans-serif;letter-spacing:.16em;writing-mode:vertical-rl;transform:rotate(180deg);text-transform:uppercase;grid-column:2;grid-row:1}.story-kind.notice{color:#f0c58e!important}.story h3{color:var(--text)!important;font:800 17px/1.35 Arial,sans-serif;letter-spacing:-.02em;margin:0 0 7px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.story .meta{margin-top:auto;padding-top:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:8px}.story .meta span:last-child{color:var(--cyan)!important;font-size:9px;font-weight:700;white-space:nowrap}.empty{padding:40px 25px;border:1px dashed var(--line);border-radius:17px;color:var(--muted)!important;background:rgba(7,27,37,.35)!important;text-align:center;font:500 14px Arial,sans-serif}.pager{padding-top:25px}
+@media(max-width:900px){.newsroom{width:min(100% - 24px,700px);padding:38px 0 70px}.news-tools{grid-template-columns:minmax(0,1fr) 105px 105px 105px}.lead{grid-template-columns:1fr}.paper-list{grid-template-columns:1fr}.story{grid-template-columns:160px 28px minmax(0,1fr);height:160px}.story-media{width:160px;height:160px}.story-body{height:160px}}
+@media(max-width:560px){.newsroom{width:calc(100% - 24px);padding:30px 0 60px}.news-mast{padding-bottom:20px;margin-bottom:18px}.news-mast h1{font-size:43px}.news-mast p{font-size:13px}.news-tools{grid-template-columns:minmax(0,1fr) 62px 62px 82px;gap:6px;margin-bottom:22px}.news-tools>*{min-height:45px;border-radius:11px}.search{padding:0 10px;gap:7px}.search input{font-size:11px}.search input::placeholder{font-size:10px}.filter{padding:0 8px}.filter select{font-size:10px}.published-count{padding:0 6px;font-size:9px}.published-count i{margin-right:4px}.lead{border-radius:17px;margin-bottom:28px}.lead-copy{padding:21px}.lead-copy h2{font-size:27px}.lead-copy p{font-size:12px}.section-head h2{font-size:22px}.paper-list{display:block}.story{grid-template-columns:104px 22px minmax(0,1fr);gap:0;height:112px;min-height:112px;margin-bottom:10px;border-radius:13px}.story-media{width:104px;height:112px;border-radius:0}.story-body{height:112px;padding:10px 11px}.story-type{font-size:6px;letter-spacing:.1em}.story h3{font-size:13px;line-height:1.3;margin:0 0 4px;-webkit-line-clamp:2}.story p{font-size:8px;line-height:1.5;-webkit-line-clamp:2}.story .meta{padding-top:4px;font-size:7px}.story .meta span:last-child{font-size:8px}.section-head span{font-size:8px}}
 </style>
 
-<main class="news-page public-container">
-    <header class="news-mast">
-        <div class="news-kicker">Latest updates</div>
-        <h1>News &amp; Notices</h1>
-        <p>Stay informed with the latest announcements, achievements and important updates from {{ $siteName }}.</p>
-    </header>
-
-    <div class="news-tools">
-        <form class="search" method="GET" action="{{ route('news.index') }}">
-            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-            <input type="search" name="q" value="{{ request('q') }}" placeholder="Search news..." aria-label="Search news">
-        </form>
-        <label class="filter"><select name="type" onchange="this.form.submit()" form="news-filter"><option value="">All</option><option value="news" @selected(request('type')==='news')>News</option><option value="announcement" @selected(request('type')==='announcement')>Notice</option></select></label>
-        <label class="filter"><select name="sort" onchange="this.form.submit()" form="news-filter"><option value="newest" @selected(request('sort','newest')==='newest')>Newest</option><option value="oldest" @selected(request('sort')==='oldest')>Oldest</option></select></label>
-        <div class="view-switch" aria-label="News view">
-            <button class="view-btn active" type="button" data-view="grid" title="Grid view" aria-label="Grid view"><i class="fa-solid fa-grip"></i></button>
-            <button class="view-btn" type="button" data-view="list" title="List view" aria-label="List view"><i class="fa-solid fa-list"></i></button>
-        </div>
-    </div>
-    <form id="news-filter" method="GET" action="{{ route('news.index') }}"><input type="hidden" name="q" value="{{ request('q') }}"></form>
-
-    <section>
-        <div class="news-head"><div><small>From the newsroom</small><h2>Latest publications</h2></div><small>{{ $news->total() }} stories</small></div>
-        @if($news->isEmpty())
-            <div class="empty">No published news or notices are available yet.</div>
-        @else
-            <div id="newsItems" class="news-grid">
-                @foreach($news as $item)
-                    <a class="news-card" href="{{ route('news.show',$item->slug) }}">
-                        <div class="news-media">
-                            @if($item->image_path)<img src="{{ asset('storage/'.ltrim($item->image_path,'/')) }}" alt="{{ $item->cover_alt ?: $item->title }}" loading="lazy">@else<div class="media-fallback"><i class="fa-regular fa-newspaper"></i></div>@endif
-                        </div>
-                        <div class="news-kind {{ $item->type==='announcement'?'notice':'' }}">{{ $item->type==='announcement'?'Notice':'News' }}</div>
-                        <div class="news-body">
-                            <h3 class="news-title">{{ $item->title }}</h3>
-                            @if($item->excerpt)<p class="news-excerpt">{{ $item->excerpt }}</p>@endif
-                            <div class="news-footer"><span class="news-date">{{ $item->published_at?->format('d F Y') }}</span><span class="read">Read more →</span></div>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-            <div class="pager">{{ $news->links() }}</div>
-        @endif
-    </section>
+<main class="newsroom">
+    <header class="news-mast"><div class="news-kicker">Latest updates</div><h1>News &amp; Notices</h1><p>Stay informed with the latest announcements, achievements and important updates from {{ $siteName }}.</p></header>
+    <div class="news-tools"><form class="search" method="GET" action="{{ route('news.index') }}"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" name="q" value="{{ request('q') }}" placeholder="Search news..." aria-label="Search news"></form><label class="filter"><select name="type" onchange="this.form.submit()" form="news-filter"><option value="">All</option><option value="news" @selected(request('type')==='news')>News</option><option value="announcement" @selected(request('type')==='announcement')>Notice</option></select></label><label class="filter"><select name="sort" onchange="this.form.submit()" form="news-filter"><option value="newest" @selected(request('sort','newest')==='newest')>Newest</option><option value="oldest" @selected(request('sort')==='oldest')>Oldest</option></select></label><div class="published-count"><i class="fa-regular fa-newspaper"></i>{{ $publishedCount }} Published</div></div><form id="news-filter" method="GET" action="{{ route('news.index') }}"><input type="hidden" name="q" value="{{ request('q') }}"></form>
+    @if($featured)<a class="lead" href="{{ route('news.show',$featured->slug) }}"><div class="lead-media">@if($featured->image_path)<img src="{{ asset('storage/'.$featured->image_path) }}" alt="{{ $featured->cover_alt ?: $featured->title }}">@else<div class="media-fallback"><i class="fa-regular fa-newspaper"></i></div>@endif</div><div class="lead-copy"><span class="label">{{ $featured->type==='announcement'?'NOTICE':'NEWS' }}</span><h2>{{ $featured->title }}</h2><div class="meta"><span>{{ $featured->published_at?->format('d F Y') }}</span></div><span class="read">Read more <i class="fa-solid fa-arrow-right"></i></span></div></a>@endif
+    <section><div class="section-head"><div><span>From the newsroom</span><h2>Latest publications</h2></div><span>{{ $news->total() }} stories</span></div>@if($news->isEmpty())<div class="empty">No published news or notices are available yet.</div>@else<div class="paper-list">@foreach($news as $item)<a class="story" href="{{ route('news.show',$item->slug) }}"><div class="story-media">@if($item->image_path)<img src="{{ asset('storage/'.$item->image_path) }}" alt="{{ $item->cover_alt ?: $item->title }}" loading="lazy">@else<div class="media-fallback"><i class="fa-regular fa-newspaper"></i></div>@endif</div><div class="story-kind {{ $item->type==='announcement'?'notice':'' }}">{{ $item->type==='announcement'?'Notice':'News' }}</div><div class="story-body"><h3>{{ $item->title }}</h3><div class="meta"><span>{{ $item->published_at?->format('d F Y') }}</span><span>Read more →</span></div></div></a>@endforeach</div><div class="pager">{{ $news->links() }}</div>@endif</section>
 </main>
-
-<script>
-(() => {
-    const items = document.getElementById('newsItems');
-    const buttons = document.querySelectorAll('.view-btn');
-    if (!items || !buttons.length) return;
-    const saved = localStorage.getItem('news-view');
-    const setView = view => {
-        items.classList.toggle('news-list', view === 'list');
-        items.classList.toggle('news-grid', view !== 'list');
-        buttons.forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
-        localStorage.setItem('news-view', view);
-    };
-    setView(saved === 'list' ? 'list' : 'grid');
-    buttons.forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
-})();
-</script>
 @endsection
