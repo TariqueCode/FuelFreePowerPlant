@@ -1,14 +1,14 @@
 <?php
 
-namespace AppHttpControllersAdmin;
+namespace App\Http\Controllers\Admin;
 
-use AppHttpControllersController;
-use AppModelsSocialLink;
-use IlluminateHttpJsonResponse;
-use IlluminateHttpRedirectResponse;
-use IlluminateHttpRequest;
-use IlluminateSupportFacadesCache;
-use IlluminateViewView;
+use App\Http\Controllers\Controller;
+use App\Models\SocialLink;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\View\View;
 
 class SocialLinkController extends Controller
 {
