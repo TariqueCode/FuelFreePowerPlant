@@ -58,7 +58,11 @@ class CareerController extends Controller
             'status' => 'new',
         ]);
 
-        $careerMailbox = EmailAccount::query()->where('address','career@fuelfreepowerplant.com')->where('status','active')->first();
+        $settings = SystemSetting::query()->pluck('value', 'key')->all();
+        $configuredMailboxId = (int) ($settings['mail.career_account_id'] ?? 0);
+        $careerMailbox = $configuredMailboxId
+            ? EmailAccount::query()->whereKey($configuredMailboxId)->where('status','active')->first()
+            : EmailAccount::query()->where('address','career@fuelfreepowerplant.com')->where('status','active')->first();
         if ($careerMailbox) {
             try {
                 app(WebmailService::class)->send(
