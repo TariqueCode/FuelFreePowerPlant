@@ -94,6 +94,15 @@ class SiteContentController extends Controller
         return redirect()->route('admin.site-content.index', ['type'=>$type])->with('status','Content deleted successfully.');
     }
 
+    public function toggleNews(SiteContentItem $item): RedirectResponse
+    {
+        abort_unless(in_array($item->type, ['news','announcement'], true), 404);
+        $item->status = $item->status === 'published' ? 'draft' : 'published';
+        if ($item->status === 'published' && empty($item->published_at)) $item->published_at = now();
+        $item->save();
+        return redirect()->route('admin.site-content.index', ['type'=>'news'])->with('status', $item->status === 'published' ? 'Publication activated.' : 'Publication deactivated.');
+    }
+
     public function toggleNavigation(Request $request, SiteContentItem $item): JsonResponse
     {
         abort_unless($item->type === 'company', 404);
