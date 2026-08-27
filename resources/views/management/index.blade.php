@@ -303,6 +303,79 @@ main{padding:72px 0 88px}
     .grid{gap:18px}
     .body{padding:18px}
 }
+/* Desktop presentation only. Everything at 850px and below keeps the existing mobile/tablet design. */
+@media(min-width:851px){
+    main{padding-top:68px}
+    .hero{
+        max-width:none;
+        margin-bottom:42px;
+        padding:0 4px;
+    }
+    .hero h1{
+        max-width:850px;
+        font-size:clamp(44px,4.5vw,62px);
+    }
+    .hero p{
+        max-width:760px;
+        font-size:14px;
+    }
+    .grid{
+        gap:22px;
+        align-items:stretch;
+    }
+    .card{
+        height:100%;
+        display:flex;
+        flex-direction:column;
+        border-radius:22px;
+    }
+    .photo{
+        aspect-ratio:4/4.45;
+    }
+    .body{
+        flex:1;
+        display:flex;
+        flex-direction:column;
+        padding:20px 20px 21px;
+    }
+    .bio{
+        font-size:11px;
+        line-height:1.8;
+    }
+    .bio-preview{
+        -webkit-line-clamp:6;
+        max-height:119px;
+    }
+    .bio-full.open{
+        display:block;
+        padding:14px 15px;
+        margin:15px 0 10px;
+        max-height:none;
+        border:1px solid rgba(67,209,240,.12);
+        border-radius:12px;
+        background:rgba(2,14,21,.48);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.018);
+        color:#9bb5be;
+    }
+    .bio-more{
+        align-self:flex-start;
+        margin-bottom:16px;
+        padding:8px 12px;
+    }
+    .contact-list{
+        margin-top:auto;
+        padding:15px 0;
+    }
+    .contact{
+        font-size:10px;
+    }
+    .actions{
+        margin-top:14px;
+    }
+    .action{
+        min-height:40px;
+    }
+}
 @media(max-width:850px){
     main{padding:55px 0 70px}
     .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
