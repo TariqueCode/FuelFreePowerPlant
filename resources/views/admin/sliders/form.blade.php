@@ -9,10 +9,9 @@
 <div class="full"><label>Slider image {{ $slider->exists?'(leave empty to keep current)':'' }}</label><input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/avif" {{ $slider->exists?'':'required' }}></div>
 <div class="full">@if($slider->image_path)<img class="preview" src="{{ asset('storage/'.$slider->image_path) }}" alt="Current slider image">@endif</div>
 <div class="full"><label>Title (optional)</label><input name="title" value="{{ old('title',$slider->title) }}" maxlength="255" placeholder="e.g. Our power project"></div>
-<div><label>Display order</label><input type="number" name="sort_order" value="{{ old('sort_order',$slider->sort_order ?? 0) }}" min="0" max="9999" required><small>Lower numbers appear first.</small></div>
-<div><label>Destination URL (optional)</label><input type="url" name="link_url" value="{{ old('link_url',$slider->link_url) }}" placeholder="https://example.com"></div>
-<div><label>Start time (optional)</label><input type="datetime-local" name="starts_at" value="{{ old('starts_at',$slider->starts_at?->format('Y-m-d\\TH:i')) }}"></div>
-<div><label>End time (optional)</label><input type="datetime-local" name="ends_at" value="{{ old('ends_at',$slider->ends_at?->format('Y-m-d\\TH:i')) }}"></div>
+<div class="full"><label>Destination URL (optional)</label><input type="url" name="link_url" value="{{ old('link_url',$slider->link_url) }}" placeholder="https://example.com"></div>
+<div><label>Start time (optional)</label><input type="datetime-local" name="starts_at" value="{{ old('starts_at',$slider->starts_at?->format('Y-m-d\TH:i')) }}"></div>
+<div><label>End time (optional)</label><input type="datetime-local" name="ends_at" value="{{ old('ends_at',$slider->ends_at?->format('Y-m-d\TH:i')) }}"></div>
 <div class="full check"><label><input type="checkbox" name="is_published" value="1" @checked(old('is_published',$slider->is_published))> Show this image on the homepage slider</label></div>
 </div>
 <div class="actions"><a class="back" href="{{ route('admin.sliders.index') }}">Cancel</a><button class="save" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save slider</button></div>
