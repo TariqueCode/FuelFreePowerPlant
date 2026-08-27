@@ -401,11 +401,113 @@ main{padding:72px 0 88px}
     .grid{gap:26px}
     .body{padding:23px}
 }
+
+/* Desktop biography modal: keeps every management card compact and independent. */
+@media(min-width:851px){
+    .bio-modal{
+        position:fixed;
+        inset:0;
+        z-index:120;
+        display:none;
+        align-items:center;
+        justify-content:center;
+        padding:32px;
+        background:rgba(0,7,12,.78);
+        backdrop-filter:blur(12px);
+    }
+    .bio-modal.open{display:flex}
+    .bio-modal-panel{
+        width:min(760px,92vw);
+        max-height:min(78vh,720px);
+        overflow:auto;
+        border:1px solid rgba(67,209,240,.20);
+        border-radius:22px;
+        background:
+            radial-gradient(500px 220px at 0% 0%,rgba(40,173,205,.12),transparent 70%),
+            linear-gradient(155deg,#082735,#03151f 70%,#021018);
+        box-shadow:0 30px 100px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.035);
+        scrollbar-width:thin;
+    }
+    .bio-modal-head{
+        position:sticky;
+        top:0;
+        z-index:2;
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap:18px;
+        padding:24px 26px 18px;
+        border-bottom:1px solid rgba(91,214,239,.12);
+        background:rgba(5,27,38,.94);
+        backdrop-filter:blur(14px);
+    }
+    .bio-modal-kicker{
+        margin:0 0 6px;
+        color:var(--cyan);
+        font-size:9px;
+        font-weight:800;
+        letter-spacing:.16em;
+        text-transform:uppercase;
+    }
+    .bio-modal-title{
+        margin:0;
+        color:#effbfc;
+        font-size:24px;
+        line-height:1.25;
+        letter-spacing:-.025em;
+        font-weight:800;
+    }
+    .bio-modal-role{
+        margin:5px 0 0;
+        color:var(--cyan-soft);
+        font-size:11px;
+        line-height:1.5;
+        font-weight:800;
+    }
+    .bio-modal-close{
+        flex:0 0 40px;
+        width:40px;
+        height:40px;
+        display:grid;
+        place-items:center;
+        border:1px solid rgba(91,214,239,.16);
+        border-radius:11px;
+        background:rgba(67,209,240,.05);
+        color:#b9d8df;
+        cursor:pointer;
+    }
+    .bio-modal-close:hover{background:rgba(67,209,240,.12);color:#fff;border-color:rgba(91,214,239,.30)}
+    .bio-modal-body{
+        padding:24px 26px 28px;
+        color:#a5bdc5;
+        font-size:13px;
+        line-height:1.9;
+        overflow-wrap:anywhere;
+    }
+    .bio-modal-body p{margin:0 0 12px}
+    .bio-modal-body p:last-child{margin-bottom:0}
+}
 </style>
 <main class="shell">
     <section class="hero"><span class="eyebrow">Leadership &amp; Management</span><h1>Management Team</h1><p>Meet the people responsible for guiding {{ $name }}.</p></section>
     <section class="grid">@forelse($members as $member)<article class="card"><div class="photo" @if($member->image_path) data-image="{{ asset('storage/'.$member->image_path) }}" data-name="{{ $member->title }}" role="button" tabindex="0" @endif>@if($member->image_path)<img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}" loading="lazy">@else<i class="fa-solid fa-user-tie"></i>@endif</div><div class="body"><h2>{{ $member->title }}</h2><div class="role">{{ $member->designation ?: $member->excerpt }}</div>@if($member->content)<div class="bio bio-preview" id="bio-preview-{{ $member->id }}">{!! nl2br(e($member->content)) !!}</div><div class="bio-full" id="bio-full-{{ $member->id }}">{!! nl2br(e($member->content)) !!}</div><button class="bio-more" type="button" data-more="{{ $member->id }}"><span>More</span><i class="fa-solid fa-chevron-down"></i></button>@endif<div class="contact-list">@if($member->phone)<a class="contact" href="tel:{{ preg_replace('/[^0-9+]/','',$member->phone) }}"><i class="fa-solid fa-phone"></i>{{ $member->phone }}</a>@endif @if($member->email)<a class="contact" href="mailto:{{ $member->email }}"><i class="fa-solid fa-envelope"></i>{{ $member->email }}</a>@endif</div><div class="actions"><a class="action primary" href="{{ route('management.vcard',$member) }}"><i class="fa-solid fa-user-plus"></i> Add to Contacts</a>@if($member->visiting_card_path)<a class="action" href="{{ asset('storage/'.$member->visiting_card_path) }}" target="_blank"><i class="fa-regular fa-address-card"></i> Visiting Card</a>@else<a class="action" href="tel:{{ preg_replace('/[^0-9+]/','',$member->phone) }}"><i class="fa-solid fa-phone"></i> Call</a>@endif</div></div></article>@empty<div class="empty"><i class="fa-solid fa-people-group"></i></div>@endforelse</section>
 </main>
+
+<div class="bio-modal" id="bioModal" aria-hidden="true">
+    <div class="bio-modal-panel" role="dialog" aria-modal="true" aria-labelledby="bioModalTitle">
+        <div class="bio-modal-head">
+            <div>
+                <div class="bio-modal-kicker">Management Profile</div>
+                <h2 class="bio-modal-title" id="bioModalTitle"></h2>
+                <div class="bio-modal-role" id="bioModalRole"></div>
+            </div>
+            <button class="bio-modal-close" id="bioModalClose" type="button" aria-label="Close biography">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="bio-modal-body" id="bioModalBody"></div>
+    </div>
+</div>
 <div class="lightbox" id="photoLightbox"><button class="lightbox-close" id="lightboxClose" type="button"><i class="fa-solid fa-xmark"></i></button><div class="lightbox-content"><img id="lightboxImage" src="" alt=""></div><div class="zoom-controls"><button id="zoomOut" type="button"><i class="fa-solid fa-minus"></i></button><span class="zoom-level" id="zoomLevel">100%</span><button id="zoomIn" type="button"><i class="fa-solid fa-plus"></i></button><button id="zoomReset" type="button"><i class="fa-solid fa-rotate-left"></i></button></div></div>
-<script>(function(){const buttons=[...document.querySelectorAll('.bio-more')];function closeOther(except){buttons.forEach(btn=>{if(btn===except)return;const id=btn.dataset.more,full=document.getElementById('bio-full-'+id),preview=document.getElementById('bio-preview-'+id);if(full&&full.classList.contains('open')){full.classList.remove('open');preview.style.display='';btn.querySelector('span').textContent='More';btn.querySelector('i').className='fa-solid fa-chevron-down'}})}buttons.forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.more,full=document.getElementById('bio-full-'+id),preview=document.getElementById('bio-preview-'+id),open=!full.classList.contains('open');if(open)closeOther(btn);full.classList.toggle('open',open);preview.style.display=open?'none':'';btn.querySelector('span').textContent=open?'Less':'More';btn.querySelector('i').className=open?'fa-solid fa-chevron-up':'fa-solid fa-chevron-down'}));const box=document.getElementById('photoLightbox'),img=document.getElementById('lightboxImage'),close=document.getElementById('lightboxClose'),level=document.getElementById('zoomLevel');let zoom=1;function render(){zoom=Math.min(4,Math.max(1,zoom));img.style.transform='scale('+zoom+')';level.textContent=Math.round(zoom*100)+'%'}function open(p){img.src=p.dataset.image;img.alt=p.dataset.name||'';zoom=1;render();box.classList.add('open');document.body.style.overflow='hidden'}function shut(){box.classList.remove('open');img.src='';document.body.style.overflow=''}document.querySelectorAll('.photo[data-image]').forEach(p=>{p.onclick=()=>open(p);p.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open(p)}}});document.getElementById('zoomIn').onclick=()=>{zoom+=.25;render()};document.getElementById('zoomOut').onclick=()=>{zoom-=.25;render()};document.getElementById('zoomReset').onclick=()=>{zoom=1;render()};close.onclick=shut;box.onclick=e=>{if(e.target===box)shut()};document.addEventListener('keydown',e=>{if(e.key==='Escape')shut()})})();</script>
+<script>(function(){const buttons=[...document.querySelectorAll('.bio-more')];function closeOther(except){buttons.forEach(btn=>{if(btn===except)return;const id=btn.dataset.more,full=document.getElementById('bio-full-'+id),preview=document.getElementById('bio-preview-'+id);if(full&&full.classList.contains('open')){full.classList.remove('open');preview.style.display='';btn.querySelector('span').textContent='More';btn.querySelector('i').className='fa-solid fa-chevron-down'}})}const bioModal=document.getElementById('bioModal'),bioModalTitle=document.getElementById('bioModalTitle'),bioModalRole=document.getElementById('bioModalRole'),bioModalBody=document.getElementById('bioModalBody'),bioModalClose=document.getElementById('bioModalClose');function shutBioModal(){if(!bioModal)return;bioModal.classList.remove('open');bioModal.setAttribute('aria-hidden','true');document.body.style.overflow=''}function openBioModal(btn){const body=btn.closest('.body'),title=body.querySelector('h2'),role=body.querySelector('.role'),full=body.querySelector('.bio-full');bioModalTitle.textContent=title?title.textContent:'';bioModalRole.textContent=role?role.textContent:'';bioModalBody.innerHTML=full?full.innerHTML:'';bioModal.classList.add('open');bioModal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';bioModalClose.focus()}buttons.forEach(btn=>btn.addEventListener('click',()=>{if(window.matchMedia('(min-width:851px)').matches){openBioModal(btn);return}const id=btn.dataset.more,full=document.getElementById('bio-full-'+id),preview=document.getElementById('bio-preview-'+id),open=!full.classList.contains('open');if(open)closeOther(btn);full.classList.toggle('open',open);preview.style.display=open?'none':'';btn.querySelector('span').textContent=open?'Less':'More';btn.querySelector('i').className=open?'fa-solid fa-chevron-up':'fa-solid fa-chevron-down'}));if(bioModal){bioModalClose.addEventListener('click',shutBioModal);bioModal.addEventListener('click',e=>{if(e.target===bioModal)shutBioModal})}const box=document.getElementById('photoLightbox'),img=document.getElementById('lightboxImage'),close=document.getElementById('lightboxClose'),level=document.getElementById('zoomLevel');let zoom=1;function render(){zoom=Math.min(4,Math.max(1,zoom));img.style.transform='scale('+zoom+')';level.textContent=Math.round(zoom*100)+'%'}function open(p){img.src=p.dataset.image;img.alt=p.dataset.name||'';zoom=1;render();box.classList.add('open');document.body.style.overflow='hidden'}function shut(){box.classList.remove('open');img.src='';document.body.style.overflow=''}document.querySelectorAll('.photo[data-image]').forEach(p=>{p.onclick=()=>open(p);p.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open(p)}}});document.getElementById('zoomIn').onclick=()=>{zoom+=.25;render()};document.getElementById('zoomOut').onclick=()=>{zoom-=.25;render()};document.getElementById('zoomReset').onclick=()=>{zoom=1;render()};close.onclick=shut;box.onclick=e=>{if(e.target===box)shut()};document.addEventListener('keydown',e=>{if(e.key==='Escape'){shut();shutBioModal()}})})();</script>
 @endsection
