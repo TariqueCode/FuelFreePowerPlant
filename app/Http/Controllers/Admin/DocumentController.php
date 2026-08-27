@@ -142,6 +142,32 @@ class DocumentController extends Controller
         abort_unless($disk->copy($document->path, $copyPath), 500, 'Unable to copy the file.'); Document::create(['user_id' => $request->user()->id, 'folder_id' => $folderId, 'original_name' => pathinfo($document->original_name, PATHINFO_FILENAME).' - Copy'.($document->extension ? '.'.$document->extension : ''), 'stored_name' => $storedName, 'disk' => $document->disk, 'path' => $copyPath, 'mime_type' => $document->mime_type, 'size' => $document->size, 'extension' => $document->extension]); return back()->with('success', 'File copied successfully.');
     }
     public function download(Request $request, Document $document): mixed { $this->ownDocument($request, $document); abort_unless(Storage::disk($document->disk)->exists($document->path), 404); return Storage::disk($document->disk)->download($document->path, $document->original_name); }
+
+    public function share(Request $request, Document $document): RedirectResponse
+    {
+        $this->ownDocument($request, $document);
+        if (! $document->share_token) {
+            $document->share_token = bin2hex(random_bytes(32));
+        }
+        $document->share_enabled = true;
+        $document->save();
+
+        return back()->with('success', 'Secure download link created.');
+    }
+
+    public function unshare(Request $request, Document $document): RedirectResponse
+    {
+        $this->ownDocument($request, $document);
+        $document->update(['share_enabled' => false]);
+        return back()->with('success', 'Download link revoked.');
+    }
+
+    public function sharedDownload(string $token): mixed
+    {
+        $document = Document::where('share_token', $token)->where('share_enabled', true)->firstOrFail();
+        abort_unless(Storage::disk($document->disk)->exists($document->path), 404);
+        return Storage::disk($document->disk)->download($document->path, $document->original_name);
+    }
     public function destroy(Request $request, Document $document): RedirectResponse { $this->ownDocument($request, $document); Storage::disk($document->disk)->delete($document->path); $document->delete(); return back()->with('success', 'File deleted permanently.'); }
     private function ownFolder(Request $request, DocumentFolder $folder): void { abort_unless($folder->user_id === $request->user()->id, 403); }
     private function ownDocument(Request $request, Document $document): void { abort_unless($document->user_id === $request->user()->id, 403); }

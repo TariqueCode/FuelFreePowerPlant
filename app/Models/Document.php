@@ -9,8 +9,13 @@ class Document extends Model
 {
     protected $fillable = [
         'user_id', 'folder_id', 'original_name', 'stored_name', 'disk',
-        'path', 'mime_type', 'size', 'extension',
+        'path', 'mime_type', 'size', 'extension', 'share_token', 'share_enabled',
     ];
+
+    public function getShareUrlAttribute(): ?string
+    {
+        return $this->share_enabled && $this->share_token ? route('documents.shared-download', $this->share_token) : null;
+    }
 
     public function user(): BelongsTo
     {
