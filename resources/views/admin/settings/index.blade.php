@@ -17,7 +17,6 @@
 'welcome_enabled'=>['Welcome message','Company introduction below the slider.','fa-hand-wave'],
 'news_enabled'=>['News & Notices','Latest news and notices.','fa-newspaper'],
 'gallery_enabled'=>['Gallery','Photo collections and albums.','fa-photo-film'],
-'stats_enabled'=>['Power statistics','Project, capacity and operational statistics.','fa-chart-simple'],
 ] as $key=>$item)
 <label class="home-option"><span class="option-icon"><i class="fa-solid {{ $item[2] }}"></i></span><span class="option-copy"><strong>{{ $item[0] }}</strong><small>{{ $item[1] }}</small></span><input class="switch-input" type="checkbox" name="home[{{ $key }}]" value="1" form="homepage-visibility-form" @checked(old('home.'.$key,$settings['home.'.$key]))><span class="switch"><i></i></span></label>
 @endforeach
