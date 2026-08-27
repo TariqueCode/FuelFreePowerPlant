@@ -1,8 +1,8 @@
 <?php
 
-namespace AppModels;
+namespace App\Models;
 
-use IlluminateDatabaseEloquentModel;
+use Illuminate\Database\Eloquent\Model;
 
 class SocialLink extends Model
 {
@@ -15,12 +15,18 @@ class SocialLink extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('is_active', true)->orderBy('sort_order')->orderBy('id');
+        return $query->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('id');
     }
 
     public function platformMeta(): array
     {
-        return config('fuelfree.social.platforms.'.$this->platform)
-            ?: ['label' => $this->label, 'icon' => $this->icon ?: 'fa-solid fa-globe', 'color' => '#51D8F0'];
+        return config('fuelfree.social.platforms.' . $this->platform)
+            ?: [
+                'label' => $this->label,
+                'icon' => $this->icon ?: 'fa-solid fa-globe',
+                'color' => '#51D8F0',
+            ];
     }
 }
