@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Inquiry;
+use App\Services\HelpDeskReplyService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -37,4 +38,17 @@ class InquiryController extends Controller
         $inquiry->update($data);
         return back()->with('status', 'Inquiry updated successfully.');
     }
+    public function reply(Request $request, Inquiry $inquiry, HelpDeskReplyService $replyService): RedirectResponse
+    {
+        $data = $request->validate(['body' => ['required', 'string', 'max:50000']]);
+        try {
+            $replyService->sendInquiry($inquiry, $data['body']);
+        } catch (\Throwable $e) {
+            report($e);
+            return back()->withErrors(['reply' => 'Reply could not be sent: '.($e->getMessage() ?: 'mail server error.')])->withInput();
+        }
+        $inquiry->update(['status' => 'in_progress']);
+        return back()->with('status', 'Reply sent successfully.');
+    }
+
 }
