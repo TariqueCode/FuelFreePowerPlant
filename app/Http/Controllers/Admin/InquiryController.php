@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Inquiry;
+use App\Models\HelpDeskReply;
 use App\Services\HelpDeskReplyService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,7 +26,8 @@ class InquiryController extends Controller
     public function show(Inquiry $inquiry): View
     {
         if (!$inquiry->read_at) $inquiry->update(['read_at' => now(), 'status' => $inquiry->status === 'new' ? 'read' : $inquiry->status]);
-        return view('admin.inquiries.show', compact('inquiry'));
+        $replies = HelpDeskReply::query()->where('inquiry_id', $inquiry->id)->latest('sent_at')->get();
+        return view('admin.inquiries.show', compact('inquiry', 'replies'));
     }
 
     public function update(Request $request, Inquiry $inquiry): RedirectResponse
