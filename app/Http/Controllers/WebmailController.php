@@ -90,6 +90,7 @@ class WebmailController extends Controller
         [$email, $password] = $credentials;
 
         $initialTo = '';
+        $initialCc = '';
         $initialSubject = '';
         $initialBody = '';
         $mode = 'new';
@@ -101,6 +102,7 @@ class WebmailController extends Controller
             try {
                 $message = $webmail->message($email, $password, $uid, $this->mailConfigFor($email), $folder);
                 $initialTo = $this->extractEmail($message['from']);
+                $initialCc = '';
                 $initialSubject = str_starts_with(strtolower($message['subject']), 're:') ? $message['subject'] : 'Re: '.$message['subject'];
                 $initialBody = '<p><br></p><hr><p><strong>Original message</strong><br>'.$this->escapeHtml($message['from']).'<br>'.$this->escapeHtml($message['date']).'</p><blockquote>'.$message['body'].'</blockquote>';
                 $mode = 'reply';
@@ -119,29 +121,49 @@ class WebmailController extends Controller
             }
         }
 
-        return view('webmail.compose', compact('email', 'initialTo', 'initialSubject', 'initialBody', 'mode', 'folder'));
+        return view('webmail.compose', compact('email', 'initialTo', 'initialCc', 'initialSubject', 'initialBody', 'mode', 'folder'));
     }
 
     public function send(Request $request, WebmailService $webmail): RedirectResponse
     {
-        $credentials = $this->credentials($request);
-        if ($credentials === null) return redirect()->to($this->url('/'));
-        [$email, $password] = $credentials;
-
-        $data = $request->validate([
-            'to' => ['required','email'],
-            'subject' => ['nullable','string','max:255'],
-            'body' => ['required','string','max:500000'],
+        $credentials=$this->credentials($request); if($credentials===null)return redirect()->to($this->url('/'));
+        [$email,$password]=$credentials;
+        $data=$request->validate([
+            'to'=>['required','string','max:5000'],'cc'=>['nullable','string','max:5000'],'bcc'=>['nullable','string','max:5000'],
+            'subject'=>['nullable','string','max:255'],'body'=>['required','string','max:500000'],
+            'attachments'=>['nullable','array','max:10'],'attachments.*'=>['file','max:10240'],
         ]);
+        $attachments=[];
+        foreach($request->file('attachments',[]) as $file){if($file&&$file->isValid())$attachments[]=['path'=>$file->getRealPath(),'name'=>$file->getClientOriginalName(),'mime'=>$file->getMimeType()?:'application/octet-stream'];}
+        try{
+            $webmail->send($email,$password,$data['to'],$data['subject']?:'(No subject)',$data['body'],$this->mailConfigFor($email),$attachments,false,$data['cc']??[],$data['bcc']??[]);
+        }catch(Throwable $e){report($e);return back()->withErrors(['send'=>'The message could not be sent: '.($e->getMessage()?:'SMTP error.')])->withInput();}
+        return redirect()->to($this->url('/inbox'))->with('status','Message sent successfully.');
+    }
 
-        try {
-            $webmail->send($email, $password, $data['to'], $data['subject'] ?: '(No subject)', $data['body'], $this->mailConfigFor($email));
-        } catch (Throwable $e) {
-            report($e);
-            return back()->withErrors(['send' => 'The message could not be sent. Please try again.'])->withInput();
-        }
+    public function attachment(Request $request,int $uid,string $part,WebmailService $webmail)
+    {
+        $credentials=$this->credentials($request); if($credentials===null)return redirect()->to($this->url('/'));
+        [$email,$password]=$credentials; $folder=$this->resolveFolder($request,[]);
+        $folder=trim((string)$request->query('folder','INBOX'));
+        $data=$webmail->attachment($email,$password,$uid,$part,$this->mailConfigFor($email),$folder);
+        return response($data['content'],200,['Content-Type'=>$data['type'],'Content-Disposition'=>'attachment; filename="'.addcslashes($data['name'],'"').'"']);
+    }
 
-        return redirect()->to($this->url('/inbox'))->with('status', 'Message sent successfully.');
+    public function delete(Request $request,int $uid,WebmailService $webmail): RedirectResponse
+    {
+        $credentials=$this->credentials($request); if($credentials===null)return redirect()->to($this->url('/'));
+        [$email,$password]=$credentials; $folder=trim((string)$request->input('folder','INBOX'));
+        try{$webmail->delete($email,$password,$uid,$folder,$this->mailConfigFor($email));return redirect()->to($this->url('/inbox?folder='.urlencode($folder)))->with('status','Message moved to Trash.');}
+        catch(Throwable $e){report($e);return back()->withErrors(['email'=>'The message could not be deleted.']);}
+    }
+
+    public function toggleRead(Request $request,int $uid,WebmailService $webmail): RedirectResponse
+    {
+        $credentials=$this->credentials($request); if($credentials===null)return redirect()->to($this->url('/'));
+        [$email,$password]=$credentials;$folder=trim((string)$request->input('folder','INBOX'));$seen=$request->boolean('seen');
+        try{$webmail->setSeen($email,$password,$uid,$seen,$this->mailConfigFor($email),$folder);}catch(Throwable $e){report($e);}
+        return back();
     }
 
     public function logout(Request $request): RedirectResponse
