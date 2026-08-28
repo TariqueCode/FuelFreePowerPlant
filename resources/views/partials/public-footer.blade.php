@@ -4,6 +4,9 @@
     $publicFooterName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
     $publicFooterTagline = $footerSettings['tagline'] ?? (is_object($publicBrand) ? ($publicBrand->get('tagline') ?: $publicBrand->get('company.tagline') ?: config('fuelfree.company.tagline')) : ($publicBrand['tagline'] ?? $publicBrand['company.tagline'] ?? config('fuelfree.company.tagline')));
     $publicFooterLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
+    $publicFooterNameParts = preg_split('/\s+/', trim((string) $publicFooterName), 2);
+    $publicFooterNameFirst = $publicFooterNameParts[0] ?? '';
+    $publicFooterNameRest = $publicFooterNameParts[1] ?? '';
 @endphp
 @php
     $publicSocials = \Illuminate\Support\Facades\Cache::remember('public.social-links', 600, fn () => \App\Models\SocialLink::active()->get(['platform','label','url','icon'])->map(fn ($social) => ['platform' => $social->platform, 'label' => $social->label, 'url' => $social->url, 'icon' => $social->icon, 'color' => data_get(config('fuelfree.social.platforms'), $social->platform.'.color', '#51D8F0')])->values()->all());
@@ -17,7 +20,7 @@
 .public-footer-brand-section{padding-right:20px}
 .public-footer-brand-row{display:flex;align-items:center;gap:11px;margin-bottom:9px}
 .public-footer-logo{width:38px;height:38px;object-fit:contain;flex:0 0 38px}
-.public-footer-brand{color:#effcff;font-size:20px;font-weight:800;line-height:1.25;letter-spacing:-.2px}
+.public-footer-brand{color:#effcff;font-size:20px;font-weight:800;line-height:1.25;letter-spacing:-.2px}.public-footer-brand-first{color:#51d8f0}.public-footer-brand-rest{color:#effcff}
 .public-footer-tagline{color:#5fcde5;font-size:12px;font-weight:700;margin:0 0 6px 49px}
 .public-footer-tech{color:#7899a5;font-size:12px;line-height:1.7;max-width:300px}
 .public-footer-heading{position:relative;margin:2px 0 17px;padding-left:12px;color:#eaf8fb;font-size:14px;font-weight:800;letter-spacing:.2px}
@@ -71,7 +74,7 @@
                     @if($publicFooterLogo)
                         <img class="public-footer-logo" src="{{ asset('storage/'.$publicFooterLogo) }}" alt="{{ $publicFooterName }}">
                     @endif
-                    <div class="public-footer-brand">{{ $publicFooterName }}</div>
+                    <div class="public-footer-brand"><span class="public-footer-brand-first">{{ $publicFooterNameFirst }}</span>@if($publicFooterNameRest) <span class="public-footer-brand-rest">{{ $publicFooterNameRest }}</span>@endif</div>
                 </div>
                 @if($publicFooterTagline)
                     <div class="public-footer-tagline">{{ $publicFooterTagline }}</div>
