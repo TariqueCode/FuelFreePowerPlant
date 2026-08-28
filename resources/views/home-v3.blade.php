@@ -24,7 +24,7 @@
 @media(max-width:650px){.welcome{padding:65px 0 48px}.welcome h1{font-size:45px}.welcome p{text-align:left;font-size:15px!important;line-height:1.8}.welcome-message-title{font-size:20px;margin-bottom:10px}.head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.head>div{min-width:0}.head h2{font-size:clamp(25px,7vw,34px);line-height:1.05;margin:5px 0 0;white-space:nowrap}.head .more{flex:0 0 auto;font-size:9px}.head p{margin-top:8px}.news-grid{grid-template-columns:1fr;gap:10px}.news{grid-template-columns:112px 24px minmax(0,1fr);width:100%;height:112px;min-height:112px;align-items:stretch}.news-media{width:112px;height:112px;min-width:112px;min-height:112px;aspect-ratio:1/1}.news-media img{width:112px;height:112px;object-fit:cover}.news-kind{font-size:7px;letter-spacing:.11em}.news-body{width:100%;height:112px;min-height:112px;padding:11px 13px;overflow:hidden}.news h3{font-size:14px;line-height:1.3;margin:0;-webkit-line-clamp:2}.news p{display:none}.news-footer{padding-top:5px}.date{font-size:8px}.read{font-size:8px}.folders{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.folder-body{padding:11px 11px 12px}.folder-body h3{font-size:13px;margin-bottom:8px}.folder-meta{font-size:8px;display:block}.folder-count{display:block;margin-top:4px}.folder-date i,.folder-count i{margin-right:4px}}
 @media(max-width:400px){.news{grid-template-columns:100px 22px minmax(0,1fr);height:100px;min-height:100px}.news-media,.news-media img{width:100px;height:100px;min-width:100px;min-height:100px}.news-body{height:100px;min-height:100px;padding:9px 11px}.news h3{font-size:13px}.news-kind{font-size:6px}.shell{width:calc(100% - 22px)}}
 
-.home-slider{position:relative;width:100%;margin:28px 0 0;overflow:visible;border:0;border-radius:0;background:transparent;box-shadow:none}
+.home-slider{position:relative;width:100%;margin:28px 0 0;overflow:visible;border:0;border-radius:0;background:transparent;box-shadow:none}.home-slider.has-caption{margin-bottom:28px}
 .slider-track{position:relative;width:100%;height:calc(min(100vw - 32px,1280px) / 2.35);min-height:0}
 .slide{position:absolute;inset:0;display:block;opacity:0;visibility:hidden;transform:scale(1.008);transition:opacity .8s ease,transform 6s ease,visibility .8s}
 .slide.is-active{opacity:1;visibility:visible;transform:scale(1)}
@@ -51,7 +51,7 @@
 .welcome-signoff span{color:var(--muted);font-weight:500}
 
 @media(min-width:1100px){
-.home-slider{margin-top:32px}
+.home-slider{margin-top:32px}.home-slider.has-caption{margin-bottom:34px}
 .welcome{padding:72px 0 70px}
 .welcome-heading{padding-bottom:26px}
 .welcome h1{max-width:980px}
@@ -60,7 +60,7 @@
 }
 
 @media(max-width:1099px) and (min-width:651px){
-.home-slider{margin-top:22px}
+.home-slider{margin-top:22px}.home-slider.has-caption{margin-bottom:30px}
 .slider-track{height:calc(min(100vw - 32px,1280px) / 2.35);min-height:0}
 .slide-media{height:calc(min(100vw - 32px,1280px) / 2.35);border-radius:20px}
 .welcome{padding:62px 0 68px}
@@ -157,7 +157,6 @@
     const prev = root.querySelector('.slider-arrow.prev');
     const next = root.querySelector('.slider-arrow.next');
     const progress = root.querySelector('.slider-progress span');
-    if (slides.length < 2) return;
     let index = 0;
     let timer;
     const syncCaptionSpace = () => {
@@ -165,6 +164,7 @@
         root.classList.toggle('has-caption', hasCaption);
     };
     syncCaptionSpace();
+    if (slides.length < 2) return;
     const show = (nextIndex) => {
         index = (nextIndex + slides.length) % slides.length;
         syncCaptionSpace();
