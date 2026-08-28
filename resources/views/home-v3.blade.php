@@ -25,7 +25,7 @@
 @media(max-width:400px){.news{grid-template-columns:100px 22px minmax(0,1fr);height:100px;min-height:100px}.news-media,.news-media img{width:100px;height:100px;min-width:100px;min-height:100px}.news-body{height:100px;min-height:100px;padding:9px 11px}.news h3{font-size:13px}.news-kind{font-size:6px}.shell{width:calc(100% - 22px)}}
 
 .home-slider{position:relative;width:100%;margin:28px 0 0;overflow:hidden;border:1px solid rgba(83,218,240,.2);border-radius:26px;background:#061923;box-shadow:0 30px 80px rgba(0,0,0,.28)}
-.slider-track{position:relative;width:100%;height:calc(min(100vw - 32px,1280px) / 2.35 + 48px);min-height:0}
+.slider-track{position:relative;width:100%;height:calc(min(100vw - 32px,1280px) / 2.35 + var(--caption-space,48px));min-height:0}
 .slide{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;visibility:hidden;transform:scale(1.008);transition:opacity .8s ease,transform 6s ease,visibility .8s}
 .slide.is-active{opacity:1;visibility:visible;transform:scale(1)}
 .slide-media{position:relative;width:100%;height:calc(min(100vw - 32px,1280px) / 2.35);min-height:0;overflow:hidden;background:#061923}
@@ -61,7 +61,7 @@
 
 @media(max-width:1099px) and (min-width:651px){
 .home-slider{margin-top:22px;border-radius:20px}
-.slider-track{height:calc(min(100vw - 32px,1280px) / 2.35 + 46px);min-height:0}
+.slider-track{height:calc(min(100vw - 32px,1280px) / 2.35 + var(--caption-space,46px));min-height:0}
 .slide-media{height:calc(min(100vw - 32px,1280px) / 2.35)}
 .welcome{padding:62px 0 68px}
 .welcome-heading{padding-bottom:24px}
@@ -72,7 +72,7 @@
 
 @media(max-width:650px){
 .slider-arrow{display:none}.home-slider{margin:8px 0 0;border-radius:18px}
-.slider-track{height:calc((100vw - 22px) / 2.35 + 43px)}
+.slider-track{height:calc((100vw - 22px) / 2.35 + var(--caption-space,43px))}
 .slide-media{height:calc((100vw - 22px) / 2.35)}
 .slide-shade{background:linear-gradient(90deg,rgba(2,10,16,.16),rgba(2,10,16,.03) 70%,rgba(2,10,16,.12))}
 .slide-caption{min-height:43px;padding:7px 12px 8px}
@@ -91,7 +91,7 @@
 }
 
 @media(max-width:400px){
-.slider-track{height:calc((100vw - 22px) / 2.35 + 42px)}
+.slider-track{height:calc((100vw - 22px) / 2.35 + var(--caption-space,42px))}
 .slide-media{height:calc((100vw - 22px) / 2.35)}
 .slide-caption{min-height:42px;padding:7px 10px}
 .slide-caption strong{font-size:10px}
@@ -158,8 +158,14 @@
     if (slides.length < 2) return;
     let index = 0;
     let timer;
+    const syncCaptionSpace = () => {
+        root.style.setProperty('--caption-space', slides[index]?.querySelector('.slide-caption') ? '' : '0px');
+        if (slides[index]?.querySelector('.slide-caption')) root.style.removeProperty('--caption-space');
+    };
+    syncCaptionSpace();
     const show = (nextIndex) => {
         index = (nextIndex + slides.length) % slides.length;
+        syncCaptionSpace();
         slides.forEach((s,i) => s.classList.toggle('is-active', i === index));
         dots.forEach((d,i) => { d.classList.toggle('is-active', i === index); d.setAttribute('aria-selected', i === index ? 'true' : 'false'); });
         if (progress) { progress.style.transition = 'none'; progress.style.width = '0%'; requestAnimationFrame(() => { progress.style.transition = 'width 5s linear'; progress.style.width = '100%'; }); }
