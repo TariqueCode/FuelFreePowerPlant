@@ -1,5 +1,5 @@
 <style>
-/* Company dropdown must escape the horizontal navigation clipping on desktop. */
+/* Keep the Company dropdown visible and remove duplicate destinations. */
 @media (min-width:721px){
     .public-header-nav,
     .public-menu{overflow:visible!important;}
@@ -14,10 +14,25 @@
             if(!toggle) return;
             dropdown.dataset.dropdownFixBound = '1';
 
+            function removeDuplicateLinks(){
+                var panel = dropdown.querySelector('.public-menu-dropdown-panel');
+                if(!panel) return;
+                var seen = Object.create(null);
+                panel.querySelectorAll('a').forEach(function(link){
+                    var href = (link.getAttribute('href') || '').replace(/\/$/, '');
+                    if(!href) return;
+                    if(seen[href]) link.remove();
+                    else seen[href] = true;
+                });
+            }
+
             function setOpen(open){
+                removeDuplicateLinks();
                 dropdown.classList.toggle('is-open', open);
                 toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
             }
+
+            removeDuplicateLinks();
 
             toggle.addEventListener('click', function(e){
                 e.preventDefault();
