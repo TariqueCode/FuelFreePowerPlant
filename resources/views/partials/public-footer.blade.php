@@ -10,7 +10,7 @@
 <style>
 .public-footer{margin-top:60px;border-top:1px solid rgba(86,210,238,.15);padding:38px 0 26px;color:#8aa8b1;font-size:14px;line-height:1.7}
 .public-footer-shell{width:min(1180px,calc(100% - 28px));margin:auto}
-.public-footer-grid{display:grid;grid-template-columns:1.15fr 1fr .85fr;gap:36px;padding-bottom:30px}
+.public-footer-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px 70px;padding-bottom:30px}
 .public-footer-title{margin:0 0 12px;color:#eaf8fb;font-size:15px;font-weight:800}
 .public-footer-brand-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
 .public-footer-logo{width:34px;height:34px;object-fit:contain;flex:0 0 34px}
@@ -19,7 +19,7 @@
 .public-footer-tech{color:#7899a5;font-size:12px;line-height:1.7}
 .public-footer-address{display:flex;gap:10px;align-items:flex-start;color:#8aa8b1;font-size:13px;line-height:1.75}
 .public-footer-address i{color:#51d8f0;margin-top:4px;flex:0 0 auto}
-.public-footer-contact{display:grid;gap:10px}
+.public-footer-contact{display:grid;gap:10px;width:100%;max-width:360px}
 .public-footer-contact a{display:flex;align-items:flex-start;gap:10px;color:#8aa8b1;text-decoration:none;font-size:13px;line-height:1.5}
 .public-footer-contact a:hover{color:#effcff}
 .public-footer-contact i{width:16px;color:#51d8f0;margin-top:2px;text-align:center;flex:0 0 16px}
@@ -35,15 +35,15 @@
 .public-footer-developer a:hover{color:#79aebb}
 @media(max-width:760px){
     .public-footer{margin-top:45px;padding-top:30px}
-    .public-footer-grid{grid-template-columns:1fr;gap:28px;padding-bottom:24px;text-align:center}
-    .public-footer-grid>section{display:flex;flex-direction:column;align-items:center}
+    .public-footer-grid{grid-template-columns:1fr 1fr;gap:28px 14px;padding-bottom:24px;text-align:center}
+    .public-footer-grid>section{display:flex;flex-direction:column;align-items:center}.public-footer-grid>section:first-child{grid-column:1/-1;padding-bottom:6px}.public-footer-grid>section:nth-child(2),.public-footer-grid>section:nth-child(3){width:100%}
     .public-footer-brand-row{justify-content:center}
     .public-footer-tech{max-width:290px}
     .public-footer-address{justify-content:center;text-align:center}
     .public-footer-contact{justify-items:center}
     .public-footer-contact a{justify-content:center;text-align:center}
     .public-footer-social-wrap{justify-content:center;margin-top:14px}
-    .public-footer-bottom{flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center}
+    .public-footer-bottom{flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}.public-footer-address{max-width:250px}
     .public-footer-developer{font-size:8px}
 }
 </style>
@@ -84,6 +84,7 @@
                     <a href="mailto:info@fuelfreepowerplant.com"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>info@fuelfreepowerplant.com</span></a>
                     <a href="tel:+8801712251892"><i class="fa-solid fa-phone" aria-hidden="true"></i><span>+880 1712-251892</span></a>
                     <a href="https://www.fuelfreepowerplant.com"><i class="fa-solid fa-globe" aria-hidden="true"></i><span>www.fuelfreepowerplant.com</span></a>
+                    <a href="{{ route('contact') }}"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i><span>Get in touch</span></a>
                 </div>
             </section>
         </div>
@@ -91,7 +92,6 @@
         <div class="public-footer-bottom">
             <div>© {{ date('Y') }} {{ $publicFooterName }} · All rights reserved.</div>
             <div class="public-footer-developer">Developed by <a href="mailto:TariqueBN@gmail.com" aria-label="Email developer Saif Al-Islam">Saif Al-Islam</a></div>
-            <a href="{{ route('contact') }}">Get in touch <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
         </div>
     </div>
 </footer>
