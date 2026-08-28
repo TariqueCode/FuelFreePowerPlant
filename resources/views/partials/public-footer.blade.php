@@ -109,7 +109,7 @@
 
         <div class="public-footer-bottom">
             <div>© {{ date('Y') }} {{ $publicFooterName }} · {{ $footerSettings['copyright_text'] ?? 'All rights reserved.' }}</div>
-            <div class="public-footer-developer">{{ $footerSettings['developer_prefix'] ?? 'Developed by' }} <a href="mailto:{{ $footerSettings['developer_email'] ?? 'TariqueBN@gmail.com' }}" aria-label="Email developer {{ $footerSettings['developer_name'] ?? 'Saif Al-Islam' }}">{{ $footerSettings['developer_name'] ?? 'Saif Al-Islam' }}</a></div>
+            <div class="public-footer-developer">Developed by <a href="mailto:TariqueBN@gmail.com" aria-label="Email developer Saif Al-Islam">Saif Al-Islam</a></div>
         </div>
     </div>
 </footer>
