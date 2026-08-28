@@ -149,6 +149,12 @@ class MailController extends Controller
             } catch (Throwable $e) {
                 report($e);
             }
+        } else if ($request->filled('forward')) {
+            try {
+                $message=$webmail->message($emailAccount->address,$emailAccount->password,(int)$request->query('forward'),$this->mailConfig($emailAccount),$request->query('folder','INBOX'));
+                $initialSubject=str_starts_with(strtolower($message['subject']),'fwd:')?$message['subject']:'Fwd: '.$message['subject'];
+                $initialBody='<p><br></p><hr><p><strong>Forwarded message</strong><br>From: '.e($message['from']).'<br>To: '.e($message['to']).'<br>Date: '.e($message['date']).'<br>Subject: '.e($message['subject']).'</p><blockquote>'.$message['body'].'</blockquote>';
+            } catch (Throwable $e) { report($e); }
         }
 
         return view('admin.mail.compose', compact('emailAccount', 'initialTo', 'initialCc', 'initialSubject', 'initialBody'));
