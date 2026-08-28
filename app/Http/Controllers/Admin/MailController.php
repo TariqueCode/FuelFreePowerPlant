@@ -135,6 +135,7 @@ class MailController extends Controller
     {
         $this->authorizeAccount($request, $emailAccount);
         $initialTo = '';
+        $initialCc = '';
         $initialSubject = '';
         $initialBody = '';
 
@@ -142,6 +143,7 @@ class MailController extends Controller
             try {
                 $message = $webmail->message($emailAccount->address, $emailAccount->password, (int) $request->query('reply'), $this->mailConfig($emailAccount), $request->query('folder', 'INBOX'));
                 $initialTo = preg_match('/<([^>]+)>/', $message['from'], $m) ? trim($m[1]) : trim($message['from']);
+                $initialCc = '';
                 $initialSubject = str_starts_with(strtolower($message['subject']), 're:') ? $message['subject'] : 'Re: '.$message['subject'];
                 $initialBody = '<p><br></p><hr><p><strong>Original message</strong><br>'.e($message['from']).'<br>'.e($message['date']).'</p><blockquote>'.$message['body'].'</blockquote>';
             } catch (Throwable $e) {
@@ -149,26 +151,21 @@ class MailController extends Controller
             }
         }
 
-        return view('admin.mail.compose', compact('emailAccount', 'initialTo', 'initialSubject', 'initialBody'));
+        return view('admin.mail.compose', compact('emailAccount', 'initialTo', 'initialCc', 'initialSubject', 'initialBody'));
     }
 
     public function send(Request $request, EmailAccount $emailAccount, WebmailService $webmail): RedirectResponse
     {
-        $this->authorizeAccount($request, $emailAccount);
-        $data = $request->validate([
-            'to' => ['required', 'email'],
-            'subject' => ['nullable', 'string', 'max:255'],
-            'body' => ['required', 'string', 'max:500000'],
+        $this->authorizeAccount($request,$emailAccount);
+        $data=$request->validate([
+            'to'=>['required','string','max:5000'],'cc'=>['nullable','string','max:5000'],'bcc'=>['nullable','string','max:5000'],
+            'subject'=>['nullable','string','max:255'],'body'=>['required','string','max:500000'],
+            'attachments'=>['nullable','array','max:10'],'attachments.*'=>['file','max:10240'],
         ]);
-
-        try {
-            $webmail->send($emailAccount->address, $emailAccount->password, $data['to'], $data['subject'] ?: '(No subject)', $data['body'], $this->mailConfig($emailAccount));
-        } catch (Throwable $e) {
-            report($e);
-            return back()->withErrors(['send' => 'The message could not be sent: '.($e->getMessage() ?: 'SMTP error.')])->withInput();
-        }
-
-        return redirect()->route('admin.mail', ['account' => $emailAccount->id, 'folder' => 'Sent'])->with('status', 'Message sent successfully.');
+        $attachments=[]; foreach($request->file('attachments',[]) as $file)if($file&&$file->isValid())$attachments[]=['path'=>$file->getRealPath(),'name'=>$file->getClientOriginalName(),'mime'=>$file->getMimeType()?:'application/octet-stream'];
+        try{$webmail->send($emailAccount->address,$emailAccount->password,$data['to'],$data['subject']?:'(No subject)',$data['body'],$this->mailConfig($emailAccount),$attachments,false,$data['cc']??[],$data['bcc']??[]);}
+        catch(Throwable $e){report($e);return back()->withErrors(['send'=>'The message could not be sent: '.($e->getMessage()?:'SMTP error.')])->withInput();}
+        return redirect()->route('admin.mail',['account'=>$emailAccount->id,'folder'=>'Sent'])->with('status','Message sent successfully.');
     }
 
     private function accounts(Request $request)
