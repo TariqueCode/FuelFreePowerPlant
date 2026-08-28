@@ -45,8 +45,22 @@ jobs:
           git fetch origin main
           git reset --hard origin/main
 
+          echo "==> Locating Composer"
+          if command -v composer >/dev/null 2>&1; then
+              COMPOSER_BIN="$(command -v composer)"
+          elif [ -x "$HOME/.local/bin/composer" ]; then
+              COMPOSER_BIN="$HOME/.local/bin/composer"
+          elif [ -x "/opt/cpanel/composer/bin/composer" ]; then
+              COMPOSER_BIN="/opt/cpanel/composer/bin/composer"
+          else
+              echo "ERROR: Composer was not found on the server."
+              exit 1
+          fi
+
+          echo "Using Composer: $COMPOSER_BIN"
+
           echo "==> Installing PHP dependencies"
-          composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+          "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction
 
           if command -v npm >/dev/null 2>&1; then
               echo "==> Building frontend assets"
