@@ -1,6 +1,50 @@
 @extends('webmail.layout')
 @section('content')
-@php($hostMode=request()->getHost()==='mail.fuelfreepowerplant.com') @php($base=$hostMode?'':'/webmail')
-<div class="hero"><div><div class="eyebrow">Mailbox</div><h1 class="title">Inbox</h1><p class="sub">Your company email, in one clean workspace.</p></div><a class="btn primary" href="{{ url($base.'/compose') }}">✎ Compose</a></div>
-<div class="card">@forelse($messages as $message)<a class="message-row {{ $message['seen'] ? '' : 'unread' }}" href="{{ url($base.'/message/'.$message['uid']) }}"><span>✉</span><span class="from">{{ $message['from'] ?: 'Unknown sender' }}</span><span class="subject">{{ $message['subject'] }}</span><span class="date">{{ $message['date'] }}</span></a>@empty<div class="empty"><div style="font-size:42px;margin-bottom:12px">📭</div><h2>No messages yet</h2><p>Your inbox is empty.</p></div>@endforelse</div>
+@php($hostMode=request()->getHost()==='mail.fuelfreepowerplant.com')
+@php($base=$hostMode?'':'/webmail')
+<div class="hero">
+    <div>
+        <div class="eyebrow"><i class="fa-solid fa-envelope-open-text"></i> Mailbox</div>
+        <h1 class="title">Inbox</h1>
+        <p class="sub">Your company email, in one clean workspace.</p>
+    </div>
+    <a class="btn primary" href="{{ url($base.'/compose') }}"><i class="fa-solid fa-pen-to-square"></i> Compose</a>
+</div>
+<div class="card">
+    <div class="mail-toolbar">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input id="mail-search" type="search" placeholder="Search messages on this page…" autocomplete="off" aria-label="Search messages">
+        </div>
+        <span class="mail-count" id="mail-count">{{ count($messages) }} messages</span>
+        <a class="btn icon" href="{{ url($base.'/inbox') }}" title="Refresh inbox" aria-label="Refresh inbox"><i class="fa-solid fa-rotate"></i></a>
+    </div>
+    @forelse($messages as $message)
+        <a class="message-row {{ $message['seen'] ? '' : 'unread' }}" data-message-search="{{ strtolower($message['from'].' '.$message['subject'].' '.$message['date']) }}" href="{{ url($base.'/message/'.$message['uid']) }}">
+            <span><i class="fa-regular {{ $message['seen'] ? 'fa-envelope-open' : 'fa-envelope' }}"></i></span>
+            <span class="from">{{ $message['from'] ?: 'Unknown sender' }}</span>
+            <span class="subject">{{ $message['subject'] }}</span>
+            <span class="date">{{ $message['date'] }}</span>
+        </a>
+    @empty
+        <div class="empty"><div><i class="fa-regular fa-envelope"></i></div><h2>No messages yet</h2><p>Your inbox is empty.</p><a class="btn primary" href="{{ url($base.'/compose') }}"><i class="fa-solid fa-pen-to-square"></i> Compose your first message</a></div>
+    @endforelse
+    <div class="empty" id="search-empty" hidden><i class="fa-solid fa-magnifying-glass"></i><h3>No matching messages</h3><p>Try a different sender, subject or date.</p></div>
+</div>
+@push('scripts')
+<script>
+(function(){
+ const input=document.getElementById('mail-search'), rows=[...document.querySelectorAll('[data-message-search]')], empty=document.getElementById('search-empty'), count=document.getElementById('mail-count');
+ if(!input)return;
+ function filter(){
+   const q=input.value.trim().toLowerCase();
+   let visible=0;
+   rows.forEach(row=>{const show=!q||row.dataset.messageSearch.includes(q);row.classList.toggle('hidden',!show);if(show)visible++;});
+   if(count)count.textContent=visible+' '+(visible===1?'message':'messages');
+   if(empty)empty.hidden=visible!==0||rows.length===0;
+ }
+ input.addEventListener('input',filter);
+})();
+</script>
+@endpush
 @endsection
