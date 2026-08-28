@@ -29,6 +29,7 @@
 </head>
 <body>
     @include('partials.public-header', ['brand' => $publicBrand])
+    @include('partials.public-header-dropdown-fix')
     @yield('content')
     @include('partials.public-footer', ['brand' => $publicBrand])
     @stack('scripts')
