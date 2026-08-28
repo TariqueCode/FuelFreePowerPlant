@@ -53,14 +53,16 @@ class WebmailController extends Controller
         [$email, $password] = $credentials;
 
         try {
-            $messages = $webmail->messages($email, $password, 40, $this->mailConfigFor($email));
+            $folders = $webmail->folders($email, $password, $this->mailConfigFor($email));
+            $folder = $this->resolveFolder($request, $folders);
+            $messages = $webmail->messages($email, $password, 60, $this->mailConfigFor($email), $folder);
         } catch (Throwable $e) {
             report($e);
             $this->clearSession($request);
             return redirect()->to($this->url('/'))->withErrors(['email' => 'Your mailbox connection has expired. Please sign in again.']);
         }
 
-        return view('webmail.inbox', compact('messages', 'email'));
+        return view('webmail.inbox', compact('messages', 'email', 'folders', 'folder'));
     }
 
     public function show(Request $request, int $uid, WebmailService $webmail): View|RedirectResponse
@@ -68,15 +70,17 @@ class WebmailController extends Controller
         $credentials = $this->credentials($request);
         if ($credentials === null) return redirect()->to($this->url('/'));
         [$email, $password] = $credentials;
+        $folders = $webmail->folders($email, $password, $this->mailConfigFor($email));
+        $folder = $this->resolveFolder($request, $folders);
 
         try {
-            $message = $webmail->message($email, $password, $uid, $this->mailConfigFor($email));
+            $message = $webmail->message($email, $password, $uid, $this->mailConfigFor($email), $folder);
         } catch (Throwable $e) {
             report($e);
             return back()->withErrors(['email' => 'That message could not be opened.']);
         }
 
-        return view('webmail.message', compact('message', 'email'));
+        return view('webmail.message', compact('message', 'email', 'folder'));
     }
 
     public function compose(Request $request, WebmailService $webmail): View|RedirectResponse
@@ -89,11 +93,13 @@ class WebmailController extends Controller
         $initialSubject = '';
         $initialBody = '';
         $mode = 'new';
+        $folders = $webmail->folders($email, $password, $this->mailConfigFor($email));
+        $folder = $this->resolveFolder($request, $folders);
 
         if ($request->filled('reply')) {
             $uid = (int) $request->query('reply');
             try {
-                $message = $webmail->message($email, $password, $uid, $this->mailConfigFor($email));
+                $message = $webmail->message($email, $password, $uid, $this->mailConfigFor($email), $folder);
                 $initialTo = $this->extractEmail($message['from']);
                 $initialSubject = str_starts_with(strtolower($message['subject']), 're:') ? $message['subject'] : 'Re: '.$message['subject'];
                 $initialBody = '<p><br></p><hr><p><strong>Original message</strong><br>'.$this->escapeHtml($message['from']).'<br>'.$this->escapeHtml($message['date']).'</p><blockquote>'.$message['body'].'</blockquote>';
@@ -104,7 +110,7 @@ class WebmailController extends Controller
         } elseif ($request->filled('forward')) {
             $uid = (int) $request->query('forward');
             try {
-                $message = $webmail->message($email, $password, $uid);
+                $message = $webmail->message($email, $password, $uid, $this->mailConfigFor($email), $folder);
                 $initialSubject = str_starts_with(strtolower($message['subject']), 'fwd:') ? $message['subject'] : 'Fwd: '.$message['subject'];
                 $initialBody = '<p><br></p><hr><p><strong>Forwarded message</strong><br>From: '.$this->escapeHtml($message['from']).'<br>To: '.$this->escapeHtml($message['to']).'<br>Date: '.$this->escapeHtml($message['date']).'<br>Subject: '.$this->escapeHtml($message['subject']).'</p><blockquote>'.$message['body'].'</blockquote>';
                 $mode = 'forward';
@@ -113,7 +119,7 @@ class WebmailController extends Controller
             }
         }
 
-        return view('webmail.compose', compact('email', 'initialTo', 'initialSubject', 'initialBody', 'mode'));
+        return view('webmail.compose', compact('email', 'initialTo', 'initialSubject', 'initialBody', 'mode', 'folder'));
     }
 
     public function send(Request $request, WebmailService $webmail): RedirectResponse
@@ -142,6 +148,17 @@ class WebmailController extends Controller
     {
         $this->clearSession($request);
         return redirect()->to($this->url('/'));
+    }
+
+    private function resolveFolder(Request $request, array $folders): string
+    {
+        $requested = trim((string) $request->query('folder', 'INBOX'));
+        foreach ($folders as $folder) {
+            if (($folder['name'] ?? '') === $requested) {
+                return $requested;
+            }
+        }
+        return 'INBOX';
     }
 
     private function mailConfigFor(string $email): array
