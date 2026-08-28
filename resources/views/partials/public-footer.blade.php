@@ -7,57 +7,74 @@
 @php
     $publicSocials = \Illuminate\Support\Facades\Cache::remember('public.social-links', 600, fn () => \App\Models\SocialLink::active()->get(['platform','label','url','icon'])->map(fn ($social) => ['platform' => $social->platform, 'label' => $social->label, 'url' => $social->url, 'icon' => $social->icon, 'color' => data_get(config('fuelfree.social.platforms'), $social->platform.'.color', '#51D8F0')])->values()->all());
 @endphp
+
 <style>
-.public-footer{margin-top:60px;border-top:1px solid rgba(86,210,238,.15);padding:38px 0 26px;color:#8aa8b1;font-size:14px;line-height:1.7}
-.public-footer-shell{width:min(1180px,calc(100% - 28px));margin:auto}
-.public-footer-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px 70px;padding-bottom:30px}.public-footer-grid>section:first-child{grid-column:1/-1;padding-bottom:6px}
-.public-footer-title{margin:0 0 12px;color:#eaf8fb;font-size:15px;font-weight:800}
-.public-footer-brand-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
-.public-footer-logo{width:34px;height:34px;object-fit:contain;flex:0 0 34px}
-.public-footer-brand{color:#effcff;font-size:18px;font-weight:800;line-height:1.3}
-.public-footer-tagline{color:#5fcde5;font-size:12px;font-weight:700;margin-bottom:8px}
-.public-footer-tech{color:#7899a5;font-size:12px;line-height:1.7}
-.public-footer-address{display:flex;gap:10px;align-items:flex-start;color:#8aa8b1;font-size:13px;line-height:1.75}
-.public-footer-address i{color:#51d8f0;margin-top:4px;flex:0 0 auto}
-.public-footer-contact{display:grid;gap:10px;width:100%;max-width:360px}
-.public-footer-contact a{display:flex;align-items:flex-start;gap:10px;color:#8aa8b1;text-decoration:none;font-size:13px;line-height:1.5}
-.public-footer-contact a:hover{color:#effcff}
-.public-footer-contact i{width:16px;color:#51d8f0;margin-top:2px;text-align:center;flex:0 0 16px}
-.public-footer-social-wrap{display:flex;align-items:center;justify-content:flex-start;gap:10px;flex-wrap:wrap;margin-top:18px}
-.public-footer-social{--social-color:#51d8f0;width:40px;height:40px;display:grid;place-items:center;border:1px solid rgba(86,210,238,.16);border-radius:11px;background:rgba(67,209,240,.045);color:#86a7b1;text-decoration:none;transition:.2s ease}
-.public-footer-social:hover,.public-footer-social:focus-visible,.public-footer-social.is-touched{color:var(--social-color);background:color-mix(in srgb,var(--social-color) 10%,transparent);border-color:color-mix(in srgb,var(--social-color) 42%,transparent);box-shadow:0 0 18px color-mix(in srgb,var(--social-color) 18%,transparent);transform:translateY(-2px)}
-.public-footer-social i{font-size:15px}
-.public-footer-bottom{border-top:1px solid rgba(86,210,238,.11);padding-top:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;color:#607e89;font-size:12px}
-.public-footer-bottom a{color:#72b9c9;text-decoration:none}
-.public-footer-bottom a:hover{color:#effcff}
+.public-footer{margin-top:60px;border-top:1px solid rgba(86,210,238,.12);padding:46px 0 24px;color:#8aa8b1;font-size:14px;line-height:1.7}
+.public-footer-shell{width:min(1120px,calc(100% - 40px));margin:0 auto}
+.public-footer-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);gap:46px;padding-bottom:38px}
+.public-footer-section{min-width:0}
+.public-footer-brand-section{padding-right:20px}
+.public-footer-brand-row{display:flex;align-items:center;gap:11px;margin-bottom:9px}
+.public-footer-logo{width:38px;height:38px;object-fit:contain;flex:0 0 38px}
+.public-footer-brand{color:#effcff;font-size:20px;font-weight:800;line-height:1.25;letter-spacing:-.2px}
+.public-footer-tagline{color:#5fcde5;font-size:12px;font-weight:700;margin:0 0 6px 49px}
+.public-footer-tech{color:#7899a5;font-size:12px;line-height:1.7;max-width:300px}
+.public-footer-heading{position:relative;margin:2px 0 17px;padding-left:12px;color:#eaf8fb;font-size:14px;font-weight:800;letter-spacing:.2px}
+.public-footer-heading::before{content:"";position:absolute;left:0;top:4px;width:3px;height:14px;border-radius:3px;background:#51d8f0}
+.public-footer-address{display:flex;gap:11px;align-items:flex-start;color:#8aa8b1;font-size:13px;line-height:1.8}
+.public-footer-address i{color:#51d8f0;width:16px;margin-top:5px;flex:0 0 16px;text-align:center}
+.public-footer-contact{display:grid;gap:12px}
+.public-footer-contact a{display:flex;align-items:flex-start;gap:11px;color:#8aa8b1;text-decoration:none;font-size:13px;line-height:1.55;transition:color .2s ease,transform .2s ease}
+.public-footer-contact a:hover,.public-footer-contact a:focus-visible{color:#effcff;transform:translateX(2px)}
+.public-footer-contact i{width:16px;color:#51d8f0;margin-top:3px;text-align:center;flex:0 0 16px}
+.public-footer-social-wrap{display:flex;align-items:center;justify-content:flex-start;gap:9px;flex-wrap:wrap;margin-top:20px}
+.public-footer-social{--social-color:#51d8f0;width:36px;height:36px;display:grid;place-items:center;border:1px solid rgba(86,210,238,.14);border-radius:10px;background:rgba(67,209,240,.035);color:#7899a5;text-decoration:none;transition:.2s ease}
+.public-footer-social:hover,.public-footer-social:focus-visible,.public-footer-social.is-touched{color:var(--social-color);background:rgba(67,209,240,.07);border-color:rgba(86,210,238,.35);transform:translateY(-2px)}
+.public-footer-social i{font-size:14px}
+.public-footer-bottom{border-top:1px solid rgba(86,210,238,.10);padding-top:17px;display:flex;align-items:center;justify-content:space-between;gap:18px;color:#607e89;font-size:12px}
 .public-footer-developer{font-size:9px;line-height:1.4;color:#496b75;white-space:nowrap}
-.public-footer-developer a{color:#547f8a;text-decoration:none}
-.public-footer-developer a:hover{color:#79aebb}
+.public-footer-developer a{color:#547f8a;text-decoration:none;transition:color .2s ease}
+.public-footer-developer a:hover,.public-footer-developer a:focus-visible{color:#79aebb}
 @media(max-width:760px){
-    .public-footer{margin-top:45px;padding-top:30px}
-    .public-footer-grid{grid-template-columns:1fr 1fr;gap:28px 14px;padding-bottom:24px;text-align:center}
-    .public-footer-grid>section{display:flex;flex-direction:column;align-items:center}.public-footer-grid>section:first-child{grid-column:1/-1;padding-bottom:6px}.public-footer-grid>section:nth-child(2),.public-footer-grid>section:nth-child(3){width:100%}
-    .public-footer-brand-row{justify-content:center}
-    .public-footer-tech{max-width:290px}
-    .public-footer-address{justify-content:flex-start;text-align:left}
-    .public-footer-contact{justify-items:center}
-    .public-footer-contact a{justify-content:flex-start;text-align:left}
-    .public-footer-social-wrap{justify-content:center;margin-top:14px}
-    .public-footer-bottom{flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}.public-footer-address{max-width:250px}
+    .public-footer{margin-top:44px;padding:34px 0 20px}
+    .public-footer-shell{width:min(100% - 32px,560px)}
+    .public-footer-grid{grid-template-columns:1fr 1fr;gap:34px 22px;padding-bottom:28px}
+    .public-footer-brand-section{grid-column:1/-1;padding:0;text-align:center;display:flex;flex-direction:column;align-items:center}
+    .public-footer-brand-row{justify-content:center;margin-bottom:8px}
+    .public-footer-logo{width:36px;height:36px;flex-basis:36px}
+    .public-footer-brand{font-size:19px}
+    .public-footer-tagline{margin:0 0 5px;font-size:11px}
+    .public-footer-tech{max-width:290px;font-size:11px}
+    .public-footer-social-wrap{justify-content:center;margin-top:15px}
+    .public-footer-section:not(.public-footer-brand-section){width:100%;text-align:left}
+    .public-footer-heading{margin-bottom:15px;font-size:14px}
+    .public-footer-address{justify-content:flex-start;text-align:left;font-size:12.5px;line-height:1.75}
+    .public-footer-contact{justify-items:stretch;gap:11px}
+    .public-footer-contact a{justify-content:flex-start;text-align:left;font-size:12.5px;word-break:break-word}
+    .public-footer-bottom{flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;font-size:11px}
     .public-footer-developer{font-size:8px}
 }
+@media(max-width:390px){
+    .public-footer-shell{width:calc(100% - 24px)}
+    .public-footer-grid{gap:30px 14px}
+    .public-footer-brand{font-size:18px}
+    .public-footer-address,.public-footer-contact a{font-size:12px}
+}
 </style>
+
 <footer class="public-footer">
     <div class="public-footer-shell">
         <div class="public-footer-grid">
-            <section>
+            <section class="public-footer-section public-footer-brand-section">
                 <div class="public-footer-brand-row">
                     @if($publicFooterLogo)
                         <img class="public-footer-logo" src="{{ asset('storage/'.$publicFooterLogo) }}" alt="{{ $publicFooterName }}">
                     @endif
                     <div class="public-footer-brand">{{ $publicFooterName }}</div>
                 </div>
-                @if($publicFooterTagline)<div class="public-footer-tagline">{{ $publicFooterTagline }}</div>@endif
+                @if($publicFooterTagline)
+                    <div class="public-footer-tagline">{{ $publicFooterTagline }}</div>
+                @endif
                 <div class="public-footer-tech">Fuel-Free Flywheel-Based Clean Energy Technology</div>
                 @if(!empty($publicSocials))
                     <div class="public-footer-social-wrap" aria-label="Social media">
@@ -70,16 +87,16 @@
                 @endif
             </section>
 
-            <section>
-                <h2 class="public-footer-title">Office</h2>
+            <section class="public-footer-section">
+                <h2 class="public-footer-heading">Office</h2>
                 <div class="public-footer-address">
                     <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
                     <span>House-141, 3rd Floor, Road-22,<br>Mohakhali DOHS, Dhaka-1206,<br>Bangladesh</span>
                 </div>
             </section>
 
-            <section>
-                <h2 class="public-footer-title">Contact</h2>
+            <section class="public-footer-section">
+                <h2 class="public-footer-heading">Contact</h2>
                 <div class="public-footer-contact">
                     <a href="mailto:info@fuelfreepowerplant.com"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>info@fuelfreepowerplant.com</span></a>
                     <a href="tel:+8801712251892"><i class="fa-solid fa-phone" aria-hidden="true"></i><span>+880 1712-251892</span></a>
@@ -96,4 +113,11 @@
     </div>
 </footer>
 
-<script>(function(){document.querySelectorAll('.public-footer-social').forEach(function(el){el.addEventListener('pointerdown',function(){el.classList.add('is-touched')},{passive:true});el.addEventListener('blur',function(){el.classList.remove('is-touched')});});})();</script>
+<script>
+(function(){
+    document.querySelectorAll('.public-footer-social').forEach(function(el){
+        el.addEventListener('pointerdown',function(){el.classList.add('is-touched')},{passive:true});
+        el.addEventListener('blur',function(){el.classList.remove('is-touched')});
+    });
+})();
+</script>
