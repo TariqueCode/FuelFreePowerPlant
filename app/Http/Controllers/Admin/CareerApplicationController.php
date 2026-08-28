@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CareerApplication;
+use App\Models\HelpDeskReply;
 use App\Services\HelpDeskReplyService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,7 +24,8 @@ class CareerApplicationController extends Controller
 
     public function show(CareerApplication $application): View
     {
-        return view('admin.career-applications.show', compact('application'));
+        $replies = HelpDeskReply::query()->where('career_application_id', $application->id)->latest('sent_at')->get();
+        return view('admin.career-applications.show', compact('application', 'replies'));
     }
 
     public function update(Request $request, CareerApplication $application): RedirectResponse
