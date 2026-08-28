@@ -2,6 +2,7 @@
     $publicBrand = $brand ?? [];
     $publicFooterName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
     $publicFooterTagline = is_object($publicBrand) ? ($publicBrand->get('tagline') ?: $publicBrand->get('company.tagline') ?: config('fuelfree.company.tagline')) : ($publicBrand['tagline'] ?? $publicBrand['company.tagline'] ?? config('fuelfree.company.tagline'));
+    $publicFooterLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
 @endphp
 @php
     $publicSocials = \Illuminate\Support\Facades\Cache::remember('public.social-links', 600, fn () => \App\Models\SocialLink::active()->get(['platform','label','url','icon'])->map(fn ($social) => ['platform' => $social->platform, 'label' => $social->label, 'url' => $social->url, 'icon' => $social->icon, 'color' => data_get(config('fuelfree.social.platforms'), $social->platform.'.color', '#51D8F0')])->values()->all());
@@ -11,7 +12,9 @@
 .public-footer-shell{width:min(1180px,calc(100% - 28px));margin:auto}
 .public-footer-grid{display:grid;grid-template-columns:1.15fr 1fr .85fr;gap:36px;padding-bottom:30px}
 .public-footer-title{margin:0 0 12px;color:#eaf8fb;font-size:15px;font-weight:800}
-.public-footer-brand{color:#effcff;font-size:18px;font-weight:800;line-height:1.3;margin-bottom:6px}
+.public-footer-brand-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.public-footer-logo{width:34px;height:34px;object-fit:contain;flex:0 0 34px}
+.public-footer-brand{color:#effcff;font-size:18px;font-weight:800;line-height:1.3}
 .public-footer-tagline{color:#5fcde5;font-size:12px;font-weight:700;margin-bottom:8px}
 .public-footer-tech{color:#7899a5;font-size:12px;line-height:1.7}
 .public-footer-address{display:flex;gap:10px;align-items:flex-start;color:#8aa8b1;font-size:13px;line-height:1.75}
@@ -27,13 +30,33 @@
 .public-footer-bottom{border-top:1px solid rgba(86,210,238,.11);padding-top:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;color:#607e89;font-size:12px}
 .public-footer-bottom a{color:#72b9c9;text-decoration:none}
 .public-footer-bottom a:hover{color:#effcff}
-@media(max-width:760px){.public-footer{margin-top:45px;padding-top:30px}.public-footer-grid{grid-template-columns:1fr;gap:26px;padding-bottom:24px}.public-footer-bottom{flex-direction:column;align-items:flex-start;gap:7px}.public-footer-social-wrap{margin-top:14px}}
+.public-footer-developer{font-size:9px;line-height:1.4;color:#496b75;white-space:nowrap}
+.public-footer-developer a{color:#547f8a;text-decoration:none}
+.public-footer-developer a:hover{color:#79aebb}
+@media(max-width:760px){
+    .public-footer{margin-top:45px;padding-top:30px}
+    .public-footer-grid{grid-template-columns:1fr;gap:28px;padding-bottom:24px;text-align:center}
+    .public-footer-grid>section{display:flex;flex-direction:column;align-items:center}
+    .public-footer-brand-row{justify-content:center}
+    .public-footer-tech{max-width:290px}
+    .public-footer-address{justify-content:center;text-align:center}
+    .public-footer-contact{justify-items:center}
+    .public-footer-contact a{justify-content:center;text-align:center}
+    .public-footer-social-wrap{justify-content:center;margin-top:14px}
+    .public-footer-bottom{flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center}
+    .public-footer-developer{font-size:8px}
+}
 </style>
 <footer class="public-footer">
     <div class="public-footer-shell">
         <div class="public-footer-grid">
             <section>
-                <div class="public-footer-brand">{{ $publicFooterName }}</div>
+                <div class="public-footer-brand-row">
+                    @if($publicFooterLogo)
+                        <img class="public-footer-logo" src="{{ asset('storage/'.$publicFooterLogo) }}" alt="{{ $publicFooterName }}">
+                    @endif
+                    <div class="public-footer-brand">{{ $publicFooterName }}</div>
+                </div>
                 @if($publicFooterTagline)<div class="public-footer-tagline">{{ $publicFooterTagline }}</div>@endif
                 <div class="public-footer-tech">Fuel-Free Flywheel-Based Clean Energy Technology</div>
                 @if(!empty($publicSocials))
@@ -67,6 +90,7 @@
 
         <div class="public-footer-bottom">
             <div>© {{ date('Y') }} {{ $publicFooterName }} · All rights reserved.</div>
+            <div class="public-footer-developer">Developed by <a href="mailto:TariqueBN@gmail.com" aria-label="Email developer Saif Al-Islam">Saif Al-Islam</a></div>
             <a href="{{ route('contact') }}">Get in touch <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
         </div>
     </div>
