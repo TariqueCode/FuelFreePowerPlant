@@ -28,7 +28,15 @@ class WebmailController extends Controller
             $webmail->login($data['email'], $data['password'], $this->mailConfigFor($data['email']));
         } catch (Throwable $e) {
             report($e);
-            return back()->withErrors(['email' => 'Email or password is incorrect, or the mail server is temporarily unavailable.'])->withInput($request->only('email'));
+            $message = $e->getMessage() ?: 'The mail server is temporarily unavailable.';
+            if (str_contains($message, 'PHP IMAP extension')) {
+                $message = 'Webmail service is not enabled on the hosting server. Please enable the PHP IMAP extension for this site.';
+            } elseif (preg_match('/certificate|ssl|tls|verify/i', $message)) {
+                $message = 'The mail server TLS certificate could not be verified. Please use the exact IMAP server hostname shown by cPanel Mail Client Setup.';
+            } else {
+                $message = 'Email or password is incorrect, or the mail server is temporarily unavailable.';
+            }
+            return back()->withErrors(['email' => $message])->withInput($request->only('email'));
         }
 
         $request->session()->regenerate();
@@ -85,7 +93,7 @@ class WebmailController extends Controller
         if ($request->filled('reply')) {
             $uid = (int) $request->query('reply');
             try {
-                $message = $webmail->message($email, $password, $uid);
+                $message = $webmail->message($email, $password, $uid, $this->mailConfigFor($email));
                 $initialTo = $this->extractEmail($message['from']);
                 $initialSubject = str_starts_with(strtolower($message['subject']), 're:') ? $message['subject'] : 'Re: '.$message['subject'];
                 $initialBody = '<p><br></p><hr><p><strong>Original message</strong><br>'.$this->escapeHtml($message['from']).'<br>'.$this->escapeHtml($message['date']).'</p><blockquote>'.$message['body'].'</blockquote>';
