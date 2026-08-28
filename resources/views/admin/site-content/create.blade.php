@@ -113,7 +113,15 @@
 <button type="button" id="preview-content" title="Preview"><i class="fa-solid fa-eye"></i></button>
 <button type="button" id="toggle-fullscreen" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
 </div></div><div id="editor" class="editor" contenteditable="true">{!! old('content',$item->content) !!}</div></div><textarea id="content-source" name="content" hidden></textarea><input id="media-input" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"><input id="gallery-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif"><input id="video-input" type="file" hidden accept="video/mp4,video/webm">@if($contentType==='gallery')<input id="gallery-batch-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">@endif</div>
-@if($contentType!=='news')<div><label>Cover image path</label><input id="image-path" name="image_path" value="{{ old('image_path',$item->image_path) }}" maxlength="500"></div><div><label>{{ $contentType==='gallery' ? 'Event date & time' : 'Publish date/time' }}</label><input type="datetime-local" name="published_at" value="{{ old('published_at',$item->published_at?->format('Y-m-d\TH:i')) }}"></div>@else<input id="image-path" type="hidden" name="image_path" value="{{ old('image_path',$item->image_path) }}">@endif
+@if($contentType!=='news')
+<div class="news-cover-field full">
+<div class="field-head"><div><label>Cover Image</label><small>Optional. Upload a clear image to use as the page cover. The file path is managed automatically.</small></div><button type="button" class="upload-cover" id="cover-upload"><i class="fa-solid fa-cloud-arrow-up"></i> {{ $item->image_path?'Replace image':'Choose image' }}</button></div>
+<div class="cover-preview {{ $item->image_path?'has-image':'' }}" id="cover-preview">@if($item->image_path)<img src="{{ asset('storage/'.$item->image_path) }}" alt="{{ $item->cover_alt ?: $item->title }}">@else<div><i class="fa-regular fa-image"></i><span>No cover image selected</span></div>@endif</div>
+<div class="cover-actions"><button type="button" id="remove-cover" class="remove-cover" @disabled(!$item->image_path)><i class="fa-solid fa-trash-can"></i> Remove</button><span id="cover-status"></span></div>
+<input type="hidden" id="image-path" name="image_path" value="{{ old('image_path',$item->image_path) }}">
+<input type="file" id="cover-input" hidden accept="image/jpeg,image/png,image/webp">
+</div>
+<div><label>{{ $contentType==='gallery' ? 'Event date &amp; time' : 'Publish date/time' }}</label><input type="datetime-local" name="published_at" value="{{ old('published_at',$item->published_at?->format('Y-m-d\\TH:i')) }}"></div>@else<input id="image-path" type="hidden" name="image_path" value="{{ old('image_path',$item->image_path) }}">@endif
 </div><div class="actions"><a class="back" href="{{ route('admin.site-content.index',['type'=>in_array($item->type,['news','announcement'],true)?'news':$item->type]) }}">Cancel</a><button class="save" type="submit"><i class="fa-solid fa-floppy-disk"></i> {{ $item->exists?'Save changes':'Create content' }}</button></div></form></div>
 @endsection
 @push('styles')<style>
