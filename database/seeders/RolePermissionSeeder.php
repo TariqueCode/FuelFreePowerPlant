@@ -22,6 +22,7 @@ class RolePermissionSeeder extends Seeder
             'users.view'=>'View users','users.manage'=>'Manage users','documents.view'=>'View documents','documents.manage'=>'Manage documents',
             'notifications.view'=>'View notifications','settings.manage'=>'Manage system settings','audit.view'=>'View audit log','health.view'=>'View system health',
             'inquiries.view'=>'View website inquiries','inquiries.manage'=>'Manage website inquiries',
+            'mail.view'=>'View Help Desk mail','mail.manage'=>'Manage Help Desk mail',
             'social-media.manage'=>'Manage social media links',
         ];
         foreach ($roles as $slug => [$name,$description]) Role::updateOrCreate(['slug'=>$slug],['name'=>$name,'description'=>$description,'is_system'=>true]);
