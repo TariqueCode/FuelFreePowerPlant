@@ -71,15 +71,12 @@
 }
 
 @media(max-width:650px){
-.slider-arrow{display:none}.home-slider{margin:8px 0 0}
+.slider-arrow{display:none}.home-slider{margin:8px 0 0}.home-slider.has-caption{margin-bottom:24px}
 .slider-track{height:calc((100vw - 22px) / 2.35)}
 .slide-media{height:calc((100vw - 22px) / 2.35);border-radius:18px}
 .slide-caption{top:calc(100% + 6px);padding:0 8px}
 .slide-caption strong{font-size:8px}
 .slide-shade{background:linear-gradient(90deg,rgba(2,10,16,.16),rgba(2,10,16,.03) 70%,rgba(2,10,16,.12))}
-.slide-caption{min-height:43px;padding:7px 12px 8px}
-.slide-caption span{font-size:6px;margin-bottom:2px}
-.slide-caption strong{font-size:11px;line-height:1.3}
 .slider-dots{right:16px;bottom:55px;gap:6px}
 .slider-dots button{width:6px;height:6px}
 .slider-dots button.is-active{width:18px}
