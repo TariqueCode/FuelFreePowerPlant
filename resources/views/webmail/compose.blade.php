@@ -2,7 +2,7 @@
 @section('content')
 <div class="hero">
     <div><div class="eyebrow">FuelFree PowerPlant Webmail</div><h1 class="title">{{ $mode === 'reply' ? 'Reply' : ($mode === 'forward' ? 'Forward' : 'Compose') }}</h1><p class="sub">Send an email from {{ $email }}.</p></div>
-    <a class="btn" href="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/inbox">← Inbox</a>
+    <a class="btn" href="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/inbox?folder={{ urlencode($folder ?? 'INBOX') }}">← Inbox</a>
 </div>
 <form class="card compose" method="POST" action="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/send" id="compose-form">
     @csrf
