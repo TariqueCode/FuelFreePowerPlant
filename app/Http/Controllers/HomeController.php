@@ -31,7 +31,7 @@ class HomeController
 
         $newsLimit=max(1,min(12,(int)($settings['home.news_limit']??3)));
         $galleryLimit=max(1,min(12,(int)($settings['home.gallery_limit']??4)));
-        $content['news']=$content['news']->take($newsLimit);
+        $content['news']=$content->get('news', collect())->take($newsLimit);
         $gallery=$gallery->take($galleryLimit);
         $stats=['projects'=>PowerPlant::query()->count(),'capacity_mw'=>round((float)PowerPlant::query()->sum('capacity_kw')/1000,2),'operational'=>PowerPlant::query()->whereRaw('LOWER(status)=?', ['operational'])->count()];
 
