@@ -28,8 +28,7 @@ class SettingsController
             'footer.contact_heading'=>'Contact','footer.email'=>'info@fuelfreepowerplant.com','footer.phone'=>'+880 1712-251892',
             'footer.website'=>'www.fuelfreepowerplant.com','footer.website_url'=>'https://www.fuelfreepowerplant.com',
             'footer.get_in_touch_label'=>'Get in touch','footer.get_in_touch_url'=>'/contact',
-            'footer.copyright_text'=>'All rights reserved.','footer.developer_prefix'=>'Developed by',
-            'footer.developer_name'=>'Saif Al-Islam','footer.developer_email'=>'TariqueBN@gmail.com',
+            'footer.copyright_text'=>'All rights reserved.',
             'home.slider_enabled'=>'1','home.welcome_enabled'=>'1','home.news_enabled'=>'1','home.gallery_enabled'=>'1',
         ];
         $saved=SystemSetting::query()->pluck('value','key')->all();
@@ -61,8 +60,7 @@ class SettingsController
             'footer.phone'=>['required','string','max:50'],'footer.website'=>['required','string','max:255'],
             'footer.website_url'=>['required','url','max:255'],'footer.get_in_touch_label'=>['required','string','max:100'],
             'footer.get_in_touch_url'=>['required','string','max:255'],
-            'footer.copyright_text'=>['required','string','max:150'],'footer.developer_prefix'=>['nullable','string','max:50'],
-            'footer.developer_name'=>['nullable','string','max:100'],'footer.developer_email'=>['nullable','email','max:255'],
+            'footer.copyright_text'=>['required','string','max:150'],
         ]);
 
         $data=[
@@ -86,8 +84,6 @@ class SettingsController
             'footer.phone'=>data_get($validated,'footer.phone'),'footer.website'=>data_get($validated,'footer.website'),
             'footer.website_url'=>data_get($validated,'footer.website_url'),'footer.get_in_touch_label'=>data_get($validated,'footer.get_in_touch_label'),
             'footer.get_in_touch_url'=>data_get($validated,'footer.get_in_touch_url'),'footer.copyright_text'=>data_get($validated,'footer.copyright_text'),
-            'footer.developer_prefix'=>data_get($validated,'footer.developer_prefix'),'footer.developer_name'=>data_get($validated,'footer.developer_name'),
-            'footer.developer_email'=>data_get($validated,'footer.developer_email'),
             'mail.career_account_id'=>(string) $request->input('mail.career_account_id',''),
         ];
 
