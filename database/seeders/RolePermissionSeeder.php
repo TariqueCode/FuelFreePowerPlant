@@ -28,7 +28,7 @@ class RolePermissionSeeder extends Seeder
         $models=[]; foreach ($permissions as $slug=>$name) $models[$slug]=Permission::updateOrCreate(['slug'=>$slug],['name'=>$name]);
         Role::where('slug','super-admin')->firstOrFail()->permissions()->sync(array_values($models));
         Role::where('slug','administrator')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>!in_array($s,['settings.manage','health.view'],true),ARRAY_FILTER_USE_BOTH)));
-        Role::where('slug','project-manager')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>in_array($s,['dashboard.view','plants.view','plants.manage','users.view','documents.view','documents.manage','inquiries.view','inquiries.manage','notifications.view'],true),ARRAY_FILTER_USE_BOTH)));
+        Role::where('slug','project-manager')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>in_array($s,['dashboard.view','plants.view','plants.manage','users.view','documents.view','documents.manage','inquiries.view','inquiries.manage','notifications.view','social-media.manage'],true),ARRAY_FILTER_USE_BOTH)));
         Role::where('slug','client')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>in_array($s,['dashboard.view','documents.view','documents.manage','notifications.view'],true),ARRAY_FILTER_USE_BOTH)));
     }
 }
