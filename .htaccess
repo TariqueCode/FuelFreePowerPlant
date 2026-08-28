@@ -1,0 +1,23 @@
+<IfModule mod_rewrite.c>
+    Options -Indexes
+
+    RewriteEngine On
+
+    # Never expose sensitive Laravel application directories.
+    RewriteRule ^(?:app|bootstrap|config|database|resources|routes|tests|vendor)(?:/|$) - [F,L,NC]
+
+    # Never expose sensitive files.
+    RewriteRule ^(?:\.env|\.env\..*|artisan|composer\.(?:json|lock)|package(?:-lock)?\.json|phpunit\.xml|vite\.config\..*)(?:/|$) - [F,L,NC]
+
+    # Redirect /public/... to /...
+    RewriteCond %{THE_REQUEST} \s/+public(?:/([^\s?]*))?[\s?] [NC]
+    RewriteRule ^public(?:/(.*))?$ /$1 [R=301,L,NE]
+
+    # Serve files that actually exist inside Laravel's public directory.
+    RewriteCond %{DOCUMENT_ROOT}/public/$1 -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}/public/$1 -d
+    RewriteRule ^(.+)$ public/$1 [L]
+
+    # Send everything else to Laravel's front controller.
+    RewriteRule ^ public/index.php [L]
+</IfModule>

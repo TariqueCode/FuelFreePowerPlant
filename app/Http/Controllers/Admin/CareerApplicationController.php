@@ -1,13 +1,13 @@
 <?php
 
-namespace AppHttpControllersAdmin;
+namespace App\Http\Controllers\Admin;
 
-use AppHttpControllersController;
-use AppModelsCareerApplication;
-use IlluminateHttpRedirectResponse;
-use IlluminateHttpRequest;
-use IlluminateSupportFacadesStorage;
-use IlluminateViewView;
+use App\Http\Controllers\Controller;
+use App\Models\CareerApplication;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class CareerApplicationController extends Controller
 {
