@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EmailAccount;
 use App\Services\WebmailService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ class WebmailController extends Controller
         ]);
 
         try {
-            $webmail->login($data['email'], $data['password']);
+            $webmail->login($data['email'], $data['password'], $this->mailConfigFor($data['email']));
         } catch (Throwable $e) {
             report($e);
             return back()->withErrors(['email' => 'Email or password is incorrect, or the mail server is temporarily unavailable.'])->withInput($request->only('email'));
@@ -44,7 +45,7 @@ class WebmailController extends Controller
         [$email, $password] = $credentials;
 
         try {
-            $messages = $webmail->messages($email, $password);
+            $messages = $webmail->messages($email, $password, 40, $this->mailConfigFor($email));
         } catch (Throwable $e) {
             report($e);
             $this->clearSession($request);
@@ -61,7 +62,7 @@ class WebmailController extends Controller
         [$email, $password] = $credentials;
 
         try {
-            $message = $webmail->message($email, $password, $uid);
+            $message = $webmail->message($email, $password, $uid, $this->mailConfigFor($email));
         } catch (Throwable $e) {
             report($e);
             return back()->withErrors(['email' => 'That message could not be opened.']);
@@ -120,7 +121,7 @@ class WebmailController extends Controller
         ]);
 
         try {
-            $webmail->send($email, $password, $data['to'], $data['subject'] ?: '(No subject)', $data['body']);
+            $webmail->send($email, $password, $data['to'], $data['subject'] ?: '(No subject)', $data['body'], $this->mailConfigFor($email));
         } catch (Throwable $e) {
             report($e);
             return back()->withErrors(['send' => 'The message could not be sent. Please try again.'])->withInput();
@@ -133,6 +134,21 @@ class WebmailController extends Controller
     {
         $this->clearSession($request);
         return redirect()->to($this->url('/'));
+    }
+
+    private function mailConfigFor(string $email): array
+    {
+        $account = EmailAccount::query()
+            ->where('address', strtolower(trim($email)))
+            ->where('status', 'active')
+            ->first(['imap_host','imap_port','smtp_host','smtp_port']);
+
+        return [
+            'imap_host' => $account?->imap_host ?: config('cpanel.mail_host', 'mail.fuelfreepowerplant.com'),
+            'imap_port' => $account?->imap_port ?: 993,
+            'smtp_host' => $account?->smtp_host ?: config('cpanel.mail_host', 'mail.fuelfreepowerplant.com'),
+            'smtp_port' => $account?->smtp_port ?: 465,
+        ];
     }
 
     private function credentials(Request $request): ?array
