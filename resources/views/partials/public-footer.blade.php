@@ -125,3 +125,14 @@
     });
 })();
 </script>
+
+<style>
+@media (max-width:850px){
+    .bio-modal,
+    .bio-modal.open{
+        display:none !important;
+        visibility:hidden !important;
+        pointer-events:none !important;
+    }
+}
+</style>
