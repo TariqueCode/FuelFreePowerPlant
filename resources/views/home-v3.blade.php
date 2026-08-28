@@ -30,15 +30,10 @@
 .slide.is-active{opacity:1;visibility:visible;transform:scale(1)}
 .slide-media{position:relative;width:100%;height:calc(min(100vw - 32px,1280px) / 2.35);min-height:0;overflow:hidden;background:#061923;border:1px solid rgba(83,218,240,.2);border-radius:26px}
 .slide img{width:100%;height:100%;display:block;object-fit:cover}
-.slide-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(2,10,16,.24),rgba(2,10,16,.04) 58%,rgba(2,10,16,.16))}
+
 .slide-caption{position:absolute;left:0;right:0;top:calc(100% + 7px);display:block;padding:0 10px;overflow:hidden;text-align:center;pointer-events:none}
 .slide-caption span{display:none}
 .slide-caption strong{display:block;color:#8faeb8;font-size:9px;line-height:1.25;letter-spacing:.02em;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:none}
-.slider-dots{position:absolute;right:24px;bottom:18px;display:flex;gap:7px;z-index:3}
-.slider-dots button{width:7px;height:7px;padding:0;border:0;border-radius:50%;background:rgba(239,252,255,.45);cursor:pointer;transition:width .2s,background .2s}
-.slider-dots button.is-active{width:24px;border-radius:999px;background:var(--cyan)}
-.slider-arrow{position:absolute;top:calc((min(100vw - 32px,1280px) / 2.35) / 2);z-index:4;width:42px;height:42px;border:1px solid rgba(239,252,255,.2);border-radius:50%;display:grid;place-items:center;background:rgba(2,10,16,.34);color:#effcff;cursor:pointer;opacity:0;transform:translateY(-50%);transition:opacity .2s,background .2s,border-color .2s}.home-slider:hover .slider-arrow,.home-slider:focus-within .slider-arrow{opacity:1}.slider-arrow:hover{background:rgba(72,216,241,.16);border-color:rgba(72,216,241,.5)}.slider-arrow.prev{left:18px}.slider-arrow.next{right:18px}.slider-progress{position:absolute;left:0;bottom:0;width:100%;height:2px;background:rgba(239,252,255,.1);z-index:4}.slider-progress span{display:block;height:100%;width:0;background:var(--cyan);transform-origin:left center}
-
 .welcome{padding:78px 0 82px;text-align:left}
 .welcome-heading{max-width:100%;padding-bottom:30px;border-bottom:1px solid var(--line)}
 .welcome h1{max-width:900px;font-size:clamp(42px,6vw,72px);margin:13px 0 0}
@@ -71,15 +66,12 @@
 }
 
 @media(max-width:650px){
-.slider-arrow{display:none}.home-slider{margin:8px 0 0}.home-slider.has-caption{margin-bottom:24px}
+.slider-arrow,.slider-dots,.slider-progress{display:none}.home-slider{margin:8px 0 0}.home-slider.has-caption{margin-bottom:24px}
 .slider-track{height:calc((100vw - 22px) / 2.35)}
 .slide-media{height:calc((100vw - 22px) / 2.35);border-radius:18px}
 .slide-caption{top:calc(100% + 6px);padding:0 8px}
 .slide-caption strong{font-size:8px}
-.slide-shade{background:linear-gradient(90deg,rgba(2,10,16,.16),rgba(2,10,16,.03) 70%,rgba(2,10,16,.12))}
-.slider-dots{right:16px;bottom:55px;gap:6px}
-.slider-dots button{width:6px;height:6px}
-.slider-dots button.is-active{width:18px}
+
 .welcome{padding:52px 0 48px}
 .welcome-heading{padding-bottom:20px}
 .welcome h1{font-size:clamp(34px,10vw,48px);line-height:1.02;margin-top:10px}
@@ -108,20 +100,11 @@
                 @if($sliderUrl)<a class="slide {{ $index===0?'is-active':'' }}" href="{{ $sliderUrl }}" @if(str_starts_with($sliderUrl,'http')) target="_blank" rel="noopener" @endif>@else<div class="slide {{ $index===0?'is-active':'' }}">@endif
                     <div class="slide-media">
                         <img src="{{ asset('storage/'.ltrim($slider->image_path,'/')) }}" alt="{{ $slider->title ?: $siteName }}" @if($index>0)loading="lazy"@endif>
-                        <div class="slide-shade"></div>
                     </div>
                     @if($slider->title)<div class="slide-caption" aria-label="{{ $slider->title }}"><strong>{{ $slider->title }}</strong></div>@endif
                 @if($sliderUrl)</a>@else</div>@endif
             @endforeach
         </div>
-        @if($sliders->count()>1)
-        <button class="slider-arrow prev" type="button" aria-label="Previous slide">‹</button>
-        <button class="slider-arrow next" type="button" aria-label="Next slide">›</button>
-        <div class="slider-dots" role="tablist" aria-label="Slider navigation">
-            @foreach($sliders as $index => $slider)<button type="button" class="{{ $index===0?'is-active':'' }}" aria-label="Show slide {{ $index+1 }}" data-slide="{{ $index }}"></button>@endforeach
-        </div>
-        <div class="slider-progress" aria-hidden="true"><span></span></div>
-        @endif
     </section>
     @endif
 
@@ -150,41 +133,30 @@
     const root = document.querySelector('.home-slider');
     if (!root) return;
     const slides = [...root.querySelectorAll('.slide')];
-    const dots = [...root.querySelectorAll('.slider-dots button')];
-    const prev = root.querySelector('.slider-arrow.prev');
-    const next = root.querySelector('.slider-arrow.next');
-    const progress = root.querySelector('.slider-progress span');
+    if (slides.length < 2) return;
+
     let index = 0;
     let timer;
-    const syncCaptionSpace = () => {
-        const hasCaption = !!slides[index]?.querySelector('.slide-caption');
-        root.classList.toggle('has-caption', hasCaption);
-    };
-    syncCaptionSpace();
-    if (slides.length < 2) return;
+
     const show = (nextIndex) => {
         index = (nextIndex + slides.length) % slides.length;
-        syncCaptionSpace();
-        slides.forEach((s,i) => s.classList.toggle('is-active', i === index));
-        dots.forEach((d,i) => { d.classList.toggle('is-active', i === index); d.setAttribute('aria-selected', i === index ? 'true' : 'false'); });
-        if (progress) { progress.style.transition = 'none'; progress.style.width = '0%'; requestAnimationFrame(() => { progress.style.transition = 'width 5s linear'; progress.style.width = '100%'; }); }
+        slides.forEach((slide, i) => slide.classList.toggle('is-active', i === index));
     };
-    const start = () => { clearInterval(timer); timer = setInterval(() => show(index + 1), 5000); };
-    dots.forEach((dot,i) => dot.addEventListener('click', () => { show(i); start(); }));
-    if (prev) prev.addEventListener('click', () => { show(index - 1); start(); });
-    if (next) next.addEventListener('click', () => { show(index + 1); start(); });
-    root.addEventListener('mouseenter', () => clearInterval(timer));
+
+    const start = () => {
+        clearInterval(timer);
+        timer = setInterval(() => show(index + 1), 5000);
+    };
+
+    const pause = () => clearInterval(timer);
+
+    root.addEventListener('mouseenter', pause);
     root.addEventListener('mouseleave', start);
-    root.addEventListener('focusin', () => clearInterval(timer));
-    root.addEventListener('focusout', start);
-    let touchStartX = 0;
-    root.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; }, {passive:true});
-    root.addEventListener('touchend', e => {
-        const delta = e.changedTouches[0].clientX - touchStartX;
-        if (Math.abs(delta) > 45) { show(index + (delta < 0 ? 1 : -1)); start(); }
-    }, {passive:true});
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    start();
+    root.addEventListener('touchstart', pause, {passive:true});
+    root.addEventListener('touchend', start, {passive:true});
+    root.addEventListener('touchcancel', start, {passive:true});
+
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) start();
 })();
 </script>
 @endpush
