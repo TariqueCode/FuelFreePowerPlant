@@ -26,146 +26,160 @@ class WebmailService
     {
         $this->ensureExtension();
         $connection = $this->openConnection($email, $password, $config, '', OP_HALFOPEN);
-        if (!$connection) throw new RuntimeException($this->imapError() ?: 'Unable to connect to the mailbox.');
-
-        $list = imap_list($connection, $this->serverPrefix($config), '*') ?: [];
+        $prefix = $this->serverPrefix($config);
+        $list = imap_getmailboxes($connection, $prefix, '*') ?: [];
         imap_close($connection);
 
-        $folders = [['name' => 'INBOX', 'label' => 'Inbox', 'icon' => 'fa-inbox']];
-        foreach ($list as $raw) {
-            $name = $this->decodeFolderName(str_replace($this->serverPrefix($config), '', $raw));
-            if (strtoupper($name) === 'INBOX') continue;
+        $found = [['name'=>'INBOX','label'=>'Inbox','icon'=>'fa-inbox','special'=>'inbox']];
+        foreach ($list as $mailbox) {
+            $raw = (string)($mailbox->name ?? '');
+            if ($raw === '') continue;
+            $name = $this->decodeFolderName(str_replace($prefix, '', $raw));
             $upper = strtoupper($name);
-            if (str_contains($upper, 'SENT')) $folders[] = ['name' => $name, 'label' => 'Sent', 'icon' => 'fa-paper-plane'];
-            elseif (str_contains($upper, 'DRAFT')) $folders[] = ['name' => $name, 'label' => 'Drafts', 'icon' => 'fa-file-pen'];
+            if ($upper === 'INBOX') continue;
+            $label = null; $icon = 'fa-folder'; $special = 'custom';
+            if (preg_match('/(^|[.\\/ ])SENT($|[.\\/ ])/i', $name) || str_contains($upper,'SENT ITEMS')) { $label='Sent'; $icon='fa-paper-plane'; $special='sent'; }
+            elseif (preg_match('/DRAFT/i',$name)) { $label='Drafts'; $icon='fa-file-pen'; $special='drafts'; }
+            elseif (preg_match('/(SPAM|JUNK)/i',$name)) { $label='Spam'; $icon='fa-shield-halved'; $special='spam'; }
+            elseif (preg_match('/(TRASH|DELETED)/i',$name)) { $label='Trash'; $icon='fa-trash'; $special='trash'; }
+            elseif (preg_match('/ARCHIVE/i',$name)) { $label='Archive'; $icon='fa-box-archive'; $special='archive'; }
+            if ($label) $found[] = compact('name','label','icon','special');
         }
-
-        $unique = [];
-        foreach ($folders as $folder) $unique[$folder['label']] = $folder;
+        $priority = ['Inbox'=>0,'Sent'=>1,'Drafts'=>2,'Spam'=>3,'Trash'=>4,'Archive'=>5];
+        usort($found, fn($a,$b)=>($priority[$a['label']]??99)<=>($priority[$b['label']]??99));
+        $unique=[]; foreach($found as $folder) $unique[$folder['label']]=$folder;
         return array_values($unique);
     }
 
-    public function messages(string $email, string $password, int $limit = 40, array $config = [], string $folder = 'INBOX'): array
+    public function messages(string $email, string $password, int $limit = 40, array $config = [], string $folder = 'INBOX', string $search = ''): array
     {
-        $connection = $this->open($email, $password, $config, $folder);
-        $numbers = imap_search($connection, 'ALL') ?: [];
-        rsort($numbers);
-        $numbers = array_slice($numbers, 0, $limit);
-        $messages = [];
-
-        foreach ($numbers as $number) {
-            $header = imap_headerinfo($connection, $number);
-            $messages[] = [
-                'uid' => imap_uid($connection, $number),
-                'number' => $number,
-                'subject' => $this->decodeHeader($header->subject ?? '(No subject)'),
-                'from' => $this->address($header->from[0] ?? null),
-                'to' => $this->addressList($header->to ?? []),
-                'date' => $header->date ?? '',
-                'seen' => empty($header->Unseen),
+        $connection = $this->open($email,$password,$config,$folder);
+        $criteria = trim($search) !== '' ? 'TEXT "'.addcslashes(trim($search),'\\\"').'"' : 'ALL';
+        $numbers = imap_search($connection,$criteria) ?: [];
+        rsort($numbers,SORT_NUMERIC); $numbers=array_slice($numbers,0,$limit); $messages=[];
+        foreach($numbers as $number){
+            $header=imap_headerinfo($connection,$number);
+            $messages[]=[
+                'uid'=>(int)imap_uid($connection,$number),'number'=>$number,
+                'subject'=>$this->decodeHeader($header->subject??'(No subject)'),
+                'from'=>$this->address($header->from[0]??null),'to'=>$this->addressList($header->to??[]),
+                'cc'=>$this->addressList($header->cc??[]),'date'=>$header->date??'',
+                'seen'=>empty($header->Unseen),'answered'=>!empty($header->Answered),'flagged'=>!empty($header->Flagged),
+                'size'=>(int)($header->Size??0),
             ];
         }
-
-        imap_close($connection);
-        return $messages;
+        imap_close($connection); return $messages;
     }
 
     public function message(string $email, string $password, int $uid, array $config = [], string $folder = 'INBOX'): array
     {
-        $connection = $this->open($email, $password, $config, $folder);
-        $number = imap_msgno($connection, $uid);
-        if ($number < 1) {
-            imap_close($connection);
-            throw new RuntimeException('Message not found.');
+        $connection=$this->open($email,$password,$config,$folder);
+        $number=imap_msgno($connection,$uid);
+        if($number<1){imap_close($connection);throw new RuntimeException('Message not found.');}
+        $header=imap_headerinfo($connection,$number); $structure=imap_fetchstructure($connection,$number);
+        $parts=['html'=>null,'text'=>null,'attachments'=>[]];
+        $this->walkParts($connection,$number,$structure,'',$parts);
+        if($parts['html']===null && $parts['text']===null){
+            $parts['text']=$this->decodeTransfer((string)imap_body($connection,$number,FT_PEEK),(int)($structure->encoding??0));
         }
-
-        $header = imap_headerinfo($connection, $number);
-        $body = imap_fetchbody($connection, $number, '1', FT_PEEK);
-        if ($body === '' || $body === false) $body = imap_body($connection, $number, FT_PEEK);
-        $structure = imap_fetchstructure($connection, $number);
-        $body = $this->decodeBody((string) $body, $structure);
-        imap_setflag_full($connection, (string) $number, '\\Seen');
-        imap_close($connection);
-
+        imap_setflag_full($connection,(string)$uid,'\\Seen',ST_UID); imap_close($connection);
         return [
-            'uid' => $uid,
-            'subject' => $this->decodeHeader($header->subject ?? '(No subject)'),
-            'from' => $this->address($header->from[0] ?? null),
-            'to' => $this->addressList($header->to ?? []),
-            'date' => $header->date ?? '',
-            'body' => $this->safeBody($body),
+            'uid'=>$uid,'subject'=>$this->decodeHeader($header->subject??'(No subject)'),
+            'from'=>$this->address($header->from[0]??null),'to'=>$this->addressList($header->to??[]),
+            'cc'=>$this->addressList($header->cc??[]),'date'=>$header->date??'',
+            'message_id'=>$this->headerValue($header,'message_id'),
+            'body'=>$this->safeBody($parts['html']??nl2br(e($parts['text']??''))),
+            'attachments'=>$parts['attachments'],
         ];
     }
 
-    public function send(string $email, string $password, string $to, string $subject, string $body, array $config = [], ?array $attachment = null, bool $saveSent = false): void
+    public function attachment(string $email,string $password,int $uid,string $part,array $config=[],string $folder='INBOX'): array
     {
-        $host = $config['smtp_host'] ?? config('cpanel.mail_host', 'mail.fuelfreepowerplant.com');
-        $port = (int) ($config['smtp_port'] ?? 465);
-        $ssl = $port === 465 ? 'ssl://' : 'tcp://';
-        $socket = @stream_socket_client($ssl.$host.':'.$port, $errno, $errstr, 20, STREAM_CLIENT_CONNECT);
-        if (!$socket) throw new RuntimeException('SMTP connection failed: '.($errstr ?: 'Unable to connect.'));
-
-        stream_set_timeout($socket, 20);
-        $this->smtpExpect($socket, 220);
-        $ehlo = 'EHLO '.(parse_url(config('app.url'), PHP_URL_HOST) ?: 'localhost');
-        $this->smtpCommand($socket, $ehlo, 250);
-        if ($port === 587) {
-            $this->smtpCommand($socket, 'STARTTLS', 220);
-            if (!stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
-                fclose($socket);
-                throw new RuntimeException('SMTP STARTTLS negotiation failed.');
-            }
-            $this->smtpCommand($socket, $ehlo, 250);
-        }
-        $this->smtpCommand($socket, 'AUTH LOGIN', 334);
-        $this->smtpCommand($socket, base64_encode($email), 334);
-        $this->smtpCommand($socket, base64_encode($password), 235);
-        $this->smtpCommand($socket, 'MAIL FROM:<'.$email.'>', 250);
-        $this->smtpCommand($socket, 'RCPT TO:<'.$to.'>', 250);
-        $this->smtpCommand($socket, 'DATA', 354);
-
-        $html = $this->safeBodyForSend($body);
-        $plain = trim(preg_replace('/\s+/u', ' ', strip_tags(str_replace(['</p>', '</div>', '<br>', '<br/>', '<br />'], "\n", $html))) ?? $body);
-        $boundary = '=_FuelFreePowerPlant_'.bin2hex(random_bytes(12));
-        $headers = [
-            'From: '.$email,
-            'To: '.$to,
-            'Subject: =?UTF-8?B?'.base64_encode($subject).'?=',
-            'MIME-Version: 1.0',
-            'Content-Type: multipart/alternative; boundary="'.$boundary.'"',
-            'Date: '.date(DATE_RFC2822),
-        ];
-
-        $payload = implode("\r\n", $headers)."\r\n\r\n";
-        $payload .= '--'.$boundary."\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n".$this->dotStuff($plain)."\r\n";
-        $payload .= '--'.$boundary."\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: 8bit\r\n\r\n".$this->dotStuff($html)."\r\n";
-        if ($attachment && !empty($attachment['path']) && is_file($attachment['path'])) {
-            $name = $attachment['name'] ?? basename($attachment['path']);
-            $mime = $attachment['mime'] ?? 'application/octet-stream';
-            $data = chunk_split(base64_encode((string) file_get_contents($attachment['path'])));
-            $payload .= '--'.$boundary."\r\nContent-Type: ".$mime."; name=\"".$name."\"\r\nContent-Disposition: attachment; filename=\"".$name."\"\r\nContent-Transfer-Encoding: base64\r\n\r\n".$data."\r\n";
-        }
-        $payload .= '--'.$boundary."--\r\n.\r\n";
-
-        fwrite($socket, $payload);
-        $this->smtpExpect($socket, 250);
-        fwrite($socket, "QUIT\r\n");
-        fclose($socket);
-
-        // Optionally keep a copy in the provider's Sent folder.
-        if (!$saveSent) return;
-        try {
-            $sent = $this->findFolder($email, $password, $config, 'SENT');
-            if ($sent) {
-                $append = implode("\r\n", $headers)."\r\n\r\n".$this->dotStuff($html)."\r\n";
-                $connection = $this->open($email, $password, $config, $sent);
-                @imap_append($connection, $this->mailbox($config, $sent), $append, '\\Seen');
-                imap_close($connection);
-            }
-        } catch (\Throwable) {
-            // Sending succeeded even if the provider does not expose a writable Sent folder.
-        }
+        $connection=$this->open($email,$password,$config,$folder); $number=imap_msgno($connection,$uid);
+        if($number<1){imap_close($connection);throw new RuntimeException('Message not found.');}
+        $structure=imap_fetchstructure($connection,$number); $found=null;
+        $this->findPart($connection,$number,$structure,'',$part,$found); imap_close($connection);
+        if(!$found)throw new RuntimeException('Attachment not found.'); return $found;
     }
+
+    public function setSeen(string $email,string $password,int $uid,bool $seen,array $config=[],string $folder='INBOX'): void
+    {
+        $connection=$this->open($email,$password,$config,$folder);
+        if($seen)imap_setflag_full($connection,(string)$uid,'\\Seen',ST_UID); else imap_clearflag_full($connection,(string)$uid,'\\Seen',ST_UID);
+        imap_close($connection);
+    }
+
+    public function move(string $email,string $password,int $uid,string $source,string $destination,array $config=[]): void
+    {
+        $connection=$this->open($email,$password,$config,$source);
+        if(!imap_mail_move($connection,(string)$uid,$this->mailbox($config,$destination),CP_UID)){ $e=$this->imapError()?:'Unable to move message.'; imap_close($connection); throw new RuntimeException($e); }
+        imap_expunge($connection); imap_close($connection);
+    }
+
+    public function delete(string $email,string $password,int $uid,string $folder,array $config=[]): void
+    {
+        $trash=collect($this->folders($email,$password,$config))->firstWhere('special','trash');
+        if($trash && $trash['name']!==$folder){$this->move($email,$password,$uid,$folder,$trash['name'],$config);return;}
+        $connection=$this->open($email,$password,$config,$folder);
+        if(!imap_setflag_full($connection,(string)$uid,'\\Deleted',ST_UID)){ $e=$this->imapError()?:'Unable to delete message.'; imap_close($connection); throw new RuntimeException($e); }
+        imap_expunge($connection); imap_close($connection);
+    }
+
+    public function send(string $email,string $password,string|array $to,string $subject,string $body,array $config=[],?array $attachments=null,bool $saveSent=false,string|array $cc=[],string|array $bcc=[],array $headersExtra=[]): void
+    {
+        $to=$this->normalizeRecipients($to); $cc=$this->normalizeRecipients($cc); $bcc=$this->normalizeRecipients($bcc);
+        if(!$to)throw new RuntimeException('At least one recipient is required.');
+        $host=$config['smtp_host']??config('cpanel.mail_host','mail.fuelfreepowerplant.com'); $port=(int)($config['smtp_port']??465);
+        $socket=@stream_socket_client(($port===465?'ssl://':'tcp://').$host.':'.$port,$errno,$errstr,20,STREAM_CLIENT_CONNECT);
+        if(!$socket)throw new RuntimeException('SMTP connection failed: '.($errstr?:'Unable to connect.'));
+        stream_set_timeout($socket,20);
+        try{
+            $this->smtpExpect($socket,220); $ehlo='EHLO '.(parse_url(config('app.url'),PHP_URL_HOST)?:'localhost'); $this->smtpCommand($socket,$ehlo,250);
+            if($port===587){$this->smtpCommand($socket,'STARTTLS',220);if(!stream_socket_enable_crypto($socket,true,STREAM_CRYPTO_METHOD_TLS_CLIENT))throw new RuntimeException('SMTP STARTTLS negotiation failed.');$this->smtpCommand($socket,$ehlo,250);}
+            $this->smtpCommand($socket,'AUTH LOGIN',334);$this->smtpCommand($socket,base64_encode($email),334);$this->smtpCommand($socket,base64_encode($password),235);
+            $this->smtpCommand($socket,'MAIL FROM:<'.$email.'>',250); foreach(array_merge($to,$cc,$bcc) as $recipient)$this->smtpCommand($socket,'RCPT TO:<'.$recipient.'>',250); $this->smtpCommand($socket,'DATA',354);
+            $html=$this->safeBodyForSend($body); $plain=trim(strip_tags(str_replace(['</p>','</div>','<br>','<br/>','<br />'],"\n",$html)));
+            $hasAttachments=false; foreach(($attachments??[]) as $a)if(!empty($a['path'])&&is_file($a['path'])){$hasAttachments=true;break;}
+            $boundary='=_FuelFreePowerPlant_'.bin2hex(random_bytes(12)); $headers=['From: '.$email,'To: '.implode(', ',$to)];
+            if($cc)$headers[]='Cc: '.implode(', ',$cc); $headers[]='Subject: =?UTF-8?B?'.base64_encode($subject).'?='; $headers[]='Date: '.date(DATE_RFC2822);
+            $headers[]='Message-ID: <'.bin2hex(random_bytes(16)).'@'.(parse_url(config('app.url'),PHP_URL_HOST)?:'localhost'); foreach($headersExtra as $k=>$v)if($v!=='')$headers[]=$k.': '.$v;
+            $headers[]='MIME-Version: 1.0';
+            if(!$hasAttachments){
+                $headers[]='Content-Type: multipart/alternative; boundary="'.$boundary.'"'; $payload=implode("\r\n",$headers)."\r\n\r\n";
+                $payload.='--'.$boundary."\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n".quoted_printable_encode($this->dotStuff($plain))."\r\n";
+                $payload.='--'.$boundary."\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n".quoted_printable_encode($this->dotStuff($html))."\r\n--".$boundary."--\r\n.\r\n";
+            }else{
+                $alt='=_Alt_'.bin2hex(random_bytes(8)); $headers[]='Content-Type: multipart/mixed; boundary="'.$boundary.'"'; $payload=implode("\r\n",$headers)."\r\n\r\n";
+                $payload.='--'.$boundary."\r\nContent-Type: multipart/alternative; boundary=\"'.$alt.'\"\r\n\r\n";
+                $payload.='--'.$alt."\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n".quoted_printable_encode($this->dotStuff($plain))."\r\n";
+                $payload.='--'.$alt."\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n".quoted_printable_encode($this->dotStuff($html))."\r\n--".$alt."--\r\n";
+                foreach($attachments??[] as $a){if(empty($a['path'])||!is_file($a['path']))continue;$name=$this->headerFilename($a['name']??basename($a['path']));$mime=$a['mime']??'application/octet-stream';$data=chunk_split(base64_encode((string)file_get_contents($a['path'])));$payload.='--'.$boundary."\r\nContent-Type: {$mime}; name=\"{$name}\"\r\nContent-Disposition: attachment; filename=\"{$name}\"\r\nContent-Transfer-Encoding: base64\r\n\r\n{$data}\r\n";}
+                $payload.='--'.$boundary."--\r\n.\r\n";
+            }
+            fwrite($socket,$payload);$this->smtpExpect($socket,250);fwrite($socket,"QUIT\r\n");
+        }finally{fclose($socket);}
+        if(!$saveSent)return;
+        try{$sent=$this->findFolder($email,$password,$config,'SENT');if($sent){$connection=$this->open($email,$password,$config,$sent);@imap_append($connection,$this->mailbox($config,$sent),$payload,'\\Seen');imap_close($connection);}}catch(\\Throwable){}
+    }
+
+    private function walkParts($connection,int $number,?object $part,string $partNo,array &$parts): void
+    {
+        if(!$part)return; $type=$this->mimeType((int)($part->type??0)); $sub=strtolower((string)($part->subtype??'')); $filename=$this->partFilename($part); $disposition=strtolower((string)($part->disposition??''));
+        if($filename!==''||$disposition==='attachment'){$parts['attachments'][]=['part'=>$partNo?:'1','name'=>$filename?:'attachment','type'=>$type.'/'.$sub,'size'=>(int)($part->bytes??0),'inline'=>$disposition==='inline','cid'=>trim((string)($part->ifid??''))];}
+        elseif($type==='text'&&in_array($sub,['html','plain'],true)){ $raw=$partNo!==''?imap_fetchbody($connection,$number,$partNo,FT_PEEK):imap_body($connection,$number,FT_PEEK); $decoded=$this->convertCharset($this->decodeTransfer((string)$raw,(int)($part->encoding??0)),$this->partCharset($part)); if($sub==='html')$parts['html']=$decoded;elseif($parts['text']===null)$parts['text']=$decoded; }
+        foreach(($part->parts??[]) as $i=>$child){$childNo=$partNo!==''?$partNo.'.'.($i+1):(string)($i+1);$this->walkParts($connection,$number,$child,$childNo,$parts);}
+    }
+
+    private function findPart($connection,int $number,?object $part,string $partNo,string $wanted,?array &$found): void
+    {
+        if(!$part||$found)return; if($partNo===$wanted){$raw=$partNo!==''?imap_fetchbody($connection,$number,$partNo,FT_PEEK):imap_body($connection,$number,FT_PEEK);$found=['name'=>$this->partFilename($part)?:'attachment','type'=>$this->mimeType((int)($part->type??3)).'/'.strtolower((string)($part->subtype??'octet-stream')),'content'=>$this->decodeTransfer((string)$raw,(int)($part->encoding??0)),'size'=>(int)($part->bytes??0)];return;} foreach(($part->parts??[]) as $i=>$child){$childNo=$partNo!==''?$partNo.'.'.($i+1):(string)($i+1);$this->findPart($connection,$number,$child,$childNo,$wanted,$found);}
+    }
+
+    private function decodeTransfer(string $body,int $encoding): string{return match($encoding){3=>(base64_decode($body,true)?:''),4=>quoted_printable_decode($body),default=>$body};}
+    private function convertCharset(string $value,string $charset): string{$charset=strtoupper(trim($charset));if($charset===''||$charset==='UTF-8'||$charset==='US-ASCII')return $value;return function_exists('mb_convert_encoding')?(mb_convert_encoding($value,'UTF-8',$charset)?:$value):$value;}
+    private function partFilename(object $part): string{foreach(['dparameters','parameters'] as $key)foreach(($part->{$key}??[]) as $param){$attr=strtolower((string)($param->attribute??''));if(in_array($attr,['filename','name'],true))return $this->decodeHeader((string)($param->value??''));}return '';}
+    private function partCharset(object $part): string{foreach(($part->parameters??[]) as $param)if(strtolower((string)($param->attribute??''))==='charset')return (string)$param->value;return '';}
+    private function mimeType(int $type): string{return ['text','multipart','message','application','audio','image','video','other'][$type]??'application';}
 
     private function open(string $email, string $password, array $config = [], string $folder = 'INBOX')
     {
@@ -250,6 +264,10 @@ class WebmailService
     {
         return function_exists('imap_utf8') ? imap_utf8($value) : $value;
     }
+
+    private function normalizeRecipients(string|array $value): array{$items=is_array($value)?$value:(preg_split('/[,;]+/',str_replace(["\r","\n"],' ',$value))?:[]);$out=[];foreach($items as $item){$item=trim($item);if($item!==''&&filter_var($item,FILTER_VALIDATE_EMAIL))$out[]=strtolower($item);}return array_values(array_unique($out));}
+    private function headerValue(object $header,string $property): string{return isset($header->{$property})?(string)$header->{$property}:'';}
+    private function headerFilename(string $name): string{return str_replace(["\r","\n",'"'],['','',''],basename($name));}
 
     private function address(?object $address): string
     {
