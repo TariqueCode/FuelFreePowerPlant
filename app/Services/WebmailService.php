@@ -196,6 +196,15 @@ class WebmailService
         return null;
     }
 
+    private function looksLikeCertificateError(): bool
+    {
+        $error = strtolower($this->imapError());
+        return str_contains($error, 'certificate')
+            || str_contains($error, 'ssl')
+            || str_contains($error, 'tls')
+            || str_contains($error, 'verify');
+    }
+
     private function ensureExtension(): void
     {
         if (!$this->extensionAvailable()) throw new RuntimeException('PHP IMAP extension is not enabled on this server. Enable IMAP in PHP extensions.');
