@@ -97,7 +97,7 @@ class WebmailService
         ];
     }
 
-    public function send(string $email, string $password, string $to, string $subject, string $body, array $config = [], ?array $attachment = null): void
+    public function send(string $email, string $password, string $to, string $subject, string $body, array $config = [], ?array $attachment = null, bool $saveSent = true): void
     {
         $host = $config['smtp_host'] ?? config('cpanel.mail_host', 'mail.fuelfreepowerplant.com');
         $port = (int) ($config['smtp_port'] ?? 465);
@@ -152,7 +152,8 @@ class WebmailService
         fwrite($socket, "QUIT\r\n");
         fclose($socket);
 
-        // Keep a copy in the provider's Sent folder when IMAP permits it.
+        // Optionally keep a copy in the provider's Sent folder.
+        if (!$saveSent) return;
         try {
             $sent = $this->findFolder($email, $password, $config, 'SENT');
             if ($sent) {
