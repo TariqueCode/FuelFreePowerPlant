@@ -53,11 +53,33 @@ jobs:
           elif [ -x "/opt/cpanel/composer/bin/composer" ]; then
               COMPOSER_BIN="/opt/cpanel/composer/bin/composer"
           else
-              echo "ERROR: Composer was not found on the server."
+              echo "==> Composer not found; installing Composer locally"
+              mkdir -p "$HOME/.local/bin"
+              COMPOSER_INSTALLER="/tmp/composer-setup.php"
+
+              curl -fsSL https://getcomposer.org/installer -o "$COMPOSER_INSTALLER"
+
+              EXPECTED_CHECKSUM="$(curl -fsSL https://composer.github.io/installer.sig)"
+              ACTUAL_CHECKSUM="$(php -r "echo hash_file('sha384', '$COMPOSER_INSTALLER');")"
+
+              if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
+                  echo "ERROR: Composer installer checksum verification failed."
+                  rm -f "$COMPOSER_INSTALLER"
+                  exit 1
+              fi
+
+              php "$COMPOSER_INSTALLER" --install-dir="$HOME/.local/bin" --filename=composer
+              rm -f "$COMPOSER_INSTALLER"
+              COMPOSER_BIN="$HOME/.local/bin/composer"
+          fi
+
+          if [ ! -x "$COMPOSER_BIN" ]; then
+              echo "ERROR: Composer is not executable: $COMPOSER_BIN"
               exit 1
           fi
 
           echo "Using Composer: $COMPOSER_BIN"
+          "$COMPOSER_BIN" --version
 
           echo "==> Installing PHP dependencies"
           "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction
