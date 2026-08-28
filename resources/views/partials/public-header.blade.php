@@ -7,6 +7,7 @@
     $publicNameFirst = $publicNameParts[0] ?? '';
     $publicNameRest = $publicNameParts[1] ?? '';
     $publicNavPages = \App\Models\SiteContentItem::query()->where('type','company')->where('status','published')->where('show_in_navigation',true)->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')->orderBy('navigation_order')->orderByDesc('created_at')->get(['title','slug']);
+    $publicOfferPage = \App\Models\CmsPage::query()->where('slug','our-offer')->where('is_published',true)->first(['title','slug']);
     $publicSocials = \Illuminate\Support\Facades\Cache::remember('public.social-links', 600, fn () => \App\Models\SocialLink::active()->get(['platform','label','url','icon'])->map(fn ($social) => ['platform' => $social->platform, 'label' => $social->label, 'url' => $social->url, 'icon' => $social->icon, 'color' => data_get(config('fuelfree.social.platforms'), $social->platform.'.color', '#51D8F0')])->values()->all());
     $isPortalUser = auth()->check();
     $publicPortalUrl = $isPortalUser ? route('dashboard') : route('login');
@@ -69,6 +70,7 @@ body{font-size:16px!important}main p,main li,main td,main th,main label,main .bo
             <nav class="public-menu" aria-label="Primary navigation">
                 <a href="{{ route('home') }}" @if(request()->routeIs('home')) aria-current="page" @endif>{{ $headerLabels['home_label'] ?? 'Home' }}</a>
                 @foreach($publicNavPages as $navPage)<a href="{{ route('company.page',$navPage->slug) }}" @if(request()->is('company/'.$navPage->slug)) aria-current="page" @endif>{{ $navPage->title }}</a>@endforeach
+                @if($publicOfferPage)<a href="{{ route('cms.page',$publicOfferPage->slug) }}" @if(request()->routeIs('cms.page') && request()->route('slug') === $publicOfferPage->slug) aria-current="page" @endif>{{ $publicOfferPage->title }}</a>@endif
                 <a href="{{ route('management') }}" @if(request()->routeIs('management')) aria-current="page" @endif>{{ $headerLabels['management_label'] ?? 'Management Team' }}</a>
                 <a href="{{ route('site.gallery') }}" @if(request()->routeIs('site.gallery') || request()->routeIs('gallery.show')) aria-current="page" @endif>{{ $headerLabels['gallery_label'] ?? 'Gallery' }}</a>
                 <a href="{{ route('news.index') }}" @if(request()->routeIs('news.*')) aria-current="page" @endif>{{ $headerLabels['news_label'] ?? 'News &amp; Notices' }}</a>
