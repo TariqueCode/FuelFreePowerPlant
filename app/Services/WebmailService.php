@@ -14,7 +14,7 @@ class WebmailService
     public function login(string $email, string $password, array $config = []): bool
     {
         $this->ensureExtension();
-        $connection = @imap_open($this->mailbox($config, 'INBOX'), $email, $password, OP_HALFOPEN, 1, ['DISABLE_AUTHENTICATOR' => 'GSSAPI']);
+        $connection = $this->openConnection($email, $password, $config, 'INBOX', OP_HALFOPEN);
         if (!$connection) {
             throw new RuntimeException($this->imapError() ?: 'The email address or password is incorrect.');
         }
@@ -25,7 +25,7 @@ class WebmailService
     public function folders(string $email, string $password, array $config = []): array
     {
         $this->ensureExtension();
-        $connection = @imap_open($this->mailbox($config, ''), $email, $password, OP_HALFOPEN, 1, ['DISABLE_AUTHENTICATOR' => 'GSSAPI']);
+        $connection = $this->openConnection($email, $password, $config, '', OP_HALFOPEN);
         if (!$connection) throw new RuntimeException($this->imapError() ?: 'Unable to connect to the mailbox.');
 
         $list = imap_list($connection, $this->serverPrefix($config), '*') ?: [];
@@ -170,21 +170,22 @@ class WebmailService
     private function open(string $email, string $password, array $config = [], string $folder = 'INBOX')
     {
         $this->ensureExtension();
-        $connection = @imap_open($this->mailbox($config, $folder), $email, $password, 0, 1, ['DISABLE_AUTHENTICATOR' => 'GSSAPI']);
+        $connection = $this->openConnection($email, $password, $config, $folder, 0);
         if (!$connection) throw new RuntimeException($this->imapError() ?: 'Unable to connect to the mailbox.');
         return $connection;
     }
 
-    private function mailbox(array $config, string $folder): string
+    private function mailbox(array $config, string $folder, bool $allowInvalidCert = false): string
     {
-        return $this->serverPrefix($config).$folder;
+        return $this->serverPrefix($config, $allowInvalidCert).$folder;
     }
 
-    private function serverPrefix(array $config): string
+    private function serverPrefix(array $config, bool $allowInvalidCert = false): string
     {
         $host = $config['imap_host'] ?? config('cpanel.mail_host', 'mail.fuelfreepowerplant.com');
         $port = (int) ($config['imap_port'] ?? 993);
-        return '{'.$host.':'.$port.'/imap/ssl}';
+        $flags = '/imap/ssl'.($allowInvalidCert ? '/novalidate-cert' : '');
+        return '{'.$host.':'.$port.$flags.'}';
     }
 
     private function findFolder(string $email, string $password, array $config, string $needle): ?string
