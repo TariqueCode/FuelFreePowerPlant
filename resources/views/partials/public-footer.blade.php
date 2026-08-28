@@ -10,7 +10,7 @@
 <style>
 .public-footer{margin-top:60px;border-top:1px solid rgba(86,210,238,.15);padding:38px 0 26px;color:#8aa8b1;font-size:14px;line-height:1.7}
 .public-footer-shell{width:min(1180px,calc(100% - 28px));margin:auto}
-.public-footer-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px 70px;padding-bottom:30px}
+.public-footer-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px 70px;padding-bottom:30px}.public-footer-grid>section:first-child{grid-column:1/-1;padding-bottom:6px}
 .public-footer-title{margin:0 0 12px;color:#eaf8fb;font-size:15px;font-weight:800}
 .public-footer-brand-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
 .public-footer-logo{width:34px;height:34px;object-fit:contain;flex:0 0 34px}
