@@ -1,5 +1,5 @@
 <style>
-/* Keep the Company dropdown visible and remove duplicate destinations. */
+/* Keep the Company dropdown visible on desktop and remove duplicate items. */
 @media (min-width:721px){
     .public-header-nav,
     .public-menu{overflow:visible!important;}
@@ -17,12 +17,17 @@
             function removeDuplicateLinks(){
                 var panel = dropdown.querySelector('.public-menu-dropdown-panel');
                 if(!panel) return;
-                var seen = Object.create(null);
+                var seenHref = Object.create(null);
+                var seenLabel = Object.create(null);
                 panel.querySelectorAll('a').forEach(function(link){
                     var href = (link.getAttribute('href') || '').replace(/\/$/, '');
-                    if(!href) return;
-                    if(seen[href]) link.remove();
-                    else seen[href] = true;
+                    var label = (link.textContent || '').trim().replace(/\s+/g, ' ').toLowerCase();
+                    if((href && seenHref[href]) || (label && seenLabel[label])){
+                        link.remove();
+                        return;
+                    }
+                    if(href) seenHref[href] = true;
+                    if(label) seenLabel[label] = true;
                 });
             }
 
