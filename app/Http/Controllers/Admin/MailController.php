@@ -168,6 +168,28 @@ class MailController extends Controller
         return redirect()->route('admin.mail',['account'=>$emailAccount->id,'folder'=>'Sent'])->with('status','Message sent successfully.');
     }
 
+    public function attachment(Request $request, EmailAccount $emailAccount, int $uid, string $part, WebmailService $webmail)
+    {
+        $this->authorizeAccount($request,$emailAccount);
+        $folder=(string)$request->query('folder','INBOX');
+        $data=$webmail->attachment($emailAccount->address,$emailAccount->password,$uid,$part,$this->mailConfig($emailAccount),$folder);
+        return response($data['content'],200,['Content-Type'=>$data['type'],'Content-Disposition'=>'attachment; filename="'.addcslashes($data['name'],'"').'"']);
+    }
+
+    public function delete(Request $request, EmailAccount $emailAccount, int $uid, WebmailService $webmail): RedirectResponse
+    {
+        $this->authorizeAccount($request,$emailAccount); $folder=(string)$request->input('folder','INBOX');
+        try{$webmail->delete($emailAccount->address,$emailAccount->password,$uid,$folder,$this->mailConfig($emailAccount));return redirect()->route('admin.mail',['account'=>$emailAccount->id,'folder'=>$folder])->with('status','Message moved to Trash.');}
+        catch(Throwable $e){report($e);return back()->withErrors(['mail'=>'The message could not be deleted.']);}
+    }
+
+    public function toggleRead(Request $request, EmailAccount $emailAccount, int $uid, WebmailService $webmail): RedirectResponse
+    {
+        $this->authorizeAccount($request,$emailAccount); $folder=(string)$request->input('folder','INBOX'); $seen=$request->boolean('seen');
+        try{$webmail->setSeen($emailAccount->address,$emailAccount->password,$uid,$seen,$this->mailConfig($emailAccount),$folder);}catch(Throwable $e){report($e);}
+        return back();
+    }
+
     private function accounts(Request $request)
     {
         return EmailAccount::query()
