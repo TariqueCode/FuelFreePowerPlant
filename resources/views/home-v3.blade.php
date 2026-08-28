@@ -25,18 +25,19 @@
 @media(max-width:400px){.news{grid-template-columns:100px 22px minmax(0,1fr);height:100px;min-height:100px}.news-media,.news-media img{width:100px;height:100px;min-width:100px;min-height:100px}.news-body{height:100px;min-height:100px;padding:9px 11px}.news h3{font-size:13px}.news-kind{font-size:6px}.shell{width:calc(100% - 22px)}}
 
 .home-slider{position:relative;width:100%;margin:28px 0 0;overflow:hidden;border:1px solid rgba(83,218,240,.2);border-radius:26px;background:#061923;box-shadow:0 30px 80px rgba(0,0,0,.28)}
-.slider-track{position:relative;aspect-ratio:2.35/1;min-height:300px}
-.slide{position:absolute;inset:0;display:block;opacity:0;visibility:hidden;transform:scale(1.018);transition:opacity .8s ease,transform 6s ease,visibility .8s}
+.slider-track{position:relative;width:100%;height:calc(min(100vw - 32px,1280px) / 2.35 + 48px);min-height:0}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;visibility:hidden;transform:scale(1.008);transition:opacity .8s ease,transform 6s ease,visibility .8s}
 .slide.is-active{opacity:1;visibility:visible;transform:scale(1)}
+.slide-media{position:relative;width:100%;height:calc(min(100vw - 32px,1280px) / 2.35);min-height:0;overflow:hidden;background:#061923}
 .slide img{width:100%;height:100%;display:block;object-fit:cover}
-.slide-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(2,10,16,.68),rgba(2,10,16,.12) 58%,rgba(2,10,16,.32))}
-.slide-caption{position:absolute;left:clamp(22px,4vw,58px);bottom:clamp(22px,4vw,52px);max-width:min(520px,70%);display:grid;gap:6px}
-.slide-caption span{color:var(--cyan);font-size:10px;letter-spacing:.18em;text-transform:uppercase}
-.slide-caption strong{font-size:clamp(22px,3.1vw,42px);line-height:1.08;letter-spacing:-.035em;text-shadow:0 2px 20px rgba(0,0,0,.32)}
-.slider-dots{position:absolute;right:24px;bottom:22px;display:flex;gap:7px;z-index:3}
+.slide-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(2,10,16,.24),rgba(2,10,16,.04) 58%,rgba(2,10,16,.16))}
+.slide-caption{position:relative;left:auto;bottom:auto;max-width:none;display:block;min-height:48px;padding:9px 16px 10px;background:linear-gradient(180deg,rgba(7,27,38,.98),rgba(3,18,26,.98));border-top:1px solid rgba(83,218,240,.12);overflow:hidden}
+.slide-caption span{display:block;color:#6f9ca7;font-size:7px;line-height:1.2;letter-spacing:.16em;text-transform:uppercase;margin-bottom:3px}
+.slide-caption strong{display:block;color:var(--text);font-size:13px;line-height:1.3;letter-spacing:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:none}
+.slider-dots{position:absolute;right:24px;bottom:62px;display:flex;gap:7px;z-index:3}
 .slider-dots button{width:7px;height:7px;padding:0;border:0;border-radius:50%;background:rgba(239,252,255,.45);cursor:pointer;transition:width .2s,background .2s}
 .slider-dots button.is-active{width:24px;border-radius:999px;background:var(--cyan)}
-.slider-arrow{position:absolute;top:50%;z-index:4;width:42px;height:42px;border:1px solid rgba(239,252,255,.2);border-radius:50%;display:grid;place-items:center;background:rgba(2,10,16,.34);color:#effcff;cursor:pointer;opacity:0;transform:translateY(-50%);transition:opacity .2s,background .2s,border-color .2s}.home-slider:hover .slider-arrow,.home-slider:focus-within .slider-arrow{opacity:1}.slider-arrow:hover{background:rgba(72,216,241,.16);border-color:rgba(72,216,241,.5)}.slider-arrow.prev{left:18px}.slider-arrow.next{right:18px}.slider-progress{position:absolute;left:0;bottom:0;width:100%;height:3px;background:rgba(239,252,255,.1);z-index:4}.slider-progress span{display:block;height:100%;width:0;background:var(--cyan);transform-origin:left center}
+.slider-arrow{position:absolute;top:calc((min(100vw - 32px,1280px) / 2.35) / 2);z-index:4;width:42px;height:42px;border:1px solid rgba(239,252,255,.2);border-radius:50%;display:grid;place-items:center;background:rgba(2,10,16,.34);color:#effcff;cursor:pointer;opacity:0;transform:translateY(-50%);transition:opacity .2s,background .2s,border-color .2s}.home-slider:hover .slider-arrow,.home-slider:focus-within .slider-arrow{opacity:1}.slider-arrow:hover{background:rgba(72,216,241,.16);border-color:rgba(72,216,241,.5)}.slider-arrow.prev{left:18px}.slider-arrow.next{right:18px}.slider-progress{position:absolute;left:0;bottom:48px;width:100%;height:3px;background:rgba(239,252,255,.1);z-index:4}.slider-progress span{display:block;height:100%;width:0;background:var(--cyan);transform-origin:left center}
 
 .welcome{padding:78px 0 82px;text-align:left}
 .welcome-heading{max-width:100%;padding-bottom:30px;border-bottom:1px solid var(--line)}
@@ -60,7 +61,8 @@
 
 @media(max-width:1099px) and (min-width:651px){
 .home-slider{margin-top:22px;border-radius:20px}
-.slider-track{aspect-ratio:2.2/1;min-height:260px}
+.slider-track{height:calc(min(100vw - 32px,1280px) / 2.35 + 46px);min-height:0}
+.slide-media{height:calc(min(100vw - 32px,1280px) / 2.35)}
 .welcome{padding:62px 0 68px}
 .welcome-heading{padding-bottom:24px}
 .welcome h1{max-width:900px}
@@ -70,12 +72,13 @@
 
 @media(max-width:650px){
 .slider-arrow{display:none}.home-slider{margin:8px 0 0;border-radius:18px}
-.slider-track{aspect-ratio:16/9;min-height:0}
-.slide-shade{background:linear-gradient(90deg,rgba(2,10,16,.5),rgba(2,10,16,.08) 70%,rgba(2,10,16,.22))}
-.slide-caption{left:18px;bottom:18px;max-width:78%;gap:4px}
-.slide-caption span{font-size:8px}
-.slide-caption strong{font-size:18px}
-.slider-dots{right:16px;bottom:16px;gap:6px}
+.slider-track{height:calc((100vw - 22px) / 2.35 + 43px)}
+.slide-media{height:calc((100vw - 22px) / 2.35)}
+.slide-shade{background:linear-gradient(90deg,rgba(2,10,16,.16),rgba(2,10,16,.03) 70%,rgba(2,10,16,.12))}
+.slide-caption{min-height:43px;padding:7px 12px 8px}
+.slide-caption span{font-size:6px;margin-bottom:2px}
+.slide-caption strong{font-size:11px;line-height:1.3}
+.slider-dots{right:16px;bottom:55px;gap:6px}
 .slider-dots button{width:6px;height:6px}
 .slider-dots button.is-active{width:18px}
 .welcome{padding:52px 0 48px}
@@ -88,7 +91,10 @@
 }
 
 @media(max-width:400px){
-.slider-track{aspect-ratio:16/9}
+.slider-track{height:calc((100vw - 22px) / 2.35 + 42px)}
+.slide-media{height:calc((100vw - 22px) / 2.35)}
+.slide-caption{min-height:42px;padding:7px 10px}
+.slide-caption strong{font-size:10px}
 .welcome{padding-top:46px}
 .welcome-copy p{font-size:14px!important;line-height:1.75}
 }
@@ -101,8 +107,10 @@
             @foreach($sliders as $index => $slider)
                 @php $sliderUrl=$slider->link_url; @endphp
                 @if($sliderUrl)<a class="slide {{ $index===0?'is-active':'' }}" href="{{ $sliderUrl }}" @if(str_starts_with($sliderUrl,'http')) target="_blank" rel="noopener" @endif>@else<div class="slide {{ $index===0?'is-active':'' }}">@endif
-                    <img src="{{ asset('storage/'.ltrim($slider->image_path,'/')) }}" alt="{{ $slider->title ?: $siteName }}" @if($index>0)loading="lazy"@endif>
-                    <div class="slide-shade"></div>
+                    <div class="slide-media">
+                        <img src="{{ asset('storage/'.ltrim($slider->image_path,'/')) }}" alt="{{ $slider->title ?: $siteName }}" @if($index>0)loading="lazy"@endif>
+                        <div class="slide-shade"></div>
+                    </div>
                     @if($slider->title)<div class="slide-caption"><span>{{ $siteName }}</span><strong>{{ $slider->title }}</strong></div>@endif
                 @if($sliderUrl)</a>@else</div>@endif
             @endforeach
