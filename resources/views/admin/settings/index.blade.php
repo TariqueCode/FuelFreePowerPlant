@@ -138,6 +138,49 @@
     </div>
 </div>
 
+<div class="form-card chrome-card">
+    <div class="section-heading">
+        <div><div class="eyebrow">SITE CHROME</div><h2>Header &amp; Footer</h2><p>Edit the visible Header and Footer text, contact details and links from one place. Company name and logo are controlled above, while social links remain managed from Social Media.</p></div>
+        <i class="fa-solid fa-window-maximize"></i>
+    </div>
+    <div class="chrome-section">
+        <div class="chrome-section-title"><i class="fa-solid fa-bars"></i><span>Header navigation</span></div>
+        <div class="fields">
+            <div><label>Home label</label><input name="header[home_label]" value="{{ old('header.home_label',$settings['header.home_label']) }}" required maxlength="100"></div>
+            <div><label>Management label</label><input name="header[management_label]" value="{{ old('header.management_label',$settings['header.management_label']) }}" required maxlength="100"></div>
+            <div><label>Gallery label</label><input name="header[gallery_label]" value="{{ old('header.gallery_label',$settings['header.gallery_label']) }}" required maxlength="100"></div>
+            <div><label>News &amp; Notices label</label><input name="header[news_label]" value="{{ old('header.news_label',$settings['header.news_label']) }}" required maxlength="100"></div>
+            <div><label>Career label</label><input name="header[career_label]" value="{{ old('header.career_label',$settings['header.career_label']) }}" required maxlength="100"></div>
+            <div><label>Contact label</label><input name="header[contact_label]" value="{{ old('header.contact_label',$settings['header.contact_label']) }}" required maxlength="100"></div>
+            <div><label>Webmail label</label><input name="header[webmail_label]" value="{{ old('header.webmail_label',$settings['header.webmail_label']) }}" required maxlength="100"></div>
+            <div><label>Portal label</label><input name="header[portal_label]" value="{{ old('header.portal_label',$settings['header.portal_label']) }}" required maxlength="100"></div>
+            <div><label>Login label</label><input name="header[login_label]" value="{{ old('header.login_label',$settings['header.login_label']) }}" required maxlength="100"></div>
+        </div>
+        <div class="chrome-note"><i class="fa-solid fa-circle-info"></i><span>Company/CMS page names remain editable from their existing management screens, keeping the Header connected to your content.</span></div>
+    </div>
+    <div class="chrome-section">
+        <div class="chrome-section-title"><i class="fa-solid fa-layer-group"></i><span>Footer content</span></div>
+        <div class="fields">
+            <div class="full"><label>Tagline</label><input name="footer[tagline]" value="{{ old('footer.tagline',$settings['footer.tagline']) }}" maxlength="255"></div>
+            <div class="full"><label>Technology line</label><input name="footer[technology]" value="{{ old('footer.technology',$settings['footer.technology']) }}" maxlength="255"></div>
+            <div><label>Office heading</label><input name="footer[office_heading]" value="{{ old('footer.office_heading',$settings['footer.office_heading']) }}" required maxlength="100"></div>
+            <div><label>Contact heading</label><input name="footer[contact_heading]" value="{{ old('footer.contact_heading',$settings['footer.contact_heading']) }}" required maxlength="100"></div>
+            <div class="full"><label>Office address</label><textarea name="footer[address]" rows="3" maxlength="500" required>{{ old('footer.address',$settings['footer.address']) }}</textarea></div>
+            <div><label>Email</label><input type="email" name="footer[email]" value="{{ old('footer.email',$settings['footer.email']) }}" required maxlength="255"></div>
+            <div><label>Phone</label><input name="footer[phone]" value="{{ old('footer.phone',$settings['footer.phone']) }}" required maxlength="50"></div>
+            <div><label>Website text</label><input name="footer[website]" value="{{ old('footer.website',$settings['footer.website']) }}" required maxlength="255"></div>
+            <div><label>Website URL</label><input type="url" name="footer[website_url]" value="{{ old('footer.website_url',$settings['footer.website_url']) }}" required maxlength="255"></div>
+            <div><label>Get in touch label</label><input name="footer[get_in_touch_label]" value="{{ old('footer.get_in_touch_label',$settings['footer.get_in_touch_label']) }}" required maxlength="100"></div>
+            <div><label>Get in touch URL</label><input name="footer[get_in_touch_url]" value="{{ old('footer.get_in_touch_url',$settings['footer.get_in_touch_url']) }}" required maxlength="255"></div>
+            <div><label>Copyright text</label><input name="footer[copyright_text]" value="{{ old('footer.copyright_text',$settings['footer.copyright_text']) }}" required maxlength="150"></div>
+            <div><label>Developer prefix</label><input name="footer[developer_prefix]" value="{{ old('footer.developer_prefix',$settings['footer.developer_prefix']) }}" maxlength="50"></div>
+            <div><label>Developer name</label><input name="footer[developer_name]" value="{{ old('footer.developer_name',$settings['footer.developer_name']) }}" maxlength="100"></div>
+            <div><label>Developer email</label><input type="email" name="footer[developer_email]" value="{{ old('footer.developer_email',$settings['footer.developer_email']) }}" maxlength="255"></div>
+        </div>
+        <div class="chrome-note"><i class="fa-solid fa-share-nodes"></i><span>Social icons and destinations continue to use the Social Media manager as the single source of truth.</span></div>
+    </div>
+</div>
+
 <div class="actions"><button type="submit"><i class="fa-solid fa-floppy-disk"></i> Save all settings</button></div>
 </form>
 @endsection
@@ -145,6 +188,12 @@
 @push('styles')
 <style>
 .settings-stack{max-width:980px;display:grid;gap:18px}
+.chrome-section{padding-top:18px;margin-top:18px;border-top:1px solid rgba(76,205,233,.09)}
+.chrome-section:first-of-type{padding-top:0;margin-top:0;border-top:0}
+.chrome-section-title{display:flex;align-items:center;gap:9px;margin-bottom:14px;color:#dff5f8;font-size:12px;font-weight:800}
+.chrome-section-title i{color:#51cfe9}
+.chrome-note{display:flex;gap:9px;align-items:flex-start;margin-top:14px;padding:11px 12px;border-radius:11px;background:rgba(72,216,241,.035);border:1px solid rgba(72,216,241,.08);color:#718f9a;font-size:8px;line-height:1.55}
+.chrome-note i{color:#58cfe9;margin-top:1px}
 .mail-routing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .mail-route{padding:15px;border:1px solid rgba(76,205,233,.11);border-radius:15px;background:rgba(76,205,233,.025)}
 .mail-route label{font-size:11px;color:#a9c2ca;font-weight:700}
@@ -170,7 +219,9 @@
 .fields{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .full{grid-column:1/-1}
 label{display:block;font-size:10px;color:#9eb9c4;margin:0 0 7px}
-input:not([type=checkbox]){width:100%;box-sizing:border-box;padding:13px;border-radius:11px;border:1px solid var(--line);background:#071c29;color:#e9f7fb;outline:none}
+input:not([type=checkbox]),textarea{width:100%;box-sizing:border-box;padding:13px;border-radius:11px;border:1px solid var(--line);background:#071c29;color:#e9f7fb;outline:none;font:inherit}
+textarea{resize:vertical;min-height:84px}
+input:not([type=checkbox]):focus,textarea:focus{border-color:rgba(81,216,240,.35);box-shadow:0 0 0 3px rgba(81,216,240,.06)}
 .home-options{display:grid;gap:10px}
 .home-option{border:1px solid rgba(76,205,233,.11);border-radius:16px;background:rgba(76,205,233,.025);overflow:hidden}
 .option-main{display:grid;grid-template-columns:44px minmax(0,1fr) 46px;align-items:center;gap:12px;padding:13px 14px;margin:0;cursor:pointer}

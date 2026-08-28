@@ -1,5 +1,6 @@
 @php
     $publicBrand = $brand ?? [];
+    $headerLabels = config('fuelfree.header', []);
     $publicName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
     $publicLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
     $publicNavPages = \App\Models\SiteContentItem::query()->where('type','company')->where('status','published')->where('show_in_navigation',true)->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')->orderBy('navigation_order')->orderByDesc('created_at')->get(['title','slug']);
@@ -52,9 +53,9 @@ body{font-size:16px!important}main p,main li,main td,main th,main label,main .bo
                     <span class="public-header-divider" aria-hidden="true"></span>
                 @endif
                 @if($isPortalUser)
-                    <a class="public-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-circle-user" aria-hidden="true"></i><span>Portal</span></a>
+                    <a class="public-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-circle-user" aria-hidden="true"></i><span>{{ $headerLabels['portal_label'] ?? 'Portal' }}</span></a>
                 @else
-                    <a class="public-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i><span>Login</span></a>
+                    <a class="public-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i><span>{{ $headerLabels['login_label'] ?? 'Login' }}</span></a>
                 @endif
             </div>
             <button class="public-menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="public-navigation">
@@ -63,14 +64,14 @@ body{font-size:16px!important}main p,main li,main td,main th,main label,main .bo
         </div>
         <div id="public-navigation" class="public-header-nav">
             <nav class="public-menu" aria-label="Primary navigation">
-                <a href="{{ route('home') }}" @if(request()->routeIs('home')) aria-current="page" @endif>Home</a>
+                <a href="{{ route('home') }}" @if(request()->routeIs('home')) aria-current="page" @endif>{{ $headerLabels['home_label'] ?? 'Home' }}</a>
                 @foreach($publicNavPages as $navPage)<a href="{{ route('company.page',$navPage->slug) }}" @if(request()->is('company/'.$navPage->slug)) aria-current="page" @endif>{{ $navPage->title }}</a>@endforeach
-                <a href="{{ route('management') }}" @if(request()->routeIs('management')) aria-current="page" @endif>Management Team</a>
-                <a href="{{ route('site.gallery') }}" @if(request()->routeIs('site.gallery') || request()->routeIs('gallery.show')) aria-current="page" @endif>Gallery</a>
-                <a href="{{ route('news.index') }}" @if(request()->routeIs('news.*')) aria-current="page" @endif>News &amp; Notices</a>
-                <a href="{{ route('site.career') }}" @if(request()->routeIs('site.career')) aria-current="page" @endif>Career</a>
-                <a href="{{ route('contact') }}" @if(request()->routeIs('contact*')) aria-current="page" @endif>Contact</a>
-                <a href="{{ route('webmail.redirect') }}">Webmail</a>
+                <a href="{{ route('management') }}" @if(request()->routeIs('management')) aria-current="page" @endif>{{ $headerLabels['management_label'] ?? 'Management Team' }}</a>
+                <a href="{{ route('site.gallery') }}" @if(request()->routeIs('site.gallery') || request()->routeIs('gallery.show')) aria-current="page" @endif>{{ $headerLabels['gallery_label'] ?? 'Gallery' }}</a>
+                <a href="{{ route('news.index') }}" @if(request()->routeIs('news.*')) aria-current="page" @endif>{{ $headerLabels['news_label'] ?? 'News &amp; Notices' }}</a>
+                <a href="{{ route('site.career') }}" @if(request()->routeIs('site.career')) aria-current="page" @endif>{{ $headerLabels['career_label'] ?? 'Career' }}</a>
+                <a href="{{ route('contact') }}" @if(request()->routeIs('contact*')) aria-current="page" @endif>{{ $headerLabels['contact_label'] ?? 'Contact' }}</a>
+                <a href="{{ route('webmail.redirect') }}">{{ $headerLabels['webmail_label'] ?? 'Webmail' }}</a>
                 <span class="mobile-portal-separator" aria-hidden="true"></span>
                 <a class="mobile-menu-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid {{ $isPortalUser ? 'fa-circle-user' : 'fa-right-to-bracket' }}" aria-hidden="true"></i>

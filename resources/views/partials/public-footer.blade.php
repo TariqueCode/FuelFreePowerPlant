@@ -1,7 +1,8 @@
 @php
     $publicBrand = $brand ?? [];
+    $footerSettings = config('fuelfree.footer', []);
     $publicFooterName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
-    $publicFooterTagline = is_object($publicBrand) ? ($publicBrand->get('tagline') ?: $publicBrand->get('company.tagline') ?: config('fuelfree.company.tagline')) : ($publicBrand['tagline'] ?? $publicBrand['company.tagline'] ?? config('fuelfree.company.tagline'));
+    $publicFooterTagline = $footerSettings['tagline'] ?? (is_object($publicBrand) ? ($publicBrand->get('tagline') ?: $publicBrand->get('company.tagline') ?: config('fuelfree.company.tagline')) : ($publicBrand['tagline'] ?? $publicBrand['company.tagline'] ?? config('fuelfree.company.tagline')));
     $publicFooterLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
 @endphp
 @php
@@ -75,7 +76,7 @@
                 @if($publicFooterTagline)
                     <div class="public-footer-tagline">{{ $publicFooterTagline }}</div>
                 @endif
-                <div class="public-footer-tech">Fuel-Free Flywheel-Based Clean Energy Technology</div>
+                <div class="public-footer-tech">{{ $footerSettings['technology'] ?? 'Fuel-Free Flywheel-Based Clean Energy Technology' }}</div>
                 @if(!empty($publicSocials))
                     <div class="public-footer-social-wrap" aria-label="Social media">
                         @foreach($publicSocials as $social)
@@ -88,27 +89,27 @@
             </section>
 
             <section class="public-footer-section">
-                <h2 class="public-footer-heading">Office</h2>
+                <h2 class="public-footer-heading">{{ $footerSettings['office_heading'] ?? 'Office' }}</h2>
                 <div class="public-footer-address">
                     <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                    <span>House-141, 3rd Floor, Road-22,<br>Mohakhali DOHS, Dhaka-1206,<br>Bangladesh</span>
+                    <span>{!! nl2br(e($footerSettings['address'] ?? 'House-141, 3rd Floor, Road-22, Mohakhali DOHS, Dhaka-1206, Bangladesh')) !!}</span>
                 </div>
             </section>
 
             <section class="public-footer-section">
-                <h2 class="public-footer-heading">Contact</h2>
+                <h2 class="public-footer-heading">{{ $footerSettings['contact_heading'] ?? 'Contact' }}</h2>
                 <div class="public-footer-contact">
-                    <a href="mailto:info@fuelfreepowerplant.com"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>info@fuelfreepowerplant.com</span></a>
-                    <a href="tel:+8801712251892"><i class="fa-solid fa-phone" aria-hidden="true"></i><span>+880 1712-251892</span></a>
-                    <a href="https://www.fuelfreepowerplant.com"><i class="fa-solid fa-globe" aria-hidden="true"></i><span>www.fuelfreepowerplant.com</span></a>
-                    <a href="{{ route('contact') }}"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i><span>Get in touch</span></a>
+                    <a href="mailto:{{ $footerSettings['email'] ?? 'info@fuelfreepowerplant.com' }}"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>{{ $footerSettings['email'] ?? 'info@fuelfreepowerplant.com' }}</span></a>
+                    <a href="tel:{{ preg_replace('/[^0-9+]/', '', $footerSettings['phone'] ?? '+880 1712-251892') }}"><i class="fa-solid fa-phone" aria-hidden="true"></i><span>{{ $footerSettings['phone'] ?? '+880 1712-251892' }}</span></a>
+                    <a href="{{ $footerSettings['website_url'] ?? 'https://www.fuelfreepowerplant.com' }}"><i class="fa-solid fa-globe" aria-hidden="true"></i><span>{{ $footerSettings['website'] ?? 'www.fuelfreepowerplant.com' }}</span></a>
+                    <a href="{{ $footerSettings['get_in_touch_url'] ?? route('contact') }}"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i><span>{{ $footerSettings['get_in_touch_label'] ?? 'Get in touch' }}</span></a>
                 </div>
             </section>
         </div>
 
         <div class="public-footer-bottom">
-            <div>© {{ date('Y') }} {{ $publicFooterName }} · All rights reserved.</div>
-            <div class="public-footer-developer">Developed by <a href="mailto:TariqueBN@gmail.com" aria-label="Email developer Saif Al-Islam">Saif Al-Islam</a></div>
+            <div>© {{ date('Y') }} {{ $publicFooterName }} · {{ $footerSettings['copyright_text'] ?? 'All rights reserved.' }}</div>
+            <div class="public-footer-developer">{{ $footerSettings['developer_prefix'] ?? 'Developed by' }} <a href="mailto:{{ $footerSettings['developer_email'] ?? 'TariqueBN@gmail.com' }}" aria-label="Email developer {{ $footerSettings['developer_name'] ?? 'Saif Al-Islam' }}">{{ $footerSettings['developer_name'] ?? 'Saif Al-Islam' }}</a></div>
         </div>
     </div>
 </footer>

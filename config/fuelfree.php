@@ -8,6 +8,36 @@ return [
         'timezone' => env('COMPANY_TIMEZONE', 'Asia/Dhaka'),
     ],
 
+    'header' => [
+        'home_label' => 'Home',
+        'management_label' => 'Management Team',
+        'gallery_label' => 'Gallery',
+        'news_label' => 'News & Notices',
+        'career_label' => 'Career',
+        'contact_label' => 'Contact',
+        'webmail_label' => 'Webmail',
+        'portal_label' => 'Portal',
+        'login_label' => 'Login',
+    ],
+
+    'footer' => [
+        'tagline' => 'Powering a cleaner, smarter future.',
+        'technology' => 'Fuel-Free Flywheel-Based Clean Energy Technology',
+        'office_heading' => 'Office',
+        'address' => 'House-141, 3rd Floor, Road-22, Mohakhali DOHS, Dhaka-1206, Bangladesh',
+        'contact_heading' => 'Contact',
+        'email' => 'info@fuelfreepowerplant.com',
+        'phone' => '+880 1712-251892',
+        'website' => 'www.fuelfreepowerplant.com',
+        'website_url' => 'https://www.fuelfreepowerplant.com',
+        'get_in_touch_label' => 'Get in touch',
+        'get_in_touch_url' => '/contact',
+        'copyright_text' => 'All rights reserved.',
+        'developer_prefix' => 'Developed by',
+        'developer_name' => 'Saif Al-Islam',
+        'developer_email' => 'TariqueBN@gmail.com',
+    ],
+
     'dashboard' => [
         'default_route' => env('DASHBOARD_ROUTE', 'dashboard'),
     ],
