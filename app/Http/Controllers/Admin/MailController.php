@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\EmailAccount;
+use App\Models\Inquiry;
+use App\Models\CareerApplication;
 use App\Services\WebmailService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -35,7 +37,10 @@ class MailController extends Controller
             }
         }
 
-        return view('admin.mail.index', compact('accounts', 'selected', 'folders', 'folder', 'messages', 'error'));
+        $inquiries = Inquiry::query()->latest()->limit(12)->get();
+        $applications = CareerApplication::query()->latest()->limit(12)->get();
+
+        return view('admin.mail.index', compact('accounts', 'selected', 'folders', 'folder', 'messages', 'error', 'inquiries', 'applications'));
     }
 
     public function storeAccount(Request $request, WebmailService $webmail): RedirectResponse
