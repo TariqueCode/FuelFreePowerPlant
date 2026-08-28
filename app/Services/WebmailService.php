@@ -97,7 +97,7 @@ class WebmailService
         ];
     }
 
-    public function send(string $email, string $password, string $to, string $subject, string $body, array $config = [], ?array $attachment = null, bool $saveSent = true): void
+    public function send(string $email, string $password, string $to, string $subject, string $body, array $config = [], ?array $attachment = null, bool $saveSent = false): void
     {
         $host = $config['smtp_host'] ?? config('cpanel.mail_host', 'mail.fuelfreepowerplant.com');
         $port = (int) ($config['smtp_port'] ?? 465);
@@ -175,17 +175,43 @@ class WebmailService
         return $connection;
     }
 
-    private function mailbox(array $config, string $folder, bool $allowInvalidCert = false): string
+    private function openConnection(string $email, string $password, array $config, string $folder, int $flags)
     {
-        return $this->serverPrefix($config, $allowInvalidCert).$folder;
+        $errors = [];
+        foreach ($this->mailboxCandidates($config, $folder) as $mailbox) {
+            $connection = @imap_open($mailbox, $email, $password, $flags, 1, ['DISABLE_AUTHENTICATOR' => 'GSSAPI']);
+            if ($connection) return $connection;
+            $errors[] = $this->imapError();
+        }
+
+        $message = trim((string) end($errors));
+        if ($message === '') $message = 'The email address or password is incorrect, or the IMAP server rejected the connection.';
+        throw new RuntimeException($message);
     }
 
-    private function serverPrefix(array $config, bool $allowInvalidCert = false): string
+    private function mailboxCandidates(array $config, string $folder): array
     {
         $host = $config['imap_host'] ?? config('cpanel.mail_host', 'mail.fuelfreepowerplant.com');
         $port = (int) ($config['imap_port'] ?? 993);
-        $flags = '/imap/ssl'.($allowInvalidCert ? '/novalidate-cert' : '');
-        return '{'.$host.':'.$port.$flags.'}';
+        if ($port === 993) {
+            return [
+                '{'.$host.':'.$port.'/imap/ssl}'.$folder,
+                '{'.$host.':'.$port.'/imap/ssl/novalidate-cert}'.$folder,
+            ];
+        }
+        return ['{'.$host.':'.$port.'/imap}'.$folder];
+    }
+
+    private function mailbox(array $config, string $folder): string
+    {
+        return $this->serverPrefix($config).$folder;
+    }
+
+    private function serverPrefix(array $config): string
+    {
+        $host = $config['imap_host'] ?? config('cpanel.mail_host', 'mail.fuelfreepowerplant.com');
+        $port = (int) ($config['imap_port'] ?? 993);
+        return $port === 993 ? '{'.$host.':'.$port.'/imap/ssl}' : '{'.$host.':'.$port.'/imap}';
     }
 
     private function findFolder(string $email, string $password, array $config, string $needle): ?string
