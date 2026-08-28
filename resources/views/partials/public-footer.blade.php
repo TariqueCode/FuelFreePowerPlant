@@ -39,9 +39,9 @@
     .public-footer-grid>section{display:flex;flex-direction:column;align-items:center}.public-footer-grid>section:first-child{grid-column:1/-1;padding-bottom:6px}.public-footer-grid>section:nth-child(2),.public-footer-grid>section:nth-child(3){width:100%}
     .public-footer-brand-row{justify-content:center}
     .public-footer-tech{max-width:290px}
-    .public-footer-address{justify-content:center;text-align:center}
+    .public-footer-address{justify-content:flex-start;text-align:left}
     .public-footer-contact{justify-items:center}
-    .public-footer-contact a{justify-content:center;text-align:center}
+    .public-footer-contact a{justify-content:flex-start;text-align:left}
     .public-footer-social-wrap{justify-content:center;margin-top:14px}
     .public-footer-bottom{flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}.public-footer-address{max-width:250px}
     .public-footer-developer{font-size:8px}
