@@ -69,6 +69,9 @@ Route::domain('mail.fuelfreepowerplant.com')->group(function () {
     Route::middleware('webmail.auth')->group(function () {
         Route::get('/inbox', [WebmailController::class,'inbox'])->name('webmail.host.inbox');
         Route::get('/message/{uid}', [WebmailController::class,'show'])->whereNumber('uid')->name('webmail.host.message');
+        Route::get('/message/{uid}/attachment/{part}', [WebmailController::class,'attachment'])->whereNumber('uid')->where('part','[0-9.]+')->name('webmail.host.attachment');
+        Route::post('/message/{uid}/delete', [WebmailController::class,'delete'])->whereNumber('uid')->name('webmail.host.delete');
+        Route::post('/message/{uid}/read', [WebmailController::class,'toggleRead'])->whereNumber('uid')->name('webmail.host.read');
         Route::get('/compose', [WebmailController::class,'compose'])->name('webmail.host.compose');
         Route::post('/send', [WebmailController::class,'send'])->middleware('throttle:30,1')->name('webmail.host.send');
         Route::post('/logout', [WebmailController::class,'logout'])->name('webmail.host.logout');
