@@ -173,10 +173,12 @@
             <div><label>Get in touch label</label><input name="footer[get_in_touch_label]" value="{{ old('footer.get_in_touch_label',$settings['footer.get_in_touch_label']) }}" required maxlength="100"></div>
             <div><label>Get in touch URL</label><input name="footer[get_in_touch_url]" value="{{ old('footer.get_in_touch_url',$settings['footer.get_in_touch_url']) }}" required maxlength="255"></div>
             <div><label>Copyright text</label><input name="footer[copyright_text]" value="{{ old('footer.copyright_text',$settings['footer.copyright_text']) }}" required maxlength="150"></div>
-            <div><label>Developer prefix</label><input name="footer[developer_prefix]" value="{{ old('footer.developer_prefix',$settings['footer.developer_prefix']) }}" maxlength="50"></div>
-            <div><label>Developer name</label><input name="footer[developer_name]" value="{{ old('footer.developer_name',$settings['footer.developer_name']) }}" maxlength="100"></div>
-            <div><label>Developer email</label><input type="email" name="footer[developer_email]" value="{{ old('footer.developer_email',$settings['footer.developer_email']) }}" maxlength="255"></div>
+            <div class="full locked-field">
+                <label>Developer signature</label>
+                <div class="locked-value"><i class="fa-solid fa-lock"></i><span>Developed by <strong>Saif Al-Islam</strong></span><small>Locked system signature — cannot be changed from Settings.</small></div>
+            </div>
         </div>
+        <div class="chrome-note"><i class="fa-solid fa-lock"></i><span>The developer signature is permanently locked by the system. Only the copyright text above can be edited.</span></div>
         <div class="chrome-note"><i class="fa-solid fa-share-nodes"></i><span>Social icons and destinations continue to use the Social Media manager as the single source of truth.</span></div>
     </div>
 </div>
@@ -244,6 +246,11 @@ input:not([type=checkbox]):focus,textarea:focus{border-color:rgba(81,216,240,.35
 .homepage-note{display:flex;gap:9px;align-items:flex-start;margin-top:14px;padding:12px 13px;border-radius:12px;background:rgba(72,216,241,.035);border:1px solid rgba(72,216,241,.08);color:#718f9a;font-size:8px;line-height:1.55}
 .homepage-note i{color:#58cfe9;margin-top:1px}
 .homepage-note strong{color:#9bc4ce}
+.locked-field{grid-column:1/-1}
+.locked-value{min-height:46px;box-sizing:border-box;padding:10px 13px;border-radius:11px;border:1px solid rgba(76,205,233,.08);background:rgba(255,255,255,.018);display:flex;align-items:center;gap:9px;color:#7899a5}
+.locked-value i{color:#587b86;font-size:12px}
+.locked-value strong{color:#9bbcc5;font-weight:700}
+.locked-value small{margin-left:auto;color:#526f79;font-size:8px}
 .actions{display:flex;justify-content:flex-end}
 .actions button{border:0;border-radius:12px;padding:13px 20px;background:#31afd2;color:#fff;font-weight:700;box-shadow:0 8px 24px rgba(49,175,210,.14)}
 @media(max-width:650px){
