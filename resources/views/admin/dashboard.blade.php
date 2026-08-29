@@ -1,4 +1,4 @@
-@extends('layouts.portal')
+@extends('layouts.admin')
 @section('title','Admin Dashboard')
 @section('content')
 <section class="overview-hero"><div><div class="eyebrow">ENERGY OPERATIONS CONTROL CENTER</div><h1>Powering the future, <span>{{ auth()->user()->name }}</span>.</h1><p>A focused overview of plants, verified performance and core operations.</p></div></section>
