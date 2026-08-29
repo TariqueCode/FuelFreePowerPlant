@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CareerApplication;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\View\View;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\RedirectResponse;
 
