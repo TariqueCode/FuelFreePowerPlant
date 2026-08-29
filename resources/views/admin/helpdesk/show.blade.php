@@ -51,7 +51,7 @@
                         @if($type === 'career' && $source->education)<div><span>Education</span><strong>{{ $source->education }}</strong></div>@endif
                         @if($type === 'career' && $source->experience)<div><span>Experience</span><strong>{{ $source->experience }}</strong></div>@endif
                     </div>
-                    @if($type === 'career' && $source->cv_path)<div class="cv-box"><div><i class="fa-solid fa-file-pdf"></i><span><strong>{{ $source->cv_original_name ?: 'Curriculum Vitae' }}</strong><small>Candidate attachment</small></span></div><a href="{{ route('admin.career-applications.cv',$source) }}">Download CV</a></div>@endif
+                    @if($type === 'career' && $source->cv_path)<div class="cv-box"><div><i class="fa-solid fa-file-pdf"></i><span><strong>{{ $source->cv_original_name ?: 'Curriculum Vitae' }}</strong><small>Candidate attachment</small></span></div><a href="{{ route('admin.helpdesk.career.cv',$source->id) }}">Download CV</a></div>@endif
                     <div class="message-label">Message</div>
                     <div class="plain-body">{{ $source->message ?: 'No message provided.' }}</div>
                 @endif
