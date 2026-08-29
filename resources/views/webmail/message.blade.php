@@ -1,13 +1,49 @@
 @extends('webmail.layout')
 @section('content')
-<div class="hero"><div><div class="eyebrow">FuelFree PowerPlant Webmail</div><h1 class="title">Message</h1></div><a class="btn" href="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/inbox?folder={{ urlencode($folder ?? 'INBOX') }}"><i class="fa-solid fa-arrow-left"></i> Inbox</a></div>
+@php($currentFolderLabel = collect($folders ?? [])->firstWhere('name',$folder ?? 'INBOX')['label'] ?? 'Inbox')
+<div class="hero">
+    <div class="hero-copy">
+        <div class="eyebrow">Mailbox</div>
+        <h1 class="title">Message</h1>
+    </div>
+    <a class="btn" href="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/inbox?folder={{ urlencode($folder ?? 'INBOX') }}"><i class="fa-solid fa-arrow-left"></i> {{ $currentFolderLabel }}</a>
+</div>
 <article class="card reader">
- <div class="reader-head"><h2>{{ $message['subject'] }}</h2><div class="meta"><strong>From:</strong> {{ $message['from'] }}<br><strong>To:</strong> {{ $message['to'] }}@if(!empty($message['cc']))<br><strong>Cc:</strong> {{ $message['cc'] }}@endif<br><strong>Date:</strong> {{ $message['date'] }}</div></div>
- <div class="reader-actions"><a class="btn primary" href="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/compose?reply={{ $message['uid'] }}&folder={{ urlencode($folder ?? 'INBOX') }}"><i class="fa-solid fa-reply"></i> Reply</a><a class="btn" href="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/compose?forward={{ $message['uid'] }}&folder={{ urlencode($folder ?? 'INBOX') }}"><i class="fa-solid fa-share"></i> Forward</a><form method="POST" action="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/message/{{ $message['uid'] }}/delete">@csrf<input type="hidden" name="folder" value="{{ $folder }}"><button class="btn danger" type="submit"><i class="fa-solid fa-trash"></i> Delete</button></form></div>
- @if(!empty($message['attachments']))
- <div class="attachments"><strong><i class="fa-solid fa-paperclip"></i> Attachments ({{ count($message['attachments']) }})</strong><div class="attachment-grid">@foreach($message['attachments'] as $attachment)<a class="attachment" href="{{ route('webmail.host.attachment',[$message['uid'],$attachment['part'],'folder'=>$folder]) }}"><i class="fa-solid fa-file"></i><span><b>{{ $attachment['name'] }}</b><small>{{ number_format(($attachment['size']??0)/1024,1) }} KB · {{ $attachment['type'] }}</small></span><i class="fa-solid fa-download"></i></a>@endforeach</div></div>
- @endif
- <div class="reader-body">{!! $message['body'] !!}</div>
+    <div class="reader-head">
+        <h2>{{ $message['subject'] }}</h2>
+        <div class="meta">
+            <strong>From:</strong> {{ $message['from'] }}<br>
+            <strong>To:</strong> {{ $message['to'] }}
+            @if(!empty($message['cc']))<br><strong>Cc:</strong> {{ $message['cc'] }}@endif
+            <br><strong>Date:</strong> {{ $message['date'] }}
+        </div>
+    </div>
+
+    <div class="reader-actions">
+        <a class="btn primary" href="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/compose?reply={{ $message['uid'] }}&folder={{ urlencode($folder ?? 'INBOX') }}"><i class="fa-solid fa-reply"></i> Reply</a>
+        <a class="btn" href="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/compose?forward={{ $message['uid'] }}&folder={{ urlencode($folder ?? 'INBOX') }}"><i class="fa-solid fa-share"></i> Forward</a>
+        <form method="POST" action="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/message/{{ $message['uid'] }}/delete">
+            @csrf
+            <input type="hidden" name="folder" value="{{ $folder }}">
+            <button class="btn danger" type="submit"><i class="fa-solid fa-trash"></i> Delete</button>
+        </form>
+    </div>
+
+    @if(!empty($message['attachments']))
+    <div class="attachments">
+        <strong><i class="fa-solid fa-paperclip"></i> Attachments ({{ count($message['attachments']) }})</strong>
+        <div class="attachment-grid">
+            @foreach($message['attachments'] as $attachment)
+            <a class="attachment" href="{{ route('webmail.host.attachment',[$message['uid'],$attachment['part'],'folder'=>$folder]) }}">
+                <i class="fa-solid fa-file"></i>
+                <span><b>{{ $attachment['name'] }}</b><small>{{ number_format(($attachment['size']??0)/1024,1) }} KB · {{ $attachment['type'] }}</small></span>
+                <i class="fa-solid fa-download"></i>
+            </a>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
+    <div class="reader-body">{!! $message['body'] !!}</div>
 </article>
-@push('styles')<style>.reader-actions{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}.reader-actions .btn{text-decoration:none}.btn.danger{color:#ffc4c8;border-color:rgba(255,100,110,.22)}.attachments{padding:13px 0;border-bottom:1px solid var(--line);margin-bottom:18px}.attachments>strong{font-size:13px}.attachment-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:10px}.attachment{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid var(--line);border-radius:11px;background:#041a23}.attachment>i:first-child{color:var(--accent);font-size:18px}.attachment span{min-width:0;flex:1}.attachment b,.attachment small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.attachment b{font-size:12px}.attachment small{font-size:10px;color:var(--muted);margin-top:3px}.attachment>i:last-child{color:var(--muted)}@media(max-width:650px){.reader-actions .btn,.reader-actions form{flex:1}.reader-actions form .btn{width:100%}}</style>@endpush
 @endsection
