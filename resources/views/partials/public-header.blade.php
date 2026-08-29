@@ -41,7 +41,7 @@
 }
 @media(min-width:721px){.mobile-menu-portal,.mobile-portal-separator{display:none!important}}
 .public-menu-toggle{display:none;width:42px;height:42px;border:1px solid rgba(86,210,238,.15);border-radius:11px;background:#06141d;color:#fff;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}.public-menu-toggle svg{width:19px;height:19px;display:block}
-@media(min-width:721px){.public-header-nav,.public-menu{overflow:visible!important;}} .public-header--static{position:relative}
+@media(min-width:721px){.public-header-nav,.public-menu{overflow:visible!important;}} .public-header--static{position:relative}@media(max-width:720px){.public-header-socials--desktop-only{display:none}.public-header--mobile-static{position:relative}.public-header-top{min-height:var(--public-header-mobile-height,56px)}.public-brand img,.public-brand-fallback{width:min(var(--public-header-logo-width,42px),var(--public-header-mobile-logo-width,34px));height:min(var(--public-header-logo-width,42px),var(--public-header-mobile-logo-width,34px));flex-basis:min(var(--public-header-logo-width,42px),var(--public-header-mobile-logo-width,34px))}.public-header-socials{display:none}}
 @media(min-width:1001px){.public-social-label{display:inline-block}.public-brand-name{font-size:16px}.public-menu{gap:4px}.public-menu a,.public-menu a:visited,.public-menu-dropdown-toggle{font-size:12px;padding-left:11px;padding-right:11px}}
 @media(max-width:1000px) and (min-width:721px){.public-shell{width:min(var(--public-header-container,1280px),calc(100% - 28px))}.public-header-top{gap:12px;min-height:58px}.public-brand-name{font-size:14px}.public-header-divider{height:36px;margin:0 5px}.public-portal{font-size:10px;padding:0 10px}.public-menu{justify-content:flex-start}.public-menu a,.public-menu a:visited,.public-menu-dropdown-toggle{font-size:11px;padding-left:11px;padding-right:11px}}
 @media(max-width:720px){.public-shell{width:calc(100% - 20px)}.public-header-top{min-height:58px;border-bottom:0}.public-header-nav{display:none;position:absolute;top:58px;left:12px;right:12px;height:auto;min-height:auto;padding:8px;background:rgba(4,18,26,.98);border:1px solid rgba(86,210,238,.15);border-radius:14px;box-shadow:0 20px 55px rgba(0,0,0,.3)}.public-header-nav.is-open{display:flex}.public-header-tools{display:flex;gap:3px}.public-socials{max-width:30vw;gap:1px}.public-social{width:28px;height:28px;border-radius:7px}.public-social i{font-size:11px}.public-header-divider{height:34px;margin:0 5px}.public-portal{min-height:30px;padding:0 8px;border-radius:8px;font-size:10px;gap:5px}.public-brand-name{font-size:14px}.public-brand img,.public-brand-fallback{width:min(var(--public-header-logo-width,42px),34px);height:min(var(--public-header-logo-width,42px),34px);flex-basis:min(var(--public-header-logo-width,42px),34px)}.public-menu-toggle{display:flex;width:38px;height:38px;border-radius:10px}.public-menu{flex-direction:column;align-items:stretch;justify-content:flex-start;overflow:visible;white-space:normal}.public-menu a,.public-menu a:visited{justify-content:flex-start;min-height:44px;padding:10px 13px;font-size:15px}}
@@ -119,8 +119,12 @@
     $headerLogoGap = max(0, min(24, (int) ($globalLayout['header.logo_gap'] ?? 9)));
     $headerSocialSize = max(12, min(28, (int) ($globalLayout['header.social_size'] ?? 13)));
     $headerSocialGap = max(0, min(16, (int) ($globalLayout['header.social_gap'] ?? 5)));
+    $headerMobileHeight = max(48, min(88, (int) ($globalLayout['header.mobile_height'] ?? 56)));
+    $headerMobileLogoWidth = max(24, min(48, (int) ($globalLayout['header.mobile_logo_width'] ?? 34)));
+    $headerMobileSocialVisible = ($globalLayout['header.mobile_social_visible'] ?? '0') === '1';
+    $headerMobileSticky = ($globalLayout['header.mobile_sticky'] ?? '1') === '1';
 @endphp
-<header class="public-header @if(!$headerSticky) public-header--static @endif" style="--public-header-height:{{ $headerHeight }}px;--public-header-container:{{ $headerContainer }}px;--public-header-nav-gap:{{ $headerNavGap }}px;--public-header-nav-justify:{{ $headerAlignment === 'left' ? 'flex-start' : ($headerAlignment === 'right' ? 'flex-end' : 'center') }};--public-header-logo-width:{{ $headerLogoWidth }}px;--public-header-logo-gap:{{ $headerLogoGap }}px;--public-header-social-size:{{ $headerSocialSize }}px;--public-header-social-gap:{{ $headerSocialGap }}px;">
+<header class="public-header @if(!$headerSticky) public-header--static @endif @if(!$headerMobileSticky) public-header--mobile-static @endif" style="--public-header-height:{{ $headerHeight }}px;--public-header-container:{{ $headerContainer }}px;--public-header-nav-gap:{{ $headerNavGap }}px;--public-header-nav-justify:{{ $headerAlignment === 'left' ? 'flex-start' : ($headerAlignment === 'right' ? 'flex-end' : 'center') }};--public-header-logo-width:{{ $headerLogoWidth }}px;--public-header-logo-gap:{{ $headerLogoGap }}px;--public-header-social-size:{{ $headerSocialSize }}px;--public-header-social-gap:{{ $headerSocialGap }}px;--public-header-mobile-height:{{ $headerMobileHeight }}px;--public-header-mobile-logo-width:{{ $headerMobileLogoWidth }}px;">
     <div class="public-shell">
         <div class="public-header-top">
             <a class="public-brand" href="{{ route('home') }}" aria-label="{{ $publicName }}">
@@ -129,7 +133,7 @@
             </a>
             <div class="public-header-tools">
                 @if(($globalLayout['header.social_visible'] ?? '1') === '1' && $publicSocials)
-                    <div class="public-header-socials" aria-label="Social media">
+                    <div class="public-header-socials @if(!$headerMobileSocialVisible) public-header-socials--desktop-only @endif" aria-label="Social media">
                         @foreach($publicSocials as $social)
                             <a class="public-header-social" style="--social-color:{{ $social['color'] }}" href="{{ $social['url'] }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $social['label'] }}" title="{{ $social['label'] }}">
                                 <i class="{{ $social['icon'] ?: 'fa-solid fa-link' }}" aria-hidden="true"></i>
