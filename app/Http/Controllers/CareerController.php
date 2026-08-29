@@ -69,11 +69,11 @@ class CareerController extends Controller
                 'filename' => basename($data['filename']),
                 'size' => (int) $data['size'],
                 'mime_type' => (string) $request->input('mime_type', 'application/octet-stream'),
-                'chunk_size' => 524288,
+                'chunk_size' => 262144,
                 'part_path' => $partPath,
             ], JSON_THROW_ON_ERROR));
 
-            return response()->json(['upload_id' => $uploadId, 'chunk_size' => 524288]);
+            return response()->json(['upload_id' => $uploadId, 'chunk_size' => 262144]);
         }
 
         $metaPath = "{$uploadsDir}/{$uploadId}.json";
