@@ -137,7 +137,7 @@
     </div>
   </div>
 <div id="editor" class="editor" contenteditable="true">{!! old('content',$item->content) !!}</div>
-<div class="editor-tools-footer"></span><span class="editor-counts" id="editor-counts">0 words • 0 characters</span></div>
+<div class="editor-tools-footer"><span class="editor-draft-state" id="editor-draft-state"><i class="fa-solid fa-cloud"></i><span>Local draft ready</span></span><span class="editor-counts" id="editor-counts">0 words • 0 characters</span></div>
 </div><textarea id="content-source" name="content" hidden></textarea><input id="media-input" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"><input id="gallery-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif"><input id="video-input" type="file" hidden accept="video/mp4,video/webm">@if($contentType==='gallery')<input id="gallery-batch-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">@endif</div>
 <div><label>{{ $contentType==='gallery' ? 'Event date &amp; time' : 'Publish date/time' }}</label><input type="datetime-local" name="published_at" value="{{ old('published_at',$item->published_at?->format('Y-m-d\\TH:i')) }}"></div>
 </div><div class="actions"><a class="back" href="{{ route('admin.site-content.index',['type'=>in_array($item->type,['news','announcement'],true)?'news':$item->type]) }}">Cancel</a><button class="save" type="submit"><i class="fa-solid fa-floppy-disk"></i> {{ $item->exists?'Save changes':'Create content' }}</button></div></form></div>
@@ -198,6 +198,8 @@
 .editor table{max-width:100%}
 .editor img,.editor video,.editor iframe{max-width:100%;height:auto;box-sizing:border-box}
 .editor-tools-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 12px;border-top:1px solid var(--line);background:#061923;color:#7899a5;font-size:9px}
+.editor-draft-state{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.editor-draft-state i{color:#43c2e5}
 .editor-counts{margin-left:auto;white-space:nowrap}
 @media(max-width:900px){
   .word-ribbon{top:0}
@@ -353,7 +355,7 @@ const editor=document.getElementById('editor'),source=document.getElementById('c
 let savedEditorRange=null;
 function saveEditorSelection(){const sel=window.getSelection();if(sel&&sel.rangeCount&&editor.contains(sel.anchorNode))savedEditorRange=sel.getRangeAt(0).cloneRange()}
 function restoreEditorSelection(){if(!savedEditorRange)return;try{const sel=window.getSelection();sel.removeAllRanges();sel.addRange(savedEditorRange)}catch(e){}}
-function sync(){if(source)source.value=editor.innerHTML;updateEditorMetrics()}
+function sync(){if(source)source.value=editor.innerHTML;updateEditorMetrics();saveLocalDraft()}
 function exec(cmd,value=null){restoreEditorSelection();editor.focus();document.execCommand(cmd,false,value);sync();setTimeout(updateEditorToolbarState,0)}document.querySelectorAll('.word-ribbon [data-cmd]').forEach(b=>b.addEventListener('click',()=>{exec(b.dataset.cmd,b.dataset.value||null);b.closest('.tool-dropdown')?.classList.remove('open');b.closest('.tool-dropdown')?.querySelector('.tool-dropdown-toggle')?.setAttribute('aria-expanded','false')}));document.querySelectorAll('.tool-dropdown-toggle').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const box=btn.closest('.tool-dropdown');document.querySelectorAll('.tool-dropdown.open').forEach(other=>{if(other!==box){other.classList.remove('open');other.querySelector('.tool-dropdown-toggle')?.setAttribute('aria-expanded','false')}});const open=box.classList.toggle('open');btn.setAttribute('aria-expanded',open?'true':'false')}));document.querySelectorAll('.tool-dropdown .tool-menu').forEach(menu=>menu.addEventListener('click',e=>e.stopPropagation()));document.addEventListener('click',()=>document.querySelectorAll('.tool-dropdown.open').forEach(box=>{box.classList.remove('open');box.querySelector('.tool-dropdown-toggle')?.setAttribute('aria-expanded','false')}));
 document.getElementById('insert-link').onclick=()=>{const url=prompt('URL');if(url)exec('createLink',url)};document.getElementById('insert-button').onclick=()=>{const text=prompt('Button text','Learn More');if(!text)return;const url=prompt('Button URL','/');if(!url)return;const style=prompt('Button style: primary or outline','primary')==='outline'?'cta-outline':'';exec('insertHTML',`<a class="content-cta ${style}" href="${safeAttr(url)}">${safeText(text)}</a> <span>&nbsp;</span>`)};
 document.getElementById('insert-columns').onclick=()=>{const count=Math.min(3,Math.max(2,parseInt(prompt('Number of columns (2 or 3)','2')||'2',10)));const cols=Array.from({length:count},(_,i)=>`<div class="content-column"><h3>Column ${i+1}</h3><p>Click here to edit this content.</p></div>`).join('');exec('insertHTML',`<div class="content-columns cols-${count}">${cols}</div><p></p>`)};
@@ -405,7 +407,31 @@ function updateEditorMetrics(){
   const words=text?text.split(/\\s+/).length:0,chars=text.length;
   const el=document.getElementById('editor-counts');if(el)el.textContent=words+' words • '+chars+' characters';
 }
+const DRAFT_KEY='fuelfree_admin_cms_draft_'+location.pathname;
+let draftTimer=null;
+function setDraftState(message,icon='fa-cloud'){const el=document.getElementById('editor-draft-state');if(el)el.innerHTML='<i class="fa-solid '+icon+'"></i><span>'+message+'</span>'}
+function saveLocalDraft(){
+  if(sourceMode)return;
+  clearTimeout(draftTimer);
+  draftTimer=setTimeout(()=>{
+    try{
+      localStorage.setItem(DRAFT_KEY,JSON.stringify({html:editor.innerHTML,updatedAt:Date.now()}));
+      setDraftState('Saved locally','fa-cloud-check');
+    }catch(e){setDraftState('Local draft unavailable','fa-triangle-exclamation')}
+  },350);
+}
+function restoreLocalDraft(){
+  try{
+    const raw=localStorage.getItem(DRAFT_KEY);if(!raw)return;
+    const d=JSON.parse(raw);if(!d?.html)return;
+    if(d.html===editor.innerHTML){localStorage.removeItem(DRAFT_KEY);return;}
+    const when=d.updatedAt?new Date(d.updatedAt).toLocaleString():'recently';
+    if(confirm('A local draft from '+when+' was found. Restore it?')){editor.innerHTML=d.html;sync();setDraftState('Draft restored','fa-clock-rotate-left')}
+  }catch(e){}
+}
+function clearLocalDraft(){try{localStorage.removeItem(DRAFT_KEY)}catch(e){}}
 form.addEventListener('submit',()=>{sync();setDraftState('Saving…','fa-floppy-disk')});
+window.addEventListener('beforeunload',()=>{saveLocalDraft();});
 editor.addEventListener('input',()=>{saveEditorSelection();sync();updateEditorToolbarState()});
 editor.addEventListener('keyup',()=>{saveEditorSelection();updateEditorToolbarState()});
 editor.addEventListener('mouseup',()=>{saveEditorSelection();updateEditorToolbarState()});
