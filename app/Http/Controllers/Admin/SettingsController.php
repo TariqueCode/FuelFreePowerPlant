@@ -138,6 +138,7 @@ class SettingsController
             $item->navigation_order = $row['navigation_order'] ?? null;
             $item->save();
         });
+        Cache::forget('public.company-navigation');
         return back()->with('status','Global navigation saved successfully.');
     }
 
