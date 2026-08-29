@@ -429,7 +429,7 @@ document.getElementById('highlight-color').addEventListener('input',e=>{restoreE
 document.getElementById('insert-image-url').onclick=()=>{const url=prompt('Image URL');if(url){restoreEditorSelection();editor.focus();document.execCommand('insertHTML',false,'<img src="'+safeAttr(url)+'" alt="Image" loading="lazy">');sync()}};
 document.getElementById('insert-video-url').onclick=()=>{const url=prompt('Video URL');if(url){restoreEditorSelection();editor.focus();document.execCommand('insertHTML',false,'<video controls preload="metadata" src="'+safeAttr(url)+'"></video>');sync()}};
 document.querySelectorAll('.word-ribbon [data-cmd]').forEach(b=>b.addEventListener('click',()=>{setTimeout(updateEditorToolbarState,0)}));
-updateEditorMetrics();updateEditorToolbarState();setTimeout(restoreLocalDraft,80);
+updateEditorMetrics();updateEditorToolbarState();
 
 
 
