@@ -326,6 +326,28 @@ html,body{overflow-x:hidden}
 }
 .editor-shell{position:relative!important;overflow:visible!important}
 @media(max-width:700px){.word-ribbon{top:0!important}}
+
+/* CMS editor: keep the ribbon visible while the editor is being scrolled. */
+.editor-shell.ff-ribbon-active{
+  --ff-ribbon-height:0px;
+}
+.editor-shell.ff-ribbon-active .word-ribbon{
+  position:fixed !important;
+  top:0 !important;
+  left:var(--ff-ribbon-left,0px) !important;
+  width:var(--ff-ribbon-width,100%) !important;
+  max-width:none !important;
+  margin:0 !important;
+  z-index:9999 !important;
+}
+.editor-shell.ff-ribbon-active .editor{
+  padding-top:calc(18px + var(--ff-ribbon-height,0px)) !important;
+}
+@media(max-width:700px){
+  .editor-shell.ff-ribbon-active .editor{
+    padding-top:calc(14px + var(--ff-ribbon-height,0px)) !important;
+  }
+}
 </style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
@@ -492,6 +514,46 @@ if(attachmentInput){document.getElementById('attachment-upload').onclick=()=>att
       },0);
     }
   });
+})();
+
+/* Keep the CMS ribbon pinned to the viewport while its editor is in view.
+   This avoids sticky being trapped by any parent scroll container in the portal layout. */
+(function(){
+  const shell=document.querySelector('.editor-shell');
+  const ribbon=shell?.querySelector('.word-ribbon');
+  if(!shell||!ribbon)return;
+
+  let ticking=false;
+  function updateRibbon(){
+    ticking=false;
+    const rect=shell.getBoundingClientRect();
+    const height=ribbon.getBoundingClientRect().height;
+    const active=rect.top<=0 && rect.bottom>height;
+
+    if(active){
+      const left=rect.left;
+      const width=rect.width;
+      shell.style.setProperty('--ff-ribbon-left',left+'px');
+      shell.style.setProperty('--ff-ribbon-width',width+'px');
+      shell.style.setProperty('--ff-ribbon-height',height+'px');
+      shell.classList.add('ff-ribbon-active');
+    }else{
+      shell.classList.remove('ff-ribbon-active');
+      shell.style.removeProperty('--ff-ribbon-left');
+      shell.style.removeProperty('--ff-ribbon-width');
+      shell.style.removeProperty('--ff-ribbon-height');
+    }
+  }
+
+  function requestUpdate(){
+    if(ticking)return;
+    ticking=true;
+    requestAnimationFrame(updateRibbon);
+  }
+
+  window.addEventListener('scroll',requestUpdate,{passive:true});
+  window.addEventListener('resize',requestUpdate,{passive:true});
+  requestUpdate();
 })();
 </script>@endpush
 
