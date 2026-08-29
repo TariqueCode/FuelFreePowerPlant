@@ -16,6 +16,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        view()->composer('layouts.public', function ($view) {
+            $view->with('globalLayout', app(\App\Services\GlobalLayoutService::class)->all());
+        });
         if (! Schema::hasTable('system_settings')) {
             return;
         }
