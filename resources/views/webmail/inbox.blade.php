@@ -16,15 +16,8 @@
         <span class="mail-count" id="mail-count">{{ count($messages) }} messages</span>
         <a class="btn icon" href="{{ url($base.'/inbox?folder='.urlencode($folder)) }}" title="Refresh" aria-label="Refresh"><i class="fa-solid fa-rotate"></i></a>
     </div>
-    <div class="folder-strip mobile-folder-strip" aria-label="Mailbox folders">
-        @foreach($folders as $mailFolder)
-            <a class="folder-chip {{ $mailFolder['name'] === $folder ? 'active' : '' }}" href="{{ url($base.'/inbox?folder='.urlencode($mailFolder['name'])) }}">
-                <i class="fa-solid {{ $mailFolder['icon'] ?? 'fa-folder' }}"></i><span>{{ $mailFolder['label'] }}</span>
-            </a>
-        @endforeach
-    </div>
     @forelse($messages as $message)
-        <a class="message-row {{ $message['seen'] ? '' : 'unread' }}" data-message-search="{{ strtolower($message['from'].' '.$message['subject'].' '.$message['date']) }}" href="{{ url($base.'/message/'.$message['uid'].'?folder='.urlencode($folder)) }}">
+        <a class="message-row {{ $message['seen'] ? '' : 'unread' }}" data-message-search="{{ strtolower($message['from'].' '.$message['subject'].' '.$message['date']) }}" data-message-uid="{{ $message['uid'] }}" href="{{ url($base.'/message/'.$message['uid'].'?folder='.urlencode($folder)) }}">
             <span><i class="fa-regular {{ $message['seen'] ? 'fa-envelope-open' : 'fa-envelope' }}"></i></span>
             <span class="from">{{ $message['from'] ?: 'Unknown sender' }}</span>
             <span class="subject">{{ $message['subject'] }}</span>
@@ -50,7 +43,25 @@
    if(count)count.textContent=visible+' '+(visible===1?'message':'messages');
    if(empty)empty.hidden=visible!==0||rows.length===0;
  }
+ function restoreOpened(){
+   rows.forEach(row=>{
+     const uid=row.dataset.messageUid;
+     if(!uid)return;
+     try{
+       if(sessionStorage.getItem('ff-webmail-opened:'+uid)==='1'){
+         row.classList.remove('unread');
+         const icon=row.querySelector('i.fa-envelope');
+         if(icon){icon.classList.remove('fa-envelope');icon.classList.add('fa-envelope-open');}
+       }
+     }catch(e){}
+   });
+ }
+ rows.forEach(row=>row.addEventListener('click',()=>{
+   try{sessionStorage.setItem('ff-webmail-opened:'+row.dataset.messageUid,'1');}catch(e){}
+ }));
+ restoreOpened();
  input.addEventListener('input',filter);
+ window.addEventListener('pageshow',event=>{if(event.persisted)window.location.reload();});
 })();
 </script>
 @endpush
