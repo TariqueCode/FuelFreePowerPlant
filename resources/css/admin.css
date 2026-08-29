@@ -23,6 +23,10 @@
   --admin-content-max:1500px;
   --admin-sidebar:248px;
   --admin-header:64px;
+  --admin-overlay:rgba(7,19,26,.92);
+  --admin-border-soft:rgba(116,188,207,.24);
+  --admin-icon:#9fd8e8;
+  --admin-shadow:rgba(0,0,0,.22);
   --admin-input-radius:10px;
   --admin-control-height:38px;
   --line:var(--admin-border);
@@ -52,12 +56,12 @@
 .admin-nav__icon{width:21px;height:21px;display:grid;place-items:center;flex:0 0 21px;color:var(--admin-icon)}.admin-nav a.is-active .admin-nav__icon,.admin-nav a:hover .admin-nav__icon{color:var(--admin-primary)}.admin-nav__icon i{font-size:12px}
 .admin-main{min-width:0}.admin-topbar{height:var(--admin-header);display:flex;align-items:center;gap:12px;padding:0 clamp(16px,3vw,36px);border-bottom:1px solid var(--admin-border);background:rgba(3,16,25,.72);backdrop-filter:blur(16px);position:sticky;top:0;z-index:90}
 .admin-topbar__brand{display:none;align-items:center;gap:9px;color:var(--admin-text);font-size:13px;font-weight:700;text-decoration:none;min-width:0}.admin-topbar__brand span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.admin-topbar__actions{margin-left:auto;display:flex;align-items:center}.admin-profile{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--admin-border);border-radius:12px;background:rgba(85,204,231,.07);color:#9fd8e8;text-decoration:none}
+.admin-topbar__actions{margin-left:auto;display:flex;align-items:center}.admin-profile{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--admin-border);border-radius:12px;background:rgba(85,204,231,.07);color:var(--admin-icon);text-decoration:none}
 .admin-menu-toggle{display:none;width:38px;height:38px;border:1px solid var(--admin-border);border-radius:11px;background:rgba(85,204,231,.07);color:var(--admin-text);cursor:pointer}.admin-content{min-width:0;padding:clamp(18px,3vw,34px)}.admin-mobile-backdrop{display:none}
 @media(max-width:900px){.admin-shell{grid-template-columns:1fr}.admin-sidebar{position:fixed;left:0;top:0;bottom:0;width:min(82vw,var(--admin-sidebar));height:100dvh;transform:translateX(-105%);transition:transform .2s ease;box-shadow:18px 0 45px rgba(0,0,0,.28)}.admin-nav-open .admin-sidebar{transform:translateX(0)}.admin-menu-toggle{display:grid;place-items:center}.admin-topbar__brand{display:flex}.admin-mobile-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:80}.admin-nav-open .admin-mobile-backdrop{display:block}.admin-content{padding:18px 16px}}
 @media(max-width:600px){.admin-content{padding:15px 12px}.admin-topbar{height:60px;padding:0 12px}.admin-topbar__brand img{width:34px;height:34px}.admin-profile,.admin-menu-toggle{width:36px;height:36px}.admin-sidebar{padding:12px 10px}}@media(prefers-reduced-motion:reduce){.admin-nav a,.admin-sidebar{transition:none}}
 
-.admin-nav__group{display:grid;gap:3px;margin-bottom:14px}.admin-nav__group:last-child{margin-bottom:0}.admin-nav__group-label{padding:7px 10px 5px;color:#56727e;font-size:8px;font-weight:700;letter-spacing:.13em;text-transform:uppercase}
+.admin-nav__group{display:grid;gap:3px;margin-bottom:14px}.admin-nav__group:last-child{margin-bottom:0}.admin-nav__group-label{padding:7px 10px 5px;color:var(--admin-muted);font-size:8px;font-weight:700;letter-spacing:.13em;text-transform:uppercase}
 
 .admin-page-header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:24px}.admin-page-header__copy{min-width:0}.admin-eyebrow{display:block;margin-bottom:6px;color:var(--admin-primary);font-size:9px;font-weight:700;letter-spacing:.14em}.admin-title{margin:0;font-size:clamp(20px,2.4vw,30px);line-height:1.15}.admin-description{margin:7px 0 0;color:var(--admin-muted);font-size:12px;line-height:1.6}.admin-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .admin-card{overflow:hidden;border:1px solid var(--admin-border);border-radius:var(--admin-radius-lg,16px);background:var(--admin-surface-soft,rgba(255,255,255,.025));box-shadow:0 10px 30px var(--admin-shadow)}.admin-card__header{padding:14px 16px;border-bottom:1px solid var(--admin-border);font-size:12px;font-weight:650}.admin-card__body{padding:var(--admin-card-padding,16px)}
