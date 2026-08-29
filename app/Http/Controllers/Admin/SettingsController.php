@@ -115,6 +115,7 @@ class SettingsController
 
     public function updateHeader(Request $request): RedirectResponse
     {
+
         $data = $request->validate([
             'header.home_label'=>['required','string','max:40'],
             'header.management_label'=>['required','string','max:60'],
@@ -125,6 +126,7 @@ class SettingsController
             'header.webmail_label'=>['required','string','max:40'],
             'header.portal_label'=>['required','string','max:40'],
             'header.login_label'=>['required','string','max:40'],
+            'header.logo_visible'=>['nullable','boolean'],'header.social_visible'=>['nullable','boolean'],'header.portal_visible'=>['nullable','boolean'],
         ]);
         foreach ($data as $key => $value) {
             SystemSetting::updateOrCreate(['key'=>$key], ['value'=>$value, 'is_sensitive'=>false]);
