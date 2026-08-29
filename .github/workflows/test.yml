@@ -36,6 +36,8 @@ jobs:
           sed -i 's/^APP_KEY=.*/APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=/' .env
           mkdir -p database
           touch database/database.sqlite
+          sed -i 's/^DB_DATABASE=.*/DB_DATABASE=database\/database.sqlite/' .env
+          php artisan migrate --force
 
       - name: Run Laravel tests
         run: php artisan test
