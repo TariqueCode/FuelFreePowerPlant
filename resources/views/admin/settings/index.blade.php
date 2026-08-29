@@ -10,6 +10,19 @@
 @if(session('status'))<div class="notice">{{ session('status') }}</div>@endif
 @if($errors->any())<div class="errors">{{ $errors->first() }}</div>@endif
 
+<div class="form-card settings-control-center">
+    <div class="section-heading">
+        <div><div class="eyebrow">CONTROL CENTER</div><h2>Site builders &amp; global controls</h2><p>Use focused builders for Header, Footer, Navigation and Theme instead of mixing layout controls into general settings.</p></div>
+        <i class="fa-solid fa-sliders"></i>
+    </div>
+    <div class="fields">
+        <a class="admin-btn" href="{{ route('admin.settings.header') }}"><i class="fa-solid fa-bars"></i> Header Builder</a>
+        <a class="admin-btn" href="{{ route('admin.settings.footer') }}"><i class="fa-solid fa-layer-group"></i> Footer Builder</a>
+        <a class="admin-btn" href="{{ route('admin.settings.menu') }}"><i class="fa-solid fa-list"></i> Menu Builder</a>
+        <a class="admin-btn" href="{{ route('admin.settings.theme') }}"><i class="fa-solid fa-palette"></i> Theme Builder</a>
+    </div>
+</div>
+
 <form method="POST" enctype="multipart/form-data" action="{{ route('admin.settings.update') }}" class="settings-stack">
 @csrf
 
