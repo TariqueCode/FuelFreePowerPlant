@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\EmailAccount;
 use App\Models\SystemSetting;
 use App\Services\WebmailService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -37,13 +38,12 @@ class SettingsController
         return view('admin.settings.index',compact('settings','contactAccount','careerAccount'));
     }
 
-    public function verifyMailbox(Request $request, WebmailService $webmail): RedirectResponse
+    public function verifyMailbox(Request $request, WebmailService $webmail): RedirectResponse|JsonResponse
     {
         $group = (string) $request->input('group');
         abort_unless(in_array($group, ['contact', 'career'], true), 404);
 
         $label = $group === 'career' ? 'Career' : 'Contact';
-        $fallback = $group === 'career' ? 'career@fuelfreepowerplant.com' : 'info@fuelfreepowerplant.com';
         $email = strtolower(trim((string) $request->input('email')));
         $password = (string) $request->input('password');
 
@@ -58,11 +58,19 @@ class SettingsController
             return back()->withErrors(['mail.'.$group.'_password' => $message])->withInput($request->except(['mail.contact_password','mail.career_password']));
         }
 
+        // Use the exact same mailbox configuration used by the working Webmail login.
+        // If this address already has an active EmailAccount, its stored cPanel
+        // IMAP/SMTP host and ports take precedence over global defaults.
+        $account = EmailAccount::query()
+            ->where('address', $email)
+            ->where('status', 'active')
+            ->first(['imap_host', 'imap_port', 'smtp_host', 'smtp_port']);
+
         $config = [
-            'imap_host' => config('cpanel.mail_host', 'mail.fuelfreepowerplant.com'),
-            'imap_port' => 993,
-            'smtp_host' => config('cpanel.mail_host', 'mail.fuelfreepowerplant.com'),
-            'smtp_port' => 465,
+            'imap_host' => $account?->imap_host ?: config('cpanel.mail_host', 'mail.fuelfreepowerplant.com'),
+            'imap_port' => $account?->imap_port ?: 993,
+            'smtp_host' => $account?->smtp_host ?: config('cpanel.mail_host', 'mail.fuelfreepowerplant.com'),
+            'smtp_port' => $account?->smtp_port ?: 465,
         ];
 
         try {
