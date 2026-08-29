@@ -16,6 +16,16 @@ use Throwable;
 
 class SettingsController
 {
+    private function saveSettings(array $data): void
+    {
+        foreach ($data as $key => $value) {
+            SystemSetting::updateOrCreate(['key' => $key], [
+                'value' => (string) ($value ?? ''),
+                'is_sensitive' => false,
+            ]);
+        }
+    }
+
     public function index(): View
     {
         $defaults=[
@@ -136,8 +146,7 @@ class SettingsController
             'theme.space_section'=>['required','integer','min:0','max:160'],'theme.space_content'=>['required','integer','min:0','max:80'],
             'theme.card_padding'=>['required','integer','min:8','max:64'],'theme.button_radius'=>['required','integer','min:0','max:32'],'theme.button_height'=>['required','integer','min:28','max:64'],'theme.input_radius'=>['required','integer','min:0','max:32'],
         ]);
-        foreach($data as $key=>$value) SystemSetting::updateOrCreate(['key'=>$key],['value'=>$value,'is_sensitive'=>false]);
-        Cache::forget('fuelfree.system_settings');
+        $this->saveSettings($data);
         return back()->with('status','Global theme saved successfully.');
     }
 
@@ -198,8 +207,7 @@ class SettingsController
             'footer.website_url'=>['required','url','max:500'],'footer.get_in_touch_label'=>['required','string','max:100'],
             'footer.get_in_touch_url'=>['required','string','max:500'],'footer.copyright_text'=>['required','string','max:255'],
         ]);
-        foreach($data as $key=>$value){ SystemSetting::updateOrCreate(['key'=>$key],['value'=>$value,'is_sensitive'=>false]); }
-        Cache::forget('fuelfree.system_settings');
+        $this->saveSettings($data);
         return back()->with('status','Footer settings saved successfully.');
     }
 
@@ -218,10 +226,7 @@ class SettingsController
             'header.login_label'=>['required','string','max:40'],
             'header.logo_visible'=>['nullable','boolean'],'header.social_visible'=>['nullable','boolean'],'header.portal_visible'=>['nullable','boolean'],
         ]);
-        foreach ($data as $key => $value) {
-            SystemSetting::updateOrCreate(['key'=>$key], ['value'=>$value, 'is_sensitive'=>false]);
-        }
-        Cache::forget('fuelfree.system_settings');
+        $this->saveSettings($data);
         return back()->with('status','Header settings saved successfully.');
     }
 
@@ -292,7 +297,7 @@ class SettingsController
             if($old) Storage::disk('public')->delete($old);
             $data['company.logo_path']=$request->file('company.logo')->store('site/branding','public');
         }
-        foreach($data as $key=>$value) SystemSetting::updateOrCreate(['key'=>$key],['value'=>(string)($value??''),'is_sensitive'=>false]);
+        $this->saveSettings($data);
         return back()->with('status','System settings saved. Contact and Career mailboxes were verified and connected.');
     }
 }
