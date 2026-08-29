@@ -179,11 +179,23 @@ class SettingsController
         ]);
         $ids = collect($data['items'] ?? [])->pluck('id')->all();
         $validParentIds = \App\Models\SiteContentItem::query()->whereIn('id',$ids)->where('type','company')->pluck('id')->all();
+        $parentMap = collect($data['items'] ?? [])->mapWithKeys(fn ($row) => [(int) $row['id'] => (($row['navigation_parent_id'] ?? null) ? (int) $row['navigation_parent_id'] : null)])->all();
+        foreach ($parentMap as $itemId => $parentId) {
+            $seen = [];
+            while ($parentId !== null) {
+                if (isset($seen[$parentId]) || $parentId === $itemId || !in_array($parentId, $validParentIds, true)) {
+                    $parentMap[$itemId] = null;
+                    break;
+                }
+                $seen[$parentId] = true;
+                $parentId = $parentMap[$parentId] ?? null;
+            }
+        }
         \App\Models\SiteContentItem::query()->whereIn('id',$ids)->where('type','company')->get()->each(function ($item) use ($data, $validParentIds) {
             $row = collect($data['items'])->firstWhere('id',$item->id);
             $item->show_in_navigation = (bool)($row['show_in_navigation'] ?? false);
-            $parentId = $row['navigation_parent_id'] ?? null;
-            $item->navigation_parent_id = ($parentId && in_array((int) $parentId, $validParentIds, true) && (int) $parentId !== (int) $item->id) ? (int) $parentId : null;
+            $parentId = $parentMap[(int) $item->id] ?? null;
+            $item->navigation_parent_id = $parentId;
             $item->navigation_order = $row['navigation_order'] ?? null;
             $item->save();
         });
