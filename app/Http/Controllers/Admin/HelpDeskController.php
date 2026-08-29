@@ -24,15 +24,15 @@ class HelpDeskController extends Controller
 
         Inquiry::query()->latest()->get()->each(function ($item) use ($items) {
             $items->push((object) [
-                'type'=>'contact','id'=>$item->id,'name'=>$item->name,'email'=>$item->email,'subject'=>$item->subject,
-                'message'=>$item->message,'status'=>$item->status,'received_at'=>$item->created_at,
-                'route'=>route('admin.helpdesk.show',['type'=>'contact','id'=>$item->id]),
+                'type'=>'contact','channel'=>'contact','id'=>$item->id,'name'=>$item->name,'email'=>$item->email,
+                'subject'=>$item->subject ?: '(No subject)','message'=>$item->message,'status'=>$item->status,
+                'received_at'=>$item->created_at,'route'=>route('admin.helpdesk.show',['type'=>'contact','id'=>$item->id]),
             ]);
         });
 
         CareerApplication::query()->latest()->get()->each(function ($item) use ($items) {
             $items->push((object) [
-                'type'=>'career','id'=>$item->id,'name'=>$item->name,'email'=>$item->email,
+                'type'=>'career','channel'=>'career','id'=>$item->id,'name'=>$item->name,'email'=>$item->email,
                 'subject'=>'Career application'.($item->position ? ': '.$item->position : ''),
                 'message'=>$item->message ?: '','status'=>$item->status,'received_at'=>$item->created_at,
                 'route'=>route('admin.helpdesk.show',['type'=>'career','id'=>$item->id]),
@@ -49,7 +49,22 @@ class HelpDeskController extends Controller
             ]);
         });
 
-        $items=$items->sortByDesc('received_at')->values();
+        $allItems = $items->sortByDesc('received_at')->values();
+        $search = trim((string) $request->query('q', ''));
+        $channel = (string) $request->query('channel', 'all');
+        $status = (string) $request->query('status', 'all');
+
+        $items = $allItems->filter(function ($item) use ($search, $channel, $status) {
+            if ($channel !== 'all' && $item->channel !== $channel) return false;
+            if ($status !== 'all' && $item->status !== $status) return false;
+            if ($search === '') return true;
+
+            $haystack = mb_strtolower(implode(' ', [
+                $item->name, $item->email, $item->subject, $item->message, $item->status, $item->channel,
+            ]));
+            return str_contains($haystack, mb_strtolower($search));
+        })->values();
+
         $page=max(1,(int)$request->query('page',1));
         $perPage=20;
         $pageItems=$items->slice(($page-1)*$perPage,$perPage)->values();
@@ -57,14 +72,15 @@ class HelpDeskController extends Controller
             $pageItems,$items->count(),$perPage,$page,['path'=>$request->url(),'query'=>$request->query()]
         );
 
-        $contactCount=Inquiry::query()->count()+HelpdeskEmail::query()->where('mailbox_group','contact')->count();
-        $careerCount=CareerApplication::query()->count()+HelpdeskEmail::query()->where('mailbox_group','career')->count();
-        $openCount=Inquiry::query()->whereIn('status',['new','read','in_progress'])->count()
-            +CareerApplication::query()->whereIn('status',['new','reviewing'])->count()
-            +HelpdeskEmail::query()->whereIn('status',['new','read','in_progress'])->count();
+        $contactCount=$allItems->where('channel','contact')->count();
+        $careerCount=$allItems->where('channel','career')->count();
+        $openCount=$allItems->filter(fn($item) => in_array($item->status,['new','read','in_progress','reviewing'],true))->count();
+        $repliedCount=$allItems->where('status','replied')->count();
+        $unreadCount=$allItems->where('status','new')->count();
 
         return view('admin.helpdesk.index',[
             'items'=>$paginator,'openCount'=>$openCount,'contactCount'=>$contactCount,'careerCount'=>$careerCount,
+            'repliedCount'=>$repliedCount,'unreadCount'=>$unreadCount,'search'=>$search,'channel'=>$channel,'status'=>$status,
         ]);
     }
 
@@ -80,6 +96,21 @@ class HelpDeskController extends Controller
         }
 
         return view('admin.helpdesk.show',compact('source','label','type','replies'));
+    }
+
+    public function updateStatus(Request $request, string $type, int $id): RedirectResponse
+    {
+        [$source] = $this->source($type, $id);
+
+        $allowed = match ($type) {
+            'career' => ['new','reviewing','shortlisted','rejected','hired'],
+            default => ['new','read','in_progress','replied','closed'],
+        };
+
+        $data = $request->validate(['status' => ['required','in:'.implode(',', $allowed)]]);
+        $source->update(['status' => $data['status']]);
+
+        return back()->with('status', 'Status updated successfully.');
     }
 
     public function reply(Request $request,string $type,int $id,WebmailService $webmail): RedirectResponse
