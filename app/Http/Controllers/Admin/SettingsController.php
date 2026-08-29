@@ -115,8 +115,8 @@ class SettingsController
 
     public function theme(): View
     {
-        $keys = ['theme.primary','theme.secondary','theme.accent','theme.surface','theme.text','theme.muted','theme.radius','theme.font_body','theme.font_heading','theme.base_size','theme.line_height','theme.space_section','theme.space_content'];
-        $defaults = ['theme.primary'=>'#55cce7','theme.secondary'=>'#0f2430','theme.accent'=>'#9de8f7','theme.surface'=>'#07131a','theme.text'=>'#eaf7fb','theme.muted'=>'#8ea8b2','theme.radius'=>'12','theme.font_body'=>'Inter, sans-serif','theme.font_heading'=>'Inter, sans-serif','theme.base_size'=>'16','theme.line_height'=>'1.6','theme.space_section'=>'64','theme.space_content'=>'24'];
+        $keys = ['theme.primary','theme.secondary','theme.accent','theme.surface','theme.text','theme.muted','theme.radius','theme.font_body','theme.font_heading','theme.base_size','theme.line_height','theme.space_section','theme.space_content','theme.card_padding','theme.button_radius','theme.button_height','theme.input_radius'];
+        $defaults = ['theme.primary'=>'#55cce7','theme.secondary'=>'#0f2430','theme.accent'=>'#9de8f7','theme.surface'=>'#07131a','theme.text'=>'#eaf7fb','theme.muted'=>'#8ea8b2','theme.radius'=>'12','theme.font_body'=>'Inter, sans-serif','theme.font_heading'=>'Inter, sans-serif','theme.base_size'=>'16','theme.line_height'=>'1.6','theme.space_section'=>'64','theme.space_content'=>'24','theme.card_padding'=>'24','theme.button_radius'=>'10','theme.button_height'=>'42','theme.input_radius'=>'10'];
         $settings = array_merge($defaults, SystemSetting::query()->whereIn('key',$keys)->pluck('value','key')->all());
         return view('admin.settings.theme', compact('settings'));
     }
@@ -134,6 +134,7 @@ class SettingsController
             'theme.font_body'=>['required','string','max:120','regex:/^[A-Za-z0-9 ,\-]+$/'],'theme.font_heading'=>['required','string','max:120','regex:/^[A-Za-z0-9 ,\-]+$/'],
             'theme.base_size'=>['required','integer','min:12','max:22'],'theme.line_height'=>['required','numeric','min:1.1','max:2.2'],
             'theme.space_section'=>['required','integer','min:0','max:160'],'theme.space_content'=>['required','integer','min:0','max:80'],
+            'theme.card_padding'=>['required','integer','min:8','max:64'],'theme.button_radius'=>['required','integer','min:0','max:32'],'theme.button_height'=>['required','integer','min:28','max:64'],'theme.input_radius'=>['required','integer','min:0','max:32'],
         ]);
         foreach($data as $key=>$value) SystemSetting::updateOrCreate(['key'=>$key],['value'=>$value,'is_sensitive'=>false]);
         Cache::forget('fuelfree.system_settings');
