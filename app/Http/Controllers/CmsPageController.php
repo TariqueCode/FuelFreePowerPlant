@@ -17,25 +17,6 @@ class CmsPageController extends Controller
             ->where('is_published', true)
             ->firstOrFail();
 
-        $pages = CmsPage::query()
-            ->where('is_published', true)
-            ->whereNotIn('slug', ['home', $slug])
-            ->orderBy('title')
-            ->get(['title', 'slug']);
-
-        $projects = PowerPlant::query()
-            ->orderByRaw("CASE WHEN status = 'operational' THEN 0 ELSE 1 END")
-            ->latest()
-            ->take(6)
-            ->get(['name', 'slug', 'location', 'capacity_kw', 'technology', 'status', 'overview']);
-
-        $companyItems = SiteContentItem::query()
-            ->published()
-            ->where('type', 'company')
-            ->orderBy('sort_order')
-            ->orderBy('title')
-            ->get(['title', 'slug', 'excerpt', 'content', 'image_path']);
-
         $brand = SystemSetting::query()
             ->whereIn('key', ['company.name', 'company.logo_path', 'company.tagline'])
             ->pluck('value', 'key');
