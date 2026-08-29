@@ -1,6 +1,6 @@
 @php
     $publicBrand = $brand ?? [];
-    $headerLabels = config('fuelfree.header', []);
+    $headerLabels = array_merge(config('fuelfree.header', []), collect($globalLayout ?? [])->filter(fn($v,$k)=>str_starts_with($k,'header.'))->all());
     $publicName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
     $publicLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
     $publicNameParts = preg_split('/\s+/', trim((string) $publicName), 2);
