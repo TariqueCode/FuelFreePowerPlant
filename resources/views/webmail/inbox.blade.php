@@ -16,8 +16,9 @@
         <span class="mail-count" id="mail-count">{{ count($messages) }} messages</span>
         <a class="btn icon" href="{{ url($base.'/inbox?folder='.urlencode($folder)) }}" title="Refresh" aria-label="Refresh"><i class="fa-solid fa-rotate"></i></a>
     </div>
+    @php($isDraftFolder = (collect($folders)->firstWhere('name',$folder)['special'] ?? '') === 'drafts')
     @forelse($messages as $message)
-        <a class="message-row {{ $message['seen'] ? '' : 'unread' }}" data-message-search="{{ strtolower($message['from'].' '.$message['subject'].' '.$message['date']) }}" data-message-uid="{{ $message['uid'] }}" href="{{ url($base.'/message/'.$message['uid'].'?folder='.urlencode($folder)) }}">
+        <a class="message-row {{ $message['seen'] ? '' : 'unread' }}" data-message-search="{{ strtolower($message['from'].' '.$message['subject'].' '.$message['date']) }}" data-message-uid="{{ $message['uid'] }}" href="{{ $isDraftFolder ? url($base.'/compose?draft='.$message['uid'].'&folder='.urlencode($folder)) : url($base.'/message/'.$message['uid'].'?folder='.urlencode($folder)) }}">
             <span><i class="fa-regular {{ $message['seen'] ? 'fa-envelope-open' : 'fa-envelope' }}"></i></span>
             <span class="from">{{ $message['from'] ?: 'Unknown sender' }}</span>
             <span class="subject">{{ $message['subject'] }}</span>
