@@ -2,6 +2,8 @@
 
 @php
     $siteName = $brand['name'] ?? config('fuelfree.company.name');
+    $backRoute = $backRoute ?? route('site.about');
+    $backLabel = $backLabel ?? 'Back to Company';
 @endphp
 
 @section('title', $item->title.' — '.$siteName)
@@ -32,7 +34,7 @@
 </style>
 
 <main class="company-page-shell">
-    <a class="company-page-back" href="{{ route('site.about') }}"><i class="fa-solid fa-arrow-left"></i> Back to Company</a>
+    <a class="company-page-back" href="{{ $backRoute }}"><i class="fa-solid fa-arrow-left"></i> {{ $backLabel }}</a>
     <section class="company-page-hero">
         <div class="company-page-hero-content">
             <h1>{{ $item->title }}</h1>
