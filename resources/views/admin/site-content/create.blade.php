@@ -326,6 +326,28 @@ html,body{overflow-x:hidden}
 }
 .editor-shell{position:relative!important;overflow:visible!important}
 @media(max-width:700px){.word-ribbon{top:0!important}}
+
+/* CMS editor: keep the ribbon visible while the editor is being scrolled. */
+.editor-shell.ff-ribbon-active{
+  --ff-ribbon-height:0px;
+}
+.editor-shell.ff-ribbon-active .word-ribbon{
+  position:fixed !important;
+  top:0 !important;
+  left:var(--ff-ribbon-left,0px) !important;
+  width:var(--ff-ribbon-width,100%) !important;
+  max-width:none !important;
+  margin:0 !important;
+  z-index:9999 !important;
+}
+.editor-shell.ff-ribbon-active .editor{
+  padding-top:calc(18px + var(--ff-ribbon-height,0px)) !important;
+}
+@media(max-width:700px){
+  .editor-shell.ff-ribbon-active .editor{
+    padding-top:calc(14px + var(--ff-ribbon-height,0px)) !important;
+  }
+}
 </style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
