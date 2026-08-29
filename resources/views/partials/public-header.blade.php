@@ -43,45 +43,68 @@
 .public-menu-toggle{display:none;width:42px;height:42px;border:1px solid rgba(86,210,238,.15);border-radius:11px;background:#06141d;color:#fff;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}.public-menu-toggle svg{width:19px;height:19px;display:block}
 @media(min-width:721px){.public-header-nav,.public-menu{overflow:visible!important;}}
 @media(min-width:1001px){.public-social-label{display:inline-block}.public-brand img,.public-brand-fallback{width:42px;height:42px;flex-basis:42px}.public-brand-name{font-size:16px}.public-menu{gap:4px}.public-menu a,.public-menu a:visited,.public-menu-dropdown-toggle{font-size:12px;padding-left:11px;padding-right:11px}}
-@media(max-width:1000px) and (min-width:721px){.public-shell{width:min(1280px,calc(100% - 28px))}.public-header-top{gap:12px;min-height:58px}.public-brand img,.public-brand-fallback{width:38px;height:38px;flex-basis:38px}.public-brand-name{font-size:14px}.public-header-divider{height:36px;margin:0 5px}.public-portal{font-size:10px;padding:0 10px}.public-menu{justify-content:flex-start}.public-menu a,.public-menu a:visited,.public-menu-dropdown-toggle{font-size:11px;padding-left:8px;padding-right:8px}}
+@media(max-width:1000px) and (min-width:721px){.public-shell{width:min(1280px,calc(100% - 28px))}.public-header-top{gap:12px;min-height:58px}.public-brand img,.public-brand-fallback{width:38px;height:38px;flex-basis:38px}.public-brand-name{font-size:14px}.public-header-divider{height:36px;margin:0 5px}.public-portal{font-size:10px;padding:0 10px}.public-menu{justify-content:flex-start}.public-menu a,.public-menu a:visited,.public-menu-dropdown-toggle{font-size:11px;padding-left:11px;padding-right:11px}}
 @media(max-width:720px){.public-shell{width:calc(100% - 20px)}.public-header-top{min-height:58px;border-bottom:0}.public-header-nav{display:none;position:absolute;top:58px;left:12px;right:12px;height:auto;min-height:auto;padding:8px;background:rgba(4,18,26,.98);border:1px solid rgba(86,210,238,.15);border-radius:14px;box-shadow:0 20px 55px rgba(0,0,0,.3)}.public-header-nav.is-open{display:flex}.public-header-tools{display:flex;gap:3px}.public-socials{max-width:30vw;gap:1px}.public-social{width:28px;height:28px;border-radius:7px}.public-social i{font-size:11px}.public-header-divider{height:34px;margin:0 5px}.public-portal{min-height:30px;padding:0 8px;border-radius:8px;font-size:10px;gap:5px}.public-brand-name{font-size:14px}.public-brand img,.public-brand-fallback{width:34px;height:34px;flex-basis:34px}.public-menu-toggle{display:flex;width:38px;height:38px;border-radius:10px}.public-menu{flex-direction:column;align-items:stretch;justify-content:flex-start;overflow:visible;white-space:normal}.public-menu a,.public-menu a:visited{justify-content:flex-start;min-height:44px;padding:10px 13px;font-size:15px}}
 @media(max-width:400px){.public-brand-name{font-size:13px}.public-brand img,.public-brand-fallback{width:32px;height:32px;flex-basis:32px}.public-social{width:26px;height:26px}.public-portal span{display:none}.public-portal{width:auto;min-width:30px;padding:0 9px;justify-content:center;gap:6px}.public-portal span{display:inline-block}}
+/* Single canonical navigation spacing for ALL public pages and ALL device sizes.
+   Responsive layout may change orientation/size, but spacing rules live here once. */
+.public-header .public-menu{
+  gap:4px!important;
+  row-gap:4px!important;
+  column-gap:4px!important;
+}
+.public-header .public-menu > a,
+.public-header .public-menu > .public-menu-dropdown{
+  margin:0!important;
+}
+.public-header .public-menu > a{
+  box-sizing:border-box!important;
+}
+.public-header .public-menu > .public-menu-dropdown > .public-menu-dropdown-toggle{
+  margin:0!important;
+  box-sizing:border-box!important;
+}
+.public-header .public-menu-dropdown-panel{
+  gap:0!important;
+  row-gap:0!important;
+}
+.public-header .public-menu-dropdown-panel a,
+.public-header .public-menu-dropdown-panel a:visited{
+  margin:0!important;
+  box-sizing:border-box!important;
+}
 @media(max-width:720px){
-  /* One shared compact mobile navigation rhythm for every public page.
-     Keep sizing here so individual page templates cannot introduce extra gaps. */
-  .public-header .public-menu{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:0!important;row-gap:0!important}
-  .public-header .public-menu > a,
-  .public-header .public-menu > .public-menu-dropdown,
-  .public-header .public-menu > .public-menu-dropdown > .public-menu-dropdown-toggle{
-    margin:0!important;
-    padding-top:0!important;
-    padding-bottom:0!important;
-    line-height:1.2!important;
+  .public-header .public-menu{
+    gap:0!important;
+    row-gap:0!important;
+    column-gap:0!important;
   }
   .public-header .public-menu > a,
   .public-header .public-menu > .public-menu-dropdown > .public-menu-dropdown-toggle{
     min-height:44px!important;
     height:44px!important;
     max-height:44px!important;
-    box-sizing:border-box!important;
+    padding-top:0!important;
+    padding-bottom:0!important;
+    line-height:1.2!important;
   }
-  .public-header .public-menu > a{padding-left:13px!important;padding-right:13px!important}
+  .public-header .public-menu > a{
+    padding-left:13px!important;
+    padding-right:13px!important;
+  }
   .public-header .public-menu-dropdown-panel{
     margin:0!important;
     padding:0 0 0 10px!important;
-    gap:0!important;
     line-height:1.2!important;
   }
   .public-header .public-menu-dropdown-panel a,
   .public-header .public-menu-dropdown-panel a:visited{
     display:flex!important;
     align-items:center!important;
-    margin:0!important;
     padding:0 13px!important;
     min-height:42px!important;
     height:42px!important;
     max-height:42px!important;
-    box-sizing:border-box!important;
     line-height:1.2!important;
   }
 }
