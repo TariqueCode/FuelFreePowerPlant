@@ -461,6 +461,62 @@ updateEditorMetrics();updateEditorToolbarState();setTimeout(restoreLocalDraft,80
 
 
 
+
+// HTML Code Designer
+(function(){
+  const modal=document.getElementById('html-code-modal');
+  const input=document.getElementById('html-code-input');
+  const open=document.getElementById('open-html-code');
+  const close=document.getElementById('html-code-close');
+  const cancel=document.getElementById('html-code-cancel');
+  const apply=document.getElementById('html-code-apply');
+  const insert=document.getElementById('html-code-insert');
+  if(!modal||!input||!open)return;
+
+  function show(){
+    if(sourceMode)document.getElementById('toggle-source')?.click();
+    saveEditorSelection();
+    input.value=editor.innerHTML;
+    modal.hidden=false;
+    document.body.classList.add('html-code-open');
+    requestAnimationFrame(()=>input.focus());
+  }
+  function hide(){
+    modal.hidden=true;
+    document.body.classList.remove('html-code-open');
+  }
+  open.addEventListener('click',show);
+  close?.addEventListener('click',hide);
+  cancel?.addEventListener('click',hide);
+  modal.addEventListener('click',e=>{if(e.target===modal)hide()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)hide()});
+
+  apply?.addEventListener('click',()=>{
+    editor.innerHTML=input.value;
+    sync();
+    updateEditorToolbarState();
+    hide();
+  });
+
+  insert?.addEventListener('click',()=>{
+    const html=input.value;
+    if(!html)return;
+    restoreEditorSelection();
+    editor.focus();
+    try{document.execCommand('insertHTML',false,html)}
+    catch(e){
+      const sel=window.getSelection();
+      if(sel&&sel.rangeCount){
+        const range=sel.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(range.createContextualFragment(html));
+      }
+    }
+    sync();
+    updateEditorToolbarState();
+    hide();
+  });
+})();
 const publicationType=document.getElementById('publication-type');
 document.querySelectorAll('[data-publication-type]').forEach(btn=>btn.addEventListener('click',()=>{
     if(!publicationType)return;
