@@ -17,6 +17,11 @@ class GlobalLayoutService
         });
     }
 
+    public function footer(string $scope = 'site'): array
+    {
+        return array_filter($this->all($scope), fn ($value, $key) => str_starts_with($key, 'footer.'), ARRAY_FILTER_USE_BOTH);
+    }
+
     public function get(string $key, mixed $default = null, string $scope = 'site'): mixed
     {
         return $this->all($scope)[$key] ?? $default;
