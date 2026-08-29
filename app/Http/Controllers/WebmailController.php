@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\EmailAccount;
 use App\Services\WebmailService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -94,10 +95,23 @@ class WebmailController extends Controller
         $initialSubject = '';
         $initialBody = '';
         $mode = 'new';
+        $draftUid = (int) $request->query('draft', 0);
         $folders = $webmail->folders($email, $password, $this->mailConfigFor($email));
         $folder = $this->resolveFolder($request, $folders);
 
-        if ($request->filled('reply')) {
+        if ($draftUid > 0) {
+            try {
+                $message = $webmail->message($email, $password, $draftUid, $this->mailConfigFor($email), $folder);
+                $initialTo = $this->extractEmailList($message['to'] ?? '');
+                $initialCc = $this->extractEmailList($message['cc'] ?? '');
+                $initialSubject = $message['subject'] ?? '';
+                $initialBody = $message['body'] ?? '';
+                $mode = 'draft';
+            } catch (Throwable $e) {
+                report($e);
+                $draftUid = 0;
+            }
+        } elseif ($request->filled('reply')) {
             $uid = (int) $request->query('reply');
             try {
                 $message = $webmail->message($email, $password, $uid, $this->mailConfigFor($email), $folder);
@@ -121,7 +135,7 @@ class WebmailController extends Controller
             }
         }
 
-        return view('webmail.compose', compact('email', 'initialTo', 'initialCc', 'initialSubject', 'initialBody', 'mode', 'folder'));
+        return view('webmail.compose', compact('email', 'initialTo', 'initialCc', 'initialSubject', 'initialBody', 'mode', 'folder', 'draftUid'));
     }
 
     public function send(Request $request, WebmailService $webmail): RedirectResponse
@@ -131,6 +145,7 @@ class WebmailController extends Controller
         $data=$request->validate([
             'to'=>['required','string','max:5000'],'cc'=>['nullable','string','max:5000'],'bcc'=>['nullable','string','max:5000'],
             'subject'=>['nullable','string','max:255'],'body'=>['required','string','max:500000'],
+            'draft_uid'=>['nullable','integer','min:1'],
             'attachments'=>['nullable','array','max:30'],'attachments.*'=>['file','max:102400'],
         ]);
         $attachments=[];
@@ -138,7 +153,29 @@ class WebmailController extends Controller
         try{
             $webmail->send($email,$password,$data['to'],$data['subject']?:'(No subject)',$data['body'],$this->mailConfigFor($email),$attachments,true,$data['cc']??[],$data['bcc']??[]);
         }catch(Throwable $e){report($e);return back()->withErrors(['send'=>'The message could not be sent: '.($e->getMessage()?:'SMTP error.')])->withInput();}
+        if (!empty($data['draft_uid'])) {
+            try { $webmail->deleteDraft($email, $password, (int) $data['draft_uid'], $this->mailConfigFor($email)); } catch (Throwable $e) { report($e); }
+        }
         return redirect()->to($this->url('/inbox'))->with('status','Message sent successfully.');
+    }
+
+    public function saveDraft(Request $request, WebmailService $webmail): JsonResponse
+    {
+        $credentials=$this->credentials($request);
+        if($credentials===null)return response()->json(['ok'=>false,'message'=>'Session expired.'],401);
+        [$email,$password]=$credentials;
+        $data=$request->validate([
+            'to'=>['nullable','string','max:5000'],'cc'=>['nullable','string','max:5000'],'bcc'=>['nullable','string','max:5000'],
+            'subject'=>['nullable','string','max:255'],'body'=>['nullable','string','max:500000'],
+            'draft_uid'=>['nullable','integer','min:1'],
+        ]);
+        try{
+            $uid=$webmail->saveDraft($email,$password,$data['to']??'',$data['cc']??'',$data['bcc']??'',$data['subject']??'',$data['body']??'',$this->mailConfigFor($email),(int)($data['draft_uid']??0));
+            return response()->json(['ok'=>true,'uid'=>$uid]);
+        }catch(Throwable $e){
+            report($e);
+            return response()->json(['ok'=>false,'message'=>'The draft could not be saved.'],500);
+        }
     }
 
     public function attachment(Request $request,int $uid,string $part,WebmailService $webmail)
@@ -249,6 +286,12 @@ class WebmailController extends Controller
     {
         if (preg_match('/<([^>]+)>/', $value, $match)) return trim($match[1]);
         return trim($value);
+    }
+
+    private function extractEmailList(string $value): string
+    {
+        preg_match_all('/[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}/i', $value, $matches);
+        return implode(', ', array_unique($matches[0] ?? []));
     }
 
     private function escapeHtml(string $value): string
