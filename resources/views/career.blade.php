@@ -57,7 +57,7 @@
                     <div class="career-field"><label for="career-experience">Experience</label><input id="career-experience" name="experience" value="{{ old('experience') }}" maxlength="180" placeholder="e.g. 3 years"></div>
                     <div class="career-field full"><label for="career-location">Location</label><input id="career-location" name="location" value="{{ old('location') }}" maxlength="180" autocomplete="address-level2" placeholder="City / district"></div>
                     <div class="career-field full"><label for="career-message">About you</label><textarea id="career-message" name="message" maxlength="5000" placeholder="Briefly tell us about your skills, experience and career goals.">{{ old('message') }}</textarea></div>
-                    <div class="career-field full career-file"><label for="career-cv">CV / Resume *</label><input id="career-cv" type="file" name="cv" accept=".pdf,.doc,.docx" required><small>Accepted: PDF, DOC, DOCX · Maximum 8 MB.</small></div>
+                    <div class="career-field full career-file"><label for="career-cv">CV / Resume *</label><input id="career-cv" type="file" name="cv" accept=".pdf,.doc,.docx" required><small>Accepted: PDF, DOC, DOCX · Maximum 50 MB.</small></div>
                 </div>
                 <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-10000px;width:1px;height:1px" aria-hidden="true">
                 <label class="career-consent"><input type="checkbox" name="consent" value="1" required> <span>I confirm that the information provided is accurate and consent to {{ $brand['name'] ?? 'FuelFree PowerPlant' }} reviewing my application for current or future opportunities.</span></label>
