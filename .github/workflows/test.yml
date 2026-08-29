@@ -33,7 +33,7 @@ jobs:
       - name: Prepare test environment
         run: |
           cp .env.example .env
-          sed -i 's/^APP_KEY=.*/APP_KEY=base64:ZmFrZS10ZXN0LWtleS1mb3ItY2ktb25seQ==/' .env
+          sed -i 's/^APP_KEY=.*/APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=/' .env
 
       - name: Run Laravel tests
         run: php artisan test
