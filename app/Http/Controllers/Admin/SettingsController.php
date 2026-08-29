@@ -162,7 +162,8 @@ class SettingsController
             ->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')
             ->orderByRaw('CASE WHEN navigation_parent_id IS NULL THEN 0 ELSE 1 END')->orderBy('navigation_order')->orderByDesc('created_at')
             ->get(['id','title','slug','show_in_navigation','navigation_order','navigation_parent_id']);
-        return view('admin.settings.menu', compact('items'));
+        $menuGroups = json_decode(SystemSetting::query()->where('key','navigation.menu_groups')->value('value') ?? '[]', true) ?: [];
+        return view('admin.settings.menu', compact('items','menuGroups'));
     }
 
     public function updateMenu(Request $request): RedirectResponse
@@ -176,6 +177,9 @@ class SettingsController
             'custom_items'=>['nullable','array','max:30'],
             'custom_items.*.label'=>['required','string','max:80'],
             'custom_items.*.url'=>['required','url','max:500'],
+            'menu_groups'=>['nullable','array','max:20'],
+            'menu_groups.*.label'=>['required','string','max:60'],
+            'menu_groups.*.parent_id'=>['nullable','integer'],
         ]);
         $ids = collect($data['items'] ?? [])->pluck('id')->all();
         $validParentIds = \App\Models\SiteContentItem::query()->whereIn('id',$ids)->where('type','company')->pluck('id')->all();
@@ -191,7 +195,7 @@ class SettingsController
                 $parentId = $parentMap[$parentId] ?? null;
             }
         }
-        \App\Models\SiteContentItem::query()->whereIn('id',$ids)->where('type','company')->get()->each(function ($item) use ($data, $validParentIds) {
+        \App\Models\SiteContentItem::query()->whereIn('id',$ids)->where('type','company')->get()->each(function ($item) use ($data, $validParentIds, $parentMap) {
             $row = collect($data['items'])->firstWhere('id',$item->id);
             $item->show_in_navigation = (bool)($row['show_in_navigation'] ?? false);
             $parentId = $parentMap[(int) $item->id] ?? null;
@@ -200,6 +204,8 @@ class SettingsController
             $item->save();
         });
         Cache::forget('public.company-navigation');
+        $groups = collect($data['menu_groups'] ?? [])->map(fn ($g) => ['label'=>trim($g['label']), 'parent_id'=>($g['parent_id'] ?? null) ? (int)$g['parent_id'] : null])->values()->all();
+        SystemSetting::updateOrCreate(['key'=>'navigation.menu_groups'],['value'=>json_encode($groups, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE),'is_sensitive'=>false]);
         if ($request->filled('custom_items')) { SystemSetting::updateOrCreate(['key'=>'navigation.custom_items'],['value'=>json_encode(array_values($data['custom_items'] ?? []), JSON_UNESCAPED_SLASHES),'is_sensitive'=>false]); } else { SystemSetting::updateOrCreate(['key'=>'navigation.custom_items'],['value'=>'[]','is_sensitive'=>false]); }
         Cache::forget('fuelfree.system_settings');
         return back()->with('status','Global navigation saved successfully.');
