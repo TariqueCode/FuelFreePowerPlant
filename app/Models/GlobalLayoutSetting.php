@@ -38,6 +38,5 @@ class GlobalLayoutSetting extends Model
             ['value' => is_scalar($value) || $value === null ? $value : json_encode($value)]
         );
 
-        Cache::forget("fuelfree.layout.{$scope}.{$key}");
     }
 }
