@@ -26,7 +26,7 @@
     <div class="ff-editor-body" contenteditable="true" spellcheck="true" role="textbox" aria-multiline="true"></div>
     <textarea class="ff-editor-source" hidden aria-label="HTML source"></textarea>
     @if($allowAttachments)
-        <div class="ff-attachments"><label class="ff-attach-btn"><i class="fa-solid fa-paperclip"></i> Attach files<input type="file" name="attachments[]" multiple hidden></label><span class="ff-attach-help">Up to 10 files · 10 MB each · sent directly without permanent server storage</span><div class="ff-file-list"></div></div>
+        <div class="ff-attachments"><label class="ff-attach-btn"><i class="fa-solid fa-paperclip"></i> Attach files<input type="file" name="attachments[]" multiple hidden></label><span class="ff-attach-help">Up to 30 files · 100 MB each · sent directly without permanent server storage</span><div class="ff-file-list"></div></div>
     @endif
     <div class="ff-editor-status"><span><i class="fa-solid fa-circle-check"></i> Auto-saved locally</span><span class="ff-word-count">0 words · 0 characters</span></div>
     <textarea name="{{ $bodyName }}" class="ff-editor-value" hidden required></textarea>
@@ -43,7 +43,8 @@
 .ff-attachments{padding:10px 12px;border-top:1px solid #dbe5e8;background:#f8fbfc}.ff-attach-btn{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid #cbd9de;border-radius:8px;background:#fff;color:#334e58;font-size:12px;font-weight:700;cursor:pointer}.ff-attach-help{margin-left:8px;color:#78909a;font-size:11px}.ff-file-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ff-file{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:7px;background:#eaf5f8;color:#31505b;font-size:11px}.ff-file button{border:0;background:none;color:#78909a;cursor:pointer}
 .ff-editor-status{display:flex;justify-content:space-between;gap:10px;padding:7px 12px;border-top:1px solid #dbe5e8;color:#718790;background:#fbfdfe;font-size:10px}.ff-editor-status i{color:#1db58b}
 .ff-mail-editor.is-fullscreen{position:fixed;inset:12px;z-index:9999;display:flex;flex-direction:column;box-shadow:0 30px 100px rgba(0,0,0,.55)}.ff-mail-editor.is-fullscreen .ff-editor-body,.ff-mail-editor.is-fullscreen .ff-editor-source{flex:1;min-height:0}
-@media(max-width:700px){.ff-editor-toolbar{max-height:150px;overflow:auto}.ff-editor-body{min-height:300px;padding:15px}.ff-attach-help{display:block;margin:6px 0 0}.ff-editor-status{font-size:9px}}
+@media(max-width:760px){.ff-editor-toolbar{max-height:128px;overflow:auto;align-content:flex-start}.ff-editor-toolbar select{max-width:112px}.ff-editor-body{min-height:280px;padding:14px;font-size:14px;overflow:auto}.ff-attachments{padding:9px}.ff-attach-help{display:block;margin:6px 0 0}.ff-file-list{max-height:90px;overflow:auto}.ff-editor-status{font-size:9px;flex-wrap:wrap}}
+@media(max-width:420px){.ff-editor-toolbar{gap:2px;padding:6px}.ff-editor-toolbar button,.ff-editor-toolbar select,.ff-color{height:32px}.ff-editor-toolbar button{min-width:32px;padding:0 6px}.ff-editor-body{min-height:240px}}
 </style>
 @endpush
 @push('scripts')
@@ -69,7 +70,13 @@
  editor.addEventListener('paste',()=>setTimeout(update,0));
  function renderFiles(){if(!fileList)return;fileList.innerHTML='';files.forEach((f,i)=>{const el=document.createElement('span');el.className='ff-file';el.innerHTML='<i class="fa-solid fa-paperclip"></i>'+f.name+' <button type="button" aria-label="Remove">×</button>';el.querySelector('button').onclick=()=>{files.splice(i,1);syncFiles();renderFiles();};fileList.appendChild(el);});}
  function syncFiles(){if(!fileInput)return;const dt=new DataTransfer();files.forEach(f=>dt.items.add(f));fileInput.files=dt.files;}
- if(fileInput)fileInput.addEventListener('change',()=>{files=[...fileInput.files].slice(0,10);syncFiles();renderFiles();});
+ if(fileInput)fileInput.addEventListener('change',()=>{
+   const incoming=[...fileInput.files];
+   const maxBytes=100*1024*1024;
+   const oversized=incoming.find(f=>f.size>maxBytes);
+   if(oversized){alert(oversized.name+' is larger than 100 MB.');fileInput.value='';files=[];renderFiles();return;}
+   files=incoming.slice(0,30);syncFiles();renderFiles();
+ });
  function update(){if(source.hidden===false){value.value=source.value;return;}value.value=editor.innerHTML.trim();const text=editor.innerText.trim();const words=text?text.split(/\s+/).length:0;if(wordCount)wordCount.textContent=words+' words · '+text.length+' characters';try{localStorage.setItem(storageKey,editor.innerHTML);}catch(e){}}
  try{const saved=localStorage.getItem(storageKey);if(saved&&!initial)editor.innerHTML=saved;}catch(e){}
  if(form)form.addEventListener('submit',()=>{if(!source.hidden)editor.innerHTML=source.value;update();try{localStorage.removeItem(storageKey);}catch(e){}});
