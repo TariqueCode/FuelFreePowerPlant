@@ -27,6 +27,28 @@ class HomeController
             'welcome' => filter_var($settings['home.welcome_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
             'news' => filter_var($settings['home.news_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
             'gallery' => filter_var($settings['home.gallery_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
+            'cta' => filter_var($settings['home.cta_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
+        ];
+
+        $homeContent = [
+            'welcome_eyebrow' => $settings['home.welcome_eyebrow'] ?? 'Welcome to '.$brand['name'],
+            'welcome_title' => $settings['home.welcome_title'] ?? 'Building a stronger energy future.',
+            'welcome_intro_1' => $settings['home.welcome_intro_1'] ?? 'FuelFree PowerPlant is a forward-thinking energy company committed to contributing to Bangladesh’s sustainable energy future. Our vision is to develop efficient, reliable, and innovative power solutions that support the country’s growing energy needs and economic development.',
+            'welcome_intro_2' => $settings['home.welcome_intro_2'] ?? 'We are dedicated to building a cleaner and smarter energy future through innovation, responsible development, and world-class management practices. We aim to strengthen our capabilities, expand our projects, embrace modern technologies, and deliver dependable energy solutions while maintaining our commitment to quality, sustainability, and excellence.',
+            'welcome_signoff' => $settings['home.welcome_signoff'] ?? $brand['name'].' — Powering a cleaner, smarter future.',
+            'news_eyebrow' => $settings['home.news_eyebrow'] ?? 'Latest updates',
+            'news_title' => $settings['home.news_title'] ?? 'News & Notices',
+            'news_description' => $settings['home.news_description'] ?? '',
+            'gallery_eyebrow' => $settings['home.gallery_eyebrow'] ?? 'Photo collections',
+            'gallery_title' => $settings['home.gallery_title'] ?? 'Gallery',
+            'gallery_description' => $settings['home.gallery_description'] ?? '',
+            'cta_eyebrow' => $settings['home.cta_eyebrow'] ?? 'Let’s work together',
+            'cta_title' => $settings['home.cta_title'] ?? 'Build the next chapter of clean energy.',
+            'cta_text' => $settings['home.cta_text'] ?? 'Talk to our team about projects, partnerships, and reliable energy solutions.',
+            'cta_primary_label' => $settings['home.cta_primary_label'] ?? 'Get in touch',
+            'cta_primary_url' => $settings['home.cta_primary_url'] ?? '/contact',
+            'cta_secondary_label' => $settings['home.cta_secondary_label'] ?? 'Explore our projects',
+            'cta_secondary_url' => $settings['home.cta_secondary_url'] ?? '/power-plants',
         ];
 
         $newsLimit=max(1,min(12,(int)($settings['home.news_limit']??3)));
@@ -35,6 +57,6 @@ class HomeController
         $gallery=$gallery->take($galleryLimit);
         $stats=['projects'=>PowerPlant::query()->count(),'capacity_mw'=>round((float)PowerPlant::query()->sum('capacity_kw')/1000,2),'operational'=>PowerPlant::query()->whereRaw('LOWER(status)=?', ['operational'])->count()];
 
-        return response(view('home-v3',compact('plants','homePage','stats','content','brand','gallery','sliders','home'))->render());
+        return response(view('home-v3',compact('plants','homePage','stats','content','brand','gallery','sliders','home','homeContent'))->render());
     }
 }
