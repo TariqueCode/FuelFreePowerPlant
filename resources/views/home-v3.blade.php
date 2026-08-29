@@ -110,11 +110,11 @@
 
     @if($home['welcome'])
     <section class="welcome">
-        <div class="welcome-heading"><span class="eyebrow">Welcome to {{ $siteName }}</span><h1>Building a <em>stronger</em> energy future.</h1><div class="welcome-rule"></div></div>
+        <div class="welcome-heading"><span class="eyebrow">{{ $home['welcome_eyebrow'] ?? ('Welcome to '.$siteName) }}</span><h1>{!! e($home['welcome_title'] ?? 'Building a stronger energy future.') !!}</h1><div class="welcome-rule"></div></div>
         <div class="welcome-copy">
-            <p><strong>{{ $siteName }}</strong> is a forward-thinking energy company committed to contributing to Bangladesh’s sustainable energy future. Our vision is to develop efficient, reliable, and innovative power solutions that support the country’s growing energy needs and economic development.</p>
-            <p>We are dedicated to building a cleaner and smarter energy future through innovation, responsible development, and world-class management practices. We aim to strengthen our capabilities, expand our projects, embrace modern technologies, and deliver dependable energy solutions while maintaining our commitment to quality, sustainability, and excellence.</p>
-            <div class="welcome-signoff">{{ $siteName }} <span>— Powering a cleaner, smarter future.</span></div>
+            <p>{!! nl2br(e($home['welcome_intro_1'] ?? '')) !!}</p>
+            <p>{!! nl2br(e($home['welcome_intro_2'] ?? '')) !!}</p>
+            <div class="welcome-signoff">{!! e($home['welcome_signoff'] ?? $siteName) !!}</div>
         </div>
     </section>
     @endif
