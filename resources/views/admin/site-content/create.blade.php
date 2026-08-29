@@ -494,3 +494,134 @@ if(attachmentInput){document.getElementById('attachment-upload').onclick=()=>att
   });
 })();
 </script>@endpush
+
+
+{{-- Final CMS ribbon positioning fix: keep the Word-style toolbar attached to the viewport below the dashboard topbar while the editor is being edited. --}}
+@push('styles')
+<style>
+/* Final, JS-assisted sticky behavior.
+   CSS sticky remains the default; the floating state is used only while the
+   editor shell crosses the dashboard topbar, which makes the behavior robust
+   even when the CMS page is inside a complex layout. */
+.word-ribbon.ff-fixed-toolbar{
+    position:fixed !important;
+    top:var(--ff-toolbar-top,70px) !important;
+    left:var(--ff-toolbar-left,0px) !important;
+    width:var(--ff-toolbar-width,100%) !important;
+    max-width:none !important;
+    margin:0 !important;
+    z-index:950 !important;
+    border-radius:0 !important;
+}
+.ff-ribbon-spacer{
+    display:block;
+    width:100%;
+    flex:0 0 auto;
+}
+@media(max-width:700px){
+    .word-ribbon.ff-fixed-toolbar{
+        top:var(--ff-toolbar-top,70px) !important;
+    }
+}
+</style>
+@endpush
+
+@push('scripts')
+<script>
+(function(){
+    const shell=document.querySelector('.editor-shell');
+    const ribbon=shell?.querySelector('.word-ribbon');
+    if(!shell||!ribbon)return;
+
+    let spacer=null;
+    let floating=false;
+    let ticking=false;
+
+    const topbar=()=>document.querySelector('.topbar');
+    const topOffset=()=>{
+        const bar=topbar();
+        return Math.max(0,Math.round(bar?.offsetHeight || 70));
+    };
+
+    function ensureSpacer(){
+        if(spacer)return;
+        spacer=document.createElement('div');
+        spacer.className='ff-ribbon-spacer';
+        spacer.setAttribute('aria-hidden','true');
+        spacer.style.height=ribbon.getBoundingClientRect().height+'px';
+        ribbon.parentNode.insertBefore(spacer,ribbon);
+    }
+
+    function removeSpacer(){
+        if(spacer){
+            spacer.remove();
+            spacer=null;
+        }
+    }
+
+    function setFloating(){
+        if(floating)return;
+        const rect=shell.getBoundingClientRect();
+        const height=ribbon.getBoundingClientRect().height;
+        ensureSpacer();
+        spacer.style.height=height+'px';
+        ribbon.classList.add('ff-fixed-toolbar');
+        ribbon.style.setProperty('--ff-toolbar-top',topOffset()+'px');
+        ribbon.style.setProperty('--ff-toolbar-left',Math.round(rect.left)+'px');
+        ribbon.style.setProperty('--ff-toolbar-width',Math.round(rect.width)+'px');
+        floating=true;
+    }
+
+    function updateGeometry(){
+        if(!floating)return;
+        const rect=shell.getBoundingClientRect();
+        ribbon.style.setProperty('--ff-toolbar-top',topOffset()+'px');
+        ribbon.style.setProperty('--ff-toolbar-left',Math.round(rect.left)+'px');
+        ribbon.style.setProperty('--ff-toolbar-width',Math.round(rect.width)+'px');
+        if(spacer)spacer.style.height=ribbon.getBoundingClientRect().height+'px';
+    }
+
+    function clearFloating(){
+        if(!floating)return;
+        ribbon.classList.remove('ff-fixed-toolbar');
+        ribbon.style.removeProperty('--ff-toolbar-top');
+        ribbon.style.removeProperty('--ff-toolbar-left');
+        ribbon.style.removeProperty('--ff-toolbar-width');
+        removeSpacer();
+        floating=false;
+    }
+
+    function evaluate(){
+        ticking=false;
+        const offset=topOffset();
+        const rect=shell.getBoundingClientRect();
+        const height=ribbon.getBoundingClientRect().height;
+        const shouldFloat=rect.top<=offset && rect.bottom>offset+Math.min(height,window.innerHeight);
+
+        if(shouldFloat){
+            setFloating();
+            updateGeometry();
+        }else{
+            clearFloating();
+        }
+    }
+
+    function schedule(){
+        if(ticking)return;
+        ticking=true;
+        requestAnimationFrame(evaluate);
+    }
+
+    window.addEventListener('scroll',schedule,{passive:true});
+    window.addEventListener('resize',schedule,{passive:true});
+    window.addEventListener('orientationchange',schedule,{passive:true});
+
+    if('ResizeObserver' in window){
+        new ResizeObserver(schedule).observe(shell);
+        new ResizeObserver(schedule).observe(ribbon);
+    }
+
+    schedule();
+})();
+</script>
+@endpush
