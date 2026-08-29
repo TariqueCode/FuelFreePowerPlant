@@ -119,7 +119,7 @@ class SettingsController
             'header.home_label'=>'Home','header.management_label'=>'Management Team','header.gallery_label'=>'Gallery',
             'header.news_label'=>'News & Notices','header.career_label'=>'Career','header.contact_label'=>'Contact',
             'header.webmail_label'=>'Webmail','header.portal_label'=>'Portal','header.login_label'=>'Login',
-            'header.height'=>'64','header.container_width'=>'1280','header.nav_gap'=>'4','header.alignment'=>'center','header.sticky'=>'1','header.logo_width'=>'42','header.logo_gap'=>'9','header.social_size'=>'13','header.social_gap'=>'5',
+            'header.height'=>'64','header.container_width'=>'1280','header.nav_gap'=>'4','header.alignment'=>'center','header.sticky'=>'1','header.logo_width'=>'42','header.logo_gap'=>'9','header.social_size'=>'13','header.social_gap'=>'5','header.mobile_height'=>'56','header.mobile_logo_width'=>'34','header.mobile_social_visible'=>'0','header.mobile_sticky'=>'1',
         ];
         $systemKeys = array_filter(array_keys($defaults), fn ($key) => !str_starts_with($key, 'header.'));
         $system = SystemSetting::query()->whereIn('key', $systemKeys)->pluck('value','key')->all();
@@ -230,9 +230,9 @@ class SettingsController
             'header.portal_label'=>['required','string','max:40'],
             'header.login_label'=>['required','string','max:40'],
             'header.logo_visible'=>['nullable','boolean'],'header.social_visible'=>['nullable','boolean'],'header.portal_visible'=>['nullable','boolean'],
-            'header.height'=>['required','integer','min:48','max:120'],'header.container_width'=>['required','integer','min:960','max:1600'],'header.nav_gap'=>['required','integer','min:0','max:24'],'header.alignment'=>['required','in:left,center,right'],'header.sticky'=>['nullable','boolean'],'header.logo_width'=>['required','integer','min:24','max:96'],'header.logo_gap'=>['required','integer','min:0','max:24'],'header.social_size'=>['required','integer','min:12','max:28'],'header.social_gap'=>['required','integer','min:0','max:16'],
+            'header.height'=>['required','integer','min:48','max:120'],'header.container_width'=>['required','integer','min:960','max:1600'],'header.nav_gap'=>['required','integer','min:0','max:24'],'header.alignment'=>['required','in:left,center,right'],'header.sticky'=>['nullable','boolean'],'header.logo_width'=>['required','integer','min:24','max:96'],'header.logo_gap'=>['required','integer','min:0','max:24'],'header.social_size'=>['required','integer','min:12','max:28'],'header.social_gap'=>['required','integer','min:0','max:16'],'header.mobile_height'=>['required','integer','min:48','max:88'],'header.mobile_logo_width'=>['required','integer','min:24','max:48'],'header.mobile_social_visible'=>['nullable','boolean'],'header.mobile_sticky'=>['nullable','boolean'],
         ]);
-        $system = collect($data)->except(['header.height','header.container_width','header.nav_gap','header.alignment','header.sticky','header.logo_width','header.logo_gap','header.social_size','header.social_gap'])->all();
+        $system = collect($data)->except(['header.height','header.container_width','header.nav_gap','header.alignment','header.sticky','header.logo_width','header.logo_gap','header.social_size','header.social_gap','header.mobile_height','header.mobile_logo_width','header.mobile_social_visible','header.mobile_sticky'])->all();
         $this->saveSettings($system);
         foreach (['header.height','header.container_width','header.nav_gap','header.alignment','header.sticky'] as $key) {
             GlobalLayoutSetting::set($key, $data[$key] ?? null);
