@@ -4,6 +4,9 @@
     $publicFooterName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
     $publicFooterTagline = $footerSettings['tagline'] ?? (is_object($publicBrand) ? ($publicBrand->get('tagline') ?: $publicBrand->get('company.tagline') ?: config('fuelfree.company.tagline')) : ($publicBrand['tagline'] ?? $publicBrand['company.tagline'] ?? config('fuelfree.company.tagline')));
     $publicFooterLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
+    $footerContainerWidth = max(960, min(1400, (int) ($globalLayout['footer.container_width'] ?? 1120)));
+    $footerColumnGap = max(16, min(64, (int) ($globalLayout['footer.column_gap'] ?? 46)));
+    $footerLayout = in_array(($globalLayout['footer.layout'] ?? 'three-column'), ['three-column','two-column','stacked'], true) ? $globalLayout['footer.layout'] : 'three-column';
     $publicFooterNameParts = preg_split('/\s+/', trim((string) $publicFooterName), 2);
     $publicFooterNameFirst = $publicFooterNameParts[0] ?? '';
     $publicFooterNameRest = $publicFooterNameParts[1] ?? '';
@@ -14,8 +17,8 @@
 
 <style>
 .public-footer{margin-top:60px;border-top:1px solid rgba(86,210,238,.12);padding:46px 0 24px;color:#8aa8b1;font-size:14px;line-height:1.7}
-.public-footer-shell{width:min(1120px,calc(100% - 40px));margin:0 auto}
-.public-footer-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);gap:46px;padding-bottom:38px}
+.public-footer-shell{width:min(var(--public-footer-container,1120px),calc(100% - 40px));margin:0 auto}
+.public-footer-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);gap:var(--public-footer-gap,46px);padding-bottom:38px}
 .public-footer-section{min-width:0}
 .public-footer-brand-section{padding-right:20px}
 .public-footer-brand-row{display:flex;align-items:center;gap:11px;margin-bottom:9px}
@@ -39,6 +42,7 @@
 .public-footer-developer{font-size:9px;line-height:1.4;color:#496b75;white-space:nowrap}
 .public-footer-developer a{color:#547f8a;text-decoration:none;transition:color .2s ease}
 .public-footer-developer a:hover,.public-footer-developer a:focus-visible{color:#79aebb}
+@media(min-width:761px){.public-footer.footer-layout--two-column .public-footer-grid{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}.public-footer.footer-layout--two-column .public-footer-brand-section{grid-column:1/-1}.public-footer.footer-layout--stacked .public-footer-grid{grid-template-columns:1fr}.public-footer.footer-layout--stacked .public-footer-brand-section{grid-column:auto}}
 @media(max-width:760px){
     .public-footer{margin-top:44px;padding:34px 0 20px}
     .public-footer-shell{width:min(100% - 32px,560px)}
@@ -66,7 +70,7 @@
 }
 </style>
 
-<footer class="public-footer">
+<footer class="public-footer footer-layout--{{ $footerLayout }}" style="--public-footer-container:{{ $footerContainerWidth }}px;--public-footer-gap:{{ $footerColumnGap }}px;">
     <div class="public-footer-shell">
         <div class="public-footer-grid">
             <section class="public-footer-section public-footer-brand-section">
