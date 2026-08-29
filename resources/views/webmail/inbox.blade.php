@@ -16,7 +16,7 @@
         <span class="mail-count" id="mail-count">{{ count($messages) }} messages</span>
         <a class="btn icon" href="{{ url($base.'/inbox?folder='.urlencode($folder)) }}" title="Refresh" aria-label="Refresh"><i class="fa-solid fa-rotate"></i></a>
     </div>
-    <div class="folder-strip" aria-label="Mailbox folders">
+    <div class="folder-strip mobile-folder-strip" aria-label="Mailbox folders">
         @foreach($folders as $mailFolder)
             <a class="folder-chip {{ $mailFolder['name'] === $folder ? 'active' : '' }}" href="{{ url($base.'/inbox?folder='.urlencode($mailFolder['name'])) }}">
                 <i class="fa-solid {{ $mailFolder['icon'] ?? 'fa-folder' }}"></i><span>{{ $mailFolder['label'] }}</span>
