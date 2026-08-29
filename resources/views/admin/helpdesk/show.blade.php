@@ -107,11 +107,11 @@
                 </div>
             </section>
 
-            @if($type==='email' && auth()->user()->hasPermission('mail.manage'))
+            @if(auth()->user()->hasPermission('mail.manage'))
             <section class="side-card danger-card">
                 <div class="side-title"><i class="fa-solid fa-trash-can"></i><div><strong>Danger zone</strong><small>Permanent action</small></div></div>
-                <p>Delete this imported email and its stored attachments from the Help Desk server.</p>
-                <form method="POST" action="{{ route('admin.helpdesk.email.delete',$source->id) }}" onsubmit="return confirm('Permanently delete this Help Desk email and its attachments?')">@csrf @method('DELETE')<button class="delete-btn" type="submit">Delete email</button></form>
+                <p>Delete this Help Desk record permanently. Stored attachments or CV files are removed from the application server too.</p>
+                <form method="POST" action="{{ route('admin.helpdesk.delete',[$type,$source->id]) }}" onsubmit="return confirm('Permanently delete this Help Desk record and its stored files?')">@csrf @method('DELETE')<button class="delete-btn" type="submit"><i class="fa-solid fa-trash-can"></i> Delete permanently</button></form>
             </section>
             @endif
         </aside>
