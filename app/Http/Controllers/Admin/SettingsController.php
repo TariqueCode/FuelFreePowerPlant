@@ -131,7 +131,7 @@ class SettingsController
             'theme.text'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],
             'theme.muted'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],
             'theme.radius'=>['required','integer','min:0','max:32'],
-            'theme.font_body'=>['required','string','max:120'],'theme.font_heading'=>['required','string','max:120'],
+            'theme.font_body'=>['required','string','max:120','regex:/^[A-Za-z0-9 ,\-]+$/'],'theme.font_heading'=>['required','string','max:120','regex:/^[A-Za-z0-9 ,\-]+$/'],
             'theme.base_size'=>['required','integer','min:12','max:22'],'theme.line_height'=>['required','numeric','min:1.1','max:2.2'],
             'theme.space_section'=>['required','integer','min:0','max:160'],'theme.space_content'=>['required','integer','min:0','max:80'],
         ]);
