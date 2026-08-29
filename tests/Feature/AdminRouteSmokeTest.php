@@ -25,6 +25,32 @@ class AdminRouteSmokeTest extends TestCase
     }
 
     /** @return void */
+    public function test_sensitive_routes_have_expected_permissions(): void
+    {
+        $matrix = [
+            'admin.helpdesk' => 'mail.view',
+            'admin.helpdesk.delete' => 'mail.manage',
+            'admin.helpdesk.attachment' => 'mail.view',
+            'admin.mail' => 'mail.view',
+            'admin.mail.send' => 'mail.manage',
+            'admin.career-applications.cv' => 'mail.view',
+            'admin.documents.download' => 'documents.view',
+            'admin.documents.destroy' => 'documents.manage',
+            'admin.cms.index' => 'cms.view',
+            'admin.cms.destroy' => 'cms.manage',
+            'admin.social-links.destroy' => 'social-media.manage',
+        ];
+
+        foreach ($matrix as $name => $permission) {
+            $route = Route::getRoutes()->getByName($name);
+
+            $this->assertNotNull($route, "Missing route: {$name}");
+            $this->assertContains('auth', $route->gatherMiddleware());
+            $this->assertContains("permission:{$permission}", $route->gatherMiddleware());
+        }
+    }
+
+    /** @return void */
     public function test_settings_routes_require_authentication_and_permission(): void
     {
         foreach ([
