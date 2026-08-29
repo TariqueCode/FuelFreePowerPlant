@@ -33,7 +33,7 @@ class CareerApplicationController extends Controller
         $data = $request->validate(['status' => ['required','in:new,reviewing,shortlisted,rejected,hired']]);
         $application->update($data);
 
-        return response()->redirectToRoute('admin.career-applications.show', $application)
+        return redirect()->route('admin.helpdesk.show', ['type' => 'career', 'id' => $application->id])
             ->with('status', 'Application status updated.');
     }
 
