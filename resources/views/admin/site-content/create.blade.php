@@ -590,7 +590,7 @@ if(attachmentInput){document.getElementById('attachment-upload').onclick=()=>att
     ticking=false;
     const rect=shell.getBoundingClientRect();
     const height=ribbon.getBoundingClientRect().height;
-    const active=rect.top<=0 && rect.bottom>height;
+    const active=rect.top<=0 && rect.bottom>0;
 
     if(active){
       const left=rect.left;
