@@ -1,6 +1,6 @@
 @php
     $publicBrand = $brand ?? [];
-    $footerSettings = config('fuelfree.footer', []);
+    $footerSettings = array_merge(config('fuelfree.footer', []), collect($globalLayout ?? [])->filter(fn($v,$k)=>str_starts_with($k,'footer.'))->mapWithKeys(fn($v,$k)=>[substr($k,7)=>$v])->all());
     $publicFooterName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
     $publicFooterTagline = $footerSettings['tagline'] ?? (is_object($publicBrand) ? ($publicBrand->get('tagline') ?: $publicBrand->get('company.tagline') ?: config('fuelfree.company.tagline')) : ($publicBrand['tagline'] ?? $publicBrand['company.tagline'] ?? config('fuelfree.company.tagline')));
     $publicFooterLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
