@@ -160,8 +160,8 @@ class SettingsController
         $items = \App\Models\SiteContentItem::query()
             ->where('type','company')->where('status','published')
             ->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')
-            ->orderBy('navigation_order')->orderByDesc('created_at')
-            ->get(['id','title','slug','show_in_navigation','navigation_order']);
+            ->orderByRaw('CASE WHEN navigation_parent_id IS NULL THEN 0 ELSE 1 END')->orderBy('navigation_order')->orderByDesc('created_at')
+            ->get(['id','title','slug','show_in_navigation','navigation_order','navigation_parent_id']);
         return view('admin.settings.menu', compact('items'));
     }
 
@@ -172,14 +172,18 @@ class SettingsController
             'items.*.id'=>['required','integer'],
             'items.*.show_in_navigation'=>['nullable','boolean'],
             'items.*.navigation_order'=>['nullable','integer','min:0','max:9999'],
+            'items.*.navigation_parent_id'=>['nullable','integer'],
             'custom_items'=>['nullable','array','max:30'],
             'custom_items.*.label'=>['required','string','max:80'],
             'custom_items.*.url'=>['required','url','max:500'],
         ]);
         $ids = collect($data['items'] ?? [])->pluck('id')->all();
-        \App\Models\SiteContentItem::query()->whereIn('id',$ids)->where('type','company')->get()->each(function ($item) use ($data) {
+        $validParentIds = \App\Models\SiteContentItem::query()->whereIn('id',$ids)->where('type','company')->pluck('id')->all();
+        \App\Models\SiteContentItem::query()->whereIn('id',$ids)->where('type','company')->get()->each(function ($item) use ($data, $validParentIds) {
             $row = collect($data['items'])->firstWhere('id',$item->id);
             $item->show_in_navigation = (bool)($row['show_in_navigation'] ?? false);
+            $parentId = $row['navigation_parent_id'] ?? null;
+            $item->navigation_parent_id = ($parentId && in_array((int) $parentId, $validParentIds, true) && (int) $parentId !== (int) $item->id) ? (int) $parentId : null;
             $item->navigation_order = $row['navigation_order'] ?? null;
             $item->save();
         });
