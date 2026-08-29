@@ -165,7 +165,7 @@ class WebmailService
     private function walkParts($connection,int $number,?object $part,string $partNo,array &$parts): void
     {
         if(!$part)return; $type=$this->mimeType((int)($part->type??0)); $sub=strtolower((string)($part->subtype??'')); $filename=$this->partFilename($part); $disposition=strtolower((string)($part->disposition??''));
-        $cid=trim((string)($part->ifid??''),"<> \t\r\n");
+        $cid=trim((string)($part->id ?? $part->ifid ?? ''),"<> \t\r\n");
         if($type==='image'&&$cid!==''){$parts['inline'][]=['part'=>$partNo?:'1','type'=>$type.'/'.$sub,'cid'=>$cid];}
         if($filename!==''||$disposition==='attachment'){$parts['attachments'][]=['part'=>$partNo?:'1','name'=>$filename?:'attachment','type'=>$type.'/'.$sub,'size'=>(int)($part->bytes??0),'inline'=>$disposition==='inline','cid'=>$cid];}
         elseif($type==='text'&&in_array($sub,['html','plain'],true)){ $raw=$partNo!==''?imap_fetchbody($connection,$number,$partNo,FT_PEEK):imap_body($connection,$number,FT_PEEK); $decoded=$this->convertCharset($this->decodeTransfer((string)$raw,(int)($part->encoding??0)),$this->partCharset($part)); if($sub==='html')$parts['html']=$decoded;elseif($parts['text']===null)$parts['text']=$decoded; }
