@@ -77,10 +77,11 @@ class HelpDeskController extends Controller
         $openCount=$allItems->filter(fn($item) => in_array($item->status,['new','read','in_progress','reviewing'],true))->count();
         $repliedCount=$allItems->where('status','replied')->count();
         $unreadCount=$allItems->where('status','new')->count();
+        $emailCount=$allItems->where('channel','email')->count();
 
         return view('admin.helpdesk.index',[
             'items'=>$paginator,'openCount'=>$openCount,'contactCount'=>$contactCount,'careerCount'=>$careerCount,
-            'repliedCount'=>$repliedCount,'unreadCount'=>$unreadCount,'search'=>$search,'channel'=>$channel,'status'=>$status,
+            'repliedCount'=>$repliedCount,'unreadCount'=>$unreadCount,'emailCount'=>$emailCount,'allItems'=>$allItems,'search'=>$search,'channel'=>$channel,'status'=>$status,
         ]);
     }
 
