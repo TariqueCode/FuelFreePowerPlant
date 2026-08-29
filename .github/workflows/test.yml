@@ -34,6 +34,8 @@ jobs:
         run: |
           cp .env.example .env
           sed -i 's/^APP_KEY=.*/APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=/' .env
+          mkdir -p database
+          touch database/database.sqlite
 
       - name: Run Laravel tests
         run: php artisan test
