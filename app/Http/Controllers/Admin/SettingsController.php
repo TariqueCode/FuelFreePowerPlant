@@ -78,7 +78,7 @@ class SettingsController
             $password=(string)$mail['password'];
             $hasMailboxInput=trim((string)$mail['email'])!=='' || $password!=='';
             if(!$hasMailboxInput) continue;
-            if($password==='' && $existing && $email===$existing->address) $password=$existing->password;
+            if($password==='' && $existing && $email===$existing->address) continue;
             if($password==='') return back()->withErrors(['mail.'.$mail['group'].'_password'=>$mail['label'].' mailbox password is required when connecting a mailbox.'])->withInput($request->except(['mail.contact_password','mail.career_password']));
 
             $config=['imap_host'=>config('cpanel.mail_host','mail.fuelfreepowerplant.com'),'imap_port'=>993,'smtp_host'=>config('cpanel.mail_host','mail.fuelfreepowerplant.com'),'smtp_port'=>465];
