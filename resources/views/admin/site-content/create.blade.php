@@ -288,6 +288,10 @@ html, body {
   }
 }
 
+/* Fixed fallback state used by the ribbon controller above. */
+.word-ribbon.is-editor-floating{position:fixed!important;z-index:1200!important;margin:0!important;overflow:visible!important;contain:none!important;box-sizing:border-box!important}
+.word-ribbon.is-editor-floating .word-panel{overflow-x:auto!important;overflow-y:hidden!important}
+
 </style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
@@ -394,6 +398,63 @@ document.getElementById('insert-image-url').onclick=()=>{const url=prompt('Image
 document.getElementById('insert-video-url').onclick=()=>{const url=prompt('Video URL');if(url){restoreEditorSelection();editor.focus();document.execCommand('insertHTML',false,'<video controls preload="metadata" src="'+safeAttr(url)+'"></video>');sync()}};
 document.querySelectorAll('.word-ribbon [data-cmd]').forEach(b=>b.addEventListener('click',()=>{setTimeout(updateEditorToolbarState,0)}));
 updateEditorMetrics();updateEditorToolbarState();setTimeout(restoreLocalDraft,80);
+/* Guaranteed Word 365-style floating ribbon behavior.
+   CSS sticky can be defeated by an ancestor's scroll/contain context, so while the
+   editor is in view we promote the ribbon to a precisely positioned fixed bar.
+   It remains aligned to the editor and always sits below the dashboard topbar. */
+(function(){
+  const shell=document.querySelector('.editor-shell');
+  const ribbon=shell?.querySelector('.word-ribbon');
+  const topbar=document.querySelector('.topbar');
+  if(!shell||!ribbon)return;
+
+  let lockedHeight=0;
+  function reset(){
+    ribbon.classList.remove('is-editor-floating');
+    ribbon.style.position='';
+    ribbon.style.top='';
+    ribbon.style.left='';
+    ribbon.style.width='';
+    ribbon.style.right='';
+    ribbon.style.bottom='';
+    shell.style.paddingTop='';
+    lockedHeight=0;
+  }
+  function update(){
+    if(shell.classList.contains('is-fullscreen')){
+      reset();
+      return;
+    }
+    const sr=shell.getBoundingClientRect();
+    const rb=ribbon.getBoundingClientRect();
+    const top=Math.max(0,Math.round(topbar?.getBoundingClientRect().bottom || 70));
+    const height=Math.ceil(rb.height || lockedHeight || 110);
+    const shouldFloat=sr.top<=top && sr.bottom>top+height;
+    if(shouldFloat){
+      if(!ribbon.classList.contains('is-editor-floating')){
+        lockedHeight=height;
+        shell.style.paddingTop=lockedHeight+'px';
+        ribbon.classList.add('is-editor-floating');
+      }
+      const fresh=shell.getBoundingClientRect();
+      ribbon.style.position='fixed';
+      ribbon.style.top=top+'px';
+      ribbon.style.left=fresh.left+'px';
+      ribbon.style.width=fresh.width+'px';
+      ribbon.style.right='auto';
+      ribbon.style.bottom='auto';
+    }else if(ribbon.classList.contains('is-editor-floating')){
+      reset();
+    }
+  }
+  let raf=0;
+  const schedule=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;update()})};
+  window.addEventListener('scroll',schedule,{passive:true});
+  window.addEventListener('resize',schedule,{passive:true});
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',schedule);
+  update();
+})();
+
 
 
 const publicationType=document.getElementById('publication-type');
