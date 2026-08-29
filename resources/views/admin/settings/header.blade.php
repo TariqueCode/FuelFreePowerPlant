@@ -7,7 +7,15 @@
 <form method="POST" action="{{ route('admin.settings.header.update') }}">
 @csrf
 <x-admin.card>
-    <x-slot:header>Header controls</x-slot:header><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px">
+    <x-slot:header>Header controls</x-slot:header>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:18px">
+      <x-admin.setting-field label="Logo source" id="header-logo-source">
+        <div class="admin-help">Uses the existing global branding/logo. No duplicate upload system is created here.</div>
+      </x-admin.setting-field>
+      <x-admin.setting-field label="Header behavior" id="header-behavior">
+        <div class="admin-help">Global header settings apply consistently across supported devices.</div>
+      </x-admin.setting-field>
+    </div><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px">
 @foreach(['header.logo_visible'=>'Show logo','header.social_visible'=>'Show social icons','header.portal_visible'=>'Show portal'] as $key=>$label)
 <label class="admin-toggle"><input type="checkbox" name="{{ $key }}" value="1" @checked(old($key,$settings[$key]??'1')==='1')><span>{{ $label }}</span></label>
 @endforeach
@@ -30,7 +38,7 @@
 </form>
 @push('head')
 <style>
-.admin-toggle{display:flex;align-items:center;gap:8px;min-height:38px;padding:0 11px;border:1px solid var(--admin-border);border-radius:10px;font-size:10px}.admin-toggle input{accent-color:var(--admin-primary)}.admin-input{width:100%;box-sizing:border-box;min-height:38px;padding:8px 11px;border:1px solid var(--admin-border);border-radius:10px;background:rgba(255,255,255,.035);color:var(--admin-text);outline:none}.admin-input:focus{border-color:var(--admin-primary);box-shadow:0 0 0 3px rgba(85,204,231,.08)}
+.admin-help{font-size:10px;line-height:1.5;color:var(--admin-muted)}.admin-toggle{display:flex;align-items:center;gap:8px;min-height:38px;padding:0 11px;border:1px solid var(--admin-border);border-radius:10px;font-size:10px}.admin-toggle input{accent-color:var(--admin-primary)}.admin-input{width:100%;box-sizing:border-box;min-height:38px;padding:8px 11px;border:1px solid var(--admin-border);border-radius:10px;background:rgba(255,255,255,.035);color:var(--admin-text);outline:none}.admin-input:focus{border-color:var(--admin-primary);box-shadow:0 0 0 3px rgba(85,204,231,.08)}
 @media(max-width:700px){form .admin-card [style*="grid-template-columns"]{grid-template-columns:1fr!important}}
 </style>
 @endpush
