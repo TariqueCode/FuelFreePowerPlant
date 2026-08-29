@@ -19,6 +19,18 @@ class GlobalLayoutSetting extends Model
         return $value === null ? $default : $value;
     }
 
+    protected static function booted(): void
+    {
+        static::saved(function (self $setting) {
+            Cache::forget("fuelfree.layout.all.{$setting->scope}");
+            Cache::forget("fuelfree.layout.{$setting->scope}.{$setting->key}");
+        });
+        static::deleted(function (self $setting) {
+            Cache::forget("fuelfree.layout.all.{$setting->scope}");
+            Cache::forget("fuelfree.layout.{$setting->scope}.{$setting->key}");
+        });
+    }
+
     public static function set(string $key, mixed $value, string $scope = 'site'): void
     {
         static::query()->updateOrCreate(
