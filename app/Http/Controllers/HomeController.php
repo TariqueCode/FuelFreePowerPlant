@@ -27,6 +27,11 @@ class HomeController
             'welcome' => filter_var($settings['home.welcome_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
             'news' => filter_var($settings['home.news_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
             'gallery' => filter_var($settings['home.gallery_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
+            'welcome_eyebrow' => str_replace('{{company}}', $brand['name'], $settings['home.welcome_eyebrow'] ?? 'Welcome to {{company}}'),
+            'welcome_title' => $settings['home.welcome_title'] ?? 'Building a stronger energy future.',
+            'welcome_intro_1' => str_replace('{{company}}', $brand['name'], $settings['home.welcome_intro_1'] ?? '{{company}} is a forward-thinking energy company committed to contributing to Bangladesh’s sustainable energy future. Our vision is to develop efficient, reliable, and innovative power solutions that support the country’s growing energy needs and economic development.'),
+            'welcome_intro_2' => $settings['home.welcome_intro_2'] ?? 'We are dedicated to building a cleaner and smarter energy future through innovation, responsible development, and world-class management practices. We aim to strengthen our capabilities, expand our projects, embrace modern technologies, and deliver dependable energy solutions while maintaining our commitment to quality, sustainability, and excellence.',
+            'welcome_signoff' => str_replace('{{company}}', $brand['name'], $settings['home.welcome_signoff'] ?? '{{company}} — Powering a cleaner, smarter future.'),
         ];
 
         $newsLimit=max(1,min(12,(int)($settings['home.news_limit']??3)));
