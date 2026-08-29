@@ -159,7 +159,7 @@ class WebmailService
             fwrite($socket,$payload);$this->smtpExpect($socket,250);fwrite($socket,"QUIT\r\n");
         }finally{fclose($socket);}
         if(!$saveSent)return;
-        try{$sent=$this->findFolder($email,$password,$config,'SENT');if($sent){$connection=$this->open($email,$password,$config,$sent);@imap_append($connection,$this->mailbox($config,$sent),$payload,'\\Seen');imap_close($connection);}}catch(\\Throwable){}
+        try{$sent=$this->findFolder($email,$password,$config,'SENT');if($sent){$connection=$this->open($email,$password,$config,$sent);@imap_append($connection,$this->mailbox($config,$sent),$payload,'\\Seen');imap_close($connection);}}catch (\Throwable $e){}
     }
 
     private function walkParts($connection,int $number,?object $part,string $partNo,array &$parts): void
