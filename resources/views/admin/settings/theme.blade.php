@@ -7,7 +7,7 @@
 <form method="POST" action="{{ route('admin.settings.theme.update') }}">@csrf
 <x-admin.card><x-slot:header>Global color tokens</x-slot:header>
 <div class="theme-grid">
-@foreach(['theme.primary'=>'Primary','theme.secondary'=>'Secondary','theme.accent'=>'Accent','theme.surface'=>'Surface','theme.text'=>'Text','theme.muted'=>'Muted'] as $key=>$label)
+@foreach(['theme.primary'=>'Primary','theme.secondary'=>'Secondary','theme.accent'=>'Accent','theme.surface'=>'Surface','theme.text'=>'Text','theme.muted'=>'Muted','theme.success'=>'Success','theme.warning'=>'Warning','theme.danger'=>'Danger'] as $key=>$label)
 <x-admin.setting-field :label="$label" :id="'theme-'.str_replace('.','-',$key)"><div class="color-row"><input type="color" name="{{ $key }}" value="{{ old($key,$settings[$key]) }}" aria-label="{{ $label }}"><input class="admin-input" value="{{ old($key,$settings[$key]) }}" readonly></div></x-admin.setting-field>
 @endforeach
 </div>
