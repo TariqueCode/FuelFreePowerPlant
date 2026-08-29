@@ -12,6 +12,8 @@
       <x-admin.setting-field label="Logo source" id="header-logo-source">
         <div class="admin-help">Uses the existing global branding/logo. No duplicate upload system is created here.</div>
       </x-admin.setting-field>
+      <x-admin.setting-field label="Logo width (px)" id="header-logo-width"><input class="admin-input" type="number" name="header.logo_width" min="24" max="96" value="{{ old('header.logo_width',$settings['header.logo_width']??'42') }}" required></x-admin.setting-field>
+      <x-admin.setting-field label="Logo gap (px)" id="header-logo-gap"><input class="admin-input" type="number" name="header.logo_gap" min="0" max="24" value="{{ old('header.logo_gap',$settings['header.logo_gap']??'9') }}" required></x-admin.setting-field>
       <x-admin.setting-field label="Header behavior" id="header-behavior">
         <div class="admin-help">Global header settings apply consistently across supported devices.</div>
       </x-admin.setting-field>
