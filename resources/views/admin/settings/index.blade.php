@@ -142,6 +142,14 @@
         @endforeach
     </div>
 
+    <div class="homepage-editor-grid">
+        <div class="full"><label for="home-welcome-eyebrow">Welcome eyebrow</label><input id="home-welcome-eyebrow" name="home[welcome_eyebrow]" value="{{ old('home.welcome_eyebrow',str_replace('{{company}}',$settings['company.name'],$settings['home.welcome_eyebrow'])) }}" maxlength="120"></div>
+        <div class="full"><label for="home-welcome-title">Welcome heading</label><input id="home-welcome-title" name="home[welcome_title]" value="{{ old('home.welcome_title',$settings['home.welcome_title']) }}" maxlength="255"></div>
+        <div class="full"><label for="home-welcome-intro1">Introduction paragraph 1</label><textarea id="home-welcome-intro1" name="home[welcome_intro_1]" rows="5" maxlength="3000">{{ old('home.welcome_intro_1',str_replace('{{company}}',$settings['company.name'],$settings['home.welcome_intro_1'])) }}</textarea></div>
+        <div class="full"><label for="home-welcome-intro2">Introduction paragraph 2</label><textarea id="home-welcome-intro2" name="home[welcome_intro_2]" rows="5" maxlength="3000">{{ old('home.welcome_intro_2',$settings['home.welcome_intro_2']) }}</textarea></div>
+        <div class="full"><label for="home-welcome-signoff">Sign-off</label><input id="home-welcome-signoff" name="home[welcome_signoff]" value="{{ old('home.welcome_signoff',str_replace('{{company}}',$settings['company.name'],$settings['home.welcome_signoff'])) }}" maxlength="255"></div>
+    </div>
+
     <div class="homepage-note">
         <i class="fa-solid fa-circle-info"></i>
         <span><strong>Tip:</strong> The Slider is managed separately from the Slider menu, where images can be reordered with drag &amp; drop. This page only controls whether each homepage section is visible and, where applicable, its display count.</span>
@@ -257,7 +265,7 @@ label{display:block;font-size:10px;color:#9eb9c4;margin:0 0 7px}
 input:not([type=checkbox]),textarea{width:100%;box-sizing:border-box;padding:13px;border-radius:11px;border:1px solid var(--line);background:#071c29;color:#e9f7fb;outline:none;font:inherit}
 textarea{resize:vertical;min-height:84px}
 input:not([type=checkbox]):focus,textarea:focus{border-color:rgba(81,216,240,.35);box-shadow:0 0 0 3px rgba(81,216,240,.06)}
-.home-options{display:grid;gap:10px}
+.homepage-editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;padding-top:18px;border-top:1px solid rgba(76,205,233,.09)}.homepage-editor-grid .full{grid-column:1/-1}.homepage-editor-grid label{display:block;margin-bottom:6px;color:#a9c2ca;font-size:10px;font-weight:700}.homepage-editor-grid textarea{width:100%;resize:vertical;min-height:110px}.home-options{display:grid;gap:10px}
 .home-option{border:1px solid rgba(76,205,233,.11);border-radius:16px;background:rgba(76,205,233,.025);overflow:hidden}
 .option-main{display:grid;grid-template-columns:44px minmax(0,1fr) 46px;align-items:center;gap:12px;padding:13px 14px;margin:0;cursor:pointer}
 .option-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:rgba(72,216,241,.08);color:#5fd4ed;font-size:15px}
