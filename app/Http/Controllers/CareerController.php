@@ -94,7 +94,7 @@ class CareerController extends Controller
                 true
             );
 
-            $request->merge(['cv' => $uploadedFile]);
+            $request->files->set('cv', $uploadedFile);
             $data = $this->validateApplication($request);
             unset($data['website']);
 
