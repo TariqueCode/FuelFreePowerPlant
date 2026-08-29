@@ -239,11 +239,7 @@ class SettingsController
             'home.slider_enabled'=>['nullable','boolean'],'home.welcome_enabled'=>['nullable','boolean'],'home.news_enabled'=>['nullable','boolean'],'home.gallery_enabled'=>['nullable','boolean'],
             'mail.contact_email'=>['nullable','email:rfc,dns','ends_with:@fuelfreepowerplant.com','max:255'],'mail.contact_password'=>['nullable','string','max:1000'],
             'mail.career_email'=>['nullable','email:rfc,dns','ends_with:@fuelfreepowerplant.com','max:255'],'mail.career_password'=>['nullable','string','max:1000'],
-            'company.logo'=>['nullable','image','mimes:jpg,jpeg,png,webp,svg'],'header.*'=>['required','string','max:100'],
-            'footer.tagline'=>['nullable','string','max:255'],'footer.technology'=>['nullable','string','max:255'],'footer.office_heading'=>['required','string','max:100'],
-            'footer.address'=>['required','string','max:500'],'footer.contact_heading'=>['required','string','max:100'],'footer.email'=>['required','email','max:255'],
-            'footer.phone'=>['required','string','max:50'],'footer.website'=>['required','string','max:255'],'footer.website_url'=>['required','url','max:255'],
-            'footer.get_in_touch_label'=>['required','string','max:100'],'footer.get_in_touch_url'=>['required','string','max:255'],'footer.copyright_text'=>['required','string','max:150'],
+            'company.logo'=>['nullable','image','mimes:jpg,jpeg,png,webp,svg'],
         ]);
 
         $data=[
@@ -252,14 +248,6 @@ class SettingsController
             'home.news_limit'=>data_get($validated,'home.news_limit'),'home.gallery_limit'=>data_get($validated,'home.gallery_limit'),
             'home.slider_enabled'=>$request->boolean('home.slider_enabled')?'1':'0','home.welcome_enabled'=>$request->boolean('home.welcome_enabled')?'1':'0',
             'home.news_enabled'=>$request->boolean('home.news_enabled')?'1':'0','home.gallery_enabled'=>$request->boolean('home.gallery_enabled')?'1':'0',
-            'header.home_label'=>data_get($validated,'header.home_label'),'header.management_label'=>data_get($validated,'header.management_label'),
-            'header.gallery_label'=>data_get($validated,'header.gallery_label'),'header.news_label'=>data_get($validated,'header.news_label'),
-            'header.career_label'=>data_get($validated,'header.career_label'),'header.contact_label'=>data_get($validated,'header.contact_label'),
-            'header.webmail_label'=>data_get($validated,'header.webmail_label'),'header.portal_label'=>data_get($validated,'header.portal_label'),'header.login_label'=>data_get($validated,'header.login_label'),
-            'footer.tagline'=>data_get($validated,'footer.tagline'),'footer.technology'=>data_get($validated,'footer.technology'),'footer.office_heading'=>data_get($validated,'footer.office_heading'),
-            'footer.address'=>data_get($validated,'footer.address'),'footer.contact_heading'=>data_get($validated,'footer.contact_heading'),'footer.email'=>data_get($validated,'footer.email'),
-            'footer.phone'=>data_get($validated,'footer.phone'),'footer.website'=>data_get($validated,'footer.website'),'footer.website_url'=>data_get($validated,'footer.website_url'),
-            'footer.get_in_touch_label'=>data_get($validated,'footer.get_in_touch_label'),'footer.get_in_touch_url'=>data_get($validated,'footer.get_in_touch_url'),'footer.copyright_text'=>data_get($validated,'footer.copyright_text'),
         ];
 
         foreach([
