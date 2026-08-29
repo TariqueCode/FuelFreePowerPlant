@@ -30,7 +30,5 @@ class GlobalLayoutService
     public function set(string $key, mixed $value, string $scope = 'site'): void
     {
         GlobalLayoutSetting::set($key, $value, $scope);
-        Cache::forget("fuelfree.layout.all.{$scope}");
-        Cache::forget("fuelfree.layout.{$scope}.{$key}");
     }
 }
