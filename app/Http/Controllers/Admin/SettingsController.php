@@ -9,6 +9,7 @@ use App\Services\WebmailService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 use Throwable;
 
@@ -35,6 +36,50 @@ class SettingsController
         $contactAccount=EmailAccount::query()->where('mailbox_group','contact')->where('status','active')->where('address','like','%@fuelfreepowerplant.com')->first();
         $careerAccount=EmailAccount::query()->where('mailbox_group','career')->where('status','active')->where('address','like','%@fuelfreepowerplant.com')->first();
         return view('admin.settings.index',compact('settings','contactAccount','careerAccount'));
+    }
+
+    public function verifyMailbox(Request $request, WebmailService $webmail): RedirectResponse
+    {
+        $group = (string) $request->input('group');
+        abort_unless(in_array($group, ['contact', 'career'], true), 404);
+
+        $label = $group === 'career' ? 'Career' : 'Contact';
+        $fallback = $group === 'career' ? 'career@fuelfreepowerplant.com' : 'info@fuelfreepowerplant.com';
+        $email = strtolower(trim((string) $request->input('email')));
+        $password = (string) $request->input('password');
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !str_ends_with($email, '@fuelfreepowerplant.com')) {
+            return back()->withErrors(['mail.'.$group.'_email' => $label.' mailbox address is invalid.'])->withInput($request->except(['mail.contact_password','mail.career_password']));
+        }
+        if ($password === '') {
+            return back()->withErrors(['mail.'.$group.'_password' => $label.' mailbox password is required for verification.'])->withInput($request->except(['mail.contact_password','mail.career_password']));
+        }
+
+        $config = [
+            'imap_host' => config('cpanel.mail_host', 'mail.fuelfreepowerplant.com'),
+            'imap_port' => 993,
+            'smtp_host' => config('cpanel.mail_host', 'mail.fuelfreepowerplant.com'),
+            'smtp_port' => 465,
+        ];
+
+        try {
+            $webmail->login($email, $password, $config);
+
+            // Keep only a non-reversible verification fingerprint in the session.
+            // The password itself is never stored by the verification action.
+            $fingerprint = hash_hmac('sha256', $group.'|'.$email.'|'.$password, (string) config('app.key'));
+            $request->session()->put('mailbox_verification.'.$group, [
+                'email' => $email,
+                'fingerprint' => $fingerprint,
+                'verified_at' => now()->toIso8601String(),
+            ]);
+
+            return back()->with('mail_verify_'.$group, $label.' mailbox login verified successfully. You can now save this mailbox.');
+        } catch (Throwable $e) {
+            report($e);
+            $request->session()->forget('mailbox_verification.'.$group);
+            return back()->withErrors(['mail.'.$group.'_email' => $label.' mailbox login failed. Check the email, password and cPanel mail server settings.'])->withInput($request->except(['mail.contact_password','mail.career_password']));
+        }
     }
 
     public function update(Request $request,WebmailService $webmail): RedirectResponse
@@ -81,11 +126,13 @@ class SettingsController
             if($password==='' && $existing && $email===$existing->address) continue;
             if($password==='') return back()->withErrors(['mail.'.$mail['group'].'_password'=>$mail['label'].' mailbox password is required when connecting a mailbox.'])->withInput($request->except(['mail.contact_password','mail.career_password']));
 
-            $config=['imap_host'=>config('cpanel.mail_host','mail.fuelfreepowerplant.com'),'imap_port'=>993,'smtp_host'=>config('cpanel.mail_host','mail.fuelfreepowerplant.com'),'smtp_port'=>465];
-            try{$webmail->login($email,$password,$config);}catch(Throwable $e){
-                report($e);
-                return back()->withErrors(['mail.'.$mail['group'].'_email'=>$mail['label'].' mailbox verification failed. Check the email, password and cPanel mail server settings.'])->withInput($request->except(['mail.contact_password','mail.career_password']));
+            $verification=$request->session()->get('mailbox_verification.'.$mail['group']);
+            $fingerprint=hash_hmac('sha256',$mail['group'].'|'.$email.'|'.$password,(string) config('app.key'));
+            if(!is_array($verification) || ($verification['email']??'')!==$email || !hash_equals((string)($verification['fingerprint']??''),$fingerprint)){
+                return back()->withErrors(['mail.'.$mail['group'].'_email'=>'Verify the '.$mail['label'].' mailbox login successfully before saving these credentials.'])->withInput($request->except(['mail.contact_password','mail.career_password']));
             }
+
+            $config=['imap_host'=>config('cpanel.mail_host','mail.fuelfreepowerplant.com'),'imap_port'=>993,'smtp_host'=>config('cpanel.mail_host','mail.fuelfreepowerplant.com'),'smtp_port'=>465];
 
             EmailAccount::query()->where('mailbox_group',$mail['group'])->where('address','!=',$email)->update(['status'=>'inactive']);
             $account=EmailAccount::updateOrCreate(['address'=>$email],[
@@ -94,6 +141,7 @@ class SettingsController
                 'username'=>$email,'password'=>$password,'provisioned'=>true,'provider_message'=>'Verified from System Settings.',
             ]);
             SystemSetting::updateOrCreate(['key'=>'mail.'.$mail['group'].'_account_id'],['value'=>(string)$account->id,'is_sensitive'=>false]);
+            $request->session()->forget('mailbox_verification.'.$mail['group']);
         }
 
         if($request->hasFile('company.logo')){
