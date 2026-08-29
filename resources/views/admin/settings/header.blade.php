@@ -7,7 +7,11 @@
 <form method="POST" action="{{ route('admin.settings.header.update') }}">
 @csrf
 <x-admin.card>
-    <x-slot:header>Navigation labels</x-slot:header>
+    <x-slot:header>Header controls</x-slot:header><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px">
+@foreach(['header.logo_visible'=>'Show logo','header.social_visible'=>'Show social icons','header.portal_visible'=>'Show portal'] as $key=>$label)
+<label class="admin-toggle"><input type="checkbox" name="{{ $key }}" value="1" @checked(old($key,$settings[$key]??'1')==='1')><span>{{ $label }}</span></label>
+@endforeach
+</div><div style="margin-bottom:14px;font-size:10px;font-weight:650">Navigation labels</div>
     <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px">
     @foreach([
       'header.home_label'=>'Home','header.management_label'=>'Management Team','header.gallery_label'=>'Gallery',
@@ -26,7 +30,7 @@
 </form>
 @push('head')
 <style>
-.admin-input{width:100%;box-sizing:border-box;min-height:38px;padding:8px 11px;border:1px solid var(--admin-border);border-radius:10px;background:rgba(255,255,255,.035);color:var(--admin-text);outline:none}.admin-input:focus{border-color:var(--admin-primary);box-shadow:0 0 0 3px rgba(85,204,231,.08)}
+.admin-toggle{display:flex;align-items:center;gap:8px;min-height:38px;padding:0 11px;border:1px solid var(--admin-border);border-radius:10px;font-size:10px}.admin-toggle input{accent-color:var(--admin-primary)}.admin-input{width:100%;box-sizing:border-box;min-height:38px;padding:8px 11px;border:1px solid var(--admin-border);border-radius:10px;background:rgba(255,255,255,.035);color:var(--admin-text);outline:none}.admin-input:focus{border-color:var(--admin-primary);box-shadow:0 0 0 3px rgba(85,204,231,.08)}
 @media(max-width:700px){form .admin-card [style*="grid-template-columns"]{grid-template-columns:1fr!important}}
 </style>
 @endpush
