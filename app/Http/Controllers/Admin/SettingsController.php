@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\EmailAccount;
 use App\Models\SystemSetting;
+use App\Models\GlobalLayoutSetting;
 use App\Services\WebmailService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -118,6 +119,7 @@ class SettingsController
             'header.home_label'=>'Home','header.management_label'=>'Management Team','header.gallery_label'=>'Gallery',
             'header.news_label'=>'News & Notices','header.career_label'=>'Career','header.contact_label'=>'Contact',
             'header.webmail_label'=>'Webmail','header.portal_label'=>'Portal','header.login_label'=>'Login',
+            'header.height'=>'64','header.container_width'=>'1280','header.nav_gap'=>'4','header.alignment'=>'center','header.sticky'=>'1',
         ];
         $settings = array_merge($defaults, SystemSetting::query()->whereIn('key', array_keys($defaults))->pluck('value','key')->all());
         return view('admin.settings.header', compact('settings'));
@@ -225,8 +227,13 @@ class SettingsController
             'header.portal_label'=>['required','string','max:40'],
             'header.login_label'=>['required','string','max:40'],
             'header.logo_visible'=>['nullable','boolean'],'header.social_visible'=>['nullable','boolean'],'header.portal_visible'=>['nullable','boolean'],
+            'header.height'=>['required','integer','min:48','max:120'],'header.container_width'=>['required','integer','min:960','max:1600'],'header.nav_gap'=>['required','integer','min:0','max:24'],'header.alignment'=>['required','in:left,center,right'],'header.sticky'=>['nullable','boolean'],
         ]);
-        $this->saveSettings($data);
+        $system = collect($data)->except(['header.height','header.container_width','header.nav_gap','header.alignment','header.sticky'])->all();
+        $this->saveSettings($system);
+        foreach (['header.height','header.container_width','header.nav_gap','header.alignment','header.sticky'] as $key) {
+            GlobalLayoutSetting::set($key, $data[$key] ?? null);
+        }
         return back()->with('status','Header settings saved successfully.');
     }
 
