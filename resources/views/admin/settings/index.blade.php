@@ -45,7 +45,7 @@
         <div>
             <div class="eyebrow">HELP DESK MAILBOXES</div>
             <h2>Contact &amp; Career email login</h2>
-            <p>Connect the two official mailboxes directly. Incoming messages are imported to the Help Desk server and removed from the external mailbox after successful storage.</p>
+            <p>Connect the two official mailboxes directly. Use the separate Verify button for each mailbox first. Save will be accepted only after the entered email/password has passed a live IMAP login check.</p>
         </div>
         <i class="fa-solid fa-envelope-circle-check"></i>
     </div>
@@ -57,7 +57,11 @@
             <input id="mail-contact-email" type="email" name="mail[contact_email]" value="{{ old('mail.contact_email',$contactAccount->address ?? 'info@fuelfreepowerplant.com') }}" placeholder="info@fuelfreepowerplant.com" autocomplete="username">
             <label for="mail-contact-password">Password</label>
             <input id="mail-contact-password" type="password" name="mail[contact_password]" placeholder="{{ $contactAccount ? 'Leave blank to keep the saved password' : 'Enter mailbox password' }}" autocomplete="new-password">
-            <small>Contact replies are always sent from <strong>info@fuelfreepowerplant.com</strong>. The mailbox password is encrypted in the database.</small>
+            <div class="mail-verify-row">
+                <button type="submit" class="mail-verify-btn" formmethod="POST" formaction="{{ route('admin.settings.mail.verify') }}" name="group" value="contact"><i class="fa-solid fa-plug-circle-check"></i> Verify Contact Login</button>
+                @if(session('mail_verify_contact'))<span class="mail-verify-success"><i class="fa-solid fa-circle-check"></i> {{ session('mail_verify_contact') }}</span>@endif
+            </div>
+            <small>Contact replies are always sent from <strong>info@fuelfreepowerplant.com</strong>. Passwords are encrypted after saving. Verify the login before saving.</small>
         </div>
 
         <div class="mail-route">
@@ -66,7 +70,11 @@
             <input id="mail-career-email" type="email" name="mail[career_email]" value="{{ old('mail.career_email',$careerAccount->address ?? 'career@fuelfreepowerplant.com') }}" placeholder="career@fuelfreepowerplant.com" autocomplete="username">
             <label for="mail-career-password">Password</label>
             <input id="mail-career-password" type="password" name="mail[career_password]" placeholder="{{ $careerAccount ? 'Leave blank to keep the saved password' : 'Enter mailbox password' }}" autocomplete="new-password">
-            <small>Career replies are always sent from <strong>career@fuelfreepowerplant.com</strong>. CV attachments are stored on the Help Desk server.</small>
+            <div class="mail-verify-row">
+                <button type="submit" class="mail-verify-btn" formmethod="POST" formaction="{{ route('admin.settings.mail.verify') }}" name="group" value="career"><i class="fa-solid fa-plug-circle-check"></i> Verify Career Login</button>
+                @if(session('mail_verify_career'))<span class="mail-verify-success"><i class="fa-solid fa-circle-check"></i> {{ session('mail_verify_career') }}</span>@endif
+            </div>
+            <small>Career replies are always sent from <strong>career@fuelfreepowerplant.com</strong>. CV attachments are stored on the Help Desk server. Verify the login before saving.</small>
         </div>
     </div>
 
