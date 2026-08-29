@@ -1,4 +1,5 @@
 @php
+    $globalLayout = $globalLayout ?? app(\App\Services\GlobalLayoutService::class)->all();
     $publicBrand = $brand ?? null;
     if (!$publicBrand || (is_countable($publicBrand) && count($publicBrand) === 0)) {
         $publicBrand = \App\Models\SystemSetting::query()->whereIn('key',['company.name','company.logo_path','company.tagline'])->pluck('value','key');
