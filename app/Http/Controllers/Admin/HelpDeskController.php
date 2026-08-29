@@ -167,15 +167,40 @@ class HelpDeskController extends Controller
         }
     }
 
-    public function deleteEmail(Request $request,int $id): RedirectResponse
+    public function destroy(Request $request, string $type, int $id): RedirectResponse
     {
-        abort_unless($request->user()->hasPermission('mail.manage'),403);
-        $email=HelpdeskEmail::query()->with('attachments')->findOrFail($id);
-        foreach($email->attachments as $attachment){
-            if($attachment->path) Storage::disk('local')->delete($attachment->path);
+        abort_unless($request->user()->hasPermission('mail.manage'), 403);
+
+        [$source] = $this->source($type, $id);
+
+        HelpdeskReply::query()
+            ->where('source_type', $type)
+            ->where('source_id', $id)
+            ->delete();
+
+        if ($type === 'email') {
+            $source->load('attachments');
+            foreach ($source->attachments as $attachment) {
+                if ($attachment->path) {
+                    Storage::disk('local')->delete($attachment->path);
+                }
+            }
         }
-        $email->delete();
-        return redirect()->route('admin.helpdesk')->with('status','Help Desk email permanently deleted from the application server.');
+
+        if ($type === 'career' && $source->cv_path) {
+            Storage::disk('local')->delete($source->cv_path);
+        }
+
+        $source->delete();
+
+        return redirect()
+            ->route('admin.helpdesk')
+            ->with('status', 'The Help Desk record and its stored attachments were permanently deleted.');
+    }
+
+    public function deleteEmail(Request $request, int $id): RedirectResponse
+    {
+        return $this->destroy($request, 'email', $id);
     }
 
     public function downloadAttachment(Request $request,int $id): mixed
