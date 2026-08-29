@@ -45,6 +45,9 @@ button,input,textarea{font:inherit}
 .side a{display:flex;align-items:center;gap:11px;padding:13px 14px;border-radius:12px;color:var(--muted);font-weight:700}
 .side a i{width:18px;text-align:center;color:#65cfe4}
 .side a.active,.side a:hover{background:#0b2d38;color:var(--text)}
+.side-compose{display:flex;align-items:center;gap:11px;padding:13px 14px;border-radius:12px;color:var(--text);font-weight:750;background:rgba(67,209,240,.07);border:1px solid rgba(86,210,238,.12)}
+.side-compose i{width:18px;text-align:center;color:#65cfe4}
+.side-compose:hover{background:#0b2d38}
 .side-divider{height:1px;background:var(--line);margin:10px 5px}
 .side-note{padding:11px 13px;color:#6f909b;font-size:11px;line-height:1.6}
 .main{min-width:0}
@@ -88,7 +91,12 @@ button,input,textarea{font:inherit}
 .reader-actions{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
 .reader-actions form{display:contents}
 .reader-body{position:relative;isolation:isolate;contain:content;line-height:1.75;overflow-x:auto;overflow-y:visible;overflow-wrap:anywhere;-webkit-overflow-scrolling:touch;background:#fff;color:#17232a;border:1px solid rgba(86,210,238,.12);border-radius:14px;padding:16px;max-width:100%}
-.reader-body>*{max-width:100%}
+.reader-body>*{max-width:100%!important;box-sizing:border-box}
+.reader-body table,.reader-body tbody,.reader-body thead,.reader-body tr{width:100%!important;max-width:100%!important}
+.reader-body td,.reader-body th{max-width:100%!important;overflow-wrap:anywhere;word-break:break-word}
+.reader-body div,.reader-body section,.reader-body article,.reader-body p{max-width:100%!important;overflow-wrap:anywhere}
+.reader-body img{display:block;max-width:100%!important;width:auto!important;height:auto!important}
+.reader-body iframe,.reader-body video{width:100%!important;max-width:100%!important}
 .reader-body a{color:#087f9c;text-decoration:underline}
 .reader-body img{max-width:100%!important;height:auto!important}
 .reader-body video,.reader-body iframe{max-width:100%!important;height:auto}
@@ -165,10 +173,18 @@ button,input,textarea{font:inherit}
 <div class="wm-body">
 <nav class="side" aria-label="Mailbox navigation">
     <div class="side-nav">
-        <a class="{{ request()->is('inbox')||request()->is('message/*')?'active':'' }}" href="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/inbox"><i class="fa-solid fa-inbox"></i><span>Inbox</span></a>
-        <a class="{{ request()->is('compose')?'active':'' }}" href="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/compose"><i class="fa-solid fa-pen-to-square"></i><span>Compose</span></a>
+        @if(!empty($folders))
+            @foreach($folders as $mailFolder)
+                <a class="{{ ($mailFolder['name'] ?? 'INBOX') === ($folder ?? 'INBOX') ? 'active' : '' }}" href="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/inbox?folder={{ urlencode($mailFolder['name'] ?? 'INBOX') }}">
+                    <i class="fa-solid {{ $mailFolder['icon'] ?? 'fa-folder' }}"></i><span>{{ $mailFolder['label'] ?? $mailFolder['name'] }}</span>
+                </a>
+            @endforeach
+        @endif
     </div>
     <div class="side-divider"></div>
+    <a class="side-compose" href="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/compose">
+        <i class="fa-solid fa-pen-to-square"></i><span>Compose</span>
+    </a>
     <div class="side-note"><i class="fa-solid fa-shield-halved"></i> Your mailbox password is used only for the live mail connection and is never shown in the interface.</div>
 </nav>
 <main class="main">
