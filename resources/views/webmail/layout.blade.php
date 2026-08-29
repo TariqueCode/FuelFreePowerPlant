@@ -45,9 +45,6 @@ button,input,textarea{font:inherit}
 .side a{display:flex;align-items:center;gap:11px;padding:13px 14px;border-radius:12px;color:var(--muted);font-weight:700}
 .side a i{width:18px;text-align:center;color:#65cfe4}
 .side a.active,.side a:hover{background:#0b2d38;color:var(--text)}
-.side-compose{display:flex;align-items:center;gap:11px;padding:13px 14px;border-radius:12px;color:var(--text);font-weight:750;background:rgba(67,209,240,.07);border:1px solid rgba(86,210,238,.12)}
-.side-compose i{width:18px;text-align:center;color:#65cfe4}
-.side-compose:hover{background:#0b2d38}
 .side-divider{height:1px;background:var(--line);margin:10px 5px}
 .side-note{padding:11px 13px;color:#6f909b;font-size:11px;line-height:1.6}
 .main{min-width:0}
@@ -66,7 +63,7 @@ button,input,textarea{font:inherit}
 .search-box input{width:100%;height:42px;padding:0 13px 0 38px;border:1px solid var(--line);border-radius:11px;background:#041a23;color:var(--text);outline:none}
 .search-box input:focus{border-color:var(--accent)}
 .mail-count{color:var(--muted);font-size:12px;white-space:nowrap}
-.folder-strip{display:flex;gap:7px;flex-wrap:wrap;padding:11px 13px;border-bottom:1px solid var(--line);background:rgba(5,22,30,.32)}
+.folder-strip{display:none;gap:7px;flex-wrap:wrap;padding:11px 13px;border-bottom:1px solid var(--line);background:rgba(5,22,30,.32)}
 .folder-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 11px;border:1px solid transparent;border-radius:9px;color:var(--muted);font-size:12px;font-weight:750}
 .folder-chip:hover{background:#0b2d38;color:var(--text)}
 .folder-chip.active{background:rgba(67,209,240,.09);border-color:rgba(86,210,238,.18);color:#8bf3ff}
@@ -136,7 +133,7 @@ button,input,textarea{font:inherit}
  .mail-toolbar{flex-wrap:wrap}
  .search-box{order:1;flex-basis:100%}
  .mail-count{margin-left:3px}
- .folder-strip{overflow:auto;flex-wrap:nowrap;scrollbar-width:none}
+ .folder-strip{display:flex;overflow:auto;flex-wrap:nowrap;scrollbar-width:none}
  .folder-strip::-webkit-scrollbar{display:none}
  .folder-chip{white-space:nowrap;flex:0 0 auto}
  .compose,.reader{padding:15px}
@@ -181,10 +178,6 @@ button,input,textarea{font:inherit}
             @endforeach
         @endif
     </div>
-    <div class="side-divider"></div>
-    <a class="side-compose" href="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/compose">
-        <i class="fa-solid fa-pen-to-square"></i><span>Compose</span>
-    </a>
     <div class="side-note"><i class="fa-solid fa-shield-halved"></i> Your mailbox password is used only for the live mail connection and is never shown in the interface.</div>
 </nav>
 <main class="main">
