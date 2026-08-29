@@ -7,7 +7,7 @@ use App\Models\CareerApplication;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class CareerApplicationController extends Controller
 {
@@ -22,9 +22,9 @@ class CareerApplicationController extends Controller
         return view('admin.career-applications.index', compact('applications'));
     }
 
-    public function show(CareerApplication $application): View
+    public function show(CareerApplication $application): RedirectResponse
     {
-        return view('admin.career-applications.show', compact('application'));
+        return redirect()->route('admin.helpdesk.show', ['type' => 'career', 'id' => $application->id]);
     }
 
     public function update(Request $request, CareerApplication $application): Response
