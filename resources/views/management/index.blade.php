@@ -66,7 +66,7 @@ main{padding:72px 0 88px}
 }
 .grid{
     display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-columns:repeat(4,minmax(0,1fr));
     gap:24px;
     align-items:start;
 }
