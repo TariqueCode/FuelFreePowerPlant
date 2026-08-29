@@ -116,6 +116,18 @@ class WebmailService
         imap_expunge($connection); imap_close($connection);
     }
 
+    public function purge(string $email,string $password,int $uid,string $folder,array $config=[]): void
+    {
+        $connection=$this->open($email,$password,$config,$folder);
+        if(!imap_setflag_full($connection,(string)$uid,'\\Deleted',ST_UID)){
+            $e=$this->imapError()?:'Unable to permanently delete message.';
+            imap_close($connection);
+            throw new RuntimeException($e);
+        }
+        imap_expunge($connection);
+        imap_close($connection);
+    }
+
     public function delete(string $email,string $password,int $uid,string $folder,array $config=[]): void
     {
         $trash=collect($this->folders($email,$password,$config))->firstWhere('special','trash');

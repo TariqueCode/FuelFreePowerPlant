@@ -43,52 +43,37 @@
 <div class="form-card mail-routing-card">
     <div class="section-heading">
         <div>
-            <div class="eyebrow">PUBLIC EMAIL</div>
-            <h2>Website email routing</h2>
-            <p>Choose which connected company mailbox receives Contact and Career submissions.</p>
+            <div class="eyebrow">HELP DESK MAILBOXES</div>
+            <h2>Contact &amp; Career email login</h2>
+            <p>Connect the two official mailboxes directly. Incoming messages are imported to the Help Desk server and removed from the external mailbox after successful storage.</p>
         </div>
         <i class="fa-solid fa-envelope-circle-check"></i>
     </div>
 
     <div class="mail-routing-grid">
         <div class="mail-route">
-            <label for="mail-contact-account">Contact page mailbox</label>
-            <select id="mail-contact-account" name="mail[contact_account_id]">
-                <option value="">— Select a mailbox —</option>
-                @foreach($mailboxes as $mailbox)
-                    <option value="{{ $mailbox->id }}" @selected((string) old('mail.contact_account_id',$settings['mail.contact_account_id']) === (string) $mailbox->id)>
-                        {{ $mailbox->display_name ?: $mailbox->address }} — {{ $mailbox->address }}
-                    </option>
-                @endforeach
-            </select>
-            <small>New messages submitted from the public Contact page will be forwarded here.</small>
+            <div class="route-title"><i class="fa-solid fa-circle-info"></i><span>Contact</span></div>
+            <label for="mail-contact-email">Official email</label>
+            <input id="mail-contact-email" type="email" name="mail[contact_email]" value="{{ old('mail.contact_email',$contactAccount->address ?? 'info@fuelfreepowerplant.com') }}" placeholder="info@fuelfreepowerplant.com" autocomplete="username">
+            <label for="mail-contact-password">Password</label>
+            <input id="mail-contact-password" type="password" name="mail[contact_password]" placeholder="{{ $contactAccount ? 'Leave blank to keep the saved password' : 'Enter mailbox password' }}" autocomplete="new-password">
+            <small>Contact replies are always sent from <strong>info@fuelfreepowerplant.com</strong>. The mailbox password is encrypted in the database.</small>
         </div>
 
         <div class="mail-route">
-            <label for="mail-career-account">Career page mailbox</label>
-            <select id="mail-career-account" name="mail[career_account_id]">
-                <option value="">— Select a mailbox —</option>
-                @foreach($mailboxes as $mailbox)
-                    <option value="{{ $mailbox->id }}" @selected((string) old('mail.career_account_id',$settings['mail.career_account_id']) === (string) $mailbox->id)>
-                        {{ $mailbox->display_name ?: $mailbox->address }} — {{ $mailbox->address }}
-                    </option>
-                @endforeach
-            </select>
-            <small>New CV applications submitted from the public Career page will be forwarded here.</small>
+            <div class="route-title"><i class="fa-solid fa-briefcase"></i><span>Career</span></div>
+            <label for="mail-career-email">Official email</label>
+            <input id="mail-career-email" type="email" name="mail[career_email]" value="{{ old('mail.career_email',$careerAccount->address ?? 'career@fuelfreepowerplant.com') }}" placeholder="career@fuelfreepowerplant.com" autocomplete="username">
+            <label for="mail-career-password">Password</label>
+            <input id="mail-career-password" type="password" name="mail[career_password]" placeholder="{{ $careerAccount ? 'Leave blank to keep the saved password' : 'Enter mailbox password' }}" autocomplete="new-password">
+            <small>Career replies are always sent from <strong>career@fuelfreepowerplant.com</strong>. CV attachments are stored on the Help Desk server.</small>
         </div>
     </div>
 
-    @if($mailboxes->isEmpty())
-        <div class="mail-routing-empty">
-            <i class="fa-solid fa-circle-exclamation"></i>
-            <span>No active company mailboxes are available. Add and activate a mailbox from <strong>Help Desk → Mail list</strong> first.</span>
-        </div>
-    @else
-        <div class="mail-routing-note">
-            <i class="fa-solid fa-shield-halved"></i>
-            <span>Routing uses the connected mailbox account stored in the Help Desk. You can change the destination anytime without editing code or <code>.env</code>.</span>
-        </div>
-    @endif
+    <div class="mail-routing-note">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span><strong>Mailbox offloading:</strong> Help Desk imports the INBOX messages and attachments to private server storage, then permanently expunges the original message from the external mailbox. Replies do not create a Sent copy there.</span>
+    </div>
 </div>
 
 <div class="form-card homepage-card">
@@ -198,14 +183,15 @@
 .chrome-note i{color:#58cfe9;margin-top:1px}
 .mail-routing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .mail-route{padding:15px;border:1px solid rgba(76,205,233,.11);border-radius:15px;background:rgba(76,205,233,.025)}
-.mail-route label{font-size:11px;color:#a9c2ca;font-weight:700}
-.mail-route select{width:100%;box-sizing:border-box;padding:12px;border-radius:11px;border:1px solid var(--line);background:#071c29;color:#e9f7fb;outline:none}
-.mail-route select:focus{border-color:rgba(81,216,240,.35);box-shadow:0 0 0 3px rgba(81,216,240,.06)}
-.mail-route small{display:block;color:#678692;font-size:8px;line-height:1.5;margin-top:8px}
-.mail-routing-note,.mail-routing-empty{display:flex;gap:9px;align-items:flex-start;margin-top:14px;padding:12px 13px;border-radius:12px;background:rgba(72,216,241,.035);border:1px solid rgba(72,216,241,.08);color:#718f9a;font-size:9px;line-height:1.55}
-.mail-routing-note i{color:#58cfe9}.mail-routing-empty i{color:#f2b85b}
-.mail-routing-note strong,.mail-routing-empty strong{color:#9bc4ce}
-.mail-routing-note code{color:#9bc4ce}
+.route-title{display:flex;align-items:center;gap:8px;margin-bottom:14px;color:#dff5f8;font-size:12px;font-weight:800}
+.route-title i{color:#51cfe9}
+.mail-route label{font-size:11px;color:#a9c2ca;font-weight:700;margin-top:9px}
+.mail-route input{margin-bottom:3px}
+.mail-route small{display:block;color:#678692;font-size:8px;line-height:1.55;margin-top:8px}
+.mail-route small strong{color:#9bc4ce}
+.mail-routing-note{display:flex;gap:9px;align-items:flex-start;margin-top:14px;padding:12px 13px;border-radius:12px;background:rgba(72,216,241,.035);border:1px solid rgba(72,216,241,.08);color:#718f9a;font-size:9px;line-height:1.55}
+.mail-routing-note i{color:#58cfe9}
+.mail-routing-note strong{color:#9bc4ce}
 .form-card{background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:20px;padding:24px}
 .section-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:20px}
 .section-heading h2{margin:5px 0 5px;color:#eaf8fb;font-size:21px}
