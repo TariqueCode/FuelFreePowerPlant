@@ -215,8 +215,6 @@
 .editor table{max-width:100%}
 .editor img,.editor video,.editor iframe{max-width:100%;height:auto;box-sizing:border-box}
 .editor-tools-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 12px;border-top:1px solid var(--line);background:#061923;color:#7899a5;font-size:9px}
-.editor-draft-state{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
-.editor-draft-state i{color:#43c2e5}
 .editor-counts{margin-left:auto;white-space:nowrap}
 @media(max-width:900px){
   .word-ribbon{top:0}
