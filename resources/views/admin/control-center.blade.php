@@ -1,4 +1,4 @@
-@extends('layouts.portal')
+@extends('layouts.admin')
 @section('title','Overview')
 @section('content')
 <section class="hero"><span class="eyebrow">WEBSITE CONTROL CENTER</span><h1>Good to see you.</h1><p>A focused overview of the parts that actually power the public FuelFree PowerPlant website—content, homepage media, inquiries and careers.</p></section>
