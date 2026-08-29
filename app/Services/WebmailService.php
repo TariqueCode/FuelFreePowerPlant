@@ -150,7 +150,7 @@ class WebmailService
                 $payload.='--'.$boundary."\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n".quoted_printable_encode($this->dotStuff($html))."\r\n--".$boundary."--\r\n.\r\n";
             }else{
                 $alt='=_Alt_'.bin2hex(random_bytes(8)); $headers[]='Content-Type: multipart/mixed; boundary="'.$boundary.'"'; $payload=implode("\r\n",$headers)."\r\n\r\n";
-                $payload.='--'.$boundary."\r\nContent-Type: multipart/alternative; boundary=\"'.$alt.'\"\r\n\r\n";
+                $payload.='--'.$boundary."\r\nContent-Type: multipart/alternative; boundary=\"".$alt."\"\r\n\r\n";
                 $payload.='--'.$alt."\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n".quoted_printable_encode($this->dotStuff($plain))."\r\n";
                 $payload.='--'.$alt."\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n".quoted_printable_encode($this->dotStuff($html))."\r\n--".$alt."--\r\n";
                 foreach($attachments??[] as $a){if(empty($a['path'])||!is_file($a['path']))continue;$name=$this->headerFilename($a['name']??basename($a['path']));$mime=$a['mime']??'application/octet-stream';$data=chunk_split(base64_encode((string)file_get_contents($a['path'])));$payload.='--'.$boundary."\r\nContent-Type: {$mime}; name=\"{$name}\"\r\nContent-Disposition: attachment; filename=\"{$name}\"\r\nContent-Transfer-Encoding: base64\r\n\r\n{$data}\r\n";}
