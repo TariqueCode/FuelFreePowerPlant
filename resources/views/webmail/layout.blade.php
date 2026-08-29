@@ -88,7 +88,9 @@ button,input,textarea{font:inherit}
 .reader-actions{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
 .reader-actions form{display:contents}
 .reader-body{position:relative;isolation:isolate;contain:content;line-height:1.75;overflow-x:auto;overflow-y:visible;overflow-wrap:anywhere;-webkit-overflow-scrolling:touch;background:#fff;color:#17232a;border:1px solid rgba(86,210,238,.12);border-radius:14px;padding:16px;max-width:100%}
-.reader-body>*{max-width:100%!important;box-sizing:border-box}
+.reader-body>*{max-width:100%!important;min-width:0!important;box-sizing:border-box}
+.reader-body *{max-width:100%!important;min-width:0!important}
+.reader-body table{table-layout:fixed!important;overflow-wrap:anywhere;word-break:break-word}
 .reader-body table,.reader-body tbody,.reader-body thead,.reader-body tr{width:100%!important;max-width:100%!important}
 .reader-body td,.reader-body th{max-width:100%!important;overflow-wrap:anywhere;word-break:break-word}
 .reader-body div,.reader-body section,.reader-body article,.reader-body p{max-width:100%!important;overflow-wrap:anywhere}
