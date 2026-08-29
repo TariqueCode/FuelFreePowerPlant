@@ -119,6 +119,16 @@ class HelpDeskController extends Controller
         [$source]=$this->source($type,$id);
         $data=$request->validate(['body'=>['required','string','max:500000']]);
 
+        $settings=SystemSetting::query()->pluck('value','key')->all();
+        $replyHtml=view('emails.helpdesk.reply',[
+            'body'=>$data['body'],'recipientName'=>$source->name ?? ($source->sender_name ?? $source->email ?? $source->sender_email ?? ''),
+            'subject'=>$subject ?? '','channel'=>$type,'companyName'=>$settings['company.name'] ?? config('fuelfree.company.name','FuelFree PowerPlant'),
+            'tagline'=>$settings['company.tagline'] ?? config('fuelfree.company.tagline','Powering a cleaner, smarter future.'),
+            'logoUrl'=>!empty($settings['company.logo_path']) ? asset('storage/'.ltrim($settings['company.logo_path'],'/')) : null,
+            'websiteUrl'=>$settings['footer.website_url'] ?? 'https://www.fuelfreepowerplant.com',
+            'footerAddress'=>$settings['footer.address'] ?? '', 'footerPhone'=>$settings['footer.phone'] ?? '',
+        ])->render();
+
         if($type==='email'){
             $to=trim((string)$source->sender_email);
             $subject=str_starts_with(strtolower((string)$source->subject),'re:')
@@ -148,7 +158,7 @@ class HelpDeskController extends Controller
 
         try{
             $webmail->send(
-                $account->address,$account->password,$to,$subject,$data['body'],
+                $account->address,$account->password,$to,$subject,$replyHtml,
                 ['imap_host'=>$account->imap_host,'imap_port'=>$account->imap_port,'smtp_host'=>$account->smtp_host,'smtp_port'=>$account->smtp_port],
                 null,false
             );
@@ -202,6 +212,14 @@ class HelpDeskController extends Controller
     public function deleteEmail(Request $request, int $id): RedirectResponse
     {
         return $this->destroy($request, 'email', $id);
+    }
+
+    public function downloadCareerCv(Request $request, int $id): mixed
+    {
+        abort_unless($request->user()->hasPermission('mail.view'), 403);
+        $application=CareerApplication::query()->findOrFail($id);
+        abort_unless($application->cv_path && Storage::disk('local')->exists($application->cv_path), 404);
+        return Storage::disk('local')->download($application->cv_path, $application->cv_original_name ?: basename($application->cv_path));
     }
 
     public function downloadAttachment(Request $request,int $id): mixed
