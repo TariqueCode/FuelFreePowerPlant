@@ -38,90 +38,145 @@
 @endif
 @if($contentType==='gallery')<div class="full gallery-upload-box"><div class="gallery-upload-copy"><div><strong><i class="fa-solid fa-photo-film"></i> Gallery media</strong><p>Select multiple photos and videos together. They will be inserted into this event automatically.</p></div><button type="button" class="gallery-upload-btn" id="gallery-batch-upload"><i class="fa-solid fa-cloud-arrow-up"></i> Select photos &amp; videos</button></div><div id="gallery-upload-status" class="gallery-upload-status"></div></div>@endif
 <div class="full"><label>Content</label><div class="editor-shell">
-<div class="editor-toolbar" role="toolbar" aria-label="CMS content editor">
-<select id="block-format" class="toolbar-select format-select" title="Paragraph style">
-<option value="p">Paragraph</option><option value="h1">Heading 1</option><option value="h2">Heading 2</option><option value="h3">Heading 3</option><option value="h4">Heading 4</option><option value="h5">Heading 5</option><option value="h6">Heading 6</option><option value="blockquote">Quote</option><option value="pre">Code</option>
-</select>
-<select id="font-name" class="toolbar-select font-select" title="Font">
-<option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Tahoma">Tahoma</option><option value="Times New Roman">Times New Roman</option><option value="Verdana">Verdana</option>
-</select>
-<select id="font-size" class="toolbar-select size-select" title="Font size"><option value="">Size</option><option value="2">Small</option><option value="3">Normal</option><option value="4">Large</option><option value="5">X-Large</option><option value="6">Huge</option></select>
-<button type="button" data-cmd="bold" title="Bold"><b>B</b></button>
-<button type="button" data-cmd="italic" title="Italic"><i>I</i></button>
-<button type="button" data-cmd="underline" title="Underline"><u>U</u></button>
-<button type="button" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
-<span class="tool-sep"></span>
-<label class="toolbar-color" title="Text color"><i class="fa-solid fa-font"></i><input type="color" id="text-color" value="#dff6fb" aria-label="Text color"></label>
-<label class="toolbar-color" title="Highlight color"><i class="fa-solid fa-highlighter"></i><input type="color" id="highlight-color" value="#17323b" aria-label="Highlight color"></label>
-<span class="tool-sep"></span>
-<button type="button" data-cmd="justifyLeft" title="Align left"><i class="fa-solid fa-align-left"></i></button>
-<button type="button" data-cmd="justifyCenter" title="Center"><i class="fa-solid fa-align-center"></i></button>
-<button type="button" data-cmd="justifyRight" title="Align right"><i class="fa-solid fa-align-right"></i></button>
-<button type="button" data-cmd="justifyFull" title="Justify"><i class="fa-solid fa-align-justify"></i></button>
-<span class="tool-sep"></span>
-<button type="button" data-cmd="insertUnorderedList" title="Bulleted list"><i class="fa-solid fa-list"></i></button>
-<button type="button" data-cmd="insertOrderedList" title="Numbered list"><i class="fa-solid fa-list-ol"></i></button>
-<button type="button" data-cmd="outdent" title="Decrease indent"><i class="fa-solid fa-outdent"></i></button>
-<button type="button" data-cmd="indent" title="Increase indent"><i class="fa-solid fa-indent"></i></button>
-<span class="tool-sep"></span>
-<button type="button" id="insert-link" title="Insert link"><i class="fa-solid fa-link"></i></button>
-<button type="button" id="upload-image" title="Upload image"><i class="fa-regular fa-image"></i></button>
-<button type="button" id="upload-video" title="Upload video"><i class="fa-solid fa-video"></i></button>
-<button type="button" id="insert-table" title="Insert table"><i class="fa-solid fa-table"></i></button>
-<button type="button" data-cmd="insertHorizontalRule" title="Horizontal line"><i class="fa-solid fa-minus"></i></button>
-<span class="tool-sep"></span>
-<button type="button" data-cmd="undo" title="Undo"><i class="fa-solid fa-rotate-left"></i></button>
-<button type="button" data-cmd="redo" title="Redo"><i class="fa-solid fa-rotate-right"></i></button>
-<button type="button" data-cmd="removeFormat" title="Clear formatting"><i class="fa-solid fa-eraser"></i></button>
-<button type="button" id="toggle-source" title="HTML source"><i class="fa-solid fa-code"></i></button>
-<button type="button" id="preview-content" title="Preview"><i class="fa-solid fa-eye"></i></button>
-<button type="button" id="toggle-fullscreen" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
-<span class="tool-sep"></span>
-<div class="tool-dropdown">
-<button type="button" class="tool-dropdown-toggle" aria-expanded="false" title="More tools"><i class="fa-solid fa-ellipsis"></i></button>
-<div class="tool-menu tool-menu-wide">
-<div class="tool-menu-label">More tools</div>
-<button type="button" id="insert-button"><i class="fa-solid fa-square-up-right"></i> CTA button</button>
-<button type="button" id="insert-columns"><i class="fa-solid fa-table-columns"></i> Columns</button>
-<button type="button" id="insert-gallery"><i class="fa-solid fa-images"></i> Image gallery</button>
-<button type="button" id="insert-youtube"><i class="fa-brands fa-youtube"></i> YouTube</button>
-<button type="button" id="insert-facebook"><i class="fa-brands fa-facebook"></i> Facebook video</button>
-<button type="button" id="image-align-left"><i class="fa-solid fa-align-left"></i> Image left</button>
-<button type="button" id="image-align-center"><i class="fa-solid fa-align-center"></i> Image center</button>
-<button type="button" id="image-align-right"><i class="fa-solid fa-align-right"></i> Image right</button>
-</div></div>
-</div><div id="editor" class="editor" contenteditable="true">{!! old('content',$item->content) !!}</div></div><textarea id="content-source" name="content" hidden></textarea><input id="media-input" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"><input id="gallery-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif"><input id="video-input" type="file" hidden accept="video/mp4,video/webm">@if($contentType==='gallery')<input id="gallery-batch-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">@endif</div>
+  <div class="word-ribbon" role="toolbar" aria-label="Microsoft Word style content editor">
+    <div class="word-tabs" role="tablist">
+      <button type="button" class="word-tab active" data-editor-tab="home" role="tab" aria-selected="true">Home</button>
+      <button type="button" class="word-tab" data-editor-tab="insert" role="tab" aria-selected="false">Insert</button>
+      <button type="button" class="word-tab" data-editor-tab="view" role="tab" aria-selected="false">View</button>
+      <span class="word-ribbon-spacer"></span>
+      <span id="editor-format-status" class="editor-status" aria-live="polite"><strong>Paragraph</strong><span class="status-sep">•</span><span>—</span></span>
+    </div>
+
+    <div class="word-panel active" data-editor-panel="home">
+      <div class="word-group word-group-clipboard">
+        <button type="button" class="word-command" data-cmd="undo" title="Undo"><i class="fa-solid fa-rotate-left"></i><span>Undo</span></button>
+        <button type="button" class="word-command" data-cmd="redo" title="Redo"><i class="fa-solid fa-rotate-right"></i><span>Redo</span></button>
+        <span class="word-group-label">Clipboard</span>
+      </div>
+      <div class="word-group">
+        <div class="word-group-row">
+          <select id="block-format" class="word-select format-select" title="Styles">
+            <option value="p">Paragraph</option><option value="h1">Heading 1</option><option value="h2">Heading 2</option><option value="h3">Heading 3</option><option value="h4">Heading 4</option><option value="h5">Heading 5</option><option value="h6">Heading 6</option><option value="blockquote">Quote</option><option value="pre">Code</option>
+          </select>
+          <select id="font-name" class="word-select font-select" title="Font">
+            <option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Tahoma">Tahoma</option><option value="Times New Roman">Times New Roman</option><option value="Verdana">Verdana</option>
+          </select>
+          <select id="font-size" class="word-select size-select" title="Font size">
+            <option value="">Size</option><option value="2">Small</option><option value="3">Normal</option><option value="4">Large</option><option value="5">X-Large</option><option value="6">Huge</option>
+          </select>
+        </div>
+        <div class="word-group-row word-format-row">
+          <button type="button" class="word-icon" data-cmd="bold" title="Bold"><b>B</b></button>
+          <button type="button" class="word-icon" data-cmd="italic" title="Italic"><i>I</i></button>
+          <button type="button" class="word-icon" data-cmd="underline" title="Underline"><u>U</u></button>
+          <button type="button" class="word-icon" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+          <label class="word-color" title="Text color"><i class="fa-solid fa-font"></i><input type="color" id="text-color" value="#dff6fb" aria-label="Text color"></label>
+          <label class="word-color" title="Highlight color"><i class="fa-solid fa-highlighter"></i><input type="color" id="highlight-color" value="#17323b" aria-label="Highlight color"></label>
+        </div>
+        <span class="word-group-label">Font</span>
+      </div>
+      <div class="word-group">
+        <div class="word-group-row">
+          <button type="button" class="word-icon" data-cmd="justifyLeft" title="Align left"><i class="fa-solid fa-align-left"></i></button>
+          <button type="button" class="word-icon" data-cmd="justifyCenter" title="Center"><i class="fa-solid fa-align-center"></i></button>
+          <button type="button" class="word-icon" data-cmd="justifyRight" title="Align right"><i class="fa-solid fa-align-right"></i></button>
+          <button type="button" class="word-icon" data-cmd="justifyFull" title="Justify"><i class="fa-solid fa-align-justify"></i></button>
+        </div>
+        <div class="word-group-row">
+          <button type="button" class="word-icon" data-cmd="insertUnorderedList" title="Bulleted list"><i class="fa-solid fa-list"></i></button>
+          <button type="button" class="word-icon" data-cmd="insertOrderedList" title="Numbered list"><i class="fa-solid fa-list-ol"></i></button>
+          <button type="button" class="word-icon" data-cmd="outdent" title="Decrease indent"><i class="fa-solid fa-outdent"></i></button>
+          <button type="button" class="word-icon" data-cmd="indent" title="Increase indent"><i class="fa-solid fa-indent"></i></button>
+        </div>
+        <span class="word-group-label">Paragraph</span>
+      </div>
+      <div class="word-group">
+        <button type="button" class="word-command" data-cmd="removeFormat" title="Clear formatting"><i class="fa-solid fa-eraser"></i><span>Clear<br>formatting</span></button>
+        <span class="word-group-label">Editing</span>
+      </div>
+    </div>
+
+    <div class="word-panel" data-editor-panel="insert">
+      <div class="word-group">
+        <button type="button" class="word-command" id="insert-link" title="Insert link"><i class="fa-solid fa-link"></i><span>Link</span></button>
+        <button type="button" class="word-command" id="upload-image" title="Upload image"><i class="fa-regular fa-image"></i><span>Picture</span></button>
+        <button type="button" class="word-command" id="upload-video" title="Upload video"><i class="fa-solid fa-video"></i><span>Video</span></button>
+        <button type="button" class="word-command" id="insert-table" title="Insert table"><i class="fa-solid fa-table"></i><span>Table</span></button>
+        <span class="word-group-label">Media</span>
+      </div>
+      <div class="word-group">
+        <button type="button" class="word-command" id="insert-button" title="CTA button"><i class="fa-solid fa-square-up-right"></i><span>Button</span></button>
+        <button type="button" class="word-command" id="insert-columns" title="Columns"><i class="fa-solid fa-table-columns"></i><span>Columns</span></button>
+        <button type="button" class="word-command" id="insert-gallery" title="Image gallery"><i class="fa-solid fa-images"></i><span>Gallery</span></button>
+        <button type="button" class="word-command" id="insert-youtube" title="YouTube embed"><i class="fa-brands fa-youtube"></i><span>YouTube</span></button>
+        <button type="button" class="word-command" id="insert-facebook" title="Facebook video embed"><i class="fa-brands fa-facebook"></i><span>Facebook</span></button>
+        <span class="word-group-label">Content</span>
+      </div>
+      <div class="word-group">
+        <button type="button" class="word-command" data-cmd="insertHorizontalRule" title="Horizontal line"><i class="fa-solid fa-minus"></i><span>Horizontal<br>line</span></button>
+        <button type="button" class="word-command" id="image-align-left" title="Image left"><i class="fa-solid fa-align-left"></i><span>Image left</span></button>
+        <button type="button" class="word-command" id="image-align-center" title="Image center"><i class="fa-solid fa-align-center"></i><span>Image center</span></button>
+        <button type="button" class="word-command" id="image-align-right" title="Image right"><i class="fa-solid fa-align-right"></i><span>Image right</span></button>
+        <span class="word-group-label">Arrange</span>
+      </div>
+    </div>
+
+    <div class="word-panel" data-editor-panel="view">
+      <div class="word-group">
+        <button type="button" class="word-command" id="toggle-source" title="HTML source"><i class="fa-solid fa-code"></i><span>HTML<br>source</span></button>
+        <button type="button" class="word-command" id="preview-content" title="Preview"><i class="fa-solid fa-eye"></i><span>Preview</span></button>
+        <button type="button" class="word-command" id="toggle-fullscreen" title="Fullscreen"><i class="fa-solid fa-expand"></i><span>Fullscreen</span></button>
+        <span class="word-group-label">View</span>
+      </div>
+      <div class="word-group">
+        <div class="word-view-note"><i class="fa-solid fa-circle-info"></i><span>Use the ribbon tabs to access formatting and insertion tools.</span></div>
+        <span class="word-group-label">Editor</span>
+      </div>
+    </div>
+  </div>
+<div id="editor" class="editor" contenteditable="true">{!! old('content',$item->content) !!}</div></div><textarea id="content-source" name="content" hidden></textarea><input id="media-input" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"><input id="gallery-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif"><input id="video-input" type="file" hidden accept="video/mp4,video/webm">@if($contentType==='gallery')<input id="gallery-batch-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">@endif</div>
 <div><label>{{ $contentType==='gallery' ? 'Event date &amp; time' : 'Publish date/time' }}</label><input type="datetime-local" name="published_at" value="{{ old('published_at',$item->published_at?->format('Y-m-d\\TH:i')) }}"></div>
 </div><div class="actions"><a class="back" href="{{ route('admin.site-content.index',['type'=>in_array($item->type,['news','announcement'],true)?'news':$item->type]) }}">Cancel</a><button class="save" type="submit"><i class="fa-solid fa-floppy-disk"></i> {{ $item->exists?'Save changes':'Create content' }}</button></div></form></div>
 @endsection
 @push('styles')<style>
 .hero{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:18px}.hero h1{font-size:clamp(26px,4vw,40px);margin:6px 0}.hero p{margin:0;color:#7898a5;font-size:11px;line-height:1.6}.eyebrow{font-size:9px;letter-spacing:.14em;color:#4ec5e5}.back{display:inline-flex;align-items:center;gap:7px;padding:10px 13px;border:1px solid var(--line);border-radius:11px;color:#9db9c2;text-decoration:none;font-size:10px}.card{max-width:1100px;padding:20px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.02)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.full{grid-column:1/-1}label{display:block;color:#89a7b2;font-size:10px;margin-bottom:7px}input,select,textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;background:#061923;color:#e4f3f7;padding:11px;font:inherit;font-size:11px;outline:none}textarea{resize:vertical;line-height:1.6}.hint{display:block;margin-top:6px;color:#678692;font-size:9px}.locked-type{height:40px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:rgba(67,194,229,.05);color:#b9e6ef;font-size:11px}.locked-type i{color:#61d5ed}.publication-type{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}.publication-type button{height:40px;border:1px solid var(--line);border-radius:10px;background:#061923;color:#7e9ca5;font-size:10px;font-weight:800;cursor:pointer}.publication-type button i{margin-right:6px}.publication-type button.selected{color:#e7fbff;border-color:rgba(72,216,241,.35);background:rgba(72,216,241,.09);box-shadow:inset 0 0 0 1px rgba(72,216,241,.06)}.attachment-box{padding:16px;border:1px solid rgba(67,194,229,.18);border-radius:15px;background:linear-gradient(145deg,rgba(67,194,229,.06),rgba(255,255,255,.02))}.attachment-head{display:flex;align-items:center;justify-content:space-between;gap:15px}.attachment-head label{margin-bottom:3px}.attachment-head small{color:#6f8e98;font-size:9px;line-height:1.5}.attachment-upload{border:1px solid rgba(82,216,240,.3);border-radius:10px;background:rgba(55,197,230,.12);color:#dffaff;padding:10px 13px;cursor:pointer;font-size:10px;font-weight:800;white-space:nowrap}.attachment-save-note{display:flex;align-items:center;gap:7px;color:#6f8e98;font-size:9px;padding:9px 11px;border:1px solid var(--line);border-radius:10px}.attachment-save-note i{color:#5fcfe8}.attachment-current{display:flex;align-items:center;gap:11px;margin-top:12px;min-height:58px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:#061923}.attachment-current>i{font-size:25px;color:#ff8f9a}.attachment-current>div{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}.attachment-current strong{font-size:10px;color:#dff5f8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.attachment-current span{font-size:8px;color:#6f8e98}.attachment-current button{width:32px;height:32px;border:1px solid rgba(255,99,113,.14);border-radius:9px;background:rgba(255,99,113,.05);color:#ff9eaa;cursor:pointer}.attachment-empty{display:flex;align-items:center;gap:9px;color:#668792;font-size:9px}.attachment-empty i{font-size:20px;color:#4fc8e4}.attachment-progress{display:none;height:6px;margin-top:10px;border-radius:999px;background:#0a2530;overflow:hidden}.attachment-progress.show{display:block}.attachment-progress-bar{height:100%;width:0;background:linear-gradient(90deg,#27b8d4,#65e3f1);transition:width .12s}.attachment-status{margin-top:7px;color:#70d9ea;font-size:9px;min-height:13px}.nav-visibility,.featured-box{padding:12px;border:1px solid rgba(67,194,229,.16);border-radius:11px;background:rgba(67,194,229,.045)}.check-label{display:flex;align-items:center;gap:8px;color:#bfe7ef;font-size:11px;margin:0;cursor:pointer}.check-label input{width:17px;height:17px;margin:0;accent-color:#29aaca}.nav-visibility small,.featured-box small{display:block;margin:6px 0 0 25px;color:#678692;font-size:9px;line-height:1.5}.news-cover-field{padding:16px;border:1px solid rgba(67,194,229,.18);border-radius:16px;background:linear-gradient(145deg,rgba(67,194,229,.07),rgba(255,255,255,.02))}.field-head{display:flex;align-items:center;justify-content:space-between;gap:15px}.field-head label{margin-bottom:3px}.field-head small{color:#6f8e98;font-size:9px}.upload-cover,.gallery-upload-btn{border:1px solid rgba(82,216,240,.3);border-radius:10px;background:rgba(55,197,230,.12);color:#dffaff;padding:10px 13px;cursor:pointer;font-size:10px;font-weight:800;white-space:nowrap}.cover-preview{margin-top:12px;width:100%;aspect-ratio:16/9;border-radius:13px;border:1px dashed rgba(100,190,210,.22);background:#061923;display:grid;place-items:center;overflow:hidden}.cover-preview img{width:100%;height:100%;object-fit:cover}.cover-preview div{text-align:center;color:#5f8793}.cover-preview i{font-size:30px;color:#4fc8e4;display:block;margin-bottom:7px}.cover-preview span{font-size:10px}.cover-actions{display:flex;align-items:center;justify-content:space-between;margin-top:8px;min-height:26px}.remove-cover{border:0;background:transparent;color:#8da8b0;font-size:9px;cursor:pointer;padding:5px}.remove-cover:not(:disabled):hover{color:#ff9da4}.remove-cover:disabled{opacity:.35;cursor:not-allowed}.cover-actions span{color:#6fd5e8;font-size:9px}.seo-box{padding:15px;border:1px solid rgba(67,194,229,.15);border-radius:14px;background:rgba(67,194,229,.03)}.seo-title{display:flex;align-items:center;gap:8px;color:#d7f4f7;font-size:11px;margin-bottom:12px}.seo-title i{color:#5ed8ee}.seo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.editor-shell{border:1px solid var(--line);border-radius:14px;overflow:visible;background:#061923}.editor-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:9px;border-bottom:1px solid var(--line);background:rgba(67,194,229,.04);position:relative;z-index:30}.editor-toolbar .tool-dropdown{position:relative;display:inline-flex}.editor-toolbar .tool-dropdown-toggle{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:40px}.tool-caret{width:0;height:0;border-left:3px solid transparent;border-right:3px solid transparent;border-top:4px solid currentColor;margin-top:2px}.tool-dropdown.open>.tool-dropdown-toggle{background:rgba(67,194,229,.12);color:#eaf8fb}.tool-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:20;min-width:190px;padding:6px;border:1px solid var(--line);border-radius:11px;background:#071b25;box-shadow:0 14px 35px rgba(0,0,0,.35)}.tool-dropdown.open>.tool-menu{display:block}.tool-menu-wide{min-width:205px}.tool-menu-insert{min-width:190px}.tool-menu-label{padding:5px 8px 7px;color:#5fcfe8;font-size:8px;letter-spacing:.12em;text-transform:uppercase}.tool-menu>button{width:100%;display:flex;align-items:center;justify-content:flex-start;gap:9px;height:32px;padding:0 9px;border:0;border-radius:7px;background:transparent;color:#a7c2cb;font-size:10px;text-align:left}.tool-menu>button:hover{background:rgba(67,194,229,.10);color:#eaf8fb}.tool-menu .tool-select{display:block;width:100%;height:32px;margin-bottom:5px}.tool-menu .tool-select:last-of-type{margin-bottom:7px}.tool-menu-row{display:flex;align-items:center;gap:9px;padding:4px 3px;color:#8eabb4;font-size:9px}.tool-menu-row input[type=color]{flex:0 0 34px}.editor-toolbar button{min-width:34px;height:32px;border:1px solid transparent;border-radius:8px;background:transparent;color:#a7c2cb;cursor:pointer}.editor-toolbar button:hover,.editor-toolbar button.active{background:rgba(67,194,229,.12);color:#eaf8fb}.editor-toolbar select{width:auto;height:32px;min-width:0;border:1px solid var(--line);border-radius:8px;background:#061923;color:#b9d7df;padding:0 7px;font-size:10px;flex:0 0 auto}.editor-toolbar .format-select{width:112px}.editor-toolbar .size-select{width:68px}.editor-toolbar .tool-select:focus{border-color:rgba(67,194,229,.38);outline:none}.editor-toolbar input[type=color]{width:34px;height:32px;padding:3px;border:1px solid var(--line);border-radius:8px;background:#061923;cursor:pointer}.tool-sep{width:1px;height:22px;background:var(--line);margin:0 3px}.editor{min-height:430px;padding:18px;color:#e6f4f7;line-height:1.75;font-size:13px;outline:none}.editor h1{font-size:30px}.editor h2{font-size:24px}.editor h3{font-size:19px}.editor h4{font-size:17px}.editor h5{font-size:15px}.editor h6{font-size:13px;text-transform:uppercase;letter-spacing:.04em}.editor blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid #43c2e5;background:rgba(67,194,229,.06);color:#b9d7df}.editor table{width:100%;border-collapse:collapse;margin:14px 0}.editor td,.editor th{border:1px solid rgba(120,170,185,.35);padding:9px;text-align:left}.editor th{background:rgba(67,194,229,.08)}.editor.source-mode{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap}.editor-shell.is-fullscreen{position:fixed;inset:0;z-index:9999;background:#04151e;border-radius:0;display:flex;flex-direction:column}.editor-shell.is-fullscreen .editor{flex:1;overflow:auto}.editor-shell.is-fullscreen .editor-toolbar{position:sticky;top:0;z-index:2}.editor img,.editor video{max-width:100%;height:auto;border-radius:12px;margin:10px 0}.editor img.align-left{display:block;margin-left:0;margin-right:auto}.editor img.align-center{display:block;margin-left:auto;margin-right:auto}.editor img.align-right{display:block;margin-left:auto;margin-right:0}.editor .content-columns{display:grid;gap:18px;margin:18px 0}.editor .content-columns.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.editor .content-columns.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.editor .content-column{min-width:0;padding:18px;border:1px solid rgba(67,194,229,.14);border-radius:12px;background:rgba(67,194,229,.025)}.editor .content-cta{display:inline-flex;align-items:center;justify-content:center;gap:7px;margin:10px 4px 10px 0;padding:11px 17px;border-radius:9px;text-decoration:none;font-weight:700;line-height:1.2;background:#29aaca;color:#fff}.editor .content-cta.cta-outline{background:transparent;color:#29aaca;border:1px solid #29aaca}.editor iframe{max-width:100%;width:100%;min-height:360px;border:0;border-radius:12px;margin:10px 0;background:#000}.media-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}.media-gallery img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:10px}.gallery-upload-box{padding:16px;border:1px solid rgba(67,209,240,.18);border-radius:15px;background:linear-gradient(135deg,rgba(67,209,240,.07),rgba(255,255,255,.02))}.gallery-upload-copy{display:flex;align-items:center;justify-content:space-between;gap:15px}.gallery-upload-copy strong{font-size:13px}.gallery-upload-copy strong i{color:#5eddf4;margin-right:6px}.gallery-upload-copy p{color:#7696a1;font-size:9px;margin:6px 0 0;line-height:1.6}.gallery-upload-status{color:#70d9ea;font-size:9px;margin-top:10px}.actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}.save{border:0;border-radius:11px;padding:12px 16px;background:#29aaca;color:#fff;font-weight:700}.errors{padding:11px;border-radius:10px;margin-bottom:14px;background:rgba(210,65,65,.12);color:#ffb0b0}@media(max-width:650px){.hero{align-items:flex-start;gap:12px;flex-direction:column}.grid{grid-template-columns:1fr}.full{grid-column:auto}.seo-grid{grid-template-columns:1fr}.editor{min-height:360px}.editor-toolbar{position:sticky;top:0;z-index:2}.editor-toolbar .format-select{width:104px}.editor-toolbar .size-select{width:64px}.actions>*{flex:1;text-align:center}.media-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.gallery-upload-copy,.field-head{align-items:stretch;flex-direction:column}.gallery-upload-btn,.upload-cover,.attachment-upload{width:100%}.attachment-head{align-items:stretch;flex-direction:column}}
 
-/* CMS editor UI: Webmail-style toolbar layout, CMS dark palette preserved. */
-.editor-shell{width:100%;max-width:100%;min-width:0;position:relative;overflow:visible;box-sizing:border-box}
-.editor-toolbar{position:sticky!important;top:70px!important;z-index:90!important;display:flex!important;align-items:center!important;flex-wrap:nowrap!important;gap:4px!important;width:100%!important;max-width:100%!important;min-width:0!important;overflow-x:auto!important;overflow-y:visible!important;white-space:nowrap!important;padding:8px!important;background:#0b202b!important;border-bottom:1px solid rgba(104,204,235,.14)!important;box-shadow:0 5px 16px rgba(0,0,0,.28)!important;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.editor-toolbar::-webkit-scrollbar{display:none}
-.editor-toolbar>*{flex:0 0 auto!important}
-.editor-toolbar button,.editor-toolbar .toolbar-select,.editor-toolbar .toolbar-color{height:34px!important;box-sizing:border-box;border:1px solid rgba(104,204,235,.16)!important;border-radius:7px!important;background:#0d2632!important;color:#d9edf2!important;transition:background .15s,border-color .15s,color .15s}
-.editor-toolbar button{min-width:34px!important;padding:0 8px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important}
-.editor-toolbar button:hover,.editor-toolbar button.active,.editor-toolbar .toolbar-select:focus,.editor-toolbar .toolbar-color:hover{background:#123544!important;border-color:rgba(104,204,235,.38)!important;color:#f0fbfd!important;outline:none!important}
-.editor-toolbar .toolbar-select{padding:0 8px!important;font-size:11px!important;flex:0 0 auto!important}
-.editor-toolbar .format-select{width:122px!important}.editor-toolbar .font-select{width:128px!important}.editor-toolbar .size-select{width:76px!important}
-.editor-toolbar .toolbar-color{width:38px!important;padding:0!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;position:relative!important;cursor:pointer!important}
-.editor-toolbar .toolbar-color i{font-size:12px;pointer-events:none}.editor-toolbar .toolbar-color input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
-.editor-toolbar .tool-sep{flex:0 0 1px!important;width:1px!important;height:24px!important;background:rgba(104,204,235,.16)!important;margin:0 3px!important}
-.editor-toolbar .tool-dropdown{position:relative;display:inline-flex;flex:0 0 auto!important}
-.tool-dropdown.open>.tool-dropdown-toggle{background:#123544!important;color:#f0fbfd!important;border-color:rgba(104,204,235,.38)!important}
-.tool-menu{background:#071b25!important;border:1px solid rgba(104,204,235,.18)!important;box-shadow:0 18px 45px rgba(0,0,0,.42)!important}
-.tool-menu>button:hover{background:rgba(67,194,229,.10)!important;color:#eaf8fb!important}
-.editor{width:100%;max-width:100%;min-width:0;box-sizing:border-box;overflow-wrap:anywhere;word-break:break-word}
-.editor>*{max-width:100%;box-sizing:border-box}.editor table{max-width:100%;width:100%;border-collapse:collapse}.editor img,.editor video,.editor iframe{max-width:100%;height:auto;box-sizing:border-box}.editor iframe{min-width:0}.editor .content-columns{max-width:100%;min-width:0}.editor .content-column{min-width:0;overflow-wrap:anywhere}
-.editor table{display:table}.editor td,.editor th{overflow-wrap:anywhere;word-break:break-word}
-.editor-shell.is-fullscreen{position:fixed;inset:0;z-index:9999;background:#04151e;border-radius:0;display:flex;flex-direction:column}
-.editor-shell.is-fullscreen .editor{flex:1;overflow:auto}.editor-shell.is-fullscreen .editor-toolbar{position:sticky!important;top:0!important;z-index:2!important}
-@media(max-width:900px){.editor-toolbar{top:70px!important;padding:7px!important;gap:3px!important}.editor-toolbar button{min-width:34px!important}.editor-toolbar .format-select{width:116px!important}.editor-toolbar .font-select{width:120px!important}.editor-toolbar .size-select{width:70px!important}}
-@media(max-width:650px){.editor-toolbar{top:70px!important;padding:6px!important;overflow-x:auto!important;overflow-y:visible!important}.editor-toolbar .tool-dropdown{flex:0 0 auto!important}.editor-toolbar .tool-menu{position:fixed!important;left:8px!important;right:8px!important;top:112px!important;max-height:min(52vh,420px);overflow:auto;z-index:10000}.editor-toolbar .tool-menu>button{min-height:42px;height:auto}.editor{font-size:16px;line-height:1.75;padding:14px}.editor h1{font-size:28px}.editor h2{font-size:23px}.editor h3{font-size:19px}.editor table{display:block;width:100%;overflow-x:auto}.editor>*{max-width:100%}}
-@media(max-width:420px){.editor-toolbar{padding:6px!important;gap:3px!important}.editor-toolbar button{min-width:33px!important;height:33px!important}.editor-toolbar .toolbar-select{height:33px!important;font-size:10px!important}.editor-toolbar .format-select{width:106px!important}.editor-toolbar .font-select{width:110px!important}.editor-toolbar .size-select{width:66px!important}.editor-toolbar .toolbar-color{width:35px!important;height:33px!important}.editor{min-height:240px;padding:12px}}
+/* Word 365-inspired CMS editor UI. Dark CMS palette is intentionally preserved. */
+.editor-shell{width:100%;max-width:100%;min-width:0;position:relative;overflow:visible;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;background:#061923}
+.word-ribbon{position:sticky;top:70px;z-index:90;width:100%;max-width:100%;min-width:0;background:#071b25;border-bottom:1px solid rgba(104,204,235,.18);box-shadow:0 6px 18px rgba(0,0,0,.28);overflow:visible}
+.word-tabs{display:flex;align-items:center;gap:2px;min-height:40px;padding:0 8px;border-bottom:1px solid rgba(104,204,235,.13);background:#061923;white-space:nowrap;overflow-x:auto;scrollbar-width:none}
+.word-tabs::-webkit-scrollbar{display:none}
+.word-tab{height:40px;padding:0 15px;border:0;border-bottom:2px solid transparent;background:transparent;color:#91aeb8;font-size:11px;font-weight:700;cursor:pointer}
+.word-tab:hover{color:#dff6fb;background:rgba(67,194,229,.05)}
+.word-tab.active{color:#eaf8fb;border-bottom-color:#43c2e5;background:rgba(67,194,229,.08)}
+.word-ribbon-spacer{flex:1 1 auto;min-width:10px}
+.editor-status{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;max-width:240px;color:#7f9ca5;font-size:9px;padding:5px 9px;border:1px solid rgba(104,204,235,.12);border-radius:7px;background:#071b25;white-space:nowrap}
+.editor-status strong{color:#cfeaf0}.status-sep{color:#3d7180}
+.word-panel{display:none;align-items:stretch;gap:0;min-width:max-content;min-height:76px;padding:6px 7px;overflow-x:auto;overflow-y:visible;scrollbar-width:thin}
+.word-panel.active{display:flex}
+.word-group{display:flex;align-items:center;gap:3px;position:relative;padding:3px 8px 17px;border-right:1px solid rgba(104,204,235,.12);min-height:58px}
+.word-group:last-child{border-right:0}
+.word-group-label{position:absolute;bottom:3px;left:8px;right:8px;text-align:center;color:#668791;font-size:8px;line-height:11px;white-space:nowrap;pointer-events:none}
+.word-group-row{display:flex;align-items:center;gap:3px}
+.word-command,.word-icon{border:1px solid transparent;background:transparent;color:#b7d0d7;border-radius:5px;cursor:pointer;transition:.15s}
+.word-command{height:53px;min-width:42px;padding:5px 7px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:9px;white-space:nowrap}
+.word-command i{font-size:15px;color:#9bc1cb}.word-command span{line-height:11px}
+.word-icon{width:31px;height:31px;display:inline-flex;align-items:center;justify-content:center;font-size:13px}
+.word-command:hover,.word-icon:hover,.word-icon.active,.word-command.active{background:rgba(67,194,229,.12);border-color:rgba(67,194,229,.25);color:#effbfe}
+.word-command:hover i,.word-icon:hover i{color:#dff6fb}
+.word-select{height:31px;border:1px solid rgba(104,204,235,.16);border-radius:5px;background:#061923;color:#c7e0e6;padding:0 8px;font-size:10px;outline:none}
+.word-select:focus{border-color:#43c2e5;box-shadow:0 0 0 2px rgba(67,194,229,.10)}
+.format-select{width:125px}.font-select{width:120px}.size-select{width:72px}
+.word-color{width:31px;height:31px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(104,204,235,.16);border-radius:5px;background:#061923;color:#b7d0d7;position:relative;cursor:pointer}
+.word-color input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.word-view-note{display:flex;align-items:center;gap:9px;color:#7e9da6;font-size:10px;max-width:300px;line-height:1.5;padding:0 12px}
+.word-view-note i{color:#43c2e5}
+.editor{width:100%;max-width:100%;min-width:0;box-sizing:border-box;min-height:430px;padding:18px;color:#e6f4f7;line-height:1.75;font-size:13px;outline:none;overflow-wrap:anywhere;word-break:break-word}
+.editor>*{max-width:100%;box-sizing:border-box}.editor h1{font-size:30px}.editor h2{font-size:24px}.editor h3{font-size:19px}.editor h4{font-size:17px}.editor h5{font-size:15px}.editor h6{font-size:13px;text-transform:uppercase;letter-spacing:.04em}.editor blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid #43c2e5;background:rgba(67,194,229,.06);color:#b9d7df}.editor table{width:100%;max-width:100%;border-collapse:collapse;margin:14px 0}.editor td,.editor th{border:1px solid rgba(120,170,185,.35);padding:9px;text-align:left;overflow-wrap:anywhere;word-break:break-word}.editor th{background:rgba(67,194,229,.08)}.editor img,.editor video,.editor iframe{max-width:100%;height:auto;box-sizing:border-box}.editor iframe{width:100%;min-width:0}.editor.source-mode{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap}
+.editor-shell.is-fullscreen{position:fixed;inset:0;z-index:9999;background:#04151e;border-radius:0;display:flex;flex-direction:column}.editor-shell.is-fullscreen .word-ribbon{position:sticky;top:0;z-index:2}.editor-shell.is-fullscreen .editor{flex:1;overflow:auto}
+@media(max-width:900px){.word-ribbon{top:70px}.word-tabs{padding:0 5px}.word-tab{padding:0 12px}.editor-status{max-width:190px}.word-panel{min-height:72px}.word-group{padding-left:6px;padding-right:6px}.format-select{width:116px}.font-select{width:110px}}
+@media(max-width:650px){.word-ribbon{top:70px}.word-tabs{min-height:38px}.word-tab{height:38px;font-size:10px;padding:0 13px}.editor-status{display:none}.word-panel{min-height:74px;overflow-x:auto;padding:5px 4px}.word-group{padding-left:6px;padding-right:6px}.word-command{min-width:40px;height:51px}.word-icon{width:31px;height:31px}.word-select{height:31px;font-size:10px}.format-select{width:110px}.font-select{width:105px}.size-select{width:68px}.editor{font-size:16px;line-height:1.75;padding:14px}.editor h1{font-size:28px}.editor h2{font-size:23px}.editor h3{font-size:19px}.editor table{display:block;overflow-x:auto}.editor .content-columns{grid-template-columns:1fr!important}}
+@media(max-width:420px){.word-panel{min-height:70px}.word-command{min-width:38px;height:49px;padding-left:5px;padding-right:5px}.word-command i{font-size:14px}.word-command span{font-size:8px}.word-icon{width:30px;height:30px}.word-select{font-size:9px}.format-select{width:104px}.font-select{width:98px}.size-select{width:65px}}
 </style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
@@ -150,6 +205,7 @@ if(galleryBatchInput){document.getElementById('gallery-batch-upload').onclick=()
 form.addEventListener('submit',sync);editor.addEventListener('input',sync);
 function updateEditorToolbarState(){try{['bold','italic','underline','strikeThrough','insertUnorderedList','insertOrderedList'].forEach(c=>{document.querySelectorAll('.editor-toolbar [data-cmd="'+c+'"]').forEach(b=>b.classList.toggle('active',document.queryCommandState(c)))});const n=document.queryCommandValue('fontName').replaceAll('"','');const fs=document.getElementById('font-name');if(fs&&n){const opt=[...fs.options].find(o=>n.toLowerCase().includes(o.value.toLowerCase()));if(opt)fs.value=opt.value}}catch(e){}}
 editor.addEventListener('keyup',updateEditorToolbarState);editor.addEventListener('mouseup',updateEditorToolbarState);document.addEventListener('selectionchange',()=>{if(editor.contains(document.activeElement)||editor===document.activeElement)updateEditorToolbarState()});
+document.querySelectorAll('[data-editor-tab]').forEach(tab=>tab.addEventListener('click',()=>{const name=tab.dataset.editorTab;document.querySelectorAll('[data-editor-tab]').forEach(t=>{const active=t.dataset.editorTab===name;t.classList.toggle('active',active);t.setAttribute('aria-selected',active?'true':'false')});document.querySelectorAll('[data-editor-panel]').forEach(p=>p.classList.toggle('active',p.dataset.editorPanel===name))}));
 sync();updateEditorToolbarState();
 
 const publicationType=document.getElementById('publication-type');
