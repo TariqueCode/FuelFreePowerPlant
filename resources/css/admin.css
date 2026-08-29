@@ -3,6 +3,7 @@
   --admin-bg:#07131a;
   --admin-surface:#0b1d26;
   --admin-surface-2:#102733;
+  --admin-surface-soft:rgba(11,29,38,.78);
   --admin-border:rgba(116,188,207,.16);
   --admin-text:#eaf8fb;
   --admin-muted:#86a5b4;
@@ -44,6 +45,8 @@
   --admin-input-radius:10px;
   --admin-control-height:38px;
   --admin-space-control:8px;
+  --admin-space-xs:10px;
+  --admin-space-section:18px;
   --admin-space-inline:11px;
   --admin-text-xs:9px;
   --admin-text-sm:11px;
