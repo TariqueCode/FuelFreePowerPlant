@@ -5,6 +5,11 @@
     }
     $publicName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
     $publicLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
+    // Some pages pass a partial brand array. Always recover the global logo so
+    // the favicon stays identical across every public page.
+    if (!$publicLogo) {
+        $publicLogo = \App\Models\SystemSetting::query()->where('key','company.logo_path')->value('value');
+    }
 @endphp
 <!doctype html>
 <html lang="{{ str_replace('_','-',app()->getLocale()) }}">
