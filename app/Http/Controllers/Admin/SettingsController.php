@@ -113,6 +113,34 @@ class SettingsController
         return view('admin.settings.header', compact('settings'));
     }
 
+    public function footer(): View
+    {
+        $keys = ['footer.tagline','footer.technology','footer.office_heading','footer.address','footer.contact_heading','footer.email','footer.phone','footer.website','footer.website_url','footer.get_in_touch_label','footer.get_in_touch_url','footer.copyright_text'];
+        $defaults = [
+            'footer.tagline'=>'Powering a cleaner, smarter future.','footer.technology'=>'Fuel-Free Flywheel-Based Clean Energy Technology',
+            'footer.office_heading'=>'Office','footer.address'=>'','footer.contact_heading'=>'Contact','footer.email'=>'info@fuelfreepowerplant.com',
+            'footer.phone'=>'','footer.website'=>'www.fuelfreepowerplant.com','footer.website_url'=>'/','footer.get_in_touch_label'=>'Get in touch',
+            'footer.get_in_touch_url'=>'/contact','footer.copyright_text'=>'All rights reserved.',
+        ];
+        $settings = array_merge($defaults, SystemSetting::query()->whereIn('key',$keys)->pluck('value','key')->all());
+        return view('admin.settings.footer', compact('settings'));
+    }
+
+    public function updateFooter(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'footer.tagline'=>['nullable','string','max:255'],'footer.technology'=>['nullable','string','max:255'],
+            'footer.office_heading'=>['required','string','max:100'],'footer.address'=>['required','string','max:500'],
+            'footer.contact_heading'=>['required','string','max:100'],'footer.email'=>['required','email','max:255'],
+            'footer.phone'=>['required','string','max:50'],'footer.website'=>['required','string','max:255'],
+            'footer.website_url'=>['required','url','max:500'],'footer.get_in_touch_label'=>['required','string','max:100'],
+            'footer.get_in_touch_url'=>['required','string','max:500'],'footer.copyright_text'=>['required','string','max:255'],
+        ]);
+        foreach($data as $key=>$value){ SystemSetting::updateOrCreate(['key'=>$key],['value'=>$value,'is_sensitive'=>false]); }
+        Cache::forget('fuelfree.system_settings');
+        return back()->with('status','Footer settings saved successfully.');
+    }
+
     public function updateHeader(Request $request): RedirectResponse
     {
 
