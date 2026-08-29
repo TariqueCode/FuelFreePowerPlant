@@ -42,14 +42,19 @@ $user = auth()->user();
 $canSee = fn($item) => (!empty($item['roles']) && $user->hasRole($item['roles'])) || (empty($item['roles']) && (empty($item['permission']) || $user->hasPermission($item['permission'])));
 $visibleGroups = collect($groups)->map(fn($group) => ['label'=>$group['label'],'items'=>collect($group['items'])->filter($canSee)->values()])->filter(fn($group)=>$group['items']->isNotEmpty())->values();
 @endphp
-<!doctype html>
+@php
+$theme = \App\Models\SystemSetting::query()->whereIn('key',[
+ 'theme.primary','theme.text','theme.muted','theme.radius','theme.font_body','theme.font_heading',
+ 'theme.base_size','theme.line_height','theme.card_padding','theme.button_radius','theme.button_height','theme.input_radius'
+])->pluck('value','key');
+@endphp<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>@yield('title','Admin') — {{ $brandName }}</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><style>:root{--admin-primary:{{ $theme->get('theme.primary','#55cce7') }};--admin-text:{{ $theme->get('theme.text','#eaf8fb') }};--admin-muted:{{ $theme->get('theme.muted','#86a5b4') }};--admin-radius-lg:{{ (int)$theme->get('theme.radius',18) }}px;--admin-font-body:{{ $theme->get('theme.font_body','Inter, sans-serif') }};--admin-font-heading:{{ $theme->get('theme.font_heading','Inter, sans-serif') }};--admin-base-size:{{ (int)$theme->get('theme.base_size',16) }}px;--admin-line-height:{{ $theme->get('theme.line_height','1.6') }};--admin-card-padding:{{ (int)$theme->get('theme.card_padding',24) }}px;--admin-button-radius:{{ (int)$theme->get('theme.button_radius',10) }}px;--admin-button-height:{{ (int)$theme->get('theme.button_height',42) }}px;--admin-input-radius:{{ (int)$theme->get('theme.input_radius',10) }}px}body{font-family:var(--admin-font-body);font-size:var(--admin-base-size);line-height:var(--admin-line-height)}.admin-title,.admin-nav__group-label,.admin-card__header{font-family:var(--admin-font-heading)}.admin-card__body{padding:var(--admin-card-padding)}.admin-btn{min-height:var(--admin-button-height);border-radius:var(--admin-button-radius)}.admin-input,.admin-select,.admin-textarea{border-radius:var(--admin-input-radius)}</style>
 @vite(['resources/css/admin.css'])
 @stack('head')
 @stack('styles')
