@@ -125,7 +125,7 @@
 
     <div class="word-panel" data-editor-panel="view">
       <div class="word-group">
-        <button type="button" class="word-command" id="toggle-source" title="HTML source"><i class="fa-solid fa-code"></i><span>HTML<br>source</span></button><button type="button" class="word-command" id="open-html-code" title="Insert or design with HTML"><i class="fa-solid fa-file-code"></i><span>HTML<br>code</span></button>
+        <button type="button" class="word-command" id="toggle-source" title="HTML source"><i class="fa-solid fa-code"></i><span>HTML<br>source</span></button><button type="button" class="word-command" id="insert-html-block" title="Add custom HTML block"><i class="fa-solid fa-file-code"></i><span>HTML<br>block</span></button>
         <button type="button" class="word-command" id="preview-content" title="Preview"><i class="fa-solid fa-eye"></i><span>Preview</span></button>
         <button type="button" class="word-command" id="toggle-fullscreen" title="Fullscreen"><i class="fa-solid fa-expand"></i><span>Fullscreen</span></button>
         <span class="word-group-label">View</span>
@@ -137,23 +137,25 @@
     </div>
   </div>
 <div id="editor" class="editor" contenteditable="true">{!! old('content',$item->content) !!}</div>
-<div class="editor-tools-footer"><span class="editor-draft-state" id="editor-draft-state"><i class="fa-solid fa-cloud"></i><span>Local draft ready</span></span><span class="editor-counts" id="editor-counts">0 words • 0 characters</span></div>
+<div class="editor-tools-footer"><span class="editor-counts" id="editor-counts">0 words • 0 characters</span></div>
 </div>
-<div id="html-code-modal" class="html-code-modal" hidden>
-  <div class="html-code-dialog" role="dialog" aria-modal="true" aria-labelledby="html-code-title">
-    <div class="html-code-head">
-      <div><strong id="html-code-title"><i class="fa-solid fa-file-code"></i> HTML Code Designer</strong><small>Write HTML to design this content directly. Existing editor content is loaded below.</small></div>
-      <button type="button" class="html-code-close" id="html-code-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+<div id="html-block-modal" class="html-block-modal" hidden>
+  <div class="html-block-dialog" role="dialog" aria-modal="true" aria-labelledby="html-block-title">
+    <div class="html-block-head">
+      <div><strong id="html-block-title"><i class="fa-solid fa-code"></i> Custom HTML</strong><small>Add a reusable HTML block to your content. Paste HTML below and insert it where your cursor is.</small></div>
+      <button type="button" class="html-block-close" id="html-block-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <textarea id="html-code-input" class="html-code-input" spellcheck="false" placeholder="<section>..."></textarea>
-    <div class="html-code-help">Tip: You can use HTML such as <code>&lt;div&gt;</code>, <code>&lt;table&gt;</code>, <code>&lt;iframe&gt;</code>, inline styles, classes and links.</div>
-    <div class="html-code-actions">
-      <button type="button" class="html-code-btn" id="html-code-cancel">Cancel</button>
-      <button type="button" class="html-code-btn html-code-insert" id="html-code-insert"><i class="fa-solid fa-plus"></i> Insert at cursor</button>
-      <button type="button" class="html-code-btn html-code-apply" id="html-code-apply"><i class="fa-solid fa-check"></i> Apply HTML</button>
+    <div class="html-block-editor-wrap">
+      <div class="html-block-label"><span>HTML</span><span>Custom block</span></div>
+      <textarea id="html-block-input" class="html-block-input" spellcheck="false" placeholder="<div class=&quot;my-block&quot;>\n  <h2>Your heading</h2>\n  <p>Your content...</p>\n</div>"></textarea>
+    </div>
+    <div class="html-block-help">You can use HTML tags, inline styles, links, tables, embeds and your own classes.</div>
+    <div class="html-block-actions">
+      <button type="button" class="html-block-btn" id="html-block-cancel">Cancel</button>
+      <button type="button" class="html-block-btn html-block-insert" id="html-block-insert"><i class="fa-solid fa-plus"></i> Insert HTML block</button>
     </div>
   </div>
-</div><textarea id="content-source" name="content" hidden></textarea><input id="media-input" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"><input id="gallery-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif"><input id="video-input" type="file" hidden accept="video/mp4,video/webm">@if($contentType==='gallery')<input id="gallery-batch-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">@endif</div>
+</div></div><textarea id="content-source" name="content" hidden></textarea><input id="media-input" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"><input id="gallery-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif"><input id="video-input" type="file" hidden accept="video/mp4,video/webm">@if($contentType==='gallery')<input id="gallery-batch-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">@endif</div>
 <div><label>{{ $contentType==='gallery' ? 'Event date &amp; time' : 'Publish date/time' }}</label><input type="datetime-local" name="published_at" value="{{ old('published_at',$item->published_at?->format('Y-m-d\\TH:i')) }}"></div>
 </div><div class="actions"><a class="back" href="{{ route('admin.site-content.index',['type'=>in_array($item->type,['news','announcement'],true)?'news':$item->type]) }}">Cancel</a><button class="save" type="submit"><i class="fa-solid fa-floppy-disk"></i> {{ $item->exists?'Save changes':'Create content' }}</button></div></form></div>
 @endsection
@@ -342,14 +344,14 @@ html,body{overflow-x:hidden}
 .editor-shell{position:relative!important;overflow:visible!important}
 @media(max-width:700px){.word-ribbon{top:0!important}}
 
-.html-code-modal{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72)}.html-code-modal[hidden]{display:none}.html-code-dialog{width:min(100%,1050px);max-height:min(88vh,820px);display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid rgba(67,194,229,.25);border-radius:16px;background:#061923;box-shadow:0 24px 70px rgba(0,0,0,.55)}.html-code-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}.html-code-head strong{display:block;color:#e7f8fb;font-size:14px}.html-code-head strong i{color:#4fc8e4;margin-right:7px}.html-code-head small{display:block;color:#7899a5;font-size:9px;margin-top:5px;line-height:1.5}.html-code-close{width:34px;height:34px;border:1px solid var(--line);border-radius:8px;background:transparent;color:#a7c2cb;cursor:pointer}.html-code-input{width:100%;min-height:430px;resize:vertical;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;background:#020d13;color:#dff6fb;padding:14px;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none}.html-code-input:focus{border-color:rgba(67,194,229,.5)}.html-code-help{color:#7899a5;font-size:9px;line-height:1.6}.html-code-help code{color:#70d9ea}.html-code-actions{display:flex;justify-content:flex-end;gap:8px}.html-code-btn{border:1px solid var(--line);border-radius:9px;padding:9px 12px;background:#071b25;color:#a7c2cb;font-size:10px;cursor:pointer}.html-code-insert,.html-code-apply{border-color:rgba(67,194,229,.35);color:#dff6fb;background:rgba(67,194,229,.09)}.html-code-apply{background:#29aaca;border-color:#29aaca}@media(max-width:650px){.html-code-modal{padding:10px}.html-code-dialog{max-height:94vh;padding:12px}.html-code-input{min-height:55vh}.html-code-actions{flex-wrap:wrap}.html-code-actions .html-code-btn{flex:1}}</style>@endpush
+.html-block-modal{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72)}.html-block-modal[hidden]{display:none}.html-block-dialog{width:min(100%,900px);max-height:min(88vh,760px);display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid rgba(67,194,229,.25);border-radius:14px;background:#061923;box-shadow:0 24px 70px rgba(0,0,0,.5)}.html-block-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.html-block-head strong{display:block;color:#e7f8fb;font-size:15px}.html-block-head strong i{color:#4fc8e4;margin-right:7px}.html-block-head small{display:block;color:#7899a5;font-size:10px;margin-top:5px;line-height:1.5}.html-block-close{width:34px;height:34px;border:1px solid var(--line);border-radius:8px;background:transparent;color:#a7c2cb;cursor:pointer}.html-block-editor-wrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#020d13}.html-block-label{display:flex;justify-content:space-between;padding:8px 11px;border-bottom:1px solid var(--line);color:#70d9ea;font-size:10px}.html-block-label span:last-child{color:#7899a5}.html-block-input{display:block;width:100%;min-height:360px;box-sizing:border-box;resize:vertical;border:0;background:#020d13;color:#dff6fb;padding:14px;outline:0;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.html-block-input:focus{box-shadow:inset 0 0 0 1px rgba(67,194,229,.35)}.html-block-help{color:#7899a5;font-size:9px;line-height:1.5}.html-block-actions{display:flex;justify-content:flex-end;gap:8px}.html-block-btn{border:1px solid var(--line);border-radius:9px;padding:9px 13px;background:#071b25;color:#a7c2cb;font-size:10px;cursor:pointer}.html-block-insert{background:#29aaca;border-color:#29aaca;color:#fff}@media(max-width:650px){.html-block-modal{padding:10px}.html-block-dialog{max-height:94vh;padding:12px}.html-block-input{min-height:55vh}.html-block-actions{flex-wrap:wrap}.html-block-actions .html-block-btn{flex:1}}</style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
 const editor=document.getElementById('editor'),source=document.getElementById('content-source'),form=document.getElementById('content-form'),mediaInput=document.getElementById('media-input'),galleryInput=document.getElementById('gallery-input'),videoInput=document.getElementById('video-input'),galleryBatchInput=document.getElementById('gallery-batch-input'),galleryStatus=document.getElementById('gallery-upload-status');
 let savedEditorRange=null;
 function saveEditorSelection(){const sel=window.getSelection();if(sel&&sel.rangeCount&&editor.contains(sel.anchorNode))savedEditorRange=sel.getRangeAt(0).cloneRange()}
 function restoreEditorSelection(){if(!savedEditorRange)return;try{const sel=window.getSelection();sel.removeAllRanges();sel.addRange(savedEditorRange)}catch(e){}}
-function sync(){if(source)source.value=editor.innerHTML;updateEditorMetrics();saveLocalDraft()}
+function sync(){if(source)source.value=editor.innerHTML;updateEditorMetrics()}
 function exec(cmd,value=null){restoreEditorSelection();editor.focus();document.execCommand(cmd,false,value);sync();setTimeout(updateEditorToolbarState,0)}document.querySelectorAll('.word-ribbon [data-cmd]').forEach(b=>b.addEventListener('click',()=>{exec(b.dataset.cmd,b.dataset.value||null);b.closest('.tool-dropdown')?.classList.remove('open');b.closest('.tool-dropdown')?.querySelector('.tool-dropdown-toggle')?.setAttribute('aria-expanded','false')}));document.querySelectorAll('.tool-dropdown-toggle').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const box=btn.closest('.tool-dropdown');document.querySelectorAll('.tool-dropdown.open').forEach(other=>{if(other!==box){other.classList.remove('open');other.querySelector('.tool-dropdown-toggle')?.setAttribute('aria-expanded','false')}});const open=box.classList.toggle('open');btn.setAttribute('aria-expanded',open?'true':'false')}));document.querySelectorAll('.tool-dropdown .tool-menu').forEach(menu=>menu.addEventListener('click',e=>e.stopPropagation()));document.addEventListener('click',()=>document.querySelectorAll('.tool-dropdown.open').forEach(box=>{box.classList.remove('open');box.querySelector('.tool-dropdown-toggle')?.setAttribute('aria-expanded','false')}));
 document.getElementById('insert-link').onclick=()=>{const url=prompt('URL');if(url)exec('createLink',url)};document.getElementById('insert-button').onclick=()=>{const text=prompt('Button text','Learn More');if(!text)return;const url=prompt('Button URL','/');if(!url)return;const style=prompt('Button style: primary or outline','primary')==='outline'?'cta-outline':'';exec('insertHTML',`<a class="content-cta ${style}" href="${safeAttr(url)}">${safeText(text)}</a> <span>&nbsp;</span>`)};
 document.getElementById('insert-columns').onclick=()=>{const count=Math.min(3,Math.max(2,parseInt(prompt('Number of columns (2 or 3)','2')||'2',10)));const cols=Array.from({length:count},(_,i)=>`<div class="content-column"><h3>Column ${i+1}</h3><p>Click here to edit this content.</p></div>`).join('');exec('insertHTML',`<div class="content-columns cols-${count}">${cols}</div><p></p>`)};
@@ -402,31 +404,7 @@ function updateEditorMetrics(){
   const words=text?text.split(/\\s+/).length:0,chars=text.length;
   const el=document.getElementById('editor-counts');if(el)el.textContent=words+' words • '+chars+' characters';
 }
-const DRAFT_KEY='fuelfree_admin_cms_draft_'+location.pathname;
-let draftTimer=null;
-function setDraftState(message,icon='fa-cloud'){const el=document.getElementById('editor-draft-state');if(el)el.innerHTML='<i class="fa-solid '+icon+'"></i><span>'+message+'</span>'}
-function saveLocalDraft(){
-  if(sourceMode)return;
-  clearTimeout(draftTimer);
-  draftTimer=setTimeout(()=>{
-    try{
-      localStorage.setItem(DRAFT_KEY,JSON.stringify({html:editor.innerHTML,updatedAt:Date.now()}));
-      setDraftState('Saved locally','fa-cloud-check');
-    }catch(e){setDraftState('Local draft unavailable','fa-triangle-exclamation')}
-  },350);
-}
-function restoreLocalDraft(){
-  try{
-    const raw=localStorage.getItem(DRAFT_KEY);if(!raw)return;
-    const d=JSON.parse(raw);if(!d?.html)return;
-    if(d.html===editor.innerHTML){localStorage.removeItem(DRAFT_KEY);return;}
-    const when=d.updatedAt?new Date(d.updatedAt).toLocaleString():'recently';
-    if(confirm('A local draft from '+when+' was found. Restore it?')){editor.innerHTML=d.html;sync();setDraftState('Draft restored','fa-clock-rotate-left')}
-  }catch(e){}
-}
-function clearLocalDraft(){try{localStorage.removeItem(DRAFT_KEY)}catch(e){}}
 form.addEventListener('submit',()=>{sync();setDraftState('Saving…','fa-floppy-disk')});
-window.addEventListener('beforeunload',()=>{saveLocalDraft();});
 editor.addEventListener('input',()=>{saveEditorSelection();sync();updateEditorToolbarState()});
 editor.addEventListener('keyup',()=>{saveEditorSelection();updateEditorToolbarState()});
 editor.addEventListener('mouseup',()=>{saveEditorSelection();updateEditorToolbarState()});
@@ -462,59 +440,31 @@ updateEditorMetrics();updateEditorToolbarState();setTimeout(restoreLocalDraft,80
 
 
 
-// HTML Code Designer
+// WordPress-style Custom HTML block
 (function(){
-  const modal=document.getElementById('html-code-modal');
-  const input=document.getElementById('html-code-input');
-  const open=document.getElementById('open-html-code');
-  const close=document.getElementById('html-code-close');
-  const cancel=document.getElementById('html-code-cancel');
-  const apply=document.getElementById('html-code-apply');
-  const insert=document.getElementById('html-code-insert');
+  const modal=document.getElementById('html-block-modal');
+  const input=document.getElementById('html-block-input');
+  const open=document.getElementById('insert-html-block');
+  const close=document.getElementById('html-block-close');
+  const cancel=document.getElementById('html-block-cancel');
+  const insert=document.getElementById('html-block-insert');
   if(!modal||!input||!open)return;
-
-  function show(){
-    if(sourceMode)document.getElementById('toggle-source')?.click();
-    saveEditorSelection();
-    input.value=editor.innerHTML;
-    modal.hidden=false;
-    document.body.classList.add('html-code-open');
-    requestAnimationFrame(()=>input.focus());
-  }
-  function hide(){
-    modal.hidden=true;
-    document.body.classList.remove('html-code-open');
-  }
+  function show(){saveEditorSelection();input.value='';modal.hidden=false;document.body.classList.add('html-block-open');requestAnimationFrame(()=>input.focus())}
+  function hide(){modal.hidden=true;document.body.classList.remove('html-block-open')}
   open.addEventListener('click',show);
   close?.addEventListener('click',hide);
   cancel?.addEventListener('click',hide);
   modal.addEventListener('click',e=>{if(e.target===modal)hide()});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)hide()});
-
-  apply?.addEventListener('click',()=>{
-    editor.innerHTML=input.value;
-    sync();
-    updateEditorToolbarState();
-    hide();
-  });
-
   insert?.addEventListener('click',()=>{
-    const html=input.value;
+    const html=input.value.trim();
     if(!html)return;
-    restoreEditorSelection();
-    editor.focus();
-    try{document.execCommand('insertHTML',false,html)}
-    catch(e){
+    restoreEditorSelection();editor.focus();
+    try{document.execCommand('insertHTML',false,html)}catch(e){
       const sel=window.getSelection();
-      if(sel&&sel.rangeCount){
-        const range=sel.getRangeAt(0);
-        range.deleteContents();
-        range.insertNode(range.createContextualFragment(html));
-      }
+      if(sel&&sel.rangeCount){const range=sel.getRangeAt(0);range.deleteContents();range.insertNode(range.createContextualFragment(html))}
     }
-    sync();
-    updateEditorToolbarState();
-    hide();
+    sync();updateEditorToolbarState();hide();
   });
 })();
 const publicationType=document.getElementById('publication-type');
