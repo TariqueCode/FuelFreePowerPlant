@@ -1,5 +1,22 @@
 @extends('webmail.layout')
 @section('content')
-<div class="login-wrap"><section class="login-card"><div class="brand"><span class="brand-mark">✉</span><span>FuelFree PowerPlant</span></div><h1>Webmail</h1><p class="sub">Sign in to your FuelFree PowerPlant mailbox.</p>@if($errors->any())<div class="error">{{ $errors->first() }}</div>@endif
-<form method="POST" action="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/login" autocomplete="on">@csrf<div class="field"><label for="email">Email address</label><input id="email" name="email" type="email" value="{{ old('email') }}" placeholder="name@fuelfreepowerplant.com" required autofocus autocomplete="username"></div><div class="field"><label for="password">Password</label><input id="password" name="password" type="password" placeholder="Your mailbox password" required autocomplete="current-password"></div><button class="btn primary full" type="submit">Sign in to Webmail</button></form><p class="hint">Use your FuelFree PowerPlant mailbox credentials. This login is separate from the website administration account.</p></section></div>
+<div class="login-wrap">
+    <section class="login-card">
+        <h1>Webmail</h1>
+        <p class="sub">Sign in to your FuelFree PowerPlant mailbox.</p>
+        <form method="POST" action="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/login" autocomplete="on">
+            @csrf
+            <div class="field">
+                <label for="email">Email address</label>
+                <input id="email" name="email" type="email" value="{{ old('email') }}" placeholder="name@fuelfreepowerplant.com" required autofocus autocomplete="username">
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" placeholder="Your mailbox password" required autocomplete="current-password">
+            </div>
+            <button class="btn primary full" type="submit">Sign in to Webmail</button>
+        </form>
+        <p class="hint">Use your FuelFree PowerPlant mailbox credentials. This login is separate from the website administration account.</p>
+    </section>
+</div>
 @endsection
