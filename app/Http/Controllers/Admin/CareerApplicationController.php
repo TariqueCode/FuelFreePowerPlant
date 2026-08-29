@@ -37,13 +37,15 @@ class CareerApplicationController extends Controller
             ->with('status', 'Application status updated.');
     }
 
-    public function download(CareerApplication $application)
+    public function download(Request $request, CareerApplication $application)
     {
-        abort_unless(Storage::disk('local')->exists($application->cv_path), 404);
+        abort_unless($request->user()->hasPermission('mail.view'), 403);
+        abort_unless($application->cv_path && Storage::disk('local')->exists($application->cv_path), 404);
 
         return Storage::disk('local')->download(
             $application->cv_path,
-            $application->cv_original_name ?: basename($application->cv_path)
+            $application->cv_original_name ?: basename($application->cv_path),
+            ['Content-Type' => 'application/pdf']
         );
     }
 }
