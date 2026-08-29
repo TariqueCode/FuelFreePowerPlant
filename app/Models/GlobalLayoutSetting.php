@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class GlobalLayoutSetting extends Model
 {
@@ -10,10 +11,10 @@ class GlobalLayoutSetting extends Model
 
     public static function get(string $key, mixed $default = null, string $scope = 'site'): mixed
     {
-        $value = static::query()
+        $value = Cache::rememberForever("fuelfree.layout.{$scope}.{$key}", fn () => static::query()
             ->where('scope', $scope)
             ->where('key', $key)
-            ->value('value');
+            ->value('value'));
 
         return $value === null ? $default : $value;
     }
@@ -24,5 +25,7 @@ class GlobalLayoutSetting extends Model
             ['scope' => $scope, 'key' => $key],
             ['value' => is_scalar($value) || $value === null ? $value : json_encode($value)]
         );
+
+        Cache::forget("fuelfree.layout.{$scope}.{$key}");
     }
 }
