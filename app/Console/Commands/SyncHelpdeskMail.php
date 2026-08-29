@@ -84,10 +84,13 @@ class SyncHelpdeskMail extends Command
                 }catch(Throwable $e){
                     report($e);
                     if(isset($email)){
-                        $email->update(['last_error'=>mb_substr($e->getMessage(),0,5000)]);
-                    }else{
-                        $this->error($account->address.' UID '.$uid.' import failed — '.$e->getMessage());
+                        foreach($email->attachments as $stored){
+                            if($stored->path) Storage::disk('local')->delete($stored->path);
+                        }
+                        $email->delete();
+                        unset($email);
                     }
+                    $this->error($account->address.' UID '.$uid.' import failed — '.$e->getMessage());
                 }
             }
         }
@@ -119,5 +122,4 @@ class SyncHelpdeskMail extends Command
         return Str::limit(trim($name),480,'');
     }
 
-    private function mailConfigFromData(array $data): array { return []; }
 }
