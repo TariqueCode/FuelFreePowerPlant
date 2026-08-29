@@ -7,8 +7,6 @@ use App\Models\SiteContentItem;
 use App\Models\SystemSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Throwable;
 use Illuminate\Validation\Rules\File;
 use Illuminate\View\View;
 
@@ -40,7 +38,7 @@ class CareerController extends Controller
             'experience' => ['nullable','string','max:180'],
             'location' => ['nullable','string','max:180'],
             'message' => ['nullable','string','max:5000'],
-            'cv' => ['required', File::types(['pdf','doc','docx'])->max('8mb')],
+            'cv' => ['required', File::types(['pdf','doc','docx'])->max('50mb')],
             'consent' => ['accepted'],
             'website' => ['nullable','string','max:0'],
         ]);
@@ -49,7 +47,7 @@ class CareerController extends Controller
         $file = $request->file('cv');
         $path = $file->store('career/cv', 'local');
 
-        $application = CareerApplication::create([
+        CareerApplication::create([
             ...$data,
             'cv_path' => $path,
             'cv_original_name' => $file->getClientOriginalName(),
