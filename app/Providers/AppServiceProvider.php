@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\SystemSetting;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
@@ -19,7 +20,8 @@ class AppServiceProvider extends ServiceProvider
             return;
         }
 
-        $settings = SystemSetting::query()->pluck('value', 'key');
+        // Keep global settings in cache so normal requests do not query the database repeatedly.
+        $settings = Cache::rememberForever('fuelfree.system_settings', fn () => SystemSetting::query()->pluck('value', 'key'));
         if ($settings->has('company.name')) config(['fuelfree.company.name' => $settings['company.name']]);
         if ($settings->has('company.domain')) config(['fuelfree.company.domain' => $settings['company.domain']]);
         if ($settings->has('company.tagline')) config(['fuelfree.company.tagline' => $settings['company.tagline']]);
