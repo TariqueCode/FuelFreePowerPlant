@@ -103,7 +103,11 @@ jobs:
 
           echo "==> Ensuring Laravel scheduler cron"
           CRON_LINE='* * * * * cd /home/fuelfree/public_html && php artisan schedule:run >> /dev/null 2>&1'
-          (crontab -l 2>/dev/null | grep -Fv 'php artisan schedule:run' || true; echo "$CRON_LINE") | crontab -
+          if command -v crontab >/dev/null 2>&1; then
+              (crontab -l 2>/dev/null | grep -Fv 'php artisan schedule:run' || true; echo "$CRON_LINE") | crontab -
+          else
+              echo "WARNING: crontab is not available; configure the Laravel scheduler cron manually."
+          fi
 
           echo "==> Deployment complete"
           REMOTE
