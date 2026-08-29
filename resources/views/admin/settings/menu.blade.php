@@ -4,7 +4,9 @@
 <x-admin.page-header title="Menu Builder" eyebrow="NAVIGATION" description="Control the global company navigation from one source." :actions="'<a class="admin-btn" href="'.route('admin.settings').'">Settings</a>'" />
 @if(session('status'))<div class="admin-card" style="margin-bottom:16px"><div class="admin-card__body">{{ session('status') }}</div></div>@endif
 @if($errors->any())<div class="admin-card" style="margin-bottom:16px"><div class="admin-card__body">{{ $errors->first() }}</div></div>@endif
-<form method="POST" action="{{ route('admin.settings.menu.update') }}">@csrf
+@php
+$customItems = json_decode((\App\Models\SystemSetting::where('key','navigation.custom_items')->value('value') ?? '[]'), true) ?: [];
+@endphp<form method="POST" action="{{ route('admin.settings.menu.update') }}">@csrf
 <x-admin.card><x-slot:header>Global company navigation</x-slot:header>
 <p style="font-size:10px;color:var(--admin-muted);margin:0 0 14px">Only published company pages are listed. Changes apply to the shared public navigation; no page-specific menu is created.</p>
 <div class="menu-list">
