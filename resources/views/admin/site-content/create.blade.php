@@ -137,7 +137,7 @@
     </div>
   </div>
 <div id="editor" class="editor" contenteditable="true">{!! old('content',$item->content) !!}</div>
-<div class="editor-tools-footer"><span class="editor-draft-state" id="editor-draft-state"><i class="fa-solid fa-cloud"></i><span>Local draft ready</span></span><span class="editor-counts" id="editor-counts">0 words • 0 characters</span></div>
+<div class="editor-tools-footer"></span><span class="editor-counts" id="editor-counts">0 words • 0 characters</span></div>
 </div><textarea id="content-source" name="content" hidden></textarea><input id="media-input" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"><input id="gallery-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif"><input id="video-input" type="file" hidden accept="video/mp4,video/webm">@if($contentType==='gallery')<input id="gallery-batch-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">@endif</div>
 <div><label>{{ $contentType==='gallery' ? 'Event date &amp; time' : 'Publish date/time' }}</label><input type="datetime-local" name="published_at" value="{{ old('published_at',$item->published_at?->format('Y-m-d\\TH:i')) }}"></div>
 </div><div class="actions"><a class="back" href="{{ route('admin.site-content.index',['type'=>in_array($item->type,['news','announcement'],true)?'news':$item->type]) }}">Cancel</a><button class="save" type="submit"><i class="fa-solid fa-floppy-disk"></i> {{ $item->exists?'Save changes':'Create content' }}</button></div></form></div>
@@ -198,8 +198,6 @@
 .editor table{max-width:100%}
 .editor img,.editor video,.editor iframe{max-width:100%;height:auto;box-sizing:border-box}
 .editor-tools-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 12px;border-top:1px solid var(--line);background:#061923;color:#7899a5;font-size:9px}
-.editor-draft-state{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
-.editor-draft-state i{color:#43c2e5}
 .editor-counts{margin-left:auto;white-space:nowrap}
 @media(max-width:900px){
   .word-ribbon{top:0}
@@ -348,41 +346,12 @@ html,body{overflow-x:hidden}
     padding-top:calc(14px + var(--ff-ribbon-height,0px)) !important;
   }
 }
-.editor-draft-state{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-size:9px;color:#7899a5}.editor-draft-state i{color:#43c2e5}</style>@endpush
+</style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
 const editor=document.getElementById('editor'),source=document.getElementById('content-source'),form=document.getElementById('content-form'),mediaInput=document.getElementById('media-input'),galleryInput=document.getElementById('gallery-input'),videoInput=document.getElementById('video-input'),galleryBatchInput=document.getElementById('gallery-batch-input'),galleryStatus=document.getElementById('gallery-upload-status');
 
-// Isolated local draft (does not modify editor commands, toolbar, or save flow).
-(function(){
-  const DRAFT_KEY='cms_site_content_draft_v1';
-  const draftState=document.getElementById('editor-draft-state');
-  let timer=null;
-  function setState(t){if(draftState){const s=draftState.querySelector('span');if(s)s.textContent=t}}
-  function saveDraft(){
-    try{
-      if(!editor)return;
-      localStorage.setItem(DRAFT_KEY,JSON.stringify({html:editor.innerHTML,savedAt:Date.now()}));
-      setState('Saved locally');
-    }catch(e){setState('Local draft unavailable')}
-  }
-  function restoreDraft(){
-    try{
-      const raw=localStorage.getItem(DRAFT_KEY);
-      if(!raw)return;
-      const d=JSON.parse(raw);
-      if(d&&typeof d.html==='string'&&d.html!==editor.innerHTML){
-        if(confirm('A local draft is available. Restore it?')){editor.innerHTML=d.html;sync();setState('Local draft restored')}
-      }
-    }catch(e){}
-  }
-  function schedule(){clearTimeout(timer);timer=setTimeout(saveDraft,700)}
-  if(editor){
-    editor.addEventListener('input',schedule);
-    window.addEventListener('beforeunload',saveDraft);
-    setTimeout(restoreDraft,250);
-  }
-})();
+
 let savedEditorRange=null;
 function saveEditorSelection(){const sel=window.getSelection();if(sel&&sel.rangeCount&&editor.contains(sel.anchorNode))savedEditorRange=sel.getRangeAt(0).cloneRange()}
 function restoreEditorSelection(){if(!savedEditorRange)return;try{const sel=window.getSelection();sel.removeAllRanges();sel.addRange(savedEditorRange)}catch(e){}}
