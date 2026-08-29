@@ -476,11 +476,40 @@ document.querySelectorAll('[data-editor-tab]').forEach(tab=>tab.addEventListener
   document.querySelectorAll('[data-editor-panel]').forEach(p=>p.classList.toggle('active',p.dataset.editorPanel===name));
 }));
 document.querySelectorAll('.word-ribbon button,.word-ribbon select,.word-ribbon input[type=color]').forEach(control=>{
-  control.addEventListener('mousedown',e=>{saveEditorSelection();if(control.tagName!=='SELECT'&&control.type!=='color')e.preventDefault()},true);
+  const preserve=()=>saveEditorSelection();
+  control.addEventListener('pointerdown',preserve,true);
+  control.addEventListener('touchstart',preserve,{capture:true,passive:true});
+  control.addEventListener('mousedown',preserve,true);
+  control.addEventListener('focus',preserve,true);
+  if(control.tagName!=='SELECT'&&control.type!=='color')control.addEventListener('click',e=>e.preventDefault(),true);
 });
-document.getElementById('block-format').addEventListener('change',e=>{restoreEditorSelection();editor.focus();document.execCommand('formatBlock',false,e.target.value);sync();updateEditorToolbarState()});
-document.getElementById('font-name').addEventListener('change',e=>{restoreEditorSelection();editor.focus();document.execCommand('fontName',false,e.target.value);sync();updateEditorToolbarState()});
-document.getElementById('font-size').addEventListener('change',e=>{if(!e.target.value)return;restoreEditorSelection();editor.focus();document.execCommand('fontSize',false,e.target.value);sync();updateEditorToolbarState()});
+function applyEditorCommand(cmd,value){
+  if(!editor)return;
+  restoreEditorSelection();
+  editor.focus();
+  try{document.execCommand('styleWithCSS',false,true)}catch(e){}
+  let ok=false;
+  try{ok=document.execCommand(cmd,false,value)}catch(e){}
+  if(!ok&&cmd==='formatBlock'){
+    try{ok=document.execCommand('formatBlock',false,'<'+String(value).replace(/[<>]/g,'')+'>')}catch(e){}
+  }
+  sync();
+  updateEditorToolbarState();
+  return ok;
+}
+document.getElementById('block-format').addEventListener('change',e=>{
+  const value=e.target.value;
+  if(!value)return;
+  applyEditorCommand('formatBlock',value);
+});
+document.getElementById('font-name').addEventListener('change',e=>{
+  if(!e.target.value)return;
+  applyEditorCommand('fontName',e.target.value);
+});
+document.getElementById('font-size').addEventListener('change',e=>{
+  if(!e.target.value)return;
+  applyEditorCommand('fontSize',e.target.value);
+});
 document.getElementById('text-color').addEventListener('input',e=>{restoreEditorSelection();editor.focus();document.execCommand('foreColor',false,e.target.value);sync();updateEditorToolbarState()});
 document.getElementById('highlight-color').addEventListener('input',e=>{restoreEditorSelection();editor.focus();document.execCommand('hiliteColor',false,e.target.value);sync();updateEditorToolbarState()});
 document.getElementById('insert-image-url').onclick=()=>{const url=prompt('Image URL');if(url){restoreEditorSelection();editor.focus();document.execCommand('insertHTML',false,'<img src="'+safeAttr(url)+'" alt="Image" loading="lazy">');sync()}};
