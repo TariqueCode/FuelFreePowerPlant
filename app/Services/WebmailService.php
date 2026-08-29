@@ -125,6 +125,73 @@ class WebmailService
         imap_expunge($connection); imap_close($connection);
     }
 
+    public function saveDraft(string $email, string $password, string $to, string $cc, string $bcc, string $subject, string $body, array $config = [], int $existingUid = 0): int
+    {
+        $draft = collect($this->folders($email, $password, $config))->firstWhere('special', 'drafts');
+        if (!$draft) throw new RuntimeException('Drafts folder is not available on this mailbox.');
+        $connection = $this->open($email, $password, $config, $draft['name']);
+
+        try {
+            if ($existingUid > 0) {
+                @imap_setflag_full($connection, (string) $existingUid, '\\Deleted', ST_UID);
+                @imap_expunge($connection);
+            }
+
+            $host = parse_url(config('app.url'), PHP_URL_HOST) ?: 'localhost';
+            $messageId = '<draft-'.bin2hex(random_bytes(18)).'@'.$host.'>';
+            $toList = $this->normalizeRecipients($to);
+            $ccList = $this->normalizeRecipients($cc);
+            $bccList = $this->normalizeRecipients($bcc);
+            $html = $this->safeBodyForSend($body);
+            $plain = trim(strip_tags(str_replace(['</p>','</div>','<br>','<br/>','<br />'], "\n", $html)));
+
+            $headers = [
+                'From: '.$email,
+                'To: '.implode(', ', $toList),
+            ];
+            if ($ccList) $headers[] = 'Cc: '.implode(', ', $ccList);
+            if ($bccList) $headers[] = 'Bcc: '.implode(', ', $bccList);
+            $headers[] = 'Subject: =?UTF-8?B?'.base64_encode($subject).'?=';
+            $headers[] = 'Date: '.date(DATE_RFC2822);
+            $headers[] = 'Message-ID: '.$messageId;
+            $headers[] = 'MIME-Version: 1.0';
+            $headers[] = 'X-FuelFree-Draft: 1';
+            $headers[] = 'Content-Type: multipart/alternative; boundary="=_FuelFreeDraft_'.bin2hex(random_bytes(10)).'"';
+
+            preg_match('/boundary="([^"]+)"/', end($headers), $boundaryMatch);
+            $boundary = $boundaryMatch[1] ?? ('=_FuelFreeDraft_'.bin2hex(random_bytes(10)));
+            $headers[count($headers)-1] = 'Content-Type: multipart/alternative; boundary="'.$boundary.'"';
+
+            $payload = implode("\r\n", $headers)."\r\n\r\n";
+            $payload .= '--'.$boundary."\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n".quoted_printable_encode($this->dotStuff($plain))."\r\n";
+            $payload .= '--'.$boundary."\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n".quoted_printable_encode($this->dotStuff($html))."\r\n";
+            $payload .= '--'.$boundary."--\r\n";
+
+            if (!imap_append($connection, $this->mailbox($config, $draft['name']), $payload, '\\Draft \\Seen')) {
+                throw new RuntimeException($this->imapError() ?: 'Unable to save the draft.');
+            }
+
+            $uids = imap_search($connection, 'HEADER Message-ID "'.addcslashes($messageId, '\\\"').'"', SE_UID) ?: [];
+            rsort($uids, SORT_NUMERIC);
+            return (int) ($uids[0] ?? 0);
+        } finally {
+            imap_close($connection);
+        }
+    }
+
+    public function deleteDraft(string $email, string $password, int $uid, array $config = []): void
+    {
+        $draft = collect($this->folders($email, $password, $config))->firstWhere('special', 'drafts');
+        if (!$draft) return;
+        $connection = $this->open($email, $password, $config, $draft['name']);
+        try {
+            @imap_setflag_full($connection, (string) $uid, '\\Deleted', ST_UID);
+            @imap_expunge($connection);
+        } finally {
+            imap_close($connection);
+        }
+    }
+
     public function send(string $email,string $password,string|array $to,string $subject,string $body,array $config=[],?array $attachments=null,bool $saveSent=false,string|array $cc=[],string|array $bcc=[],array $headersExtra=[]): void
     {
         $to=$this->normalizeRecipients($to); $cc=$this->normalizeRecipients($cc); $bcc=$this->normalizeRecipients($bcc);
@@ -246,7 +313,9 @@ class WebmailService
     private function findFolder(string $email, string $password, array $config, string $needle): ?string
     {
         foreach ($this->folders($email, $password, $config) as $folder) {
-            if (strtoupper($needle) === 'SENT' && $folder['label'] === 'Sent') return $folder['name'];
+            $wanted = strtoupper($needle);
+            if ($wanted === 'SENT' && $folder['label'] === 'Sent') return $folder['name'];
+            if ($wanted === 'DRAFTS' && $folder['label'] === 'Drafts') return $folder['name'];
         }
         return null;
     }
