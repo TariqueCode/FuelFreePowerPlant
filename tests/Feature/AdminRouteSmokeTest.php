@@ -25,6 +25,32 @@ class AdminRouteSmokeTest extends TestCase
     }
 
     /** @return void */
+    public function test_sensitive_routes_use_explicit_bindings_and_constraints(): void
+    {
+        foreach ([
+            'admin.helpdesk.show',
+            'admin.helpdesk.status',
+            'admin.helpdesk.reply',
+            'admin.helpdesk.delete',
+            'admin.helpdesk.attachment',
+            'admin.mail.message',
+            'admin.mail.attachment',
+            'admin.career-applications.cv',
+            'admin.documents.download',
+            'admin.documents.share',
+            'admin.documents.unshare',
+            'admin.documents.destroy',
+            'admin.cms.edit',
+            'admin.cms.update',
+            'admin.cms.destroy',
+        ] as $name) {
+            $route = Route::getRoutes()->getByName($name);
+            $this->assertNotNull($route, "Missing route: {$name}");
+            $this->assertNotSame([], $route->wheres(), "Missing route constraints: {$name}");
+        }
+    }
+
+    /** @return void */
     public function test_sensitive_routes_have_expected_permissions(): void
     {
         $matrix = [
