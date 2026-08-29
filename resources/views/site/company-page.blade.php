@@ -2,8 +2,8 @@
 
 @php
     $siteName = $brand['name'] ?? config('fuelfree.company.name');
-    $backRoute = $backRoute ?? route('site.about');
-    $backLabel = $backLabel ?? 'Back';
+    $backRoute = $backRoute ?? route('home');
+    $backLabel = $backLabel ?? 'Back to Home';
 @endphp
 
 @section('title', $item->title.' — '.$siteName)
