@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 use Throwable;
 
@@ -99,6 +100,37 @@ class SettingsController
             }
             return back()->withErrors(['mail.'.$group.'_email' => $message])->withInput($request->except(['mail.contact_password','mail.career_password']));
         }
+    }
+
+    public function header(): View
+    {
+        $defaults = [
+            'header.home_label'=>'Home','header.management_label'=>'Management Team','header.gallery_label'=>'Gallery',
+            'header.news_label'=>'News & Notices','header.career_label'=>'Career','header.contact_label'=>'Contact',
+            'header.webmail_label'=>'Webmail','header.portal_label'=>'Portal','header.login_label'=>'Login',
+        ];
+        $settings = array_merge($defaults, SystemSetting::query()->whereIn('key', array_keys($defaults))->pluck('value','key')->all());
+        return view('admin.settings.header', compact('settings'));
+    }
+
+    public function updateHeader(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'header.home_label'=>['required','string','max:40'],
+            'header.management_label'=>['required','string','max:60'],
+            'header.gallery_label'=>['required','string','max:40'],
+            'header.news_label'=>['required','string','max:60'],
+            'header.career_label'=>['required','string','max:40'],
+            'header.contact_label'=>['required','string','max:40'],
+            'header.webmail_label'=>['required','string','max:40'],
+            'header.portal_label'=>['required','string','max:40'],
+            'header.login_label'=>['required','string','max:40'],
+        ]);
+        foreach ($data as $key => $value) {
+            SystemSetting::updateOrCreate(['key'=>$key], ['value'=>$value, 'is_sensitive'=>false]);
+        }
+        Cache::forget('fuelfree.system_settings');
+        return back()->with('status','Header settings saved successfully.');
     }
 
     public function update(Request $request,WebmailService $webmail): RedirectResponse
