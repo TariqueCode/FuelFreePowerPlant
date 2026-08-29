@@ -75,6 +75,7 @@ Route::domain('mail.fuelfreepowerplant.com')->group(function () {
         Route::post('/message/{uid}/read', [WebmailController::class,'toggleRead'])->whereNumber('uid')->name('webmail.host.read');
         Route::get('/compose', [WebmailController::class,'compose'])->name('webmail.host.compose');
         Route::post('/send', [WebmailController::class,'send'])->middleware('throttle:30,1')->name('webmail.host.send');
+        Route::post('/draft', [WebmailController::class,'saveDraft'])->middleware('throttle:120,1')->name('webmail.host.draft');
         Route::post('/logout', [WebmailController::class,'logout'])->name('webmail.host.logout');
     });
 });
