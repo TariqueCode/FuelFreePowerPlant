@@ -515,6 +515,46 @@ if(attachmentInput){document.getElementById('attachment-upload').onclick=()=>att
     }
   });
 })();
+
+/* Keep the CMS ribbon pinned to the viewport while its editor is in view.
+   This avoids sticky being trapped by any parent scroll container in the portal layout. */
+(function(){
+  const shell=document.querySelector('.editor-shell');
+  const ribbon=shell?.querySelector('.word-ribbon');
+  if(!shell||!ribbon)return;
+
+  let ticking=false;
+  function updateRibbon(){
+    ticking=false;
+    const rect=shell.getBoundingClientRect();
+    const height=ribbon.getBoundingClientRect().height;
+    const active=rect.top<=0 && rect.bottom>height;
+
+    if(active){
+      const left=rect.left;
+      const width=rect.width;
+      shell.style.setProperty('--ff-ribbon-left',left+'px');
+      shell.style.setProperty('--ff-ribbon-width',width+'px');
+      shell.style.setProperty('--ff-ribbon-height',height+'px');
+      shell.classList.add('ff-ribbon-active');
+    }else{
+      shell.classList.remove('ff-ribbon-active');
+      shell.style.removeProperty('--ff-ribbon-left');
+      shell.style.removeProperty('--ff-ribbon-width');
+      shell.style.removeProperty('--ff-ribbon-height');
+    }
+  }
+
+  function requestUpdate(){
+    if(ticking)return;
+    ticking=true;
+    requestAnimationFrame(updateRibbon);
+  }
+
+  window.addEventListener('scroll',requestUpdate,{passive:true});
+  window.addEventListener('resize',requestUpdate,{passive:true});
+  requestUpdate();
+})();
 </script>@endpush
 
 
