@@ -342,27 +342,6 @@ html,body{overflow-x:hidden}
 .editor-shell{position:relative!important;overflow:visible!important}
 @media(max-width:700px){.word-ribbon{top:0!important}}
 
-/* CMS editor: keep the ribbon visible while the editor is being scrolled. */
-.editor-shell.ff-ribbon-active{
-  --ff-ribbon-height:0px;
-}
-.editor-shell.ff-ribbon-active .word-ribbon{
-  position:fixed !important;
-  top:0 !important;
-  left:var(--ff-ribbon-left,0px) !important;
-  width:var(--ff-ribbon-width,100%) !important;
-  max-width:none !important;
-  margin:0 !important;
-  z-index:9999 !important;
-}
-.editor-shell.ff-ribbon-active .editor{
-  padding-top:calc(18px + var(--ff-ribbon-height,0px)) !important;
-}
-@media(max-width:700px){
-  .editor-shell.ff-ribbon-active .editor{
-    padding-top:calc(14px + var(--ff-ribbon-height,0px)) !important;
-  }
-}
 .html-code-modal{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72)}.html-code-modal[hidden]{display:none}.html-code-dialog{width:min(100%,1050px);max-height:min(88vh,820px);display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid rgba(67,194,229,.25);border-radius:16px;background:#061923;box-shadow:0 24px 70px rgba(0,0,0,.55)}.html-code-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}.html-code-head strong{display:block;color:#e7f8fb;font-size:14px}.html-code-head strong i{color:#4fc8e4;margin-right:7px}.html-code-head small{display:block;color:#7899a5;font-size:9px;margin-top:5px;line-height:1.5}.html-code-close{width:34px;height:34px;border:1px solid var(--line);border-radius:8px;background:transparent;color:#a7c2cb;cursor:pointer}.html-code-input{width:100%;min-height:430px;resize:vertical;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;background:#020d13;color:#dff6fb;padding:14px;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none}.html-code-input:focus{border-color:rgba(67,194,229,.5)}.html-code-help{color:#7899a5;font-size:9px;line-height:1.6}.html-code-help code{color:#70d9ea}.html-code-actions{display:flex;justify-content:flex-end;gap:8px}.html-code-btn{border:1px solid var(--line);border-radius:9px;padding:9px 12px;background:#071b25;color:#a7c2cb;font-size:10px;cursor:pointer}.html-code-insert,.html-code-apply{border-color:rgba(67,194,229,.35);color:#dff6fb;background:rgba(67,194,229,.09)}.html-code-apply{background:#29aaca;border-color:#29aaca}@media(max-width:650px){.html-code-modal{padding:10px}.html-code-dialog{max-height:94vh;padding:12px}.html-code-input{min-height:55vh}.html-code-actions{flex-wrap:wrap}.html-code-actions .html-code-btn{flex:1}}</style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
@@ -418,65 +397,6 @@ function updateEditorToolbarState(){
   if(status)status.innerHTML='<strong>'+label+'</strong><span class="status-sep">•</span><span>'+px+'</span>';
 }
 
-// Formatting selects: preserve the current selection, then apply the chosen block/font/size.
-document.addEventListener('selectionchange',()=>{if(!sourceMode)saveEditorSelection()});
-const blockFormatSelect=document.getElementById('block-format');
-if(blockFormatSelect)blockFormatSelect.addEventListener('change',function(){
-  if(!this.value)return;
-  restoreEditorSelection(); editor.focus();
-  const tag=this.value;
-  try{document.execCommand('formatBlock',false,tag==='blockquote'?'blockquote':tag==='pre'?'pre':tag)}catch(e){}
-  sync(); updateEditorToolbarState();
-});
-const fontNameSelect=document.getElementById('font-name');
-if(fontNameSelect)fontNameSelect.addEventListener('change',function(){
-  if(!this.value)return;
-  restoreEditorSelection(); editor.focus();
-  try{document.execCommand('fontName',false,this.value)}catch(e){}
-  sync(); updateEditorToolbarState();
-});
-const fontSizeSelect=document.getElementById('font-size');
-if(fontSizeSelect)fontSizeSelect.addEventListener('change',function(){
-  if(!this.value)return;
-  restoreEditorSelection(); editor.focus();
-  try{document.execCommand('fontSize',false,this.value)}catch(e){}
-  sync(); updateEditorToolbarState();
-});
-
-// HTML Code Designer: edit, replace, or insert real HTML at the saved cursor.
-const htmlCodeModal=document.getElementById('html-code-modal');
-const htmlCodeInput=document.getElementById('html-code-input');
-const openHtmlCode=document.getElementById('open-html-code');
-function closeHtmlCode(){if(htmlCodeModal)htmlCodeModal.hidden=true}
-function openHtmlCodeDesigner(){
-  if(!htmlCodeModal||!htmlCodeInput)return;
-  if(sourceMode)document.getElementById('toggle-source')?.click();
-  saveEditorSelection();
-  htmlCodeInput.value=editor.innerHTML;
-  htmlCodeModal.hidden=false;
-  setTimeout(()=>htmlCodeInput.focus(),0);
-}
-openHtmlCode?.addEventListener('click',openHtmlCodeDesigner);
-document.getElementById('html-code-close')?.addEventListener('click',closeHtmlCode);
-document.getElementById('html-code-cancel')?.addEventListener('click',closeHtmlCode);
-document.getElementById('html-code-apply')?.addEventListener('click',()=>{
-  if(!htmlCodeInput)return;
-  editor.innerHTML=htmlCodeInput.value;
-  source.value=editor.innerHTML;
-  closeHtmlCode(); sync(); updateEditorToolbarState();
-});
-document.getElementById('html-code-insert')?.addEventListener('click',()=>{
-  if(!htmlCodeInput)return;
-  restoreEditorSelection(); editor.focus();
-  try{document.execCommand('insertHTML',false,htmlCodeInput.value)}catch(e){
-    const range=savedEditorRange;
-    if(range){range.deleteContents();range.insertNode(range.createContextualFragment(htmlCodeInput.value))}
-  }
-  closeHtmlCode(); sync(); updateEditorToolbarState();
-});
-htmlCodeModal?.addEventListener('click',e=>{if(e.target===htmlCodeModal)closeHtmlCode()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&htmlCodeModal&&!htmlCodeModal.hidden)closeHtmlCode()});
-
 function updateEditorMetrics(){
   const text=editor.innerText.replace(/\\s+/g,' ').trim();
   const words=text?text.split(/\\s+/).length:0,chars=text.length;
@@ -520,9 +440,17 @@ document.querySelectorAll('[data-editor-tab]').forEach(tab=>tab.addEventListener
 document.querySelectorAll('.word-ribbon button,.word-ribbon select,.word-ribbon input[type=color]').forEach(control=>{
   control.addEventListener('mousedown',e=>{saveEditorSelection();if(control.tagName!=='SELECT'&&control.type!=='color')e.preventDefault()},true);
 });
-document.getElementById('block-format').addEventListener('change',e=>{restoreEditorSelection();editor.focus();document.execCommand('formatBlock',false,e.target.value);sync();updateEditorToolbarState()});
-document.getElementById('font-name').addEventListener('change',e=>{restoreEditorSelection();editor.focus();document.execCommand('fontName',false,e.target.value);sync();updateEditorToolbarState()});
-document.getElementById('font-size').addEventListener('change',e=>{if(!e.target.value)return;restoreEditorSelection();editor.focus();document.execCommand('fontSize',false,e.target.value);sync();updateEditorToolbarState()});
+function applyEditorCommand(cmd,value){
+  restoreEditorSelection();
+  editor.focus();
+  try{document.execCommand(cmd,false,value)}catch(e){}
+  saveEditorSelection();
+  sync();
+  requestAnimationFrame(updateEditorToolbarState);
+}
+document.getElementById('block-format').addEventListener('change',e=>{if(e.target.value)applyEditorCommand('formatBlock',e.target.value)});
+document.getElementById('font-name').addEventListener('change',e=>{if(e.target.value)applyEditorCommand('fontName',e.target.value)});
+document.getElementById('font-size').addEventListener('change',e=>{if(e.target.value)applyEditorCommand('fontSize',e.target.value)});
 document.getElementById('text-color').addEventListener('input',e=>{restoreEditorSelection();editor.focus();document.execCommand('foreColor',false,e.target.value);sync();updateEditorToolbarState()});
 document.getElementById('highlight-color').addEventListener('input',e=>{restoreEditorSelection();editor.focus();document.execCommand('hiliteColor',false,e.target.value);sync();updateEditorToolbarState()});
 document.getElementById('insert-image-url').onclick=()=>{const url=prompt('Image URL');if(url){restoreEditorSelection();editor.focus();document.execCommand('insertHTML',false,'<img src="'+safeAttr(url)+'" alt="Image" loading="lazy">');sync()}};
@@ -591,45 +519,6 @@ if(attachmentInput){document.getElementById('attachment-upload').onclick=()=>att
   });
 })();
 
-/* Keep the CMS ribbon pinned to the viewport while its editor is in view.
-   This avoids sticky being trapped by any parent scroll container in the portal layout. */
-(function(){
-  const shell=document.querySelector('.editor-shell');
-  const ribbon=shell?.querySelector('.word-ribbon');
-  if(!shell||!ribbon)return;
-
-  let ticking=false;
-  function updateRibbon(){
-    ticking=false;
-    const rect=shell.getBoundingClientRect();
-    const height=ribbon.getBoundingClientRect().height;
-    const active=rect.top<=0 && rect.bottom>height;
-
-    if(active){
-      const left=rect.left;
-      const width=rect.width;
-      shell.style.setProperty('--ff-ribbon-left',left+'px');
-      shell.style.setProperty('--ff-ribbon-width',width+'px');
-      shell.style.setProperty('--ff-ribbon-height',height+'px');
-      shell.classList.add('ff-ribbon-active');
-    }else{
-      shell.classList.remove('ff-ribbon-active');
-      shell.style.removeProperty('--ff-ribbon-left');
-      shell.style.removeProperty('--ff-ribbon-width');
-      shell.style.removeProperty('--ff-ribbon-height');
-    }
-  }
-
-  function requestUpdate(){
-    if(ticking)return;
-    ticking=true;
-    requestAnimationFrame(updateRibbon);
-  }
-
-  window.addEventListener('scroll',requestUpdate,{passive:true});
-  window.addEventListener('resize',requestUpdate,{passive:true});
-  requestUpdate();
-})();
 </script>@endpush
 
 
