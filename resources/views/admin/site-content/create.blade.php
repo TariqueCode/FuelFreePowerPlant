@@ -177,6 +177,24 @@
 @media(max-width:900px){.word-ribbon{top:70px}.word-tabs{padding:0 5px}.word-tab{padding:0 12px}.editor-status{max-width:190px}.word-panel{min-height:72px}.word-group{padding-left:6px;padding-right:6px}.format-select{width:116px}.font-select{width:110px}}
 @media(max-width:650px){.word-ribbon{top:70px}.word-tabs{min-height:38px}.word-tab{height:38px;font-size:10px;padding:0 13px}.editor-status{display:none}.word-panel{min-height:74px;overflow-x:auto;padding:5px 4px}.word-group{padding-left:6px;padding-right:6px}.word-command{min-width:40px;height:51px}.word-icon{width:31px;height:31px}.word-select{height:31px;font-size:10px}.format-select{width:110px}.font-select{width:105px}.size-select{width:68px}.editor{font-size:16px;line-height:1.75;padding:14px}.editor h1{font-size:28px}.editor h2{font-size:23px}.editor h3{font-size:19px}.editor table{display:block;overflow-x:auto}.editor .content-columns{grid-template-columns:1fr!important}}
 @media(max-width:420px){.word-panel{min-height:70px}.word-command{min-width:38px;height:49px;padding-left:5px;padding-right:5px}.word-command i{font-size:14px}.word-command span{font-size:8px}.word-icon{width:30px;height:30px}.word-select{font-size:9px}.format-select{width:104px}.font-select{width:98px}.size-select{width:65px}}
+
+/* Reliable horizontal touch scrolling for the Word ribbon on mobile/tablet. */
+.word-ribbon,.word-tabs,.word-panel{box-sizing:border-box}
+.word-ribbon{max-width:100%;overflow:hidden;contain:layout paint}
+.word-tabs{overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;cursor:grab}
+.word-tabs:active,.word-panel:active{cursor:grabbing}
+.word-panel{width:100%;max-width:100%;min-width:0!important;overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scrollbar-width:thin}
+.word-panel.active{display:flex;width:100%;max-width:100%;min-width:0}
+.word-group{flex:0 0 auto}
+.word-group-row{flex:0 0 auto}
+.word-command,.word-icon,.word-select{flex:0 0 auto}
+@media(max-width:650px){
+  .word-tabs{overflow-x:scroll!important;scroll-snap-type:x proximity}
+  .word-panel{display:flex!important;overflow-x:scroll!important;overscroll-behavior-x:contain}
+  .word-panel:not(.active){display:none!important}
+  .word-panel .word-group{flex:0 0 auto}
+  .word-ribbon{width:100%;max-width:100%;overflow:hidden}
+}
 </style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
