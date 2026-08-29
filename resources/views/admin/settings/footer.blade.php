@@ -2,8 +2,8 @@
 @section('title','Footer Builder')
 @section('content')
 <x-admin.page-header title="Footer Builder" eyebrow="APPEARANCE" description="Manage the global website footer from one place." :actions="'<a class="admin-btn" href="'.route('admin.settings').'">Settings</a>'" />
-@if(session('status'))<div class="admin-card" style="margin-bottom:16px"><div class="admin-card__body">{{ session('status') }}</div></div>@endif
-@if($errors->any())<div class="admin-card" style="margin-bottom:16px"><div class="admin-card__body">{{ $errors->first() }}</div></div>@endif
+@if(session('status'))<div class="admin-card settings-alert"><div class="admin-card__body">{{ session('status') }}</div></div>@endif
+@if($errors->any())<div class="admin-card settings-alert"><div class="admin-card__body">{{ $errors->first() }}</div></div>@endif
 <form method="POST" action="{{ route('admin.settings.footer.update') }}">@csrf
 <x-admin.card><x-slot:header>Global footer content</x-slot:header>
 <div class="footer-structure-grid">
@@ -26,7 +26,7 @@
 </x-admin.setting-field>
 @endforeach
 </div>
-<div style="display:flex;justify-content:flex-end;margin-top:18px"><button class="admin-btn admin-btn--primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Footer</button></div>
+<div class="settings-save-row"><button class="admin-btn admin-btn--primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Footer</button></div>
 </x-admin.card></form>
 @push('head')<style>
 .footer-structure-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--admin-space-control,14px);margin-bottom:var(--admin-space-section,18px)}.footer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--admin-space-control,14px)}
