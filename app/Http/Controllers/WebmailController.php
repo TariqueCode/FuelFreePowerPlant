@@ -75,6 +75,7 @@ class WebmailController extends Controller
         $folder = $this->resolveFolder($request, $folders);
 
         try {
+            $webmail->setSeen($email, $password, $uid, true, $this->mailConfigFor($email), $folder);
             $message = $webmail->message($email, $password, $uid, $this->mailConfigFor($email), $folder);
         } catch (Throwable $e) {
             report($e);
