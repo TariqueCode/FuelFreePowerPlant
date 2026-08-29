@@ -87,11 +87,15 @@ button,input,textarea{font:inherit}
 .meta{color:var(--muted);font-size:14px;line-height:1.7;overflow-wrap:anywhere}
 .reader-actions{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
 .reader-actions form{display:contents}
-.reader-body{position:relative;isolation:isolate;contain:content;line-height:1.75;overflow-x:auto;overflow-y:visible;overflow-wrap:anywhere;-webkit-overflow-scrolling:touch;background:#fff;color:#17232a;border:1px solid rgba(86,210,238,.12);border-radius:14px;padding:16px;max-width:100%}
+.reader-body{position:relative;isolation:isolate;line-height:1.75;overflow:hidden;overflow-wrap:anywhere;-webkit-overflow-scrolling:touch;background:#fff;color:#17232a;border:1px solid rgba(86,210,238,.12);border-radius:14px;padding:16px;max-width:100%}
 .reader-body>*{max-width:100%!important;min-width:0!important;box-sizing:border-box}
 .reader-body *{max-width:100%!important;min-width:0!important}
 .reader-body table{table-layout:fixed!important;overflow-wrap:anywhere;word-break:break-word}
-.reader-body table,.reader-body tbody,.reader-body thead,.reader-body tr{width:100%!important;max-width:100%!important}
+.reader-body table,.reader-body tbody,.reader-body thead,.reader-body tr{width:100%!important;max-width:100%!important;min-width:0!important}
+.reader-body [width]{max-width:100%!important}
+.reader-body [style*="width"]{max-width:100%!important}
+.reader-body table{display:table!important}
+.reader-body td img,.reader-body th img{max-width:100%!important;height:auto!important}
 .reader-body td,.reader-body th{max-width:100%!important;overflow-wrap:anywhere;word-break:break-word}
 .reader-body div,.reader-body section,.reader-body article,.reader-body p{max-width:100%!important;overflow-wrap:anywhere}
 .reader-body img{display:block;max-width:100%!important;width:auto!important;height:auto!important}
@@ -141,7 +145,12 @@ button,input,textarea{font:inherit}
  .compose,.reader{padding:15px}
  .reader-actions .btn,.reader-actions form{flex:1}
  .reader-actions form .btn{width:100%}
- .reader-body{padding:12px;font-size:14px}
+ .reader,.reader-body{min-width:0;max-width:100%;overflow:hidden}
+ .reader-body{padding:10px;font-size:14px}
+ .reader-body table{width:100%!important;max-width:100%!important;table-layout:fixed!important}
+ .reader-body td,.reader-body th{width:auto!important;max-width:100%!important;padding:5px!important;font-size:inherit!important}
+ .reader-body img{max-width:100%!important;width:auto!important;height:auto!important}
+ .reader-body p,.reader-body div,.reader-body span{max-width:100%!important}
  .login-wrap{padding:20px}
  .login-card{padding:24px}
  .wm-footer-wrap{width:calc(100% - 20px)}
