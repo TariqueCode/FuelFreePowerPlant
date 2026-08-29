@@ -52,7 +52,7 @@
                 <tr>
                     <td><span class="channel {{ $item->channel }}"><i class="fa-solid {{ $item->channel==='career'?'fa-briefcase':'fa-comments' }}"></i>{{ ucfirst($item->channel) }}</span></td>
                     <td><div class="sender"><strong>{{ $item->name }}</strong><small>{{ $item->email }}</small></div></td>
-                    <td><div class="subject"><strong>{{ $item->subject }}</strong><span>{{ IlluminateSupportStr::limit(trim(strip_tags($item->message ?? '')),90) }}</span></div></td>
+                    <td><div class="subject"><strong>{{ $item->subject }}</strong><span>{{ \Illuminate\Support\Str::limit(trim(strip_tags($item->message ?? '')),90) }}</span></div></td>
                     <td><span class="status status-{{ $item->status }}">{{ str_replace('_',' ',ucfirst($item->status)) }}</span></td>
                     <td><time>{{ $item->received_at->format('d M Y') }}<small>{{ $item->received_at->format('h:i A') }}</small></time></td>
                     <td><a class="open-btn" href="{{ $item->route }}">Open <i class="fa-solid fa-arrow-right"></i></a></td>
@@ -69,7 +69,7 @@
             <a class="hd-ticket" href="{{ $item->route }}">
                 <div class="ticket-top"><span class="channel {{ $item->channel }}"><i class="fa-solid {{ $item->channel==='career'?'fa-briefcase':'fa-comments' }}"></i>{{ ucfirst($item->channel) }}</span><span class="status status-{{ $item->status }}">{{ str_replace('_',' ',ucfirst($item->status)) }}</span></div>
                 <strong>{{ $item->subject }}</strong>
-                <p>{{ IlluminateSupportStr::limit(trim(strip_tags($item->message ?? '')),110) }}</p>
+                <p>{{ \Illuminate\Support\Str::limit(trim(strip_tags($item->message ?? '')),110) }}</p>
                 <div class="ticket-meta"><span><i class="fa-regular fa-user"></i>{{ $item->name }}</span><time>{{ $item->received_at->format('d M Y, h:i A') }}</time></div>
             </a>
             @empty
