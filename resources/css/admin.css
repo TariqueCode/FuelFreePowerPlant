@@ -27,6 +27,9 @@
   --admin-border-soft:rgba(116,188,207,.24);
   --admin-icon:#9fd8e8;
   --admin-shadow:rgba(0,0,0,.22);
+  --admin-focus-ring:rgba(85,204,231,.08);
+  --admin-overlay-soft:rgba(0,0,0,.48);
+  --admin-surface-control:rgba(255,255,255,.035);
   --admin-input-radius:10px;
   --admin-control-height:38px;
   --admin-space-control:8px;
@@ -55,8 +58,8 @@
   --text:var(--admin-text);
 }
 .admin-page,.admin-page *{box-sizing:border-box}
-.admin-input{width:100%;box-sizing:border-box;min-height:var(--admin-control-height);padding:var(--admin-space-control) var(--admin-space-inline);border:1px solid var(--admin-border);border-radius:var(--admin-input-radius);background:rgba(255,255,255,.035);color:var(--admin-text);outline:none;font:inherit}
-.admin-input:focus{border-color:var(--admin-primary);box-shadow:0 0 0 3px rgba(85,204,231,.08)}
+.admin-input{width:100%;box-sizing:border-box;min-height:var(--admin-control-height);padding:var(--admin-space-control) var(--admin-space-inline);border:1px solid var(--admin-border);border-radius:var(--admin-input-radius);background:var(--admin-surface-control);color:var(--admin-text);outline:none;font:inherit}
+.admin-input:focus{border-color:var(--admin-primary);box-shadow:0 0 0 3px var(--admin-focus-ring)}
 .admin-page{min-width:0;color:var(--admin-text)}
 .admin-container{width:100%;max-width:var(--admin-content-max);margin:0 auto}
 .admin-grid{display:grid;gap:var(--admin-space-3)}
