@@ -219,7 +219,7 @@ class WebmailService
             $this->smtpCommand($socket,'MAIL FROM:<'.$email.'>',250); foreach(array_merge($to,$cc,$bcc) as $recipient)$this->smtpCommand($socket,'RCPT TO:<'.$recipient.'>',250); $this->smtpCommand($socket,'DATA',354);
             $html=$this->safeBodyForSend($body); $plain=trim(strip_tags(str_replace(['</p>','</div>','<br>','<br/>','<br />'],"\n",$html)));
             $hasAttachments=false; foreach(($attachments??[]) as $a)if(!empty($a['path'])&&is_file($a['path'])){$hasAttachments=true;break;}
-            $boundary='=_FuelFreePowerPlant_'.bin2hex(random_bytes(12)); $headers=['From: '.$email,'To: '.implode(', ',$to)];
+            $boundary='=_FuelFreePowerPlant_'.bin2hex(random_bytes(12)); $headers=['From: '.$this->fromHeader($email),'To: '.implode(', ',$to)];
             if($cc)$headers[]='Cc: '.implode(', ',$cc); $headers[]='Subject: =?UTF-8?B?'.base64_encode($subject).'?='; $headers[]='Date: '.date(DATE_RFC2822);
             $headers[]='Message-ID: <'.bin2hex(random_bytes(16)).'@'.(parse_url(config('app.url'),PHP_URL_HOST)?:'localhost'); foreach($headersExtra as $k=>$v)if($v!=='')$headers[]=$k.': '.$v;
             $headers[]='MIME-Version: 1.0';
@@ -359,6 +359,17 @@ class WebmailService
     private function decodeFolderName(string $value): string
     {
         return function_exists('imap_utf8') ? imap_utf8($value) : $value;
+    }
+
+    private function fromHeader(string $email): string
+    {
+        $lower=strtolower(trim($email));
+        $name=match($lower){
+            'info@fuelfreepowerplant.com'=>'FuelFree PowerPlant | Contact',
+            'career@fuelfreepowerplant.com'=>'FuelFree PowerPlant | Careers',
+            default=>$email,
+        };
+        return $name===$email ? $email : '=?UTF-8?B?'.base64_encode($name).'?= <'.$email.'>';
     }
 
     private function normalizeRecipients(string|array $value): array{$items=is_array($value)?$value:(preg_split('/[,;]+/',str_replace(["\r","\n"],' ',$value))?:[]);$out=[];foreach($items as $item){$item=trim($item);if($item!==''&&filter_var($item,FILTER_VALIDATE_EMAIL))$out[]=strtolower($item);}return array_values(array_unique($out));}
