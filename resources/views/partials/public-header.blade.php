@@ -95,7 +95,7 @@ body{font-size:16px!important}main p,main li,main td,main th,main label,main .bo
                 <a href="{{ route('news.index') }}" @if(request()->routeIs('news.*')) aria-current="page" @endif>{{ $headerLabels['news_label'] ?? 'News &amp; Notices' }}</a>
                 <a href="{{ route('site.career') }}" @if(request()->routeIs('site.career')) aria-current="page" @endif>{{ $headerLabels['career_label'] ?? 'Career' }}</a>
                 <a href="{{ route('contact') }}" @if(request()->routeIs('contact*')) aria-current="page" @endif>{{ $headerLabels['contact_label'] ?? 'Contact' }}</a>
-                <a href="{{ route('webmail.redirect') }}">{{ $headerLabels['webmail_label'] ?? 'Webmail' }}</a>
+                <a href="{{ route('webmail.redirect') }}" target="_blank" rel="noopener noreferrer">{{ $headerLabels['webmail_label'] ?? 'Webmail' }}</a>
                 <span class="mobile-portal-separator" aria-hidden="true"></span>
                 <a class="mobile-menu-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid {{ $isPortalUser ? 'fa-circle-user' : 'fa-right-to-bracket' }}" aria-hidden="true"></i>
