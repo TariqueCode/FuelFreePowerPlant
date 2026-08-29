@@ -23,11 +23,13 @@
   --admin-content-max:1500px;
   --admin-sidebar:248px;
   --admin-header:64px;
+  --admin-input-radius:10px;
+  --admin-control-height:38px;
   --line:var(--admin-border);
   --text:var(--admin-text);
 }
 .admin-page,.admin-page *{box-sizing:border-box}
-.admin-input{width:100%;box-sizing:border-box;min-height:38px;padding:8px 11px;border:1px solid var(--admin-border);border-radius:10px;background:rgba(255,255,255,.035);color:var(--admin-text);outline:none;font:inherit}
+.admin-input{width:100%;box-sizing:border-box;min-height:var(--admin-control-height);padding:8px 11px;border:1px solid var(--admin-border);border-radius:var(--admin-input-radius);background:rgba(255,255,255,.035);color:var(--admin-text);outline:none;font:inherit}
 .admin-input:focus{border-color:var(--admin-primary);box-shadow:0 0 0 3px rgba(85,204,231,.08)}
 .admin-page{min-width:0;color:var(--admin-text)}
 .admin-container{width:100%;max-width:var(--admin-content-max);margin:0 auto}
