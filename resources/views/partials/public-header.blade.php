@@ -13,13 +13,13 @@
     $publicPortalUrl = $isPortalUser ? route('dashboard') : route('login');
 @endphp
 <style>
-.public-shell{width:min(1280px,calc(100% - 40px));margin:auto}
+.public-shell{width:min(var(--public-header-container,1280px),calc(100% - 40px));margin:auto}
 .public-header{position:sticky;top:0;z-index:100;background:rgba(2,10,16,.94);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid rgba(86,210,238,.14);box-shadow:0 8px 28px rgba(0,0,0,.10)}
-.public-header-top{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid rgba(86,210,238,.09)}
+.public-header-top{min-height:var(--public-header-height,64px);display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid rgba(86,210,238,.09)}
 .public-brand{display:flex;align-items:center;gap:9px;min-width:0;flex:0 0 auto;color:#effcff!important;text-decoration:none!important}.public-brand:visited,.public-brand:hover,.public-brand:active{color:#effcff!important;text-decoration:none!important}
 .public-brand img,.public-brand-fallback{width:42px;height:42px;flex:0 0 42px}.public-brand img{object-fit:contain;border-radius:8px}.public-brand-fallback{display:grid;place-items:center;border-radius:8px;color:#43d1f0;border:1px solid rgba(86,210,238,.15)}
 .public-brand-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px;line-height:1.2;font-weight:800;letter-spacing:-.02em}.public-brand-name-first{color:#51d8f0}.public-brand-name-rest{color:#effcff}
-.public-header-nav{display:flex;align-items:center;justify-content:center;min-width:0;height:46px}.public-menu{width:100%;display:flex;align-items:center;justify-content:center;gap:4px;min-width:0;overflow-x:auto;overflow-y:hidden;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}.public-menu::-webkit-scrollbar{display:none}
+.public-header-nav{display:flex;align-items:center;justify-content:center;min-width:0;height:46px}.public-menu{width:100%;display:flex;align-items:center;justify-content:var(--public-header-nav-justify,center);gap:var(--public-header-nav-gap,4px);min-width:0;overflow-x:auto;overflow-y:hidden;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}.public-menu::-webkit-scrollbar{display:none}
 .public-menu a,.public-menu a:visited{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:6px 10px;border-radius:8px;color:#92adb6!important;font-size:12px;line-height:1.15;font-weight:600;text-decoration:none!important;white-space:nowrap;flex:0 0 auto;transition:color .18s,background .18s}.public-menu a:hover,.public-menu a:active,.public-menu a:focus,.public-menu a:focus-visible{color:#effcff!important;background:rgba(67,209,240,.08);text-decoration:none!important;outline:none!important;box-shadow:none!important;border:0!important;-webkit-tap-highlight-color:transparent}.public-menu a[aria-current=page]{color:#8bf3ff!important;background:rgba(67,209,240,.07)}
 .public-menu-dropdown{position:relative;display:flex;align-items:center;flex:0 0 auto}.public-menu-dropdown-toggle{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:34px;padding:6px 10px;border:0;border-radius:8px;background:transparent;color:#92adb6;font:inherit;font-size:12px;line-height:1.15;font-weight:600;cursor:pointer;white-space:nowrap;transition:color .18s,background .18s}.public-menu-dropdown-toggle:hover,.public-menu-dropdown-toggle:focus,.public-menu-dropdown-toggle:focus-visible,.public-menu-dropdown-toggle[aria-expanded=true]{color:#effcff;background:rgba(67,209,240,.08);outline:none!important;box-shadow:none!important;-webkit-tap-highlight-color:transparent}.public-menu-dropdown-toggle[aria-current=page]{color:#8bf3ff;background:rgba(67,209,240,.07)}.public-menu-dropdown-chevron{width:8px;height:8px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .18s}.public-menu-dropdown-toggle[aria-expanded=true] .public-menu-dropdown-chevron{transform:rotate(225deg) translate(-1px,-1px)}
 .public-menu-dropdown-panel{position:absolute;top:100%;left:50%;min-width:220px;padding:8px;background:rgba(4,18,26,.98);border:1px solid rgba(86,210,238,.15);border-radius:12px;box-shadow:0 18px 48px rgba(0,0,0,.34);opacity:0;visibility:hidden;pointer-events:none;transform:translate(-50%, -6px);transition:opacity .16s,visibility .16s,transform .16s;z-index:120}.public-menu-dropdown:hover .public-menu-dropdown-panel,.public-menu-dropdown.is-open .public-menu-dropdown-panel{opacity:1;visibility:visible;pointer-events:auto;transform:translate(-50%,0)}.public-menu-dropdown-panel a,.public-menu-dropdown-panel a:visited{display:flex;width:100%;min-height:40px;justify-content:flex-start;padding:9px 12px;font-size:13px;border-radius:9px}.public-menu-dropdown-panel a:hover,.public-menu-dropdown-panel a:active,.public-menu-dropdown-panel a:focus,.public-menu-dropdown-panel a:focus-visible{background:rgba(67,209,240,.08);outline:0!important;box-shadow:none!important;-webkit-tap-highlight-color:transparent}
@@ -41,7 +41,7 @@
 }
 @media(min-width:721px){.mobile-menu-portal,.mobile-portal-separator{display:none!important}}
 .public-menu-toggle{display:none;width:42px;height:42px;border:1px solid rgba(86,210,238,.15);border-radius:11px;background:#06141d;color:#fff;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}.public-menu-toggle svg{width:19px;height:19px;display:block}
-@media(min-width:721px){.public-header-nav,.public-menu{overflow:visible!important;}}
+@media(min-width:721px){.public-header-nav,.public-menu{overflow:visible!important;}} .public-header--static{position:relative}
 @media(min-width:1001px){.public-social-label{display:inline-block}.public-brand img,.public-brand-fallback{width:42px;height:42px;flex-basis:42px}.public-brand-name{font-size:16px}.public-menu{gap:4px}.public-menu a,.public-menu a:visited,.public-menu-dropdown-toggle{font-size:12px;padding-left:11px;padding-right:11px}}
 @media(max-width:1000px) and (min-width:721px){.public-shell{width:min(1280px,calc(100% - 28px))}.public-header-top{gap:12px;min-height:58px}.public-brand img,.public-brand-fallback{width:38px;height:38px;flex-basis:38px}.public-brand-name{font-size:14px}.public-header-divider{height:36px;margin:0 5px}.public-portal{font-size:10px;padding:0 10px}.public-menu{justify-content:flex-start}.public-menu a,.public-menu a:visited,.public-menu-dropdown-toggle{font-size:11px;padding-left:11px;padding-right:11px}}
 @media(max-width:720px){.public-shell{width:calc(100% - 20px)}.public-header-top{min-height:58px;border-bottom:0}.public-header-nav{display:none;position:absolute;top:58px;left:12px;right:12px;height:auto;min-height:auto;padding:8px;background:rgba(4,18,26,.98);border:1px solid rgba(86,210,238,.15);border-radius:14px;box-shadow:0 20px 55px rgba(0,0,0,.3)}.public-header-nav.is-open{display:flex}.public-header-tools{display:flex;gap:3px}.public-socials{max-width:30vw;gap:1px}.public-social{width:28px;height:28px;border-radius:7px}.public-social i{font-size:11px}.public-header-divider{height:34px;margin:0 5px}.public-portal{min-height:30px;padding:0 8px;border-radius:8px;font-size:10px;gap:5px}.public-brand-name{font-size:14px}.public-brand img,.public-brand-fallback{width:34px;height:34px;flex-basis:34px}.public-menu-toggle{display:flex;width:38px;height:38px;border-radius:10px}.public-menu{flex-direction:column;align-items:stretch;justify-content:flex-start;overflow:visible;white-space:normal}.public-menu a,.public-menu a:visited{justify-content:flex-start;min-height:44px;padding:10px 13px;font-size:15px}}
@@ -49,9 +49,9 @@
 /* Single canonical navigation spacing for ALL public pages and ALL device sizes.
    Responsive layout may change orientation/size, but spacing rules live here once. */
 .public-header .public-menu{
-  gap:4px!important;
-  row-gap:4px!important;
-  column-gap:4px!important;
+  gap:var(--public-header-nav-gap,4px)!important;
+  row-gap:var(--public-header-nav-gap,4px)!important;
+  column-gap:var(--public-header-nav-gap,4px)!important;
 }
 .public-header .public-menu > a,
 .public-header .public-menu > .public-menu-dropdown{
@@ -109,7 +109,14 @@
   }
 }
 </style>
-<header class="public-header">
+@php
+    $headerHeight = max(48, min(120, (int) ($globalLayout['header.height'] ?? 64)));
+    $headerContainer = max(960, min(1600, (int) ($globalLayout['header.container_width'] ?? 1280)));
+    $headerNavGap = max(0, min(24, (int) ($globalLayout['header.nav_gap'] ?? 4)));
+    $headerAlignment = in_array(($globalLayout['header.alignment'] ?? 'center'), ['left','center','right'], true) ? $globalLayout['header.alignment'] : 'center';
+    $headerSticky = ($globalLayout['header.sticky'] ?? '1') === '1';
+@endphp
+<header class="public-header @if(!$headerSticky) public-header--static @endif" style="--public-header-height:{{ $headerHeight }}px;--public-header-container:{{ $headerContainer }}px;--public-header-nav-gap:{{ $headerNavGap }}px;--public-header-nav-justify:{{ $headerAlignment === 'left' ? 'flex-start' : ($headerAlignment === 'right' ? 'flex-end' : 'center') }};">
     <div class="public-shell">
         <div class="public-header-top">
             <a class="public-brand" href="{{ route('home') }}" aria-label="{{ $publicName }}">
