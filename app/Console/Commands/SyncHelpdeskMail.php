@@ -42,7 +42,8 @@ class SyncHelpdeskMail extends Command
                 if($existing){
                     if(!$existing->external_deleted_at){
                         try{
-                            $webmail->purge($account->address,$account->password,$uid,'INBOX',$this->mailConfig($account));
+                            $email->update(['body_html'=>$bodyHtml]);
+                    $webmail->purge($account->address,$account->password,$uid,'INBOX',$this->mailConfig($account));
                             $existing->update(['external_deleted_at'=>now(),'last_error'=>null]);
                         }catch(Throwable $e){
                             $existing->update(['last_error'=>mb_substr($e->getMessage(),0,5000)]);
@@ -55,6 +56,7 @@ class SyncHelpdeskMail extends Command
                     $message=$webmail->message($account->address,$account->password,$uid,$this->mailConfig($account),'INBOX');
                     $received=$this->parseDate($message['date']??$summary['date']??null);
                     $sender=$this->parseSender((string)($message['from']??$summary['from']??''));
+                    $bodyHtml=$message['body']??null;
                     $email=HelpdeskEmail::create([
                         'email_account_id'=>$account->id,'mailbox_group'=>$account->mailbox_group,'external_uid'=>$uid,
                         'message_id'=>$message['message_id']??($summary['message_id']??null),'fingerprint'=>$fingerprint,
@@ -72,10 +74,14 @@ class SyncHelpdeskMail extends Command
                         $filename=$this->safeFilename($data['name']??$attachment['name']??'attachment');
                         $path='helpdesk/'.$email->id.'/'.Str::uuid().'-'.$filename;
                         Storage::disk('local')->put($path,$data['content']);
-                        $email->attachments()->create([
+                        $storedAttachment=$email->attachments()->create([
                             'part'=>$part,'filename'=>$filename,'mime_type'=>$data['type']??($attachment['type']??'application/octet-stream'),
                             'size'=>(int)($data['size']??$attachment['size']??0),'path'=>$path,
                         ]);
+                        if(!empty($attachment['inline']) && str_starts_with(strtolower((string)($data['type']??'')),'image/')){
+                            $inlineUrl=rtrim(config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com'),'/').'/message/'.$uid.'/inline/'.$part.'?folder='.rawurlencode('INBOX');
+                            $bodyHtml=str_ireplace($inlineUrl,'data:'.($data['type']??'application/octet-stream').';base64,'.base64_encode($data['content']),$bodyHtml??'');
+                        }
                     }
 
                     $webmail->purge($account->address,$account->password,$uid,'INBOX',$this->mailConfig($account));
