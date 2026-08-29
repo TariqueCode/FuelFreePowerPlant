@@ -77,4 +77,133 @@
         </article>
     </section>
 </main>
+@push('scripts')
+<script>
+(function(){
+    const form=document.getElementById('career-application-form');
+    const fileInput=document.getElementById('career-cv');
+    const submit=document.getElementById('career-submit');
+    const status=document.getElementById('career-upload-status');
+    const label=document.getElementById('career-upload-label');
+    const percent=document.getElementById('career-upload-percent');
+    const progress=document.getElementById('career-upload-progress');
+    if(!form||!fileInput||!submit)return;
+
+    const MAX_SIZE=50*1024*1024;
+    const FALLBACK_CHUNK_SIZE=512*1024;
+    const endpoint='{{ route('career.chunks') }}';
+
+    const setProgress=(done,total,message)=>{
+        const value=total?Math.min(100,Math.round((done/total)*100)):0;
+        status.hidden=false;
+        label.textContent=message;
+        percent.textContent=value+'%';
+        progress.style.width=value+'%';
+    };
+
+    const readJson=async(response)=>{
+        const raw=await response.text();
+        let data={};
+        try{data=raw?JSON.parse(raw):{};}catch(e){}
+        if(!response.ok){
+            throw new Error(data.message||'Upload failed. Please try again.');
+        }
+        return data;
+    };
+
+    form.addEventListener('submit',async function(event){
+        event.preventDefault();
+
+        if(!fileInput.files.length){
+            fileInput.reportValidity();
+            return;
+        }
+
+        const file=fileInput.files[0];
+        if(file.size>MAX_SIZE){
+            setProgress(0,file.size,'File is larger than 50 MB.');
+            return;
+        }
+
+        submit.disabled=true;
+        fileInput.disabled=true;
+        submit.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Uploading…';
+
+        try{
+            const csrf=document.querySelector('meta[name="csrf-token"]')?.content||'{{ csrf_token() }}';
+
+            const start=await fetch(endpoint,{
+                method:'POST',
+                headers:{
+                    'X-CSRF-TOKEN':csrf,
+                    'X-Requested-With':'XMLHttpRequest',
+                    'Accept':'application/json',
+                    'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+                body:new URLSearchParams({
+                    filename:file.name,
+                    size:String(file.size),
+                    mime_type:file.type||'application/octet-stream'
+                })
+            });
+            const session=await readJson(start);
+            const uploadId=session.upload_id;
+            const chunkSize=Number(session.chunk_size)||FALLBACK_CHUNK_SIZE;
+            const totalChunks=Math.max(1,Math.ceil(file.size/chunkSize));
+
+            for(let index=0;index<totalChunks;index++){
+                const offset=index*chunkSize;
+                const chunk=file.slice(offset,Math.min(offset+chunkSize,file.size));
+                setProgress(offset,file.size,'Uploading CV…');
+
+                const response=await fetch(endpoint,{
+                    method:'POST',
+                    headers:{
+                        'X-CSRF-TOKEN':csrf,
+                        'X-Requested-With':'XMLHttpRequest',
+                        'Accept':'application/json',
+                        'X-Upload-Id':uploadId,
+                        'X-Chunk-Index':String(index),
+                        'X-Chunk-Offset':String(offset),
+                        'Content-Type':'application/octet-stream'
+                    },
+                    body:chunk
+                });
+                await readJson(response);
+                setProgress(offset+chunk.size,file.size,'Uploading CV…');
+            }
+
+            setProgress(file.size,file.size,'Finalizing application…');
+
+            const formData=new FormData(form);
+            formData.delete('cv');
+            formData.set('finalize','1');
+
+            const finalize=await fetch(endpoint,{
+                method:'POST',
+                headers:{
+                    'X-CSRF-TOKEN':csrf,
+                    'X-Requested-With':'XMLHttpRequest',
+                    'Accept':'application/json',
+                    'X-Upload-Id':uploadId
+                },
+                body:formData
+            });
+            const result=await readJson(finalize);
+
+            window.location.assign(result.redirect||'{{ route('site.career') }}');
+        }catch(error){
+            status.hidden=false;
+            label.textContent=error.message||'Upload failed. Please try again.';
+            percent.textContent='!';
+            progress.style.width='0%';
+            submit.disabled=false;
+            fileInput.disabled=false;
+            submit.innerHTML='<i class="fa-solid fa-paper-plane"></i> Submit application';
+        }
+    });
+})();
+</script>
+@endpush
+
 @endsection
