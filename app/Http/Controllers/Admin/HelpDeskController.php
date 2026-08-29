@@ -119,16 +119,6 @@ class HelpDeskController extends Controller
         [$source]=$this->source($type,$id);
         $data=$request->validate(['body'=>['required','string','max:500000']]);
 
-        $settings=SystemSetting::query()->pluck('value','key')->all();
-        $replyHtml=view('emails.helpdesk.reply',[
-            'body'=>$data['body'],'recipientName'=>$source->name ?? ($source->sender_name ?? $source->email ?? $source->sender_email ?? ''),
-            'subject'=>$subject ?? '','channel'=>$type,'companyName'=>$settings['company.name'] ?? config('fuelfree.company.name','FuelFree PowerPlant'),
-            'tagline'=>$settings['company.tagline'] ?? config('fuelfree.company.tagline','Powering a cleaner, smarter future.'),
-            'logoUrl'=>!empty($settings['company.logo_path']) ? asset('storage/'.ltrim($settings['company.logo_path'],'/')) : null,
-            'websiteUrl'=>$settings['footer.website_url'] ?? 'https://www.fuelfreepowerplant.com',
-            'footerAddress'=>$settings['footer.address'] ?? '', 'footerPhone'=>$settings['footer.phone'] ?? '',
-        ])->render();
-
         if($type==='email'){
             $to=trim((string)$source->sender_email);
             $subject=str_starts_with(strtolower((string)$source->subject),'re:')
@@ -142,6 +132,16 @@ class HelpDeskController extends Controller
             $settings=SystemSetting::query()->pluck('value','key')->all();
             $mailboxId=(int)($settings[$type==='career'?'mail.career_account_id':'mail.contact_account_id']??0);
         }
+
+        $settings=SystemSetting::query()->pluck('value','key')->all();
+        $replyHtml=view('emails.helpdesk.reply',[
+            'body'=>$data['body'],'recipientName'=>$source->name ?? ($source->sender_name ?? $source->email ?? $source->sender_email ?? ''),
+            'subject'=>$subject,'channel'=>$type,'companyName'=>$settings['company.name'] ?? config('fuelfree.company.name','FuelFree PowerPlant'),
+            'tagline'=>$settings['company.tagline'] ?? config('fuelfree.company.tagline','Powering a cleaner, smarter future.'),
+            'logoUrl'=>!empty($settings['company.logo_path']) ? asset('storage/'.ltrim($settings['company.logo_path'],'/')) : null,
+            'websiteUrl'=>$settings['footer.website_url'] ?? 'https://www.fuelfreepowerplant.com',
+            'footerAddress'=>$settings['footer.address'] ?? '', 'footerPhone'=>$settings['footer.phone'] ?? '',
+        ])->render();
 
         $address=($type==='career'||($type==='email'&&$source->mailbox_group==='career'))
             ?'career@fuelfreepowerplant.com':'info@fuelfreepowerplant.com';
