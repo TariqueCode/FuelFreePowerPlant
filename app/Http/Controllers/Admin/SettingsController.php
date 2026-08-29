@@ -113,6 +113,30 @@ class SettingsController
         return view('admin.settings.header', compact('settings'));
     }
 
+    public function theme(): View
+    {
+        $keys = ['theme.primary','theme.secondary','theme.accent','theme.surface','theme.text','theme.muted','theme.radius'];
+        $defaults = ['theme.primary'=>'#55cce7','theme.secondary'=>'#0f2430','theme.accent'=>'#9de8f7','theme.surface'=>'#07131a','theme.text'=>'#eaf7fb','theme.muted'=>'#8ea8b2','theme.radius'=>'12'];
+        $settings = array_merge($defaults, SystemSetting::query()->whereIn('key',$keys)->pluck('value','key')->all());
+        return view('admin.settings.theme', compact('settings'));
+    }
+
+    public function updateTheme(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'theme.primary'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],
+            'theme.secondary'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],
+            'theme.accent'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],
+            'theme.surface'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],
+            'theme.text'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],
+            'theme.muted'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],
+            'theme.radius'=>['required','integer','min:0','max:32'],
+        ]);
+        foreach($data as $key=>$value) SystemSetting::updateOrCreate(['key'=>$key],['value'=>$value,'is_sensitive'=>false]);
+        Cache::forget('fuelfree.system_settings');
+        return back()->with('status','Global theme saved successfully.');
+    }
+
     public function menu(): View
     {
         $items = \App\Models\SiteContentItem::query()
