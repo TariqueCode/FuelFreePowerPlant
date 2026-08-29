@@ -2,8 +2,8 @@
 @section('title','Menu Builder')
 @section('content')
 <x-admin.page-header title="Menu Builder" eyebrow="NAVIGATION" description="Control the global company navigation from one source." :actions="'<a class="admin-btn" href="'.route('admin.settings').'">Settings</a>'" />
-@if(session('status'))<div class="admin-card" style="margin-bottom:16px"><div class="admin-card__body">{{ session('status') }}</div></div>@endif
-@if($errors->any())<div class="admin-card" style="margin-bottom:16px"><div class="admin-card__body">{{ $errors->first() }}</div></div>@endif
+@if(session('status'))<div class="admin-card settings-alert"><div class="admin-card__body">{{ session('status') }}</div></div>@endif
+@if($errors->any())<div class="admin-card settings-alert"><div class="admin-card__body">{{ $errors->first() }}</div></div>@endif
 @php
 $customItems = json_decode((\App\Models\SystemSetting::where('key','navigation.custom_items')->value('value') ?? '[]'), true) ?: [];
 @endphp<form method="POST" action="{{ route('admin.settings.menu.update') }}">@csrf
@@ -22,12 +22,12 @@ $customItems = json_decode((\App\Models\SystemSetting::where('key','navigation.c
 <div style="font-size:10px;color:var(--admin-muted)">No published company pages are available.</div>
 @endforelse
 </div>
-<div style="margin-top:22px;border-top:1px solid var(--admin-border);padding-top:18px">
-<div style="font-size:11px;font-weight:700;margin-bottom:6px">Custom links</div>
-<p style="font-size:10px;color:var(--admin-muted);margin:0 0 12px">Optional external links. No JavaScript or drag-and-drop dependency is added.</p>
+<div class="settings-subsection">
+<div class="settings-subsection__title">Custom links</div>
+<p class="settings-subsection__help">Optional external links. No JavaScript or drag-and-drop dependency is added.</p>
 <div id="custom-menu-items"></div>
 <button type="button" class="admin-btn" onclick="addCustomMenuItem()">+ Add custom link</button>
-</div><div style="margin-top:22px;border-top:1px solid var(--admin-border);padding-top:18px"><div style="font-size:11px;font-weight:700;margin-bottom:6px">Menu groups</div><p style="font-size:10px;color:var(--admin-muted);margin:0 0 12px">Create reusable group labels for the shared navigation. Groups are stored centrally.</p><div id="menu-groups">@foreach($menuGroups as $gi=>$group)<div class="menu-group-row"><input class="admin-input" name="menu_groups[{{ $gi }}][label]" maxlength="60" value="{{ $group['label'] ?? '' }}" placeholder="Group label" required><select class="admin-input" name="menu_groups[{{ $gi }}][parent_id]"><option value="">Top level</option>@foreach($items as $parent)<option value="{{ $parent->id }}" @selected((int)($group['parent_id'] ?? 0)===(int)$parent->id)>{{ $parent->title }}</option>@endforeach</select><button type="button" class="admin-btn" onclick="this.parentElement.remove()">×</button></div>@endforeach</div><button type="button" class="admin-btn" onclick="addMenuGroup()">+ Add group</button></div><div style="display:flex;justify-content:flex-end;margin-top:18px"><button class="admin-btn admin-btn--primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Menu</button></div>
+</div><div class="settings-subsection"><div class="settings-subsection__title">Menu groups</div><p class="settings-subsection__help">Create reusable group labels for the shared navigation. Groups are stored centrally.</p><div id="menu-groups">@foreach($menuGroups as $gi=>$group)<div class="menu-group-row"><input class="admin-input" name="menu_groups[{{ $gi }}][label]" maxlength="60" value="{{ $group['label'] ?? '' }}" placeholder="Group label" required><select class="admin-input" name="menu_groups[{{ $gi }}][parent_id]"><option value="">Top level</option>@foreach($items as $parent)<option value="{{ $parent->id }}" @selected((int)($group['parent_id'] ?? 0)===(int)$parent->id)>{{ $parent->title }}</option>@endforeach</select><button type="button" class="admin-btn" onclick="this.parentElement.remove()">×</button></div>@endforeach</div><button type="button" class="admin-btn" onclick="addMenuGroup()">+ Add group</button></div><div class="settings-save-row"><button class="admin-btn admin-btn--primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Menu</button></div>
 </x-admin.card></form>
 @push('head')<style>
 .menu-group-row{display:grid;grid-template-columns:1fr 1fr 34px;gap:8px;margin-bottom:8px}.custom-menu-row{display:grid;grid-template-columns:1fr 1.5fr 34px;gap:8px;margin-bottom:8px}.custom-menu-row .admin-input{min-height:34px}
