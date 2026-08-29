@@ -42,8 +42,7 @@ class SyncHelpdeskMail extends Command
                 if($existing){
                     if(!$existing->external_deleted_at){
                         try{
-                            $email->update(['body_html'=>$bodyHtml]);
-                    $webmail->purge($account->address,$account->password,$uid,'INBOX',$this->mailConfig($account));
+                                    $webmail->purge($account->address,$account->password,$uid,'INBOX',$this->mailConfig($account));
                             $existing->update(['external_deleted_at'=>now(),'last_error'=>null]);
                         }catch(Throwable $e){
                             $existing->update(['last_error'=>mb_substr($e->getMessage(),0,5000)]);
@@ -63,7 +62,7 @@ class SyncHelpdeskMail extends Command
                         'sender_name'=>$sender['name'],'sender_email'=>$sender['email'] ?: (string)$summary['from'],
                         'to_email'=>$message['to']??null,'cc_email'=>$message['cc']??null,
                         'subject'=>$message['subject']??($summary['subject']??'(No subject)'),
-                        'body_html'=>$message['body']??null,'body_text'=>trim(strip_tags((string)($message['body']??''))),
+                        'body_html'=>$bodyHtml,'body_text'=>trim(strip_tags((string)($bodyHtml??''))),
                         'status'=>'new','received_at'=>$received,'imported_at'=>now(),
                     ]);
 
@@ -74,7 +73,7 @@ class SyncHelpdeskMail extends Command
                         $filename=$this->safeFilename($data['name']??$attachment['name']??'attachment');
                         $path='helpdesk/'.$email->id.'/'.Str::uuid().'-'.$filename;
                         Storage::disk('local')->put($path,$data['content']);
-                        $storedAttachment=$email->attachments()->create([
+                        $email->attachments()->create([
                             'part'=>$part,'filename'=>$filename,'mime_type'=>$data['type']??($attachment['type']??'application/octet-stream'),
                             'size'=>(int)($data['size']??$attachment['size']??0),'path'=>$path,
                         ]);
@@ -84,6 +83,7 @@ class SyncHelpdeskMail extends Command
                         }
                     }
 
+                    $email->update(['body_html'=>$bodyHtml]);
                     $webmail->purge($account->address,$account->password,$uid,'INBOX',$this->mailConfig($account));
                     $email->update(['external_deleted_at'=>now(),'last_error'=>null]);
                     $this->line($account->address.': imported '.$email->id);
