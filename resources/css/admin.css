@@ -36,7 +36,7 @@
 .admin-grid--3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .admin-grid--4{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(max-width:1100px){.admin-grid--4{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:800px){.admin-grid--3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.admin-grid--3{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-nav__group-label{padding-top:9px}}
 @media(max-width:600px){.admin-grid--2,.admin-grid--3,.admin-grid--4{grid-template-columns:1fr}.admin-card__header,.admin-card__body{padding:var(--admin-space-4)}.admin-title{font-size:25px}.admin-description{font-size:12px}.admin-btn{min-height:40px}.admin-table{min-width:560px}}
 @media(prefers-reduced-motion:reduce){.admin-btn{transition:none}}
 
@@ -56,7 +56,6 @@
 @media(max-width:600px){.admin-content{padding:15px 12px}.admin-topbar{height:60px;padding:0 12px}.admin-topbar__brand img{width:34px;height:34px}.admin-profile,.admin-menu-toggle{width:36px;height:36px}.admin-sidebar{padding:12px 10px}}@media(prefers-reduced-motion:reduce){.admin-nav a,.admin-sidebar{transition:none}}
 
 .admin-nav__group{display:grid;gap:3px;margin-bottom:14px}.admin-nav__group:last-child{margin-bottom:0}.admin-nav__group-label{padding:7px 10px 5px;color:#56727e;font-size:8px;font-weight:700;letter-spacing:.13em;text-transform:uppercase}
-@media(max-width:900px){.admin-nav__group-label{padding-top:9px}}
 
 .admin-page-header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:24px}.admin-page-header__copy{min-width:0}.admin-eyebrow{display:block;margin-bottom:6px;color:var(--admin-primary);font-size:9px;font-weight:700;letter-spacing:.14em}.admin-title{margin:0;font-size:clamp(20px,2.4vw,30px);line-height:1.15}.admin-description{margin:7px 0 0;color:var(--admin-muted);font-size:12px;line-height:1.6}.admin-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .admin-card{overflow:hidden;border:1px solid var(--admin-border);border-radius:var(--admin-radius-lg,16px);background:var(--admin-surface-soft,rgba(255,255,255,.025));box-shadow:0 10px 30px var(--admin-shadow)}.admin-card__header{padding:14px 16px;border-bottom:1px solid var(--admin-border);font-size:12px;font-weight:650}.admin-card__body{padding:var(--admin-card-padding,16px)}
