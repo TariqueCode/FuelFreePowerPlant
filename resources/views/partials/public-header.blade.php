@@ -6,7 +6,7 @@
     $publicNameParts = preg_split('/\s+/', trim((string) $publicName), 2);
     $publicNameFirst = $publicNameParts[0] ?? '';
     $publicNameRest = $publicNameParts[1] ?? '';
-    $publicNavPages = \App\Models\SiteContentItem::query()->where('type','company')->where('status','published')->where('show_in_navigation',true)->orderByRaw("CASE WHEN slug = 'about-us' THEN 0 ELSE 1 END")->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')->orderBy('navigation_order')->orderByDesc('created_at')->get(['title','slug']);
+    $publicNavPages = \Illuminate\Support\Facades\Cache::remember('public.company-navigation', 300, fn () => \App\Models\SiteContentItem::query()->where('type','company')->where('status','published')->where('show_in_navigation',true)->orderByRaw("CASE WHEN slug = 'about-us' THEN 0 ELSE 1 END")->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')->orderBy('navigation_order')->orderByDesc('created_at')->get(['title','slug']));
     $publicCompanyActive = request()->routeIs('site.about') || request()->routeIs('company.page');
     $publicSocials = \Illuminate\Support\Facades\Cache::remember('public.social-links', 600, fn () => \App\Models\SocialLink::active()->get(['platform','label','url','icon'])->map(fn ($social) => ['platform' => $social->platform, 'label' => $social->label, 'url' => $social->url, 'icon' => $social->icon, 'color' => data_get(config('fuelfree.social.platforms'), $social->platform.'.color', '#51D8F0')])->values()->all());
     $isPortalUser = auth()->check();
