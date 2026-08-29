@@ -38,7 +38,7 @@
 </form>
 @push('head')
 <style>
-.admin-help{font-size:10px;line-height:1.5;color:var(--admin-muted)}.admin-toggle{display:flex;align-items:center;gap:8px;min-height:38px;padding:0 11px;border:1px solid var(--admin-border);border-radius:10px;font-size:10px}.admin-toggle input{accent-color:var(--admin-primary)}.admin-input{width:100%;box-sizing:border-box;min-height:38px;padding:8px 11px;border:1px solid var(--admin-border);border-radius:10px;background:rgba(255,255,255,.035);color:var(--admin-text);outline:none}.admin-input:focus{border-color:var(--admin-primary);box-shadow:0 0 0 3px rgba(85,204,231,.08)}
+.admin-help{font-size:10px;line-height:1.5;color:var(--admin-muted)}.admin-toggle{display:flex;align-items:center;gap:8px;min-height:38px;padding:0 11px;border:1px solid var(--admin-border);border-radius:10px;font-size:10px}.admin-toggle input{accent-color:var(--admin-primary)}
 @media(max-width:700px){form .admin-card [style*="grid-template-columns"]{grid-template-columns:1fr!important}}
 </style>
 @endpush
