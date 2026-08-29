@@ -9,7 +9,6 @@ use App\Services\WebmailService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 use Throwable;
 
@@ -49,10 +48,14 @@ class SettingsController
         $password = (string) $request->input('password');
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !str_ends_with($email, '@fuelfreepowerplant.com')) {
-            return back()->withErrors(['mail.'.$group.'_email' => $label.' mailbox address is invalid.'])->withInput($request->except(['mail.contact_password','mail.career_password']));
+            $message = $label.' mailbox address is invalid.';
+            if ($request->expectsJson()) return response()->json(['message' => $message], 422);
+            return back()->withErrors(['mail.'.$group.'_email' => $message])->withInput($request->except(['mail.contact_password','mail.career_password']));
         }
         if ($password === '') {
-            return back()->withErrors(['mail.'.$group.'_password' => $label.' mailbox password is required for verification.'])->withInput($request->except(['mail.contact_password','mail.career_password']));
+            $message = $label.' mailbox password is required for verification.';
+            if ($request->expectsJson()) return response()->json(['message' => $message], 422);
+            return back()->withErrors(['mail.'.$group.'_password' => $message])->withInput($request->except(['mail.contact_password','mail.career_password']));
         }
 
         $config = [
@@ -74,11 +77,19 @@ class SettingsController
                 'verified_at' => now()->toIso8601String(),
             ]);
 
-            return back()->with('mail_verify_'.$group, $label.' mailbox login verified successfully. You can now save this mailbox.');
+            $message = $label.' mailbox login verified successfully. You can now save this mailbox.';
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $message]);
+            }
+            return back()->with('mail_verify_'.$group, $message);
         } catch (Throwable $e) {
             report($e);
             $request->session()->forget('mailbox_verification.'.$group);
-            return back()->withErrors(['mail.'.$group.'_email' => $label.' mailbox login failed. Check the email, password and cPanel mail server settings.'])->withInput($request->except(['mail.contact_password','mail.career_password']));
+            $message = $label.' mailbox login failed. Check the email, password and cPanel mail server settings.';
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $message], 422);
+            }
+            return back()->withErrors(['mail.'.$group.'_email' => $message])->withInput($request->except(['mail.contact_password','mail.career_password']));
         }
     }
 
