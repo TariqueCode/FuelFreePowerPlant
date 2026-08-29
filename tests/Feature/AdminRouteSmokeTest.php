@@ -36,6 +36,8 @@ class AdminRouteSmokeTest extends TestCase
             'admin.career-applications.cv' => 'mail.view',
             'admin.documents.download' => 'documents.view',
             'admin.documents.destroy' => 'documents.manage',
+            'admin.documents.share' => 'documents.manage',
+            'admin.documents.unshare' => 'documents.manage',
             'admin.cms.index' => 'cms.view',
             'admin.cms.destroy' => 'cms.manage',
             'admin.social-links.destroy' => 'social-media.manage',
