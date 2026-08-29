@@ -231,6 +231,63 @@
   .word-icon{width:30px;height:30px}.word-select{font-size:9px}
   .format-select{width:104px}.font-select{width:98px}.size-select{width:65px}
 }
+/* Sticky Word 365 ribbon — final fix.
+   Keep the existing dark CMS palette and all editor features unchanged. */
+html, body {
+  overflow-x: hidden;
+}
+.main,
+.content,
+.card,
+.grid,
+.full,
+.editor-shell {
+  overflow: visible !important;
+}
+.word-ribbon {
+  position: -webkit-sticky !important;
+  position: sticky !important;
+  top: 70px !important;
+  z-index: 120 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  contain: none !important;
+  isolation: isolate;
+}
+.word-ribbon .word-tabs {
+  position: relative;
+  z-index: 2;
+}
+.word-ribbon .word-panel {
+  position: relative;
+  z-index: 1;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
+}
+.editor-shell {
+  position: relative !important;
+  overflow: visible !important;
+}
+@media (max-width: 700px) {
+  .word-ribbon {
+    top: 70px !important;
+    border-radius: 0;
+  }
+}
+@media (min-width: 701px) {
+  .word-ribbon {
+    top: 70px !important;
+  }
+}
+
 </style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
