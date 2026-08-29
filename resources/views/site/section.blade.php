@@ -3,9 +3,7 @@
 @php
     $siteName = $brand['name'] ?? config('fuelfree.company.name');
     $sectionTitle = $titles[$section] ?? ucfirst(str_replace('-', ' ', $section));
-    $intro = $section === 'gallery'
-        ? 'Events, activities, milestones and selected moments from Fuel Free Power Plant.'
-        : ($page?->excerpt ?: ($brand['tagline'] ?? config('fuelfree.company.tagline')));
+    $intro = $brand['tagline'] ?? config('fuelfree.company.tagline');
 @endphp
 
 @section('title', $sectionTitle.' — '.$siteName)
@@ -45,23 +43,7 @@
         <p>{{ $intro }}</p>
     </section>
 
-    @if($page?->content)
-        <section class="site-section-rich">{!! $page->content !!}</section>
-    @endif
-
-    @if($section === 'about-us')
-        @if($companyItems->isEmpty())
-            <div class="site-section-empty">No company information has been published yet.</div>
-        @else
-            @foreach($companyItems as $item)
-                <article class="site-section-rich" style="margin-bottom:14px">
-                    <h2>{{ $item->title }}</h2>
-                    @if($item->excerpt)<p>{{ $item->excerpt }}</p>@endif
-                    {!! $item->content !!}
-                </article>
-            @endforeach
-        @endif
-    @elseif($section === 'solutions' || $section === 'plants' || $section === 'future-project')
+    @if($section === 'solutions' || $section === 'plants' || $section === 'future-project')
         <section class="site-section-grid">
             @if($items->isEmpty())
                 <div class="site-section-empty">No {{ $section === 'plants' ? 'plant information' : ($section === 'future-project' ? 'future project information' : 'solutions') }} have been published yet.</div>
