@@ -147,7 +147,7 @@
 
 /* Word 365-inspired CMS editor UI. Dark CMS palette is intentionally preserved. */
 .editor-shell{width:100%;max-width:100%;min-width:0;position:relative;overflow:visible;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;background:#061923}
-.word-ribbon{position:sticky;top:70px;z-index:90;width:100%;max-width:100%;min-width:0;background:#071b25;border-bottom:1px solid rgba(104,204,235,.18);box-shadow:0 6px 18px rgba(0,0,0,.28);overflow:visible}
+.word-ribbon{position:sticky;top:0;z-index:90;width:100%;max-width:100%;min-width:0;background:#071b25;border-bottom:1px solid rgba(104,204,235,.18);box-shadow:0 6px 18px rgba(0,0,0,.28);overflow:visible}
 .word-tabs{display:flex;align-items:center;gap:2px;min-height:40px;padding:0 8px;border-bottom:1px solid rgba(104,204,235,.13);background:#061923;white-space:nowrap;overflow-x:auto;scrollbar-width:none}
 .word-tabs::-webkit-scrollbar{display:none}
 .word-tab{height:40px;padding:0 15px;border:0;border-bottom:2px solid transparent;background:transparent;color:#91aeb8;font-size:11px;font-weight:700;cursor:pointer}
@@ -178,12 +178,12 @@
 .editor{width:100%;max-width:100%;min-width:0;box-sizing:border-box;min-height:430px;padding:18px;color:#e6f4f7;line-height:1.75;font-size:13px;outline:none;overflow-wrap:anywhere;word-break:break-word}
 .editor>*{max-width:100%;box-sizing:border-box}.editor h1{font-size:30px}.editor h2{font-size:24px}.editor h3{font-size:19px}.editor h4{font-size:17px}.editor h5{font-size:15px}.editor h6{font-size:13px;text-transform:uppercase;letter-spacing:.04em}.editor blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid #43c2e5;background:rgba(67,194,229,.06);color:#b9d7df}.editor table{width:100%;max-width:100%;border-collapse:collapse;margin:14px 0}.editor td,.editor th{border:1px solid rgba(120,170,185,.35);padding:9px;text-align:left;overflow-wrap:anywhere;word-break:break-word}.editor th{background:rgba(67,194,229,.08)}.editor img,.editor video,.editor iframe{max-width:100%;height:auto;box-sizing:border-box}.editor iframe{width:100%;min-width:0}.editor.source-mode{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap}
 .editor-shell.is-fullscreen{position:fixed;inset:0;z-index:9999;background:#04151e;border-radius:0;display:flex;flex-direction:column}.editor-shell.is-fullscreen .word-ribbon{position:sticky;top:0;z-index:2}.editor-shell.is-fullscreen .editor{flex:1;overflow:auto}
-@media(max-width:900px){.word-ribbon{top:70px}.word-tabs{padding:0 5px}.word-tab{padding:0 12px}.editor-status{max-width:190px}.word-panel{min-height:72px}.word-group{padding-left:6px;padding-right:6px}.format-select{width:116px}.font-select{width:110px}}
-@media(max-width:650px){.word-ribbon{top:70px}.word-tabs{min-height:38px}.word-tab{height:38px;font-size:10px;padding:0 13px}.editor-status{display:none}.word-panel{min-height:74px;overflow-x:auto;padding:5px 4px}.word-group{padding-left:6px;padding-right:6px}.word-command{min-width:40px;height:51px}.word-icon{width:31px;height:31px}.word-select{height:31px;font-size:10px}.format-select{width:110px}.font-select{width:105px}.size-select{width:68px}.editor{font-size:16px;line-height:1.75;padding:14px}.editor h1{font-size:28px}.editor h2{font-size:23px}.editor h3{font-size:19px}.editor table{display:block;overflow-x:auto}.editor .content-columns{grid-template-columns:1fr!important}}
+@media(max-width:900px){.word-ribbon{top:0}.word-tabs{padding:0 5px}.word-tab{padding:0 12px}.editor-status{max-width:190px}.word-panel{min-height:72px}.word-group{padding-left:6px;padding-right:6px}.format-select{width:116px}.font-select{width:110px}}
+@media(max-width:650px){.word-ribbon{top:0}.word-tabs{min-height:38px}.word-tab{height:38px;font-size:10px;padding:0 13px}.editor-status{display:none}.word-panel{min-height:74px;overflow-x:auto;padding:5px 4px}.word-group{padding-left:6px;padding-right:6px}.word-command{min-width:40px;height:51px}.word-icon{width:31px;height:31px}.word-select{height:31px;font-size:10px}.format-select{width:110px}.font-select{width:105px}.size-select{width:68px}.editor{font-size:16px;line-height:1.75;padding:14px}.editor h1{font-size:28px}.editor h2{font-size:23px}.editor h3{font-size:19px}.editor table{display:block;overflow-x:auto}.editor .content-columns{grid-template-columns:1fr!important}}
 @media(max-width:420px){.word-panel{min-height:70px}.word-command{min-width:38px;height:49px;padding-left:5px;padding-right:5px}.word-command i{font-size:14px}.word-command span{font-size:8px}.word-icon{width:30px;height:30px}.word-select{font-size:9px}.format-select{width:104px}.font-select{width:98px}.size-select{width:65px}}
 
 /* Final Word 365 ribbon behavior: one responsive, touch-scrollable ribbon. */
-.word-ribbon{position:sticky;top:70px;z-index:90;width:100%;max-width:100%;min-width:0;overflow:hidden;contain:layout paint}
+.word-ribbon{position:sticky;top:0;z-index:90;width:100%;max-width:100%;min-width:0;overflow:hidden;contain:layout paint}
 .word-tabs{display:flex;align-items:center;gap:2px;width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scrollbar-width:none}
 .word-tabs::-webkit-scrollbar{display:none}
 .word-panel{display:none;align-items:stretch;gap:0;width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scrollbar-width:thin}
@@ -202,11 +202,11 @@
 .editor-draft-state i{color:#43c2e5}
 .editor-counts{margin-left:auto;white-space:nowrap}
 @media(max-width:900px){
-  .word-ribbon{top:70px}
+  .word-ribbon{top:0}
   .editor-status{max-width:210px}
 }
 @media(max-width:650px){
-  .word-ribbon{top:70px}
+  .word-ribbon{top:0}
   .word-tabs{min-height:38px}
   .word-tab{height:38px;font-size:10px;padding:0 13px}
   .editor-status{display:inline-flex;max-width:150px;font-size:8px;padding:4px 6px}
@@ -294,7 +294,7 @@ html,body{overflow-x:hidden}
 .word-ribbon{
   position:-webkit-sticky!important;
   position:sticky!important;
-  top:70px!important;
+  top:0!important;
   z-index:100!important;
   width:100%!important;
   max-width:100%!important;
@@ -325,7 +325,7 @@ html,body{overflow-x:hidden}
   overscroll-behavior-x:contain;
 }
 .editor-shell{position:relative!important;overflow:visible!important}
-@media(max-width:700px){.word-ribbon{top:70px!important}}
+@media(max-width:700px){.word-ribbon{top:0!important}}
 </style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
@@ -496,152 +496,3 @@ if(attachmentInput){document.getElementById('attachment-upload').onclick=()=>att
 </script>@endpush
 
 
-{{-- Final CMS ribbon positioning fix: toolbar follows the dashboard topbar with a real sticky/fixed fallback. --}}
-@push('styles')
-<style>
-/* The dashboard topbar is 70px high. The editor ribbon must occupy the exact
-   space immediately below it while scrolling; no extra top gap. */
-.word-ribbon{
-    top:70px !important;
-    z-index:999 !important;
-    width:100% !important;
-    max-width:100% !important;
-    min-width:0 !important;
-    margin:0 !important;
-    overflow:visible !important;
-}
-.word-ribbon.ff-fixed-toolbar{
-    position:fixed !important;
-    top:var(--ff-toolbar-top,70px) !important;
-    left:var(--ff-toolbar-left,0px) !important;
-    width:var(--ff-toolbar-width,100%) !important;
-    max-width:none !important;
-    margin:0 !important;
-    z-index:999 !important;
-    border-radius:0 !important;
-}
-.ff-ribbon-spacer{
-    display:block;
-    width:100%;
-    margin:0 !important;
-    padding:0 !important;
-}
-@media(max-width:700px){
-    .word-ribbon{top:70px !important;}
-    .word-ribbon.ff-fixed-toolbar{top:var(--ff-toolbar-top,70px) !important;}
-}
-</style>
-@endpush
-
-@push('scripts')
-<script>
-(function(){
-    const shell=document.querySelector('.editor-shell');
-    const ribbon=shell?.querySelector('.word-ribbon');
-    if(!shell||!ribbon)return;
-
-    let spacer=null;
-    let floating=false;
-    let threshold=0;
-    let ticking=false;
-
-    function topOffset(){
-        const bar=document.querySelector('.topbar');
-        return Math.max(0,Math.round(bar?.getBoundingClientRect().height || 70));
-    }
-
-    function calculateThreshold(){
-        if(floating)return;
-        const offset=topOffset();
-        const rect=ribbon.getBoundingClientRect();
-        threshold=window.scrollY + rect.top - offset;
-    }
-
-    function ensureSpacer(){
-        if(spacer)return;
-        spacer=document.createElement('div');
-        spacer.className='ff-ribbon-spacer';
-        spacer.setAttribute('aria-hidden','true');
-        spacer.style.height=Math.round(ribbon.getBoundingClientRect().height)+'px';
-        ribbon.parentNode.insertBefore(spacer,ribbon);
-    }
-
-    function updateGeometry(){
-        if(!floating)return;
-        const rect=shell.getBoundingClientRect();
-        const height=Math.round(ribbon.getBoundingClientRect().height);
-        ribbon.style.setProperty('--ff-toolbar-top',topOffset()+'px');
-        ribbon.style.setProperty('--ff-toolbar-left',Math.round(rect.left)+'px');
-        ribbon.style.setProperty('--ff-toolbar-width',Math.round(rect.width)+'px');
-        if(spacer)spacer.style.height=height+'px';
-    }
-
-    function setFloating(){
-        if(floating)return;
-        ensureSpacer();
-        ribbon.classList.add('ff-fixed-toolbar');
-        floating=true;
-        updateGeometry();
-    }
-
-    function clearFloating(){
-        if(!floating)return;
-        ribbon.classList.remove('ff-fixed-toolbar');
-        ribbon.style.removeProperty('--ff-toolbar-top');
-        ribbon.style.removeProperty('--ff-toolbar-left');
-        ribbon.style.removeProperty('--ff-toolbar-width');
-        if(spacer){spacer.remove();spacer=null;}
-        floating=false;
-    }
-
-    function evaluate(){
-        ticking=false;
-
-        if(!threshold && threshold!==0)calculateThreshold();
-
-        const shouldFloat=window.scrollY >= threshold;
-        if(shouldFloat){
-            setFloating();
-            updateGeometry();
-        }else{
-            clearFloating();
-            calculateThreshold();
-        }
-    }
-
-    function schedule(){
-        if(ticking)return;
-        ticking=true;
-        requestAnimationFrame(evaluate);
-    }
-
-    /* Capture the ribbon's real document position before scrolling.
-       This avoids relying on the editor shell's position, which can change
-       as the page reflows or the ribbon becomes fixed. */
-    calculateThreshold();
-    schedule();
-
-    window.addEventListener('scroll',schedule,{passive:true});
-    window.addEventListener('resize',function(){
-        if(!floating)calculateThreshold();
-        schedule();
-    },{passive:true});
-    window.addEventListener('orientationchange',function(){
-        if(!floating)calculateThreshold();
-        schedule();
-    },{passive:true});
-
-    if('ResizeObserver' in window){
-        new ResizeObserver(function(){
-            if(!floating)calculateThreshold();
-            else updateGeometry();
-            schedule();
-        }).observe(ribbon);
-        new ResizeObserver(function(){
-            if(floating)updateGeometry();
-            else calculateThreshold();
-        }).observe(shell);
-    }
-})();
-</script>
-@endpush
