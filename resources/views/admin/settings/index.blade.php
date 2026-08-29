@@ -144,51 +144,6 @@
     </div>
 </div>
 
-<div class="form-card chrome-card">
-    <div class="section-heading">
-        <div><div class="eyebrow">SITE CHROME</div><h2>Header &amp; Footer</h2><p>Edit the visible Header and Footer text, contact details and links from one place. Company name and logo are controlled above, while social links remain managed from Social Media.</p></div>
-        <i class="fa-solid fa-window-maximize"></i>
-    </div>
-    <div class="chrome-section">
-        <div class="chrome-section-title"><i class="fa-solid fa-bars"></i><span>Header navigation</span></div>
-        <div class="fields">
-            <div><label>Home label</label><input name="header[home_label]" value="{{ old('header.home_label',$settings['header.home_label']) }}" required maxlength="100"></div>
-            <div><label>Management label</label><input name="header[management_label]" value="{{ old('header.management_label',$settings['header.management_label']) }}" required maxlength="100"></div>
-            <div><label>Gallery label</label><input name="header[gallery_label]" value="{{ old('header.gallery_label',$settings['header.gallery_label']) }}" required maxlength="100"></div>
-            <div><label>News &amp; Notices label</label><input name="header[news_label]" value="{{ old('header.news_label',$settings['header.news_label']) }}" required maxlength="100"></div>
-            <div><label>Career label</label><input name="header[career_label]" value="{{ old('header.career_label',$settings['header.career_label']) }}" required maxlength="100"></div>
-            <div><label>Contact label</label><input name="header[contact_label]" value="{{ old('header.contact_label',$settings['header.contact_label']) }}" required maxlength="100"></div>
-            <div><label>Webmail label</label><input name="header[webmail_label]" value="{{ old('header.webmail_label',$settings['header.webmail_label']) }}" required maxlength="100"></div>
-            <div><label>Portal label</label><input name="header[portal_label]" value="{{ old('header.portal_label',$settings['header.portal_label']) }}" required maxlength="100"></div>
-            <div><label>Login label</label><input name="header[login_label]" value="{{ old('header.login_label',$settings['header.login_label']) }}" required maxlength="100"></div>
-        </div>
-        <div class="chrome-note"><i class="fa-solid fa-circle-info"></i><span>Company/CMS page names remain editable from their existing management screens, keeping the Header connected to your content.</span></div>
-    </div>
-    <div class="chrome-section">
-        <div class="chrome-section-title"><i class="fa-solid fa-layer-group"></i><span>Footer content</span></div>
-        <div class="fields">
-            <div class="full"><label>Tagline</label><input name="footer[tagline]" value="{{ old('footer.tagline',$settings['footer.tagline']) }}" maxlength="255"></div>
-            <div class="full"><label>Technology line</label><input name="footer[technology]" value="{{ old('footer.technology',$settings['footer.technology']) }}" maxlength="255"></div>
-            <div><label>Office heading</label><input name="footer[office_heading]" value="{{ old('footer.office_heading',$settings['footer.office_heading']) }}" required maxlength="100"></div>
-            <div><label>Contact heading</label><input name="footer[contact_heading]" value="{{ old('footer.contact_heading',$settings['footer.contact_heading']) }}" required maxlength="100"></div>
-            <div class="full"><label>Office address</label><textarea name="footer[address]" rows="3" maxlength="500" required>{{ old('footer.address',$settings['footer.address']) }}</textarea></div>
-            <div><label>Email</label><input type="email" name="footer[email]" value="{{ old('footer.email',$settings['footer.email']) }}" required maxlength="255"></div>
-            <div><label>Phone</label><input name="footer[phone]" value="{{ old('footer.phone',$settings['footer.phone']) }}" required maxlength="50"></div>
-            <div><label>Website text</label><input name="footer[website]" value="{{ old('footer.website',$settings['footer.website']) }}" required maxlength="255"></div>
-            <div><label>Website URL</label><input type="url" name="footer[website_url]" value="{{ old('footer.website_url',$settings['footer.website_url']) }}" required maxlength="255"></div>
-            <div><label>Get in touch label</label><input name="footer[get_in_touch_label]" value="{{ old('footer.get_in_touch_label',$settings['footer.get_in_touch_label']) }}" required maxlength="100"></div>
-            <div><label>Get in touch URL</label><input name="footer[get_in_touch_url]" value="{{ old('footer.get_in_touch_url',$settings['footer.get_in_touch_url']) }}" required maxlength="255"></div>
-            <div><label>Copyright text</label><input name="footer[copyright_text]" value="{{ old('footer.copyright_text',$settings['footer.copyright_text']) }}" required maxlength="150"></div>
-            <div class="full locked-field">
-                <label>Developer signature</label>
-                <div class="locked-value"><i class="fa-solid fa-lock"></i><span>Developed by <strong>Saif Al-Islam</strong></span><small>Locked system signature — cannot be changed from Settings.</small></div>
-            </div>
-        </div>
-        <div class="chrome-note"><i class="fa-solid fa-lock"></i><span>The developer signature is permanently locked by the system. Only the copyright text above can be edited.</span></div>
-        <div class="chrome-note"><i class="fa-solid fa-share-nodes"></i><span>Social icons and destinations continue to use the Social Media manager as the single source of truth.</span></div>
-    </div>
-</div>
-
 <div class="actions"><button type="submit"><i class="fa-solid fa-floppy-disk"></i> Save all settings</button></div>
 </form>
 
