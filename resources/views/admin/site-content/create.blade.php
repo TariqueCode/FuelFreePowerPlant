@@ -222,8 +222,9 @@
   .editor-tools-footer{font-size:8px;padding:7px 9px}
 }
 @media(max-width:420px){
-  .editor-status{max-width:120px}
-  .editor-status .status-sep,.editor-status span:last-child{display:none}
+  .editor-status{max-width:125px;overflow:hidden}
+  .editor-status .status-sep{display:inline}
+  .editor-status span:last-child{display:inline}
   .word-panel{min-height:70px}
   .word-command{min-width:38px;height:49px;padding-left:5px;padding-right:5px}
   .word-command i{font-size:14px}.word-command span{font-size:8px}
@@ -244,9 +245,6 @@ document.getElementById('insert-columns').onclick=()=>{const count=Math.min(3,Ma
 function safeText(v){return String(v).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]))}function safeAttr(v){return String(v).replace(/[<>"']/g,ch=>({'<':'%3C','>':'%3E','"':'%22',"'":'%27'}[ch]))}
 function alignSelectedImage(cls){const sel=window.getSelection();let node=sel&&sel.anchorNode;while(node&&node!==editor&&node.nodeType===3)node=node.parentElement;while(node&&node!==editor&&node.tagName!=='IMG')node=node.parentElement;if(!node||node===editor||node.tagName!=='IMG'){alert('Select an image first.');return}node.classList.remove('align-left','align-center','align-right');node.classList.add(cls);sync()}
 document.getElementById('image-align-left').onclick=()=>alignSelectedImage('align-left');document.getElementById('image-align-center').onclick=()=>alignSelectedImage('align-center');document.getElementById('image-align-right').onclick=()=>alignSelectedImage('align-right');
-document.getElementById('block-format').onchange=e=>{if(e.target.value)exec('formatBlock',e.target.value)};
-document.getElementById('font-name').onchange=e=>{if(e.target.value)exec('fontName',e.target.value)};
-document.getElementById('font-size').onchange=e=>{if(e.target.value)exec('fontSize',e.target.value);e.target.value=''};document.getElementById('text-color').oninput=e=>exec('foreColor',e.target.value);document.getElementById('highlight-color').oninput=e=>exec('hiliteColor',e.target.value);
 document.getElementById('insert-table').onclick=()=>{const rows=Math.min(20,Math.max(2,parseInt(prompt('Number of rows','3')||'3',10)));const cols=Math.min(10,Math.max(1,parseInt(prompt('Number of columns','3')||'3',10)));let h='<table><thead><tr>'+Array.from({length:cols},(_,i)=>'<th>Header '+(i+1)+'</th>').join('')+'</tr></thead><tbody>'+Array.from({length:rows-1},()=>'<tr>'+Array.from({length:cols},()=>'<td>Cell</td>').join('')+'</tr>').join('')+'</tbody></table><p></p>';exec('insertHTML',h)};
 let sourceMode=false;document.getElementById('toggle-source').onclick=()=>{if(!sourceMode){sourceMode=true;source.value=editor.innerHTML;editor.textContent=source.value;editor.classList.add('source-mode');document.getElementById('toggle-source').classList.add('active')}else{sourceMode=false;editor.innerHTML=editor.textContent;editor.classList.remove('source-mode');document.getElementById('toggle-source').classList.remove('active');sync()}};
 document.getElementById('preview-content').onclick=()=>{if(sourceMode)document.getElementById('toggle-source').click();const w=window.open('','_blank','width=1100,height=800');if(!w)return;w.document.write('<!doctype html><html><head><title>Content Preview</title><style>body{font-family:Arial,sans-serif;max-width:900px;margin:40px auto;padding:0 20px;line-height:1.75;color:#17252d}img,video,iframe{max-width:100%}table{width:100%;border-collapse:collapse}td,th{border:1px solid #ccc;padding:8px}blockquote{border-left:4px solid #28aaca;padding-left:15px}</style></head><body>'+editor.innerHTML+'</body></html>');w.document.close()};
@@ -308,13 +306,14 @@ function saveLocalDraft(){
 function restoreLocalDraft(){
   try{
     const raw=localStorage.getItem(DRAFT_KEY);if(!raw)return;
-    const d=JSON.parse(raw);if(!d?.html||d.html===editor.innerHTML)return;
+    const d=JSON.parse(raw);if(!d?.html)return;
+    if(d.html===editor.innerHTML){localStorage.removeItem(DRAFT_KEY);return;}
     const when=d.updatedAt?new Date(d.updatedAt).toLocaleString():'recently';
     if(confirm('A local draft from '+when+' was found. Restore it?')){editor.innerHTML=d.html;sync();setDraftState('Draft restored','fa-clock-rotate-left')}
   }catch(e){}
 }
 function clearLocalDraft(){try{localStorage.removeItem(DRAFT_KEY)}catch(e){}}
-form.addEventListener('submit',()=>{sync();clearLocalDraft()});
+form.addEventListener('submit',()=>{sync();setDraftState('Saving…','fa-floppy-disk')});
 window.addEventListener('beforeunload',()=>{saveLocalDraft();});
 editor.addEventListener('input',()=>{saveEditorSelection();sync();updateEditorToolbarState()});
 editor.addEventListener('keyup',()=>{saveEditorSelection();updateEditorToolbarState()});
