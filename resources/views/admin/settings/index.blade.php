@@ -127,7 +127,63 @@
 
     <div class="homepage-note">
         <i class="fa-solid fa-circle-info"></i>
-        <span><strong>Tip:</strong> The Slider is managed separately from the Slider menu, where images can be reordered with drag &amp; drop. This page only controls whether each homepage section is visible and, where applicable, its display count.</span>
+        <span><strong>Tip:</strong> The Slider is managed separately from the Slider menu, where images can be reordered with drag &amp; drop. This page controls visibility, display counts and the editable copy rendered on the public homepage.</span>
+    </div>
+</div>
+
+<div class="form-card homepage-content-card">
+    <div class="section-heading">
+        <div><div class="eyebrow">HOMEPAGE CONTENT</div><h2>Welcome, sections &amp; CTA</h2><p>Edit the public-facing homepage copy without touching Blade templates. Empty database values fall back to safe defaults.</p></div>
+        <i class="fa-solid fa-pen-to-square"></i>
+    </div>
+
+    <div class="chrome-section">
+        <div class="chrome-section-title"><i class="fa-solid fa-hand-sparkles"></i><span>Welcome section</span></div>
+        <div class="fields">
+            <div class="full"><label>Welcome eyebrow</label><input name="home[welcome_eyebrow]" value="{{ old('home.welcome_eyebrow',$settings['home.welcome_eyebrow']) }}" required maxlength="150"></div>
+            <div class="full"><label>Welcome heading</label><input name="home[welcome_title]" value="{{ old('home.welcome_title',$settings['home.welcome_title']) }}" required maxlength="255"></div>
+            <div class="full"><label>Introduction paragraph 1</label><textarea name="home[welcome_intro_1]" rows="4" maxlength="2000" required>{{ old('home.welcome_intro_1',$settings['home.welcome_intro_1']) }}</textarea></div>
+            <div class="full"><label>Introduction paragraph 2</label><textarea name="home[welcome_intro_2]" rows="4" maxlength="2000" required>{{ old('home.welcome_intro_2',$settings['home.welcome_intro_2']) }}</textarea></div>
+            <div class="full"><label>Sign-off</label><input name="home[welcome_signoff]" value="{{ old('home.welcome_signoff',$settings['home.welcome_signoff']) }}" required maxlength="255"></div>
+        </div>
+    </div>
+
+    <div class="chrome-section">
+        <div class="chrome-section-title"><i class="fa-solid fa-newspaper"></i><span>News &amp; Notices heading</span></div>
+        <div class="fields">
+            <div><label>Eyebrow</label><input name="home[news_eyebrow]" value="{{ old('home.news_eyebrow',$settings['home.news_eyebrow']) }}" required maxlength="150"></div>
+            <div><label>Heading</label><input name="home[news_title]" value="{{ old('home.news_title',$settings['home.news_title']) }}" required maxlength="150"></div>
+            <div class="full"><label>Description</label><textarea name="home[news_description]" rows="2" maxlength="500">{{ old('home.news_description',$settings['home.news_description']) }}</textarea></div>
+        </div>
+    </div>
+
+    <div class="chrome-section">
+        <div class="chrome-section-title"><i class="fa-solid fa-images"></i><span>Gallery heading</span></div>
+        <div class="fields">
+            <div><label>Eyebrow</label><input name="home[gallery_eyebrow]" value="{{ old('home.gallery_eyebrow',$settings['home.gallery_eyebrow']) }}" required maxlength="150"></div>
+            <div><label>Heading</label><input name="home[gallery_title]" value="{{ old('home.gallery_title',$settings['home.gallery_title']) }}" required maxlength="150"></div>
+            <div class="full"><label>Description</label><textarea name="home[gallery_description]" rows="2" maxlength="500">{{ old('home.gallery_description',$settings['home.gallery_description']) }}</textarea></div>
+        </div>
+    </div>
+
+    <div class="chrome-section">
+        <div class="chrome-section-title"><i class="fa-solid fa-bullhorn"></i><span>Call to action</span></div>
+        <div class="fields">
+            <div class="full">
+                <label class="option-main" style="padding:0;grid-template-columns:44px minmax(0,1fr) 46px;">
+                    <span class="option-icon"><i class="fa-solid fa-bullhorn"></i></span>
+                    <span class="option-copy"><strong>Show CTA section</strong><small>Display the conversion-focused CTA near the bottom of the homepage.</small></span>
+                    <span class="switch-wrap"><input class="switch-input" type="checkbox" name="home[cta_enabled]" value="1" @checked(old('home.cta_enabled',$settings['home.cta_enabled']))><span class="switch"><i></i></span></span>
+                </label>
+            </div>
+            <div class="full"><label>CTA eyebrow</label><input name="home[cta_eyebrow]" value="{{ old('home.cta_eyebrow',$settings['home.cta_eyebrow']) }}" required maxlength="150"></div>
+            <div class="full"><label>CTA heading</label><input name="home[cta_title]" value="{{ old('home.cta_title',$settings['home.cta_title']) }}" required maxlength="255"></div>
+            <div class="full"><label>CTA description</label><textarea name="home[cta_text]" rows="3" maxlength="500" required>{{ old('home.cta_text',$settings['home.cta_text']) }}</textarea></div>
+            <div><label>Primary button label</label><input name="home[cta_primary_label]" value="{{ old('home.cta_primary_label',$settings['home.cta_primary_label']) }}" required maxlength="100"></div>
+            <div><label>Primary button URL</label><input name="home[cta_primary_url]" value="{{ old('home.cta_primary_url',$settings['home.cta_primary_url']) }}" required maxlength="255"></div>
+            <div><label>Secondary button label</label><input name="home[cta_secondary_label]" value="{{ old('home.cta_secondary_label',$settings['home.cta_secondary_label']) }}" required maxlength="100"></div>
+            <div><label>Secondary button URL</label><input name="home[cta_secondary_url]" value="{{ old('home.cta_secondary_url',$settings['home.cta_secondary_url']) }}" required maxlength="255"></div>
+        </div>
     </div>
 </div>
 
