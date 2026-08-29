@@ -129,7 +129,7 @@ class SettingsController
             'theme.accent'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],
             'theme.surface'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],
             'theme.text'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],
-            'theme.muted'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],'theme.success'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],'theme.warning'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],'theme.danger'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],
+            'theme.muted'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],'theme.success'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],'theme.warning'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],'theme.danger'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],'theme.border_soft'=>['required','regex:/^(#[0-9A-Fa-f]{6}|rgba?\\([0-9]{1,3},\\s*[0-9]{1,3},\\s*[0-9]{1,3}(?:,\\s*(?:0|1|0?\\.[0-9]+))?\\))$/'],'theme.icon'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],'theme.overlay'=>['required','regex:/^(#[0-9A-Fa-f]{6}|rgba?\\([0-9]{1,3},\\s*[0-9]{1,3},\\s*[0-9]{1,3}(?:,\\s*(?:0|1|0?\\.[0-9]+))?\\))$/'],'theme.shadow'=>['required','regex:/^(#[0-9A-Fa-f]{6}|rgba?\\([0-9]{1,3},\\s*[0-9]{1,3},\\s*[0-9]{1,3}(?:,\\s*(?:0|1|0?\\.[0-9]+))?\\))$/'],
             'theme.radius'=>['required','integer','min:0','max:32'],
             'theme.font_body'=>['required','string','max:120','regex:/^[A-Za-z0-9 ,\-]+$/'],'theme.font_heading'=>['required','string','max:120','regex:/^[A-Za-z0-9 ,\-]+$/'],
             'theme.base_size'=>['required','integer','min:12','max:22'],'theme.line_height'=>['required','numeric','min:1.1','max:2.2'],
