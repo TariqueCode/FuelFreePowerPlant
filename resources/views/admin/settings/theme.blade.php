@@ -11,7 +11,12 @@
 <x-admin.setting-field :label="$label" :id="'theme-'.str_replace('.','-',$key)"><div class="color-row"><input type="color" name="{{ $key }}" value="{{ old($key,$settings[$key]) }}" aria-label="{{ $label }}"><input class="admin-input" value="{{ old($key,$settings[$key]) }}" readonly></div></x-admin.setting-field>
 @endforeach
 </div>
-<x-admin.setting-field label="Global border radius" id="theme-radius"><input class="admin-input" type="number" min="0" max="32" name="theme.radius" value="{{ old('theme.radius',$settings['theme.radius']) }}"></x-admin.setting-field>
+<div class="theme-grid">
+<x-admin.setting-field label="Soft border (CSS color)" id="theme-border-soft"><input class="admin-input" name="theme.border_soft" maxlength="80" value="{{ old('theme.border_soft',$settings['theme.border_soft'] ?? 'rgba(116,188,207,.08)') }}"></x-admin.setting-field>
+<x-admin.setting-field label="Icon color" id="theme-icon"><input class="admin-input" name="theme.icon" maxlength="80" value="{{ old('theme.icon',$settings['theme.icon'] ?? $settings['theme.muted']) }}"></x-admin.setting-field>
+<x-admin.setting-field label="Overlay color" id="theme-overlay"><input class="admin-input" name="theme.overlay" maxlength="120" value="{{ old('theme.overlay',$settings['theme.overlay'] ?? 'rgba(3,16,25,.88)') }}"></x-admin.setting-field>
+<x-admin.setting-field label="Shadow color" id="theme-shadow"><input class="admin-input" name="theme.shadow" maxlength="80" value="{{ old('theme.shadow',$settings['theme.shadow'] ?? 'rgba(0,0,0,.08)') }}"></x-admin.setting-field>
+</div><x-admin.setting-field label="Global border radius" id="theme-radius"><input class="admin-input" type="number" min="0" max="32" name="theme.radius" value="{{ old('theme.radius',$settings['theme.radius']) }}"></x-admin.setting-field>
 <div class="theme-grid">
 <x-admin.setting-field label="Body font" id="theme-font-body"><input class="admin-input" name="theme.font_body" maxlength="120" value="{{ old('theme.font_body',$settings['theme.font_body']) }}"></x-admin.setting-field>
 <x-admin.setting-field label="Heading font" id="theme-font-heading"><input class="admin-input" name="theme.font_heading" maxlength="120" value="{{ old('theme.font_heading',$settings['theme.font_heading']) }}"></x-admin.setting-field>
