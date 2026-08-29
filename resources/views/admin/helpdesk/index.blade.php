@@ -19,7 +19,7 @@
             <button type="submit">Search</button>
         </form>
         <div class="hd-filters">
-            <a class="{{ $channel==='all'?'active':'' }}" href="{{ route('admin.helpdesk',array_filter(['q'=>$search,'status'=>$status!=='all'?$status:null])) }}">All <em>{{ number_format($contactCount+$careerCount+$allItems->where('channel','email')->count()) }}</em></a>
+            <a class="{{ $channel==='all'?'active':'' }}" href="{{ route('admin.helpdesk',array_filter(['q'=>$search,'status'=>$status!=='all'?$status:null])) }}">All <em>{{ number_format($contactCount + $careerCount + ($emailCount ?? 0)) }}</em></a>
             <a class="{{ $channel==='contact'?'active':'' }}" href="{{ route('admin.helpdesk',array_filter(['q'=>$search,'channel'=>'contact','status'=>$status!=='all'?$status:null])) }}"><i class="fa-solid fa-comments"></i> Contact <em>{{ number_format($contactCount) }}</em></a>
             <a class="{{ $channel==='career'?'active':'' }}" href="{{ route('admin.helpdesk',array_filter(['q'=>$search,'channel'=>'career','status'=>$status!=='all'?$status:null])) }}"><i class="fa-solid fa-briefcase"></i> Career <em>{{ number_format($careerCount) }}</em></a>
             <a class="{{ $status==='new'?'active':'' }}" href="{{ route('admin.helpdesk',array_filter(['q'=>$search,'channel'=>$channel!=='all'?$channel:null,'status'=>'new'])) }}"><i class="fa-solid fa-circle"></i> New <em>{{ number_format($unreadCount) }}</em></a>
