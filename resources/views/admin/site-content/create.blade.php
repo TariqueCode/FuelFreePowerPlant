@@ -342,7 +342,12 @@ html,body{overflow-x:hidden}
 .editor-shell{position:relative!important;overflow:visible!important}
 @media(max-width:700px){.word-ribbon{top:0!important}}
 
-.html-block-modal{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72)}.html-block-modal[hidden]{display:none}.html-block-dialog{width:min(100%,900px);max-height:min(88vh,760px);display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid rgba(67,194,229,.25);border-radius:14px;background:#061923;box-shadow:0 24px 70px rgba(0,0,0,.5)}.html-block-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.html-block-head strong{display:block;color:#e7f8fb;font-size:15px}.html-block-head strong i{color:#4fc8e4;margin-right:7px}.html-block-head small{display:block;color:#7899a5;font-size:10px;margin-top:5px;line-height:1.5}.html-block-close{width:34px;height:34px;border:1px solid var(--line);border-radius:8px;background:transparent;color:#a7c2cb;cursor:pointer}.html-block-editor-wrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#020d13}.html-block-label{display:flex;justify-content:space-between;padding:8px 11px;border-bottom:1px solid var(--line);color:#70d9ea;font-size:10px}.html-block-label span:last-child{color:#7899a5}.html-block-input{display:block;width:100%;min-height:360px;box-sizing:border-box;resize:vertical;border:0;background:#020d13;color:#dff6fb;padding:14px;outline:0;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.html-block-input:focus{box-shadow:inset 0 0 0 1px rgba(67,194,229,.35)}.html-block-help{color:#7899a5;font-size:9px;line-height:1.5}.html-block-actions{display:flex;justify-content:flex-end;gap:8px}.html-block-btn{border:1px solid var(--line);border-radius:9px;padding:9px 13px;background:#071b25;color:#a7c2cb;font-size:10px;cursor:pointer}.html-block-insert{background:#29aaca;border-color:#29aaca;color:#fff}@media(max-width:650px){.html-block-modal{padding:10px}.html-block-dialog{max-height:94vh;padding:12px}.html-block-input{min-height:55vh}.html-block-actions{flex-wrap:wrap}.html-block-actions .html-block-btn{flex:1}}</style>@endpush
+.html-block-modal{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72)}.html-block-modal[hidden]{display:none}.html-block-dialog{width:min(100%,900px);max-height:min(88vh,760px);display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid rgba(67,194,229,.25);border-radius:14px;background:#061923;box-shadow:0 24px 70px rgba(0,0,0,.5)}.html-block-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.html-block-head strong{display:block;color:#e7f8fb;font-size:15px}.html-block-head strong i{color:#4fc8e4;margin-right:7px}.html-block-head small{display:block;color:#7899a5;font-size:10px;margin-top:5px;line-height:1.5}.html-block-close{width:34px;height:34px;border:1px solid var(--line);border-radius:8px;background:transparent;color:#a7c2cb;cursor:pointer}.html-block-editor-wrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#020d13}.html-block-label{display:flex;justify-content:space-between;padding:8px 11px;border-bottom:1px solid var(--line);color:#70d9ea;font-size:10px}.html-block-label span:last-child{color:#7899a5}.html-block-input{display:block;width:100%;min-height:360px;box-sizing:border-box;resize:vertical;border:0;background:#020d13;color:#dff6fb;padding:14px;outline:0;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace}.html-block-input:focus{box-shadow:inset 0 0 0 1px rgba(67,194,229,.35)}.html-block-help{color:#7899a5;font-size:9px;line-height:1.5}.html-block-actions{display:flex;justify-content:flex-end;gap:8px}.html-block-btn{border:1px solid var(--line);border-radius:9px;padding:9px 13px;background:#071b25;color:#a7c2cb;font-size:10px;cursor:pointer}.html-block-insert{background:#29aaca;border-color:#29aaca;color:#fff}@media(max-width:650px){.html-block-modal{padding:10px}.html-block-dialog{max-height:94vh;padding:12px}.html-block-input{min-height:55vh}.html-block-actions{flex-wrap:wrap}.html-block-actions .html-block-btn{flex:1}}/* CMS editor: keep the ribbon visible while the editor is being scrolled. */
+.editor-shell.ff-ribbon-active{--ff-ribbon-height:0px}
+.editor-shell.ff-ribbon-active .word-ribbon{position:fixed!important;top:0!important;left:var(--ff-ribbon-left,0px)!important;width:var(--ff-ribbon-width,100%)!important;max-width:none!important;margin:0!important;z-index:9999!important}
+.editor-shell.ff-ribbon-active .editor{padding-top:calc(18px + var(--ff-ribbon-height,0px))!important}
+@media(max-width:700px){.editor-shell.ff-ribbon-active .editor{padding-top:calc(14px + var(--ff-ribbon-height,0px))!important}}
+</style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
 const editor=document.getElementById('editor'),source=document.getElementById('content-source'),form=document.getElementById('content-form'),mediaInput=document.getElementById('media-input'),galleryInput=document.getElementById('gallery-input'),videoInput=document.getElementById('video-input'),galleryBatchInput=document.getElementById('gallery-batch-input'),galleryStatus=document.getElementById('gallery-upload-status');
@@ -523,6 +528,34 @@ if(attachmentInput){document.getElementById('attachment-upload').onclick=()=>att
   });
 })();
 
+/* Keep the CMS ribbon pinned to the viewport while its editor is in view. */
+(function(){
+  const shell=document.querySelector('.editor-shell');
+  const ribbon=shell?.querySelector('.word-ribbon');
+  if(!shell||!ribbon)return;
+  let ticking=false;
+  function updateRibbon(){
+    ticking=false;
+    const rect=shell.getBoundingClientRect();
+    const height=ribbon.getBoundingClientRect().height;
+    const active=rect.top<=0 && rect.bottom>height;
+    if(active){
+      shell.style.setProperty('--ff-ribbon-left',rect.left+'px');
+      shell.style.setProperty('--ff-ribbon-width',rect.width+'px');
+      shell.style.setProperty('--ff-ribbon-height',height+'px');
+      shell.classList.add('ff-ribbon-active');
+    }else{
+      shell.classList.remove('ff-ribbon-active');
+      shell.style.removeProperty('--ff-ribbon-left');
+      shell.style.removeProperty('--ff-ribbon-width');
+      shell.style.removeProperty('--ff-ribbon-height');
+    }
+  }
+  function requestUpdate(){if(ticking)return;ticking=true;requestAnimationFrame(updateRibbon)}
+  window.addEventListener('scroll',requestUpdate,{passive:true});
+  window.addEventListener('resize',requestUpdate,{passive:true});
+  requestUpdate();
+})();
 </script>@endpush
 
 
