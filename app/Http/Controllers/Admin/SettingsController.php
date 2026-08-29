@@ -126,10 +126,13 @@ class SettingsController
     public function updateMenu(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'items'=>['nullable','array'],
+            'items'=>['nullable','array','max:100'],
             'items.*.id'=>['required','integer'],
             'items.*.show_in_navigation'=>['nullable','boolean'],
             'items.*.navigation_order'=>['nullable','integer','min:0','max:9999'],
+            'custom_items'=>['nullable','array','max:30'],
+            'custom_items.*.label'=>['required','string','max:80'],
+            'custom_items.*.url'=>['required','url','max:500'],
         ]);
         $ids = collect($data['items'] ?? [])->pluck('id')->all();
         \App\Models\SiteContentItem::query()->whereIn('id',$ids)->where('type','company')->get()->each(function ($item) use ($data) {
@@ -139,6 +142,8 @@ class SettingsController
             $item->save();
         });
         Cache::forget('public.company-navigation');
+        if ($request->filled('custom_items')) { SystemSetting::updateOrCreate(['key'=>'navigation.custom_items'],['value'=>json_encode(array_values($data['custom_items'] ?? []), JSON_UNESCAPED_SLASHES),'is_sensitive'=>false]); } else { SystemSetting::updateOrCreate(['key'=>'navigation.custom_items'],['value'=>'[]','is_sensitive'=>false]); }
+        Cache::forget('fuelfree.system_settings');
         return back()->with('status','Global navigation saved successfully.');
     }
 
