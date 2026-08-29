@@ -11,7 +11,7 @@ class SiteContentItem extends Model
         'type', 'title', 'slug', 'excerpt', 'designation', 'phone', 'email',
         'content', 'image_path', 'attachment_path', 'attachment_name', 'attachment_size', 'attachment_mime', 'cover_alt', 'visiting_card_path', 'status', 'sort_order', 'published_at',
         'is_featured', 'meta_title', 'meta_description',
-        'show_in_navigation', 'navigation_order',
+        'show_in_navigation', 'navigation_order', 'navigation_parent_id',
     ];
 
     protected function casts(): array
@@ -21,9 +21,20 @@ class SiteContentItem extends Model
             'sort_order' => 'integer',
             'show_in_navigation' => 'boolean',
             'navigation_order' => 'integer',
+            'navigation_parent_id' => 'integer',
             'is_featured' => 'boolean',
             'attachment_size' => 'integer',
         ];
+    }
+
+    public function navigationParent()
+    {
+        return $this->belongsTo(self::class, 'navigation_parent_id');
+    }
+
+    public function navigationChildren(): HasMany
+    {
+        return $this->hasMany(self::class, 'navigation_parent_id')->orderBy('navigation_order')->orderBy('id');
     }
 
     public function galleryMedia(): HasMany
