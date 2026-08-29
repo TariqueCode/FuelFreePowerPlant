@@ -77,7 +77,7 @@ class WebmailService
         $number=imap_msgno($connection,$uid);
         if($number<1){imap_close($connection);throw new RuntimeException('Message not found.');}
         $header=imap_headerinfo($connection,$number); $structure=imap_fetchstructure($connection,$number);
-        $parts=['html'=>null,'text'=>null,'attachments'=>[]];
+        $parts=['html'=>null,'text'=>null,'attachments'=>[],'inline'=>[]];
         $this->walkParts($connection,$number,$structure,'',$parts);
         if($parts['html']===null && $parts['text']===null){
             $parts['text']=$this->decodeTransfer((string)imap_body($connection,$number,FT_PEEK),(int)($structure->encoding??0));
@@ -88,7 +88,7 @@ class WebmailService
             'from'=>$this->address($header->from[0]??null),'to'=>$this->addressList($header->to??[]),
             'cc'=>$this->addressList($header->cc??[]),'date'=>$header->date??'',
             'message_id'=>$this->headerValue($header,'message_id'),
-            'body'=>$this->safeBody($parts['html']??nl2br(e($parts['text']??''))),
+            'body'=>$this->replaceInlineCids($this->safeBody($parts['html']??nl2br(e($parts['text']??''))),$parts['inline'],$uid,$folder),
             'attachments'=>$parts['attachments'],
         ];
     }
@@ -165,7 +165,9 @@ class WebmailService
     private function walkParts($connection,int $number,?object $part,string $partNo,array &$parts): void
     {
         if(!$part)return; $type=$this->mimeType((int)($part->type??0)); $sub=strtolower((string)($part->subtype??'')); $filename=$this->partFilename($part); $disposition=strtolower((string)($part->disposition??''));
-        if($filename!==''||$disposition==='attachment'){$parts['attachments'][]=['part'=>$partNo?:'1','name'=>$filename?:'attachment','type'=>$type.'/'.$sub,'size'=>(int)($part->bytes??0),'inline'=>$disposition==='inline','cid'=>trim((string)($part->ifid??''))];}
+        $cid=trim((string)($part->ifid??''),"<> \t\r\n");
+        if($type==='image'&&$cid!==''){$parts['inline'][]=['part'=>$partNo?:'1','type'=>$type.'/'.$sub,'cid'=>$cid];}
+        if($filename!==''||$disposition==='attachment'){$parts['attachments'][]=['part'=>$partNo?:'1','name'=>$filename?:'attachment','type'=>$type.'/'.$sub,'size'=>(int)($part->bytes??0),'inline'=>$disposition==='inline','cid'=>$cid];}
         elseif($type==='text'&&in_array($sub,['html','plain'],true)){ $raw=$partNo!==''?imap_fetchbody($connection,$number,$partNo,FT_PEEK):imap_body($connection,$number,FT_PEEK); $decoded=$this->convertCharset($this->decodeTransfer((string)$raw,(int)($part->encoding??0)),$this->partCharset($part)); if($sub==='html')$parts['html']=$decoded;elseif($parts['text']===null)$parts['text']=$decoded; }
         foreach(($part->parts??[]) as $i=>$child){$childNo=$partNo!==''?$partNo.'.'.($i+1):(string)($i+1);$this->walkParts($connection,$number,$child,$childNo,$parts);}
     }
@@ -173,6 +175,19 @@ class WebmailService
     private function findPart($connection,int $number,?object $part,string $partNo,string $wanted,?array &$found): void
     {
         if(!$part||$found)return; if($partNo===$wanted){$raw=$partNo!==''?imap_fetchbody($connection,$number,$partNo,FT_PEEK):imap_body($connection,$number,FT_PEEK);$found=['name'=>$this->partFilename($part)?:'attachment','type'=>$this->mimeType((int)($part->type??3)).'/'.strtolower((string)($part->subtype??'octet-stream')),'content'=>$this->decodeTransfer((string)$raw,(int)($part->encoding??0)),'size'=>(int)($part->bytes??0)];return;} foreach(($part->parts??[]) as $i=>$child){$childNo=$partNo!==''?$partNo.'.'.($i+1):(string)($i+1);$this->findPart($connection,$number,$child,$childNo,$wanted,$found);}
+    }
+
+    private function replaceInlineCids(string $html,array $inline,int $uid,string $folder): string
+    {
+        $base=rtrim(config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com'),'/');
+        foreach($inline as $item){
+            $cid=trim((string)($item['cid']??''),"<> \t\r\n");
+            $part=(string)($item['part']??'');
+            if($cid===''||$part==='')continue;
+            $url=$base.'/message/'.$uid.'/inline/'.$part.'?folder='.rawurlencode($folder);
+            $html=str_ireplace(['cid:'.$cid,'cid:'.rawurlencode($cid)],$url,$html);
+        }
+        return $html;
     }
 
     private function decodeTransfer(string $body,int $encoding): string{return match($encoding){3=>(base64_decode($body,true)?:''),4=>quoted_printable_decode($body),default=>$body};}
