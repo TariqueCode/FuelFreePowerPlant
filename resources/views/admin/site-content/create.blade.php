@@ -125,7 +125,7 @@
 
     <div class="word-panel" data-editor-panel="view">
       <div class="word-group">
-        <button type="button" class="word-command" id="toggle-source" title="HTML source"><i class="fa-solid fa-code"></i><span>HTML<br>source</span></button>
+        <button type="button" class="word-command" id="toggle-source" title="HTML source"><i class="fa-solid fa-code"></i><span>HTML<br>source</span></button><button type="button" class="word-command" id="open-html-code" title="Insert or design with HTML"><i class="fa-solid fa-file-code"></i><span>HTML<br>code</span></button>
         <button type="button" class="word-command" id="preview-content" title="Preview"><i class="fa-solid fa-eye"></i><span>Preview</span></button>
         <button type="button" class="word-command" id="toggle-fullscreen" title="Fullscreen"><i class="fa-solid fa-expand"></i><span>Fullscreen</span></button>
         <span class="word-group-label">View</span>
@@ -138,6 +138,21 @@
   </div>
 <div id="editor" class="editor" contenteditable="true">{!! old('content',$item->content) !!}</div>
 <div class="editor-tools-footer"><span class="editor-draft-state" id="editor-draft-state"><i class="fa-solid fa-cloud"></i><span>Local draft ready</span></span><span class="editor-counts" id="editor-counts">0 words • 0 characters</span></div>
+</div>
+<div id="html-code-modal" class="html-code-modal" hidden>
+  <div class="html-code-dialog" role="dialog" aria-modal="true" aria-labelledby="html-code-title">
+    <div class="html-code-head">
+      <div><strong id="html-code-title"><i class="fa-solid fa-file-code"></i> HTML Code Designer</strong><small>Write HTML to design this content directly. Existing editor content is loaded below.</small></div>
+      <button type="button" class="html-code-close" id="html-code-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <textarea id="html-code-input" class="html-code-input" spellcheck="false" placeholder="<section>..."></textarea>
+    <div class="html-code-help">Tip: You can use HTML such as <code>&lt;div&gt;</code>, <code>&lt;table&gt;</code>, <code>&lt;iframe&gt;</code>, inline styles, classes and links.</div>
+    <div class="html-code-actions">
+      <button type="button" class="html-code-btn" id="html-code-cancel">Cancel</button>
+      <button type="button" class="html-code-btn html-code-insert" id="html-code-insert"><i class="fa-solid fa-plus"></i> Insert at cursor</button>
+      <button type="button" class="html-code-btn html-code-apply" id="html-code-apply"><i class="fa-solid fa-check"></i> Apply HTML</button>
+    </div>
+  </div>
 </div><textarea id="content-source" name="content" hidden></textarea><input id="media-input" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"><input id="gallery-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif"><input id="video-input" type="file" hidden accept="video/mp4,video/webm">@if($contentType==='gallery')<input id="gallery-batch-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">@endif</div>
 <div><label>{{ $contentType==='gallery' ? 'Event date &amp; time' : 'Publish date/time' }}</label><input type="datetime-local" name="published_at" value="{{ old('published_at',$item->published_at?->format('Y-m-d\\TH:i')) }}"></div>
 </div><div class="actions"><a class="back" href="{{ route('admin.site-content.index',['type'=>in_array($item->type,['news','announcement'],true)?'news':$item->type]) }}">Cancel</a><button class="save" type="submit"><i class="fa-solid fa-floppy-disk"></i> {{ $item->exists?'Save changes':'Create content' }}</button></div></form></div>
@@ -348,7 +363,7 @@ html,body{overflow-x:hidden}
     padding-top:calc(14px + var(--ff-ribbon-height,0px)) !important;
   }
 }
-</style>@endpush
+.html-code-modal{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72)}.html-code-modal[hidden]{display:none}.html-code-dialog{width:min(100%,1050px);max-height:min(88vh,820px);display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid rgba(67,194,229,.25);border-radius:16px;background:#061923;box-shadow:0 24px 70px rgba(0,0,0,.55)}.html-code-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}.html-code-head strong{display:block;color:#e7f8fb;font-size:14px}.html-code-head strong i{color:#4fc8e4;margin-right:7px}.html-code-head small{display:block;color:#7899a5;font-size:9px;margin-top:5px;line-height:1.5}.html-code-close{width:34px;height:34px;border:1px solid var(--line);border-radius:8px;background:transparent;color:#a7c2cb;cursor:pointer}.html-code-input{width:100%;min-height:430px;resize:vertical;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;background:#020d13;color:#dff6fb;padding:14px;font:12px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none}.html-code-input:focus{border-color:rgba(67,194,229,.5)}.html-code-help{color:#7899a5;font-size:9px;line-height:1.6}.html-code-help code{color:#70d9ea}.html-code-actions{display:flex;justify-content:flex-end;gap:8px}.html-code-btn{border:1px solid var(--line);border-radius:9px;padding:9px 12px;background:#071b25;color:#a7c2cb;font-size:10px;cursor:pointer}.html-code-insert,.html-code-apply{border-color:rgba(67,194,229,.35);color:#dff6fb;background:rgba(67,194,229,.09)}.html-code-apply{background:#29aaca;border-color:#29aaca}@media(max-width:650px){.html-code-modal{padding:10px}.html-code-dialog{max-height:94vh;padding:12px}.html-code-input{min-height:55vh}.html-code-actions{flex-wrap:wrap}.html-code-actions .html-code-btn{flex:1}}</style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
 const editor=document.getElementById('editor'),source=document.getElementById('content-source'),form=document.getElementById('content-form'),mediaInput=document.getElementById('media-input'),galleryInput=document.getElementById('gallery-input'),videoInput=document.getElementById('video-input'),galleryBatchInput=document.getElementById('gallery-batch-input'),galleryStatus=document.getElementById('gallery-upload-status');
@@ -402,6 +417,66 @@ function updateEditorToolbarState(){
   const status=document.getElementById('editor-format-status');
   if(status)status.innerHTML='<strong>'+label+'</strong><span class="status-sep">•</span><span>'+px+'</span>';
 }
+
+// Formatting selects: preserve the current selection, then apply the chosen block/font/size.
+document.addEventListener('selectionchange',()=>{if(!sourceMode)saveEditorSelection()});
+const blockFormatSelect=document.getElementById('block-format');
+if(blockFormatSelect)blockFormatSelect.addEventListener('change',function(){
+  if(!this.value)return;
+  restoreEditorSelection(); editor.focus();
+  const tag=this.value;
+  try{document.execCommand('formatBlock',false,tag==='blockquote'?'blockquote':tag==='pre'?'pre':tag)}catch(e){}
+  sync(); updateEditorToolbarState();
+});
+const fontNameSelect=document.getElementById('font-name');
+if(fontNameSelect)fontNameSelect.addEventListener('change',function(){
+  if(!this.value)return;
+  restoreEditorSelection(); editor.focus();
+  try{document.execCommand('fontName',false,this.value)}catch(e){}
+  sync(); updateEditorToolbarState();
+});
+const fontSizeSelect=document.getElementById('font-size');
+if(fontSizeSelect)fontSizeSelect.addEventListener('change',function(){
+  if(!this.value)return;
+  restoreEditorSelection(); editor.focus();
+  try{document.execCommand('fontSize',false,this.value)}catch(e){}
+  sync(); updateEditorToolbarState();
+});
+
+// HTML Code Designer: edit, replace, or insert real HTML at the saved cursor.
+const htmlCodeModal=document.getElementById('html-code-modal');
+const htmlCodeInput=document.getElementById('html-code-input');
+const openHtmlCode=document.getElementById('open-html-code');
+function closeHtmlCode(){if(htmlCodeModal)htmlCodeModal.hidden=true}
+function openHtmlCodeDesigner(){
+  if(!htmlCodeModal||!htmlCodeInput)return;
+  if(sourceMode)document.getElementById('toggle-source')?.click();
+  saveEditorSelection();
+  htmlCodeInput.value=editor.innerHTML;
+  htmlCodeModal.hidden=false;
+  setTimeout(()=>htmlCodeInput.focus(),0);
+}
+openHtmlCode?.addEventListener('click',openHtmlCodeDesigner);
+document.getElementById('html-code-close')?.addEventListener('click',closeHtmlCode);
+document.getElementById('html-code-cancel')?.addEventListener('click',closeHtmlCode);
+document.getElementById('html-code-apply')?.addEventListener('click',()=>{
+  if(!htmlCodeInput)return;
+  editor.innerHTML=htmlCodeInput.value;
+  source.value=editor.innerHTML;
+  closeHtmlCode(); sync(); updateEditorToolbarState();
+});
+document.getElementById('html-code-insert')?.addEventListener('click',()=>{
+  if(!htmlCodeInput)return;
+  restoreEditorSelection(); editor.focus();
+  try{document.execCommand('insertHTML',false,htmlCodeInput.value)}catch(e){
+    const range=savedEditorRange;
+    if(range){range.deleteContents();range.insertNode(range.createContextualFragment(htmlCodeInput.value))}
+  }
+  closeHtmlCode(); sync(); updateEditorToolbarState();
+});
+htmlCodeModal?.addEventListener('click',e=>{if(e.target===htmlCodeModal)closeHtmlCode()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&htmlCodeModal&&!htmlCodeModal.hidden)closeHtmlCode()});
+
 function updateEditorMetrics(){
   const text=editor.innerText.replace(/\\s+/g,' ').trim();
   const words=text?text.split(/\\s+/).length:0,chars=text.length;
