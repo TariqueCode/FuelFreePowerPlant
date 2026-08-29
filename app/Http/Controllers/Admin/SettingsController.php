@@ -42,6 +42,7 @@ class SettingsController
             'footer.website'=>'www.fuelfreepowerplant.com','footer.website_url'=>'https://www.fuelfreepowerplant.com','footer.get_in_touch_label'=>'Get in touch',
             'footer.get_in_touch_url'=>'/contact','footer.copyright_text'=>'All rights reserved.',
             'home.slider_enabled'=>'1','home.welcome_enabled'=>'1','home.news_enabled'=>'1','home.gallery_enabled'=>'1',
+            'home.welcome_eyebrow'=>'Welcome to {{company}}','home.welcome_title'=>'Building a stronger energy future.','home.welcome_intro_1'=>'{{company}} is a forward-thinking energy company committed to contributing to Bangladesh’s sustainable energy future. Our vision is to develop efficient, reliable, and innovative power solutions that support the country’s growing energy needs and economic development.','home.welcome_intro_2'=>'We are dedicated to building a cleaner and smarter energy future through innovation, responsible development, and world-class management practices. We aim to strengthen our capabilities, expand our projects, embrace modern technologies, and deliver dependable energy solutions while maintaining our commitment to quality, sustainability, and excellence.','home.welcome_signoff'=>'{{company}} — Powering a cleaner, smarter future.',
         ];
         $saved=SystemSetting::query()->pluck('value','key')->all();
         $settings=array_merge($defaults,$saved);
@@ -266,6 +267,7 @@ class SettingsController
             'company.name'=>['required','string','max:150'],'company.domain'=>['required','string','max:255'],'company.tagline'=>['nullable','string','max:255'],
             'company.timezone'=>['required','timezone'],'storage.quota_gib'=>['required','numeric','min:1','max:1048576'],
             'home.news_limit'=>['required','integer','min:1','max:12'],'home.gallery_limit'=>['required','integer','min:1','max:12'],
+            'home.welcome_eyebrow'=>['nullable','string','max:120'],'home.welcome_title'=>['nullable','string','max:255'],'home.welcome_intro_1'=>['nullable','string','max:3000'],'home.welcome_intro_2'=>['nullable','string','max:3000'],'home.welcome_signoff'=>['nullable','string','max:255'],
             'home.slider_enabled'=>['nullable','boolean'],'home.welcome_enabled'=>['nullable','boolean'],'home.news_enabled'=>['nullable','boolean'],'home.gallery_enabled'=>['nullable','boolean'],
             'mail.contact_email'=>['nullable','email:rfc,dns','ends_with:@fuelfreepowerplant.com','max:255'],'mail.contact_password'=>['nullable','string','max:1000'],
             'mail.career_email'=>['nullable','email:rfc,dns','ends_with:@fuelfreepowerplant.com','max:255'],'mail.career_password'=>['nullable','string','max:1000'],
@@ -276,6 +278,7 @@ class SettingsController
             'company.name'=>data_get($validated,'company.name'),'company.domain'=>data_get($validated,'company.domain'),'company.tagline'=>data_get($validated,'company.tagline'),
             'company.timezone'=>data_get($validated,'company.timezone'),'storage.quota_gib'=>data_get($validated,'storage.quota_gib'),
             'home.news_limit'=>data_get($validated,'home.news_limit'),'home.gallery_limit'=>data_get($validated,'home.gallery_limit'),
+            'home.welcome_eyebrow'=>data_get($validated,'home.welcome_eyebrow'),'home.welcome_title'=>data_get($validated,'home.welcome_title'),'home.welcome_intro_1'=>data_get($validated,'home.welcome_intro_1'),'home.welcome_intro_2'=>data_get($validated,'home.welcome_intro_2'),'home.welcome_signoff'=>data_get($validated,'home.welcome_signoff'),
             'home.slider_enabled'=>$request->boolean('home.slider_enabled')?'1':'0','home.welcome_enabled'=>$request->boolean('home.welcome_enabled')?'1':'0',
             'home.news_enabled'=>$request->boolean('home.news_enabled')?'1':'0','home.gallery_enabled'=>$request->boolean('home.gallery_enabled')?'1':'0',
         ];
