@@ -40,6 +40,6 @@ class CmsPageController extends Controller
             ->whereIn('key', ['company.name', 'company.logo_path', 'company.tagline'])
             ->pluck('value', 'key');
 
-        return view('cms.page', compact('page', 'pages', 'projects', 'companyItems', 'brand'));
+        return view('site.company-page', ['item' => $page, 'brand' => ['name' => $brand->get('company.name') ?: config('fuelfree.company.name'), 'logo_path' => $brand->get('company.logo_path'), 'tagline' => $brand->get('company.tagline') ?: config('fuelfree.company.tagline')], 'backRoute' => route('home'), 'backLabel' => 'Back to Home']);
     }
 }
