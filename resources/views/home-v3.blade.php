@@ -121,7 +121,7 @@
     <section class="welcome">
         <div class="welcome-heading"><span class="eyebrow">{{ $homeContent['welcome_eyebrow'] }}</span><h1>{{ $homeContent['welcome_title'] }}</h1><div class="welcome-rule"></div></div>
         <div class="welcome-copy">
-            <p><strong>{{ $siteName }}</strong> {{ $homeContent['welcome_intro_1'] }}</p>
+            <p><strong>{{ $siteName }}</strong> {{ IlluminateSupportStr::startsWith($homeContent['welcome_intro_1'], $siteName) ? IlluminateSupportStr::after($homeContent['welcome_intro_1'], $siteName) : $homeContent['welcome_intro_1'] }}</p>
             <p>{{ $homeContent['welcome_intro_2'] }}</p>
             <div class="welcome-signoff">{{ $homeContent['welcome_signoff'] }}</div>
         </div>
