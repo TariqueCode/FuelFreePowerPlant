@@ -113,11 +113,11 @@
     <div class="public-shell">
         <div class="public-header-top">
             <a class="public-brand" href="{{ route('home') }}" aria-label="{{ $publicName }}">
-                @if($publicLogo)<img src="{{ asset('storage/'.ltrim($publicLogo,'/')) }}" alt="{{ $publicName }}">@else<span class="public-brand-fallback" aria-hidden="true">⚡</span>@endif
+                @if(($globalLayout['header.logo_visible'] ?? '1') === '1' && $publicLogo)<img src="{{ asset('storage/'.ltrim($publicLogo,'/')) }}" alt="{{ $publicName }}">@else<span class="public-brand-fallback" aria-hidden="true">⚡</span>@endif
                 <span class="public-brand-name"><span class="public-brand-name-first">{{ $publicNameFirst }}</span>@if($publicNameRest) <span class="public-brand-name-rest">{{ $publicNameRest }}</span>@endif</span>
             </a>
             <div class="public-header-tools">
-                @if($publicSocials)
+                @if(($globalLayout['header.social_visible'] ?? '1') === '1' && $publicSocials)
                     <div class="public-header-socials" aria-label="Social media">
                         @foreach($publicSocials as $social)
                             <a class="public-header-social" style="--social-color:{{ $social['color'] }}" href="{{ $social['url'] }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $social['label'] }}" title="{{ $social['label'] }}">
@@ -127,10 +127,10 @@
                     </div>
                     <span class="public-header-divider" aria-hidden="true"></span>
                 @endif
-                @if($isPortalUser)
+                @if(($globalLayout['header.portal_visible'] ?? '1') === '1' && $isPortalUser)
                     <a class="public-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-circle-user" aria-hidden="true"></i><span>{{ $headerLabels['portal_label'] ?? 'Portal' }}</span></a>
                 @else
-                    <a class="public-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i><span>{{ $headerLabels['login_label'] ?? 'Login' }}</span></a>
+                    @if(($globalLayout['header.portal_visible'] ?? '1') === '1')<a class="public-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i><span>{{ $headerLabels['login_label'] ?? 'Login' }}</span></a>@endif
                 @endif
             </div>
             <button class="public-menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="public-navigation">
