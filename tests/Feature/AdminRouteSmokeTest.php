@@ -25,18 +25,11 @@ class AdminRouteSmokeTest extends TestCase
     }
 
 
-
     /** @return void */
     public function test_production_configuration_uses_safe_non_network_defaults(): void
     {
         $this->assertSame('database', config('cache.default'));
         $this->assertSame('local', config('filesystems.default'));
-        $this->assertFalse((bool) config('app.debug'));
-    }
-
-    /** @return void */
-    public function test_application_debug_defaults_to_false_in_configuration(): void
-    {
         $this->assertFalse((bool) config('app.debug'));
     }
 
