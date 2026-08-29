@@ -1,7 +1,7 @@
 @php
     $globalLayout = $globalLayout ?? app(\App\Services\GlobalLayoutService::class)->all();
     $publicBrand = $brand ?? null;
-    $theme = array_merge(['primary'=>'#55cce7','secondary'=>'#0f2430','accent'=>'#9de8f7','surface'=>'#07131a','text'=>'#eaf7fb','muted'=>'#8ea8b2','radius'=>'12','font_body'=>'Inter, sans-serif','font_heading'=>'Inter, sans-serif','base_size'=>'16','line_height'=>'1.6','space_section'=>'64','space_content'=>'24'], collect($globalLayout ?? [])->filter(fn($v,$k)=>str_starts_with($k,'theme.'))->mapWithKeys(fn($v,$k)=>[substr($k,6)=>$v])->all());
+    $theme = array_merge(['primary'=>'#55cce7','secondary'=>'#0f2430','accent'=>'#9de8f7','surface'=>'#07131a','text'=>'#eaf7fb','muted'=>'#8ea8b2','radius'=>'12','font_body'=>'Inter, sans-serif','font_heading'=>'Inter, sans-serif','base_size'=>'16','line_height'=>'1.6','space_section'=>'64','space_content'=>'24','card_padding'=>'20','button_radius'=>'10','button_height'=>'42','input_radius'=>'10'], collect($globalLayout ?? [])->filter(fn($v,$k)=>str_starts_with($k,'theme.'))->mapWithKeys(fn($v,$k)=>[substr($k,6)=>$v])->all());
     if (!$publicBrand || (is_countable($publicBrand) && count($publicBrand) === 0)) {
         $publicBrand = \App\Models\SystemSetting::query()->whereIn('key',['company.name','company.logo_path','company.tagline'])->pluck('value','key');
     }
