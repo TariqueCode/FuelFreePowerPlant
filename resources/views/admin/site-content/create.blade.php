@@ -496,13 +496,20 @@ if(attachmentInput){document.getElementById('attachment-upload').onclick=()=>att
 </script>@endpush
 
 
-{{-- Final CMS ribbon positioning fix: keep the Word-style toolbar attached to the viewport below the dashboard topbar while the editor is being edited. --}}
+{{-- Final CMS ribbon positioning fix: toolbar follows the dashboard topbar with a real sticky/fixed fallback. --}}
 @push('styles')
 <style>
-/* Final, JS-assisted sticky behavior.
-   CSS sticky remains the default; the floating state is used only while the
-   editor shell crosses the dashboard topbar, which makes the behavior robust
-   even when the CMS page is inside a complex layout. */
+/* The dashboard topbar is 70px high. The editor ribbon must occupy the exact
+   space immediately below it while scrolling; no extra top gap. */
+.word-ribbon{
+    top:70px !important;
+    z-index:999 !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    overflow:visible !important;
+}
 .word-ribbon.ff-fixed-toolbar{
     position:fixed !important;
     top:var(--ff-toolbar-top,70px) !important;
@@ -510,18 +517,18 @@ if(attachmentInput){document.getElementById('attachment-upload').onclick=()=>att
     width:var(--ff-toolbar-width,100%) !important;
     max-width:none !important;
     margin:0 !important;
-    z-index:950 !important;
+    z-index:999 !important;
     border-radius:0 !important;
 }
 .ff-ribbon-spacer{
     display:block;
     width:100%;
-    flex:0 0 auto;
+    margin:0 !important;
+    padding:0 !important;
 }
 @media(max-width:700px){
-    .word-ribbon.ff-fixed-toolbar{
-        top:var(--ff-toolbar-top,70px) !important;
-    }
+    .word-ribbon{top:70px !important;}
+    .word-ribbon.ff-fixed-toolbar{top:var(--ff-toolbar-top,70px) !important;}
 }
 </style>
 @endpush
@@ -535,50 +542,46 @@ if(attachmentInput){document.getElementById('attachment-upload').onclick=()=>att
 
     let spacer=null;
     let floating=false;
+    let threshold=0;
     let ticking=false;
 
-    const topbar=()=>document.querySelector('.topbar');
-    const topOffset=()=>{
-        const bar=topbar();
-        return Math.max(0,Math.round(bar?.offsetHeight || 70));
-    };
+    function topOffset(){
+        const bar=document.querySelector('.topbar');
+        return Math.max(0,Math.round(bar?.getBoundingClientRect().height || 70));
+    }
+
+    function calculateThreshold(){
+        if(floating)return;
+        const offset=topOffset();
+        const rect=ribbon.getBoundingClientRect();
+        threshold=window.scrollY + rect.top - offset;
+    }
 
     function ensureSpacer(){
         if(spacer)return;
         spacer=document.createElement('div');
         spacer.className='ff-ribbon-spacer';
         spacer.setAttribute('aria-hidden','true');
-        spacer.style.height=ribbon.getBoundingClientRect().height+'px';
+        spacer.style.height=Math.round(ribbon.getBoundingClientRect().height)+'px';
         ribbon.parentNode.insertBefore(spacer,ribbon);
-    }
-
-    function removeSpacer(){
-        if(spacer){
-            spacer.remove();
-            spacer=null;
-        }
-    }
-
-    function setFloating(){
-        if(floating)return;
-        const rect=shell.getBoundingClientRect();
-        const height=ribbon.getBoundingClientRect().height;
-        ensureSpacer();
-        spacer.style.height=height+'px';
-        ribbon.classList.add('ff-fixed-toolbar');
-        ribbon.style.setProperty('--ff-toolbar-top',topOffset()+'px');
-        ribbon.style.setProperty('--ff-toolbar-left',Math.round(rect.left)+'px');
-        ribbon.style.setProperty('--ff-toolbar-width',Math.round(rect.width)+'px');
-        floating=true;
     }
 
     function updateGeometry(){
         if(!floating)return;
         const rect=shell.getBoundingClientRect();
+        const height=Math.round(ribbon.getBoundingClientRect().height);
         ribbon.style.setProperty('--ff-toolbar-top',topOffset()+'px');
         ribbon.style.setProperty('--ff-toolbar-left',Math.round(rect.left)+'px');
         ribbon.style.setProperty('--ff-toolbar-width',Math.round(rect.width)+'px');
-        if(spacer)spacer.style.height=ribbon.getBoundingClientRect().height+'px';
+        if(spacer)spacer.style.height=height+'px';
+    }
+
+    function setFloating(){
+        if(floating)return;
+        ensureSpacer();
+        ribbon.classList.add('ff-fixed-toolbar');
+        floating=true;
+        updateGeometry();
     }
 
     function clearFloating(){
@@ -587,22 +590,22 @@ if(attachmentInput){document.getElementById('attachment-upload').onclick=()=>att
         ribbon.style.removeProperty('--ff-toolbar-top');
         ribbon.style.removeProperty('--ff-toolbar-left');
         ribbon.style.removeProperty('--ff-toolbar-width');
-        removeSpacer();
+        if(spacer){spacer.remove();spacer=null;}
         floating=false;
     }
 
     function evaluate(){
         ticking=false;
-        const offset=topOffset();
-        const rect=shell.getBoundingClientRect();
-        const height=ribbon.getBoundingClientRect().height;
-        const shouldFloat=rect.top<=offset && rect.bottom>offset+Math.min(height,window.innerHeight);
 
+        if(!threshold && threshold!==0)calculateThreshold();
+
+        const shouldFloat=window.scrollY >= threshold;
         if(shouldFloat){
             setFloating();
             updateGeometry();
         }else{
             clearFloating();
+            calculateThreshold();
         }
     }
 
@@ -612,16 +615,33 @@ if(attachmentInput){document.getElementById('attachment-upload').onclick=()=>att
         requestAnimationFrame(evaluate);
     }
 
+    /* Capture the ribbon's real document position before scrolling.
+       This avoids relying on the editor shell's position, which can change
+       as the page reflows or the ribbon becomes fixed. */
+    calculateThreshold();
+    schedule();
+
     window.addEventListener('scroll',schedule,{passive:true});
-    window.addEventListener('resize',schedule,{passive:true});
-    window.addEventListener('orientationchange',schedule,{passive:true});
+    window.addEventListener('resize',function(){
+        if(!floating)calculateThreshold();
+        schedule();
+    },{passive:true});
+    window.addEventListener('orientationchange',function(){
+        if(!floating)calculateThreshold();
+        schedule();
+    },{passive:true});
 
     if('ResizeObserver' in window){
-        new ResizeObserver(schedule).observe(shell);
-        new ResizeObserver(schedule).observe(ribbon);
+        new ResizeObserver(function(){
+            if(!floating)calculateThreshold();
+            else updateGeometry();
+            schedule();
+        }).observe(ribbon);
+        new ResizeObserver(function(){
+            if(floating)updateGeometry();
+            else calculateThreshold();
+        }).observe(shell);
     }
-
-    schedule();
 })();
 </script>
 @endpush
