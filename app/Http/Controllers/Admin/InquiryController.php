@@ -5,10 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Inquiry;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class InquiryController extends Controller
 {
+    public function show(Inquiry $inquiry): RedirectResponse
+    {
+        return redirect()->route('admin.helpdesk.show', ['type' => 'contact', 'id' => $inquiry->id]);
+    }
+
     public function index(Request $request): View
     {
         $status = $request->string('status')->toString();
