@@ -80,7 +80,7 @@ class WebmailController extends Controller
             return back()->withErrors(['email' => 'That message could not be opened.']);
         }
 
-        return view('webmail.message', compact('message', 'email', 'folder'));
+        return view('webmail.message', compact('message', 'email', 'folders', 'folder'));
     }
 
     public function compose(Request $request, WebmailService $webmail): View|RedirectResponse
@@ -131,12 +131,12 @@ class WebmailController extends Controller
         $data=$request->validate([
             'to'=>['required','string','max:5000'],'cc'=>['nullable','string','max:5000'],'bcc'=>['nullable','string','max:5000'],
             'subject'=>['nullable','string','max:255'],'body'=>['required','string','max:500000'],
-            'attachments'=>['nullable','array','max:10'],'attachments.*'=>['file','max:10240'],
+            'attachments'=>['nullable','array','max:30'],'attachments.*'=>['file','max:102400'],
         ]);
         $attachments=[];
         foreach($request->file('attachments',[]) as $file){if($file&&$file->isValid())$attachments[]=['path'=>$file->getRealPath(),'name'=>$file->getClientOriginalName(),'mime'=>$file->getMimeType()?:'application/octet-stream'];}
         try{
-            $webmail->send($email,$password,$data['to'],$data['subject']?:'(No subject)',$data['body'],$this->mailConfigFor($email),$attachments,false,$data['cc']??[],$data['bcc']??[]);
+            $webmail->send($email,$password,$data['to'],$data['subject']?:'(No subject)',$data['body'],$this->mailConfigFor($email),$attachments,true,$data['cc']??[],$data['bcc']??[]);
         }catch(Throwable $e){report($e);return back()->withErrors(['send'=>'The message could not be sent: '.($e->getMessage()?:'SMTP error.')])->withInput();}
         return redirect()->to($this->url('/inbox'))->with('status','Message sent successfully.');
     }
@@ -148,6 +148,29 @@ class WebmailController extends Controller
         $folder=trim((string)$request->query('folder','INBOX'));
         $data=$webmail->attachment($email,$password,$uid,$part,$this->mailConfigFor($email),$folder);
         return response($data['content'],200,['Content-Type'=>$data['type'],'Content-Disposition'=>'attachment; filename="'.addcslashes($data['name'],'"').'"']);
+    }
+
+    public function inline(Request $request,int $uid,string $part,WebmailService $webmail)
+    {
+        $credentials=$this->credentials($request);
+        if($credentials===null)return response('',401);
+        [$email,$password]=$credentials;
+        $folder=trim((string)$request->query('folder','INBOX'));
+        try{
+            $data=$webmail->attachment($email,$password,$uid,$part,$this->mailConfigFor($email),$folder);
+            $type=strtolower((string)($data['type']??'application/octet-stream'));
+            $allowed=['image/jpeg','image/png','image/gif','image/webp','image/bmp'];
+            if(!in_array($type,$allowed,true))return response('',404);
+            return response($data['content'],200,[
+                'Content-Type'=>$type,
+                'Content-Disposition'=>'inline',
+                'Cache-Control'=>'private, max-age=3600',
+                'X-Content-Type-Options'=>'nosniff',
+            ]);
+        }catch(Throwable $e){
+            report($e);
+            return response('',404);
+        }
     }
 
     public function delete(Request $request,int $uid,WebmailService $webmail): RedirectResponse
