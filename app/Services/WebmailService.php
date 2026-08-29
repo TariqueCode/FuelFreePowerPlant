@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\SystemSetting;
 use RuntimeException;
 
 class WebmailService
@@ -423,6 +424,12 @@ class WebmailService
         $muted = '#8AA8B1';
         $website = rtrim((string) config('app.url', 'https://www.fuelfreepowerplant.com'), '/');
         if ($website === '') $website = 'https://www.fuelfreepowerplant.com';
+        $logoPath = (string) (SystemSetting::query()->where('key','company.logo_path')->value('value') ?? '');
+        $logoUrl = $logoPath !== '' ? $website.'/storage/'.ltrim($logoPath,'/') : '';
+
+        $logoMarkup = $logoUrl !== ''
+            ? '<img src="'.$logoUrl.'" alt="FuelFree PowerPlant" width="42" height="42" style="display:block;width:42px;height:42px;object-fit:contain;border-radius:8px;">'
+            : '<div style="width:42px;height:42px;line-height:42px;text-align:center;border:1px solid #24515f;border-radius:8px;color:'.$accent.';font-size:20px;font-weight:800;">F</div>';
 
         return '<!doctype html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>'
             .e($subject)
@@ -431,7 +438,7 @@ class WebmailService
             .'<tr><td align="center"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:680px;background:'.$dark.';border:1px solid #17313b;border-radius:16px;overflow:hidden;">'
             .'<tr><td style="height:4px;background:'.$accent.';font-size:0;line-height:0;">&nbsp;</td></tr>'
             .'<tr><td style="padding:24px 28px 20px;background:#031018;border-bottom:1px solid #17313b;">'
-            .'<div style="font-size:20px;font-weight:800;line-height:1.2;color:'.$text.';"><span style="color:'.$accent.';">FUELFREE</span> POWERPLANT</div>'
+            .'<table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr><td style="padding-right:12px;vertical-align:middle;">'.$logoMarkup.'</td><td style="vertical-align:middle;"><div style="font-size:20px;font-weight:800;line-height:1.2;color:'.$text.';"><span style="color:'.$accent.';">FUELFREE</span> POWERPLANT</div></td></tr></table>'
             .'<div style="margin-top:7px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:'.$accent.';">'.$channel.' communication</div>'
             .'</td></tr>'
             .'<tr><td style="padding:28px;background:'.$panel.';font-size:15px;line-height:1.75;color:#C4D5DA;">'
