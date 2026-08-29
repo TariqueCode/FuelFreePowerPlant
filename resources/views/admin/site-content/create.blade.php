@@ -348,10 +348,41 @@ html,body{overflow-x:hidden}
     padding-top:calc(14px + var(--ff-ribbon-height,0px)) !important;
   }
 }
-</style>@endpush
+.editor-draft-state{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-size:9px;color:#7899a5}.editor-draft-state i{color:#43c2e5}</style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
 const editor=document.getElementById('editor'),source=document.getElementById('content-source'),form=document.getElementById('content-form'),mediaInput=document.getElementById('media-input'),galleryInput=document.getElementById('gallery-input'),videoInput=document.getElementById('video-input'),galleryBatchInput=document.getElementById('gallery-batch-input'),galleryStatus=document.getElementById('gallery-upload-status');
+
+// Isolated local draft (does not modify editor commands, toolbar, or save flow).
+(function(){
+  const DRAFT_KEY='cms_site_content_draft_v1';
+  const draftState=document.getElementById('editor-draft-state');
+  let timer=null;
+  function setState(t){if(draftState){const s=draftState.querySelector('span');if(s)s.textContent=t}}
+  function saveDraft(){
+    try{
+      if(!editor)return;
+      localStorage.setItem(DRAFT_KEY,JSON.stringify({html:editor.innerHTML,savedAt:Date.now()}));
+      setState('Saved locally');
+    }catch(e){setState('Local draft unavailable')}
+  }
+  function restoreDraft(){
+    try{
+      const raw=localStorage.getItem(DRAFT_KEY);
+      if(!raw)return;
+      const d=JSON.parse(raw);
+      if(d&&typeof d.html==='string'&&d.html!==editor.innerHTML){
+        if(confirm('A local draft is available. Restore it?')){editor.innerHTML=d.html;sync();setState('Local draft restored')}
+      }
+    }catch(e){}
+  }
+  function schedule(){clearTimeout(timer);timer=setTimeout(saveDraft,700)}
+  if(editor){
+    editor.addEventListener('input',schedule);
+    window.addEventListener('beforeunload',saveDraft);
+    setTimeout(restoreDraft,250);
+  }
+})();
 let savedEditorRange=null;
 function saveEditorSelection(){const sel=window.getSelection();if(sel&&sel.rangeCount&&editor.contains(sel.anchorNode))savedEditorRange=sel.getRangeAt(0).cloneRange()}
 function restoreEditorSelection(){if(!savedEditorRange)return;try{const sel=window.getSelection();sel.removeAllRanges();sel.addRange(savedEditorRange)}catch(e){}}
