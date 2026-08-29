@@ -33,9 +33,9 @@
 </div>
 @push('styles')
 <style>
-.ff-mail-editor{border:1px solid var(--line);border-radius:15px;overflow:hidden;background:#fff;color:#1f2937;box-shadow:0 8px 30px rgba(0,0,0,.12)}
-.ff-editor-toolbar{display:flex;align-items:center;gap:3px;flex-wrap:wrap;padding:8px;border-bottom:1px solid #d8e2e6;background:#f5f8f9;position:sticky;top:0;z-index:2}
-.ff-editor-toolbar button,.ff-editor-toolbar select{height:34px;border:1px solid #d7e1e5;border-radius:7px;background:#fff;color:#334155;cursor:pointer;font-size:12px;padding:0 8px}
+.ff-mail-editor{border:1px solid var(--line);border-radius:15px;overflow:hidden;background:#fff;color:#1f2937;box-shadow:0 8px 30px rgba(0,0,0,.12);width:100%;max-width:100%;min-width:0}
+.ff-editor-toolbar{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:8px;border-bottom:1px solid #d8e2e6;background:#f5f8f9;position:sticky;top:0;z-index:2;max-width:100%;min-width:0}
+.ff-editor-toolbar button,.ff-editor-toolbar select{height:34px;border:1px solid #d7e1e5;border-radius:7px;background:#fff;color:#334155;cursor:pointer;font-size:12px;padding:0 8px;flex:0 0 auto}
 .ff-editor-toolbar button:hover,.ff-editor-toolbar select:focus{border-color:#22b8d5;background:#eefbfe}
 .ff-editor-toolbar button{min-width:34px}.ff-editor-toolbar select{max-width:130px}.ff-sep{width:1px;height:24px;background:#d5e0e4;margin:0 3px}
 .ff-color{height:34px;display:inline-flex;align-items:center;gap:4px;padding:0 5px;border:1px solid #d7e1e5;border-radius:7px;background:#fff;color:#536873;cursor:pointer}.ff-color input{width:22px;height:22px;padding:0;border:0;background:transparent;cursor:pointer}
@@ -43,8 +43,26 @@
 .ff-attachments{padding:10px 12px;border-top:1px solid #dbe5e8;background:#f8fbfc}.ff-attach-btn{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid #cbd9de;border-radius:8px;background:#fff;color:#334e58;font-size:12px;font-weight:700;cursor:pointer}.ff-attach-help{margin-left:8px;color:#78909a;font-size:11px}.ff-file-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ff-file{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:7px;background:#eaf5f8;color:#31505b;font-size:11px}.ff-file button{border:0;background:none;color:#78909a;cursor:pointer}
 .ff-editor-status{display:flex;justify-content:space-between;gap:10px;padding:7px 12px;border-top:1px solid #dbe5e8;color:#718790;background:#fbfdfe;font-size:10px}.ff-editor-status i{color:#1db58b}
 .ff-mail-editor.is-fullscreen{position:fixed;inset:12px;z-index:9999;display:flex;flex-direction:column;box-shadow:0 30px 100px rgba(0,0,0,.55)}.ff-mail-editor.is-fullscreen .ff-editor-body,.ff-mail-editor.is-fullscreen .ff-editor-source{flex:1;min-height:0}
-@media(max-width:760px){.ff-editor-toolbar{max-height:128px;overflow:auto;align-content:flex-start}.ff-editor-toolbar select{max-width:112px}.ff-editor-body{min-height:280px;padding:14px;font-size:14px;overflow:auto}.ff-attachments{padding:9px}.ff-attach-help{display:block;margin:6px 0 0}.ff-file-list{max-height:90px;overflow:auto}.ff-editor-status{font-size:9px;flex-wrap:wrap}}
-@media(max-width:420px){.ff-editor-toolbar{gap:2px;padding:6px}.ff-editor-toolbar button,.ff-editor-toolbar select,.ff-color{height:32px}.ff-editor-toolbar button{min-width:32px;padding:0 6px}.ff-editor-body{min-height:240px}}
+@media(max-width:760px){
+ .ff-editor-toolbar{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;align-content:center;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x;padding:7px}
+ .ff-editor-toolbar::-webkit-scrollbar{display:none}
+ .ff-editor-toolbar select{max-width:112px}
+ .ff-editor-body{min-height:280px;padding:14px;font-size:14px;overflow:auto;overflow-wrap:break-word;word-break:normal}
+ .ff-editor-body img{max-width:100%;height:auto}
+ .ff-editor-body table{width:100%;max-width:100%;table-layout:auto}
+ .ff-editor-body td,.ff-editor-body th{max-width:100%;overflow-wrap:break-word;word-break:normal}
+ .ff-editor-source{min-height:280px;max-width:100%;overflow:auto}
+ .ff-attachments{padding:9px}
+ .ff-attach-help{display:block;margin:6px 0 0;line-height:1.5}
+ .ff-file-list{max-height:90px;overflow:auto}
+ .ff-editor-status{font-size:9px;flex-wrap:wrap;line-height:1.5}
+}
+@media(max-width:420px){
+ .ff-editor-toolbar{gap:3px;padding:6px}
+ .ff-editor-toolbar button,.ff-editor-toolbar select,.ff-color{height:32px}
+ .ff-editor-toolbar button{min-width:32px;padding:0 6px}
+ .ff-editor-body{min-height:240px;padding:12px;font-size:13px}
+}
 </style>
 @endpush
 @push('scripts')
