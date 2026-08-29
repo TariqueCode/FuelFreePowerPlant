@@ -1,6 +1,6 @@
 @extends('webmail.layout')
 @section('content')
-<div class="hero"><div><div class="eyebrow">Mailbox</div><h1 class="title">{{ $mode === 'reply' ? 'Reply' : ($mode === 'forward' ? 'Forward' : 'Compose') }}</h1><p class="sub">Professional HTML email editor · sending from {{ $email }}.</p></div><a class="btn" href="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/inbox?folder={{ urlencode($folder ?? 'INBOX') }}"><i class="fa-solid fa-arrow-left"></i> Inbox</a></div>
+<div class="hero"><div><div class="eyebrow">Mailbox</div><h1 class="title">{{ $mode === 'reply' ? 'Reply' : ($mode === 'forward' ? 'Forward' : ($mode === 'draft' ? 'Edit Draft' : 'Compose')) }}</h1><p class="sub">Professional HTML email editor · sending from {{ $email }}.</p></div><a class="btn" href="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/inbox?folder={{ urlencode($folder ?? 'INBOX') }}"><i class="fa-solid fa-arrow-left"></i> Inbox</a></div>
 <form class="card compose" method="POST" enctype="multipart/form-data" action="{{ config('cpanel.webmail_url','https://mail.fuelfreepowerplant.com') }}/send" id="compose-form">
  @csrf
  <div class="recipient-grid">
