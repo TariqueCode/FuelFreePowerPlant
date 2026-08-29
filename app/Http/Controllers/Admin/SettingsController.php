@@ -113,6 +113,34 @@ class SettingsController
         return view('admin.settings.header', compact('settings'));
     }
 
+    public function menu(): View
+    {
+        $items = \App\Models\SiteContentItem::query()
+            ->where('type','company')->where('status','published')
+            ->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('navigation_order')->orderByDesc('created_at')
+            ->get(['id','title','slug','show_in_navigation','navigation_order']);
+        return view('admin.settings.menu', compact('items'));
+    }
+
+    public function updateMenu(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'items'=>['nullable','array'],
+            'items.*.id'=>['required','integer'],
+            'items.*.show_in_navigation'=>['nullable','boolean'],
+            'items.*.navigation_order'=>['nullable','integer','min:0','max:9999'],
+        ]);
+        $ids = collect($data['items'] ?? [])->pluck('id')->all();
+        \App\Models\SiteContentItem::query()->whereIn('id',$ids)->where('type','company')->get()->each(function ($item) use ($data) {
+            $row = collect($data['items'])->firstWhere('id',$item->id);
+            $item->show_in_navigation = (bool)($row['show_in_navigation'] ?? false);
+            $item->navigation_order = $row['navigation_order'] ?? null;
+            $item->save();
+        });
+        return back()->with('status','Global navigation saved successfully.');
+    }
+
     public function footer(): View
     {
         $keys = ['footer.tagline','footer.technology','footer.office_heading','footer.address','footer.contact_heading','footer.email','footer.phone','footer.website','footer.website_url','footer.get_in_touch_label','footer.get_in_touch_url','footer.copyright_text'];
