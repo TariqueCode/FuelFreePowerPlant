@@ -1,7 +1,7 @@
-@extends('layouts.portal')
+@extends('layouts.admin')
 @section('title','CMS')
 @section('content')
-<section class="hero"><div class="eyebrow">CONTENT MANAGEMENT</div><h1>Website Content</h1><p>Manage the dynamic public website from one control center.</p></section>
+<x-admin.page-header title="Website Content" eyebrow="CONTENT MANAGEMENT" description="Manage the dynamic public website from one control center." />
 @if(session('status'))<div class="notice">{{ session('status') }}</div>@endif
 <div class="toolbar"><div class="filters"><a class="filter active" href="{{ route('admin.cms.index') }}">All</a>@foreach(['about'=>'Company','management'=>'Management','news'=>'News','sustainability'=>'Sustainability','resource'=>'Resources','gallery'=>'Gallery'] as $slug=>$label)<a class="filter" href="{{ route('admin.cms.index',['type'=>$slug]) }}">{{ $label }}</a>@endforeach</div><a class="action" href="{{ route('admin.cms.create') }}"><i class="fa-solid fa-plus"></i> New page</a></div>
 <div class="table-card"><div class="table-wrap"><table><thead><tr><th>Title</th><th>Slug</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead><tbody>@forelse($pages as $page)<tr><td><strong>{{ $page->title }}</strong></td><td>/pages/{{ $page->slug }}</td><td><span class="badge {{ $page->is_published?'published':'draft' }}">{{ $page->is_published?'Published':'Draft' }}</span></td><td>{{ $page->updated_at->format('M d, Y H:i') }}</td><td><a class="link" href="{{ route('admin.cms.edit',$page) }}"><i class="fa-solid fa-pen-to-square"></i> Edit</a> <form class="inline" method="POST" action="{{ route('admin.cms.destroy',$page) }}" onsubmit="return confirm('Delete this page?')">@csrf @method('DELETE')<button><i class="fa-solid fa-trash-can"></i> Delete</button></form></td></tr>@empty<tr><td colspan="5" class="empty">No pages found for this category.</td></tr>@endforelse</tbody></table></div><div class="pagination">{{ $pages->links() }}</div></div>
