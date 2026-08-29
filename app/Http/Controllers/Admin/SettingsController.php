@@ -36,7 +36,7 @@ class SettingsController
             'mail.contact_account_id'=>'','mail.career_account_id'=>'',
             'header.home_label'=>'Home','header.management_label'=>'Management Team','header.gallery_label'=>'Gallery','header.news_label'=>'News & Notices',
             'header.career_label'=>'Career','header.contact_label'=>'Contact','header.webmail_label'=>'Webmail','header.portal_label'=>'Portal','header.login_label'=>'Login',
-            'footer.tagline'=>'Powering a cleaner, smarter future.','footer.technology'=>'Fuel-Free Flywheel-Based Clean Energy Technology',
+            'footer.tagline'=>'Powering a cleaner, smarter future.','footer.technology'=>'Fuel-Free Flywheel-Based Clean Energy Technology','footer.container_width'=>'1120','footer.column_gap'=>'46','footer.layout'=>'three-column',
             'footer.office_heading'=>'Office','footer.address'=>'House-141, 3rd Floor, Road-22, Mohakhali DOHS, Dhaka-1206, Bangladesh',
             'footer.contact_heading'=>'Contact','footer.email'=>'info@fuelfreepowerplant.com','footer.phone'=>'+880 1712-251892',
             'footer.website'=>'www.fuelfreepowerplant.com','footer.website_url'=>'https://www.fuelfreepowerplant.com','footer.get_in_touch_label'=>'Get in touch',
@@ -191,12 +191,12 @@ class SettingsController
 
     public function footer(): View
     {
-        $keys = ['footer.tagline','footer.technology','footer.office_heading','footer.address','footer.contact_heading','footer.email','footer.phone','footer.website','footer.website_url','footer.get_in_touch_label','footer.get_in_touch_url','footer.copyright_text'];
+        $keys = ['footer.tagline','footer.technology','footer.office_heading','footer.address','footer.contact_heading','footer.email','footer.phone','footer.website','footer.website_url','footer.get_in_touch_label','footer.get_in_touch_url','footer.copyright_text','footer.container_width','footer.column_gap','footer.layout'];
         $defaults = [
             'footer.tagline'=>'Powering a cleaner, smarter future.','footer.technology'=>'Fuel-Free Flywheel-Based Clean Energy Technology',
             'footer.office_heading'=>'Office','footer.address'=>'','footer.contact_heading'=>'Contact','footer.email'=>'info@fuelfreepowerplant.com',
             'footer.phone'=>'','footer.website'=>'www.fuelfreepowerplant.com','footer.website_url'=>'/','footer.get_in_touch_label'=>'Get in touch',
-            'footer.get_in_touch_url'=>'/contact','footer.copyright_text'=>'All rights reserved.',
+            'footer.get_in_touch_url'=>'/contact','footer.copyright_text'=>'All rights reserved.','footer.container_width'=>'1120','footer.column_gap'=>'46','footer.layout'=>'three-column',
         ];
         $settings = array_merge($defaults, SystemSetting::query()->whereIn('key',$keys)->pluck('value','key')->all());
         return view('admin.settings.footer', compact('settings'));
@@ -210,7 +210,7 @@ class SettingsController
             'footer.contact_heading'=>['required','string','max:100'],'footer.email'=>['required','email','max:255'],
             'footer.phone'=>['required','string','max:50'],'footer.website'=>['required','string','max:255'],
             'footer.website_url'=>['required','url','max:500'],'footer.get_in_touch_label'=>['required','string','max:100'],
-            'footer.get_in_touch_url'=>['required','string','max:500'],'footer.copyright_text'=>['required','string','max:255'],
+            'footer.get_in_touch_url'=>['required','string','max:500'],'footer.copyright_text'=>['required','string','max:255'],'footer.container_width'=>['required','integer','min:960','max:1400'],'footer.column_gap'=>['required','integer','min:16','max:64'],'footer.layout'=>['required','in:three-column,two-column,stacked'],
         ]);
         $this->saveSettings($data);
         return back()->with('status','Footer settings saved successfully.');
@@ -234,7 +234,7 @@ class SettingsController
         ]);
         $system = collect($data)->except(['header.height','header.container_width','header.nav_gap','header.alignment','header.sticky','header.logo_width','header.logo_gap','header.social_size','header.social_gap','header.mobile_height','header.mobile_logo_width','header.mobile_social_visible','header.mobile_sticky'])->all();
         $this->saveSettings($system);
-        foreach (['header.height','header.container_width','header.nav_gap','header.alignment','header.sticky'] as $key) {
+        foreach (['header.height','header.container_width','header.nav_gap','header.alignment','header.sticky','header.logo_width','header.logo_gap','header.social_size','header.social_gap','header.mobile_height','header.mobile_logo_width','header.mobile_social_visible','header.mobile_sticky'] as $key) {
             GlobalLayoutSetting::set($key, $data[$key] ?? null);
         }
         return back()->with('status','Header settings saved successfully.');
