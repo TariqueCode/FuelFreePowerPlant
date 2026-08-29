@@ -58,7 +58,7 @@
             <label for="mail-contact-password">Password</label>
             <input id="mail-contact-password" type="password" name="mail[contact_password]" placeholder="{{ $contactAccount ? 'Leave blank to keep the saved password' : 'Enter mailbox password' }}" autocomplete="new-password">
             <div class="mail-verify-row">
-                <button type="submit" class="mail-verify-btn" formmethod="POST" formaction="{{ route('admin.settings.mail.verify') }}" name="group" value="contact"><i class="fa-solid fa-plug-circle-check"></i> Verify Contact Login</button>
+                <button type="button" class="mail-verify-btn" data-mailbox-verify="contact"><i class="fa-solid fa-plug-circle-check"></i> Verify Contact Login</button>
                 @if(session('mail_verify_contact'))<span class="mail-verify-success"><i class="fa-solid fa-circle-check"></i> {{ session('mail_verify_contact') }}</span>@endif
             </div>
             <small>Contact replies are always sent from <strong>info@fuelfreepowerplant.com</strong>. Passwords are encrypted after saving. Verify the login before saving.</small>
@@ -71,7 +71,7 @@
             <label for="mail-career-password">Password</label>
             <input id="mail-career-password" type="password" name="mail[career_password]" placeholder="{{ $careerAccount ? 'Leave blank to keep the saved password' : 'Enter mailbox password' }}" autocomplete="new-password">
             <div class="mail-verify-row">
-                <button type="submit" class="mail-verify-btn" formmethod="POST" formaction="{{ route('admin.settings.mail.verify') }}" name="group" value="career"><i class="fa-solid fa-plug-circle-check"></i> Verify Career Login</button>
+                <button type="button" class="mail-verify-btn" data-mailbox-verify="career"><i class="fa-solid fa-plug-circle-check"></i> Verify Career Login</button>
                 @if(session('mail_verify_career'))<span class="mail-verify-success"><i class="fa-solid fa-circle-check"></i> {{ session('mail_verify_career') }}</span>@endif
             </div>
             <small>Career replies are always sent from <strong>career@fuelfreepowerplant.com</strong>. CV attachments are stored on the Help Desk server. Verify the login before saving.</small>
@@ -178,6 +178,73 @@
 
 <div class="actions"><button type="submit"><i class="fa-solid fa-floppy-disk"></i> Save all settings</button></div>
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-mailbox-verify]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const group = button.dataset.mailboxVerify;
+            const email = document.getElementById('mail-' + group + '-email');
+            const password = document.getElementById('mail-' + group + '-password');
+            const row = button.closest('.mail-verify-row');
+            let status = row?.querySelector('.mail-verify-live');
+
+            if (!email?.value.trim() || !password?.value) {
+                if (!status) {
+                    status = document.createElement('span');
+                    status.className = 'mail-verify-live';
+                    row.appendChild(status);
+                }
+                status.textContent = 'Enter the email and password first.';
+                status.classList.remove('mail-verify-success');
+                return;
+            }
+
+            button.disabled = true;
+            button.classList.add('is-loading');
+            button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+            if (!status) {
+                status = document.createElement('span');
+                status.className = 'mail-verify-live';
+                row.appendChild(status);
+            }
+            status.textContent = 'Connecting to the mailbox...';
+            status.classList.remove('mail-verify-success');
+
+            try {
+                const response = await fetch(@json(route('admin.settings.mail.verify')), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                        'Accept': 'application/json',
+                    },
+                    body: new URLSearchParams({
+                        _token: document.querySelector('input[name="_token"]').value,
+                        group,
+                        email: email.value.trim(),
+                        password: password.value,
+                    }),
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Mailbox login verification failed.');
+
+                status.textContent = data.message;
+                status.classList.add('mail-verify-success');
+                button.innerHTML = '<i class="fa-solid fa-circle-check"></i> Login Verified';
+            } catch (error) {
+                status.textContent = error.message || 'Mailbox login verification failed.';
+                status.classList.remove('mail-verify-success');
+                button.innerHTML = group === 'career'
+                    ? '<i class="fa-solid fa-plug-circle-check"></i> Verify Career Login'
+                    : '<i class="fa-solid fa-plug-circle-check"></i> Verify Contact Login';
+            } finally {
+                button.disabled = false;
+                button.classList.remove('is-loading');
+            }
+        });
+    });
+});
+</script>
 @endsection
 
 @push('styles')
