@@ -23,6 +23,8 @@
   --admin-content-max:1500px;
   --admin-sidebar:248px;
   --admin-header:64px;
+  --line:var(--admin-border);
+  --text:var(--admin-text);
 }
 .admin-page,.admin-page *{box-sizing:border-box}
 .admin-page{min-width:0;color:var(--admin-text)}
