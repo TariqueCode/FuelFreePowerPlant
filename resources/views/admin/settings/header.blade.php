@@ -2,8 +2,8 @@
 @section('title','Header Builder')
 @section('content')
 <x-admin.page-header title="Header Builder" eyebrow="APPEARANCE" description="Control the global website header labels from one place." :actions="'<a class="admin-btn" href="'.route('admin.settings').'">Settings</a>'" />
-@if(session('status'))<div class="admin-card" style="margin-bottom:16px"><div class="admin-card__body">{{ session('status') }}</div></div>@endif
-@if($errors->any())<div class="admin-card" style="margin-bottom:16px"><div class="admin-card__body">{{ $errors->first() }}</div></div>@endif
+@if(session('status'))<div class="admin-card settings-alert"><div class="admin-card__body">{{ session('status') }}</div></div>@endif
+@if($errors->any())<div class="admin-card settings-alert"><div class="admin-card__body">{{ $errors->first() }}</div></div>@endif
 <form method="POST" action="{{ route('admin.settings.header.update') }}">
 @csrf
 <x-admin.card>
