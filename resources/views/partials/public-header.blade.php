@@ -46,6 +46,14 @@
 @media(max-width:1000px) and (min-width:721px){.public-shell{width:min(1280px,calc(100% - 28px))}.public-header-top{gap:12px;min-height:58px}.public-brand img,.public-brand-fallback{width:38px;height:38px;flex-basis:38px}.public-brand-name{font-size:14px}.public-header-divider{height:36px;margin:0 5px}.public-portal{font-size:10px;padding:0 10px}.public-menu{justify-content:flex-start}.public-menu a,.public-menu a:visited,.public-menu-dropdown-toggle{font-size:11px;padding-left:8px;padding-right:8px}}
 @media(max-width:720px){.public-shell{width:calc(100% - 20px)}.public-header-top{min-height:58px;border-bottom:0}.public-header-nav{display:none;position:absolute;top:58px;left:12px;right:12px;height:auto;min-height:auto;padding:8px;background:rgba(4,18,26,.98);border:1px solid rgba(86,210,238,.15);border-radius:14px;box-shadow:0 20px 55px rgba(0,0,0,.3)}.public-header-nav.is-open{display:flex}.public-header-tools{display:flex;gap:3px}.public-socials{max-width:30vw;gap:1px}.public-social{width:28px;height:28px;border-radius:7px}.public-social i{font-size:11px}.public-header-divider{height:34px;margin:0 5px}.public-portal{min-height:30px;padding:0 8px;border-radius:8px;font-size:10px;gap:5px}.public-brand-name{font-size:14px}.public-brand img,.public-brand-fallback{width:34px;height:34px;flex-basis:34px}.public-menu-toggle{display:flex;width:38px;height:38px;border-radius:10px}.public-menu{flex-direction:column;align-items:stretch;justify-content:flex-start;overflow:visible;white-space:normal}.public-menu a,.public-menu a:visited{justify-content:flex-start;min-height:44px;padding:10px 13px;font-size:15px}}
 @media(max-width:400px){.public-brand-name{font-size:13px}.public-brand img,.public-brand-fallback{width:32px;height:32px;flex-basis:32px}.public-social{width:26px;height:26px}.public-portal span{display:none}.public-portal{width:auto;min-width:30px;padding:0 9px;justify-content:center;gap:6px}.public-portal span{display:inline-block}}
+@media(max-width:720px){
+  /* Compact mobile navigation: prevent page-specific/global styles from creating artificial gaps. */
+  .public-menu{gap:0!important;row-gap:0!important}
+  .public-menu > a,.public-menu > .public-menu-dropdown{margin:0!important}
+  .public-menu > a,.public-menu-dropdown-toggle{line-height:1.2!important}
+  .public-menu-dropdown-panel{margin:0!important;gap:0!important}
+  .public-menu-dropdown-panel a,.public-menu-dropdown-panel a:visited{margin:0!important;line-height:1.2!important;min-height:42px!important;padding:9px 13px!important}
+}
 </style>
 <header class="public-header">
     <div class="public-shell">
