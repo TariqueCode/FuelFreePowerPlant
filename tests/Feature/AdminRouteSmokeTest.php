@@ -24,6 +24,13 @@ class AdminRouteSmokeTest extends TestCase
         }
     }
 
+
+    /** @return void */
+    public function test_application_debug_defaults_to_false_in_configuration(): void
+    {
+        $this->assertFalse((bool) config('app.debug'));
+    }
+
     /** @return void */
     public function test_sensitive_routes_use_explicit_bindings_and_constraints(): void
     {
