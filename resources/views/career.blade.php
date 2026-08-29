@@ -63,7 +63,7 @@
                     <div class="career-field full career-file">
     <label for="career-cv">CV / Resume *</label>
     <input id="career-cv" type="file" name="cv" accept=".pdf,.doc,.docx" required>
-    <small>Accepted: PDF, DOC, DOCX · Maximum 50 MB. Large files upload in secure 512 KB chunks to avoid server request-size limits.</small>
+    <small>Accepted: PDF, DOC, DOCX · Maximum 50 MB. Large files upload in secure 256 KB chunks to avoid server request-size limits.</small>
     <div id="career-upload-status" class="career-upload-status" hidden>
         <div class="career-upload-top"><span id="career-upload-label">Preparing upload…</span><strong id="career-upload-percent">0%</strong></div>
         <div class="career-upload-track"><span id="career-upload-progress"></span></div>
@@ -90,7 +90,7 @@
     if(!form||!fileInput||!submit)return;
 
     const MAX_SIZE=50*1024*1024;
-    const FALLBACK_CHUNK_SIZE=512*1024;
+    const FALLBACK_CHUNK_SIZE=256*1024;
     const endpoint='{{ route('career.chunks') }}';
 
     const setProgress=(done,total,message)=>{
