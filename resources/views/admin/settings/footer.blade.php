@@ -24,7 +24,7 @@
 <div style="display:flex;justify-content:flex-end;margin-top:18px"><button class="admin-btn admin-btn--primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Footer</button></div>
 </x-admin.card></form>
 @push('head')<style>
-.footer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.admin-input{width:100%;box-sizing:border-box;min-height:38px;padding:8px 11px;border:1px solid var(--admin-border);border-radius:10px;background:rgba(255,255,255,.035);color:var(--admin-text);outline:none;font:inherit}.admin-input:focus{border-color:var(--admin-primary);box-shadow:0 0 0 3px rgba(85,204,231,.08)}
+.footer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 @media(max-width:700px){.footer-grid{grid-template-columns:1fr}}
 </style>@endpush
 @endsection
