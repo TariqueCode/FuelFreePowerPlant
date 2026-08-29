@@ -100,7 +100,9 @@
       <div class="word-group">
         <button type="button" class="word-command" id="insert-link" title="Insert link"><i class="fa-solid fa-link"></i><span>Link</span></button>
         <button type="button" class="word-command" id="upload-image" title="Upload image"><i class="fa-regular fa-image"></i><span>Picture</span></button>
+        <button type="button" class="word-command" id="insert-image-url" title="Insert image from URL"><i class="fa-solid fa-image"></i><span>Image URL</span></button>
         <button type="button" class="word-command" id="upload-video" title="Upload video"><i class="fa-solid fa-video"></i><span>Video</span></button>
+        <button type="button" class="word-command" id="insert-video-url" title="Insert video from URL"><i class="fa-solid fa-link"></i><span>Video URL</span></button>
         <button type="button" class="word-command" id="insert-table" title="Insert table"><i class="fa-solid fa-table"></i><span>Table</span></button>
         <span class="word-group-label">Media</span>
       </div>
@@ -134,7 +136,9 @@
       </div>
     </div>
   </div>
-<div id="editor" class="editor" contenteditable="true">{!! old('content',$item->content) !!}</div></div><textarea id="content-source" name="content" hidden></textarea><input id="media-input" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"><input id="gallery-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif"><input id="video-input" type="file" hidden accept="video/mp4,video/webm">@if($contentType==='gallery')<input id="gallery-batch-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">@endif</div>
+<div id="editor" class="editor" contenteditable="true">{!! old('content',$item->content) !!}</div>
+<div class="editor-tools-footer"><span class="editor-draft-state" id="editor-draft-state"><i class="fa-solid fa-cloud"></i><span>Local draft ready</span></span><span class="editor-counts" id="editor-counts">0 words • 0 characters</span></div>
+</div><textarea id="content-source" name="content" hidden></textarea><input id="media-input" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"><input id="gallery-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif"><input id="video-input" type="file" hidden accept="video/mp4,video/webm">@if($contentType==='gallery')<input id="gallery-batch-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">@endif</div>
 <div><label>{{ $contentType==='gallery' ? 'Event date &amp; time' : 'Publish date/time' }}</label><input type="datetime-local" name="published_at" value="{{ old('published_at',$item->published_at?->format('Y-m-d\\TH:i')) }}"></div>
 </div><div class="actions"><a class="back" href="{{ route('admin.site-content.index',['type'=>in_array($item->type,['news','announcement'],true)?'news':$item->type]) }}">Cancel</a><button class="save" type="submit"><i class="fa-solid fa-floppy-disk"></i> {{ $item->exists?'Save changes':'Create content' }}</button></div></form></div>
 @endsection
@@ -178,28 +182,63 @@
 @media(max-width:650px){.word-ribbon{top:70px}.word-tabs{min-height:38px}.word-tab{height:38px;font-size:10px;padding:0 13px}.editor-status{display:none}.word-panel{min-height:74px;overflow-x:auto;padding:5px 4px}.word-group{padding-left:6px;padding-right:6px}.word-command{min-width:40px;height:51px}.word-icon{width:31px;height:31px}.word-select{height:31px;font-size:10px}.format-select{width:110px}.font-select{width:105px}.size-select{width:68px}.editor{font-size:16px;line-height:1.75;padding:14px}.editor h1{font-size:28px}.editor h2{font-size:23px}.editor h3{font-size:19px}.editor table{display:block;overflow-x:auto}.editor .content-columns{grid-template-columns:1fr!important}}
 @media(max-width:420px){.word-panel{min-height:70px}.word-command{min-width:38px;height:49px;padding-left:5px;padding-right:5px}.word-command i{font-size:14px}.word-command span{font-size:8px}.word-icon{width:30px;height:30px}.word-select{font-size:9px}.format-select{width:104px}.font-select{width:98px}.size-select{width:65px}}
 
-/* Reliable horizontal touch scrolling for the Word ribbon on mobile/tablet. */
-.word-ribbon,.word-tabs,.word-panel{box-sizing:border-box}
-.word-ribbon{max-width:100%;overflow:hidden;contain:layout paint}
-.word-tabs{overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;cursor:grab}
-.word-tabs:active,.word-panel:active{cursor:grabbing}
-.word-panel{width:100%;max-width:100%;min-width:0!important;overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scrollbar-width:thin}
-.word-panel.active{display:flex;width:100%;max-width:100%;min-width:0}
+/* Final Word 365 ribbon behavior: one responsive, touch-scrollable ribbon. */
+.word-ribbon{position:sticky;top:70px;z-index:90;width:100%;max-width:100%;min-width:0;overflow:hidden;contain:layout paint}
+.word-tabs{display:flex;align-items:center;gap:2px;width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scrollbar-width:none}
+.word-tabs::-webkit-scrollbar{display:none}
+.word-panel{display:none;align-items:stretch;gap:0;width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scrollbar-width:thin}
+.word-panel.active{display:flex}
 .word-group{flex:0 0 auto}
 .word-group-row{flex:0 0 auto}
 .word-command,.word-icon,.word-select{flex:0 0 auto}
+.editor-status{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;max-width:240px;white-space:nowrap}
+.editor-shell{width:100%;max-width:100%;min-width:0;overflow:visible}
+.editor{width:100%;max-width:100%;min-width:0;overflow-wrap:anywhere;word-break:break-word}
+.editor pre{max-width:100%;overflow-x:auto;white-space:pre;padding:12px 14px;border:1px solid rgba(104,204,235,.16);border-radius:9px;background:#041017}
+.editor table{max-width:100%}
+.editor img,.editor video,.editor iframe{max-width:100%;height:auto;box-sizing:border-box}
+.editor-tools-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 12px;border-top:1px solid var(--line);background:#061923;color:#7899a5;font-size:9px}
+.editor-draft-state{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.editor-draft-state i{color:#43c2e5}
+.editor-counts{margin-left:auto;white-space:nowrap}
+@media(max-width:900px){
+  .word-ribbon{top:70px}
+  .editor-status{max-width:210px}
+}
 @media(max-width:650px){
-  .word-tabs{overflow-x:scroll!important;scroll-snap-type:x proximity}
-  .word-panel{display:flex!important;overflow-x:scroll!important;overscroll-behavior-x:contain}
-  .word-panel:not(.active){display:none!important}
-  .word-panel .word-group{flex:0 0 auto}
-  .word-ribbon{width:100%;max-width:100%;overflow:hidden}
+  .word-ribbon{top:70px}
+  .word-tabs{min-height:38px}
+  .word-tab{height:38px;font-size:10px;padding:0 13px}
+  .editor-status{display:inline-flex;max-width:150px;font-size:8px;padding:4px 6px}
+  .word-panel{min-height:74px;padding:5px 4px;overflow-x:scroll!important}
+  .word-group{padding-left:6px;padding-right:6px}
+  .word-command{min-width:40px;height:51px}
+  .word-icon{width:31px;height:31px}
+  .word-select{height:31px;font-size:10px}
+  .editor{font-size:16px;line-height:1.75;padding:14px}
+  .editor h1{font-size:28px}.editor h2{font-size:23px}.editor h3{font-size:19px}
+  .editor table{display:block;overflow-x:auto}
+  .editor .content-columns{grid-template-columns:1fr!important}
+  .editor-tools-footer{font-size:8px;padding:7px 9px}
+}
+@media(max-width:420px){
+  .editor-status{max-width:120px}
+  .editor-status .status-sep,.editor-status span:last-child{display:none}
+  .word-panel{min-height:70px}
+  .word-command{min-width:38px;height:49px;padding-left:5px;padding-right:5px}
+  .word-command i{font-size:14px}.word-command span{font-size:8px}
+  .word-icon{width:30px;height:30px}.word-select{font-size:9px}
+  .format-select{width:104px}.font-select{width:98px}.size-select{width:65px}
 }
 </style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
 const editor=document.getElementById('editor'),source=document.getElementById('content-source'),form=document.getElementById('content-form'),mediaInput=document.getElementById('media-input'),galleryInput=document.getElementById('gallery-input'),videoInput=document.getElementById('video-input'),galleryBatchInput=document.getElementById('gallery-batch-input'),galleryStatus=document.getElementById('gallery-upload-status');
-function sync(){if(source)source.value=editor.innerHTML}function exec(cmd,value=null){editor.focus();document.execCommand(cmd,false,value);sync()}document.querySelectorAll('.word-ribbon [data-cmd]').forEach(b=>b.addEventListener('click',()=>{exec(b.dataset.cmd,b.dataset.value||null);b.closest('.tool-dropdown')?.classList.remove('open');b.closest('.tool-dropdown')?.querySelector('.tool-dropdown-toggle')?.setAttribute('aria-expanded','false')}));document.querySelectorAll('.tool-dropdown-toggle').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const box=btn.closest('.tool-dropdown');document.querySelectorAll('.tool-dropdown.open').forEach(other=>{if(other!==box){other.classList.remove('open');other.querySelector('.tool-dropdown-toggle')?.setAttribute('aria-expanded','false')}});const open=box.classList.toggle('open');btn.setAttribute('aria-expanded',open?'true':'false')}));document.querySelectorAll('.tool-dropdown .tool-menu').forEach(menu=>menu.addEventListener('click',e=>e.stopPropagation()));document.addEventListener('click',()=>document.querySelectorAll('.tool-dropdown.open').forEach(box=>{box.classList.remove('open');box.querySelector('.tool-dropdown-toggle')?.setAttribute('aria-expanded','false')}));
+let savedEditorRange=null;
+function saveEditorSelection(){const sel=window.getSelection();if(sel&&sel.rangeCount&&editor.contains(sel.anchorNode))savedEditorRange=sel.getRangeAt(0).cloneRange()}
+function restoreEditorSelection(){if(!savedEditorRange)return;try{const sel=window.getSelection();sel.removeAllRanges();sel.addRange(savedEditorRange)}catch(e){}}
+function sync(){if(source)source.value=editor.innerHTML;updateEditorMetrics();saveLocalDraft()}
+function exec(cmd,value=null){restoreEditorSelection();editor.focus();document.execCommand(cmd,false,value);sync();setTimeout(updateEditorToolbarState,0)}document.querySelectorAll('.word-ribbon [data-cmd]').forEach(b=>b.addEventListener('click',()=>{exec(b.dataset.cmd,b.dataset.value||null);b.closest('.tool-dropdown')?.classList.remove('open');b.closest('.tool-dropdown')?.querySelector('.tool-dropdown-toggle')?.setAttribute('aria-expanded','false')}));document.querySelectorAll('.tool-dropdown-toggle').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const box=btn.closest('.tool-dropdown');document.querySelectorAll('.tool-dropdown.open').forEach(other=>{if(other!==box){other.classList.remove('open');other.querySelector('.tool-dropdown-toggle')?.setAttribute('aria-expanded','false')}});const open=box.classList.toggle('open');btn.setAttribute('aria-expanded',open?'true':'false')}));document.querySelectorAll('.tool-dropdown .tool-menu').forEach(menu=>menu.addEventListener('click',e=>e.stopPropagation()));document.addEventListener('click',()=>document.querySelectorAll('.tool-dropdown.open').forEach(box=>{box.classList.remove('open');box.querySelector('.tool-dropdown-toggle')?.setAttribute('aria-expanded','false')}));
 document.getElementById('insert-link').onclick=()=>{const url=prompt('URL');if(url)exec('createLink',url)};document.getElementById('insert-button').onclick=()=>{const text=prompt('Button text','Learn More');if(!text)return;const url=prompt('Button URL','/');if(!url)return;const style=prompt('Button style: primary or outline','primary')==='outline'?'cta-outline':'';exec('insertHTML',`<a class="content-cta ${style}" href="${safeAttr(url)}">${safeText(text)}</a> <span>&nbsp;</span>`)};
 document.getElementById('insert-columns').onclick=()=>{const count=Math.min(3,Math.max(2,parseInt(prompt('Number of columns (2 or 3)','2')||'2',10)));const cols=Array.from({length:count},(_,i)=>`<div class="content-column"><h3>Column ${i+1}</h3><p>Click here to edit this content.</p></div>`).join('');exec('insertHTML',`<div class="content-columns cols-${count}">${cols}</div><p></p>`)};
 function safeText(v){return String(v).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]))}function safeAttr(v){return String(v).replace(/[<>"']/g,ch=>({'<':'%3C','>':'%3E','"':'%22',"'":'%27'}[ch]))}
@@ -221,10 +260,85 @@ document.getElementById('insert-facebook').onclick=()=>{const url=prompt('Facebo
 document.getElementById('insert-gallery').onclick=()=>galleryInput.click();galleryInput.onchange=async()=>{const files=[...galleryInput.files];if(!files.length)return;try{const uploads=await Promise.all(files.map(upload));exec('insertHTML','<div class="media-gallery">'+uploads.map(d=>`<img src="${d.url}" alt="${safeName(d.name)}" loading="lazy">`).join('')+'</div>')}catch(e){alert(e.message)}galleryInput.value=''};
 if(galleryBatchInput){document.getElementById('gallery-batch-upload').onclick=()=>galleryBatchInput.click();galleryBatchInput.onchange=async()=>{const files=[...galleryBatchInput.files];if(!files.length)return;galleryStatus.textContent=`Uploading ${files.length} media files...`;try{const uploads=await Promise.all(files.map(upload));const html=uploads.map(d=>d.mime.startsWith('video/')?`<video controls preload="metadata" src="${d.url}"></video>`:`<img src="${d.url}" alt="${safeName(d.name)}" loading="lazy">`).join('');exec('insertHTML',`<div class="media-gallery">${html}</div>`);galleryStatus.textContent=`${uploads.length} files added successfully.`}catch(e){galleryStatus.textContent=e.message;alert(e.message)}galleryBatchInput.value=''}}
 form.addEventListener('submit',sync);editor.addEventListener('input',sync);
-function updateEditorToolbarState(){try{['bold','italic','underline','strikeThrough','insertUnorderedList','insertOrderedList'].forEach(c=>{document.querySelectorAll('.editor-toolbar [data-cmd="'+c+'"]').forEach(b=>b.classList.toggle('active',document.queryCommandState(c)))});const n=document.queryCommandValue('fontName').replaceAll('"','');const fs=document.getElementById('font-name');if(fs&&n){const opt=[...fs.options].find(o=>n.toLowerCase().includes(o.value.toLowerCase()));if(opt)fs.value=opt.value}}catch(e){}}
-editor.addEventListener('keyup',updateEditorToolbarState);editor.addEventListener('mouseup',updateEditorToolbarState);document.addEventListener('selectionchange',()=>{if(editor.contains(document.activeElement)||editor===document.activeElement)updateEditorToolbarState()});
-document.querySelectorAll('[data-editor-tab]').forEach(tab=>tab.addEventListener('click',()=>{const name=tab.dataset.editorTab;document.querySelectorAll('[data-editor-tab]').forEach(t=>{const active=t.dataset.editorTab===name;t.classList.toggle('active',active);t.setAttribute('aria-selected',active?'true':'false')});document.querySelectorAll('[data-editor-panel]').forEach(p=>p.classList.toggle('active',p.dataset.editorPanel===name))}));
-sync();updateEditorToolbarState();
+function currentEditorBlock(){
+  const sel=window.getSelection();let n=sel&&sel.rangeCount?sel.anchorNode:null;
+  if(!n||!editor.contains(n))return null;if(n.nodeType===3)n=n.parentElement;
+  while(n&&n!==editor){if(/^(P|DIV|H1|H2|H3|H4|H5|H6|BLOCKQUOTE|PRE|LI)$/.test(n.tagName))return n;n=n.parentElement}
+  return null;
+}
+function updateEditorToolbarState(){
+  const block=currentEditorBlock(), tag=block?.tagName?.toLowerCase()||'p';
+  const format=document.getElementById('block-format');
+  if(format){const allowed=['p','h1','h2','h3','h4','h5','h6','blockquote','pre'];format.value=allowed.includes(tag)?tag:'p'}
+  const font=document.getElementById('font-name');
+  try{
+    const n=(document.queryCommandValue('fontName')||'').replaceAll('"','');
+    if(font&&n){const opt=[...font.options].find(o=>n.toLowerCase().includes(o.value.toLowerCase()));if(opt)font.value=opt.value}
+  }catch(e){}
+  const size=document.getElementById('font-size');
+  try{const v=String(document.queryCommandValue('fontSize')||'');if(size)size.value=['2','3','4','5','6'].includes(v)?v:''}catch(e){}
+  const commands=['bold','italic','underline','strikeThrough','insertUnorderedList','insertOrderedList','justifyLeft','justifyCenter','justifyRight','justifyFull'];
+  commands.forEach(cmd=>document.querySelectorAll('.word-ribbon [data-cmd="'+cmd+'"]').forEach(btn=>{
+    let active=false;try{active=document.queryCommandState(cmd)}catch(e){}
+    btn.classList.toggle('active',!!active);btn.setAttribute('aria-pressed',active?'true':'false')
+  }));
+  const px=block?getComputedStyle(block).fontSize:'—';
+  let label=tag==='p'?'Paragraph':tag==='blockquote'?'Quote':tag==='pre'?'Code':tag.toUpperCase();
+  const status=document.getElementById('editor-format-status');
+  if(status)status.innerHTML='<strong>'+label+'</strong><span class="status-sep">•</span><span>'+px+'</span>';
+}
+function updateEditorMetrics(){
+  const text=editor.innerText.replace(/\\s+/g,' ').trim();
+  const words=text?text.split(/\\s+/).length:0,chars=text.length;
+  const el=document.getElementById('editor-counts');if(el)el.textContent=words+' words • '+chars+' characters';
+}
+const DRAFT_KEY='fuelfree_admin_cms_draft_'+location.pathname;
+let draftTimer=null;
+function setDraftState(message,icon='fa-cloud'){const el=document.getElementById('editor-draft-state');if(el)el.innerHTML='<i class="fa-solid '+icon+'"></i><span>'+message+'</span>'}
+function saveLocalDraft(){
+  if(sourceMode)return;
+  clearTimeout(draftTimer);
+  draftTimer=setTimeout(()=>{
+    try{
+      localStorage.setItem(DRAFT_KEY,JSON.stringify({html:editor.innerHTML,updatedAt:Date.now()}));
+      setDraftState('Saved locally','fa-cloud-check');
+    }catch(e){setDraftState('Local draft unavailable','fa-triangle-exclamation')}
+  },350);
+}
+function restoreLocalDraft(){
+  try{
+    const raw=localStorage.getItem(DRAFT_KEY);if(!raw)return;
+    const d=JSON.parse(raw);if(!d?.html||d.html===editor.innerHTML)return;
+    const when=d.updatedAt?new Date(d.updatedAt).toLocaleString():'recently';
+    if(confirm('A local draft from '+when+' was found. Restore it?')){editor.innerHTML=d.html;sync();setDraftState('Draft restored','fa-clock-rotate-left')}
+  }catch(e){}
+}
+function clearLocalDraft(){try{localStorage.removeItem(DRAFT_KEY)}catch(e){}}
+form.addEventListener('submit',()=>{sync();clearLocalDraft()});
+window.addEventListener('beforeunload',()=>{saveLocalDraft();});
+editor.addEventListener('input',()=>{saveEditorSelection();sync();updateEditorToolbarState()});
+editor.addEventListener('keyup',()=>{saveEditorSelection();updateEditorToolbarState()});
+editor.addEventListener('mouseup',()=>{saveEditorSelection();updateEditorToolbarState()});
+editor.addEventListener('focus',()=>{saveEditorSelection();updateEditorToolbarState()});
+document.addEventListener('selectionchange',()=>{const sel=window.getSelection();if(sel&&sel.rangeCount&&editor.contains(sel.anchorNode)){savedEditorRange=sel.getRangeAt(0).cloneRange();updateEditorToolbarState()}});
+document.querySelectorAll('[data-editor-tab]').forEach(tab=>tab.addEventListener('click',()=>{
+  const name=tab.dataset.editorTab;
+  document.querySelectorAll('[data-editor-tab]').forEach(t=>{const active=t.dataset.editorTab===name;t.classList.toggle('active',active);t.setAttribute('aria-selected',active?'true':'false')});
+  document.querySelectorAll('[data-editor-panel]').forEach(p=>p.classList.toggle('active',p.dataset.editorPanel===name));
+}));
+document.querySelectorAll('.word-ribbon button,.word-ribbon select,.word-ribbon input[type=color]').forEach(control=>{
+  control.addEventListener('mousedown',e=>{saveEditorSelection();if(control.tagName!=='SELECT'&&control.type!=='color')e.preventDefault()},true);
+});
+document.getElementById('block-format').addEventListener('change',e=>{restoreEditorSelection();editor.focus();document.execCommand('formatBlock',false,e.target.value);sync();updateEditorToolbarState()});
+document.getElementById('font-name').addEventListener('change',e=>{restoreEditorSelection();editor.focus();document.execCommand('fontName',false,e.target.value);sync();updateEditorToolbarState()});
+document.getElementById('font-size').addEventListener('change',e=>{if(!e.target.value)return;restoreEditorSelection();editor.focus();document.execCommand('fontSize',false,e.target.value);sync();updateEditorToolbarState()});
+document.getElementById('text-color').addEventListener('input',e=>{restoreEditorSelection();editor.focus();document.execCommand('foreColor',false,e.target.value);sync();updateEditorToolbarState()});
+document.getElementById('highlight-color').addEventListener('input',e=>{restoreEditorSelection();editor.focus();document.execCommand('hiliteColor',false,e.target.value);sync();updateEditorToolbarState()});
+document.getElementById('insert-image-url').onclick=()=>{const url=prompt('Image URL');if(url){restoreEditorSelection();editor.focus();document.execCommand('insertHTML',false,'<img src="'+safeAttr(url)+'" alt="Image" loading="lazy">');sync()}};
+document.getElementById('insert-video-url').onclick=()=>{const url=prompt('Video URL');if(url){restoreEditorSelection();editor.focus();document.execCommand('insertHTML',false,'<video controls preload="metadata" src="'+safeAttr(url)+'"></video>');sync()}};
+document.querySelectorAll('.word-ribbon [data-cmd]').forEach(b=>b.addEventListener('click',()=>{setTimeout(updateEditorToolbarState,0)}));
+updateEditorMetrics();updateEditorToolbarState();setTimeout(restoreLocalDraft,80);
+
 
 const publicationType=document.getElementById('publication-type');
 document.querySelectorAll('[data-publication-type]').forEach(btn=>btn.addEventListener('click',()=>{
@@ -264,130 +378,23 @@ function bindAttachmentRemove(){
 }
 if(attachmentInput){document.getElementById('attachment-upload').onclick=()=>attachmentInput.click();attachmentInput.onchange=async()=>{const file=attachmentInput.files[0];if(!file)return;try{await uploadAttachment(file)}catch(e){attachmentStatus.textContent=e.message;attachmentProgress.classList.remove('show');alert(e.message)}attachmentInput.value=''};bindAttachmentRemove();}
 
-/* Word-like editor behavior layer */
+/* Word/Microsoft Word-style block behavior. */
 (function(){
-  const ed=document.getElementById('editor');
-  const bar=document.querySelector('.editor-toolbar');
-  if(!ed||!bar)return;
-  let savedRange=null;
-
-  function saveSelection(){
-    const sel=window.getSelection();
-    if(!sel||!sel.rangeCount)return;
-    const r=sel.getRangeAt(0);
-    if(ed.contains(r.commonAncestorContainer))savedRange=r.cloneRange();
-  }
-  function restoreSelection(){
-    if(!savedRange)return;
-    try{
-      const sel=window.getSelection();sel.removeAllRanges();sel.addRange(savedRange);
-    }catch(e){}
-  }
-  function currentBlock(){
-    const sel=window.getSelection();
-    let n=sel&&sel.rangeCount?sel.anchorNode:null;
-    if(!n)return null;
-    if(n.nodeType===3)n=n.parentElement;
-    while(n&&n!==ed){
-      if(/^(P|DIV|H1|H2|H3|H4|H5|H6|BLOCKQUOTE|LI)$/.test(n.tagName))return n;
-      n=n.parentElement;
-    }
-    return null;
-  }
-  function pxFromSize(v){
-    const map={1:'10px',2:'13px',3:'16px',4:'18px',5:'24px',6:'32px',7:'48px'};
-    return map[String(v)]||'—';
-  }
-  function updateState(){
-    const block=currentBlock();
-    const tag=block?.tagName?.toLowerCase()||'p';
-    const format=document.getElementById('block-format');
-    if(format){
-      const allowed=['p','h1','h2','h3','h4','h5','h6','blockquote'];
-      format.value=allowed.includes(tag)?tag:'p';
-    }
-    const size=document.getElementById('font-size');
-    let fs='';
-    try{fs=document.queryCommandValue('fontSize')||''}catch(e){}
-    if(size && ['2','3','4','5','6'].includes(String(fs)))size.value=String(fs); else if(size)size.value='';
-    const b=bar.querySelector('[data-cmd="bold"]'),i=bar.querySelector('[data-cmd="italic"]'),u=bar.querySelector('[data-cmd="underline"]');
-    [['bold',b],['italic',i],['underline',u]].forEach(([cmd,btn])=>{
-      if(!btn)return;let active=false;try{active=document.queryCommandState(cmd)}catch(e){}
-      btn.classList.toggle('active',!!active);btn.setAttribute('aria-pressed',active?'true':'false');
-    });
-    let px='—';
-    if(block){const computed=getComputedStyle(block);px=computed.fontSize||'—'}
-    let label=tag==='p'?'Paragraph':tag.toUpperCase();
-    if(tag==='blockquote')label='Quote';
-    const status=document.getElementById('editor-format-status');
-    if(status)status.innerHTML='<strong>'+label+'</strong><span class="status-sep">•</span><span>'+px+'</span>';
-  }
-
-  // Preserve the selection before toolbar controls take focus.
-  bar.addEventListener('mousedown',function(e){
-    if(e.target.closest('button,select,input'))saveSelection();
-  },true);
-
-  // Patch command execution so formatting applies to the saved selection.
-  bar.querySelectorAll('[data-cmd]').forEach(btn=>{
-    btn.addEventListener('click',function(){
-      restoreSelection();
-      ed.focus();
-      setTimeout(updateState,0);
-    },true);
-  });
-  ['block-format','font-size','text-color','highlight-color'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el)el.addEventListener('change',()=>{restoreSelection();ed.focus();setTimeout(updateState,0)},true);
-  });
-
-  // After a heading/list/quote, Enter creates a fresh paragraph instead of inheriting the block.
+  const ed=editor;
   ed.addEventListener('keydown',function(e){
     if(e.key!=='Enter'||e.shiftKey)return;
-    const block=currentBlock();
-    if(!block)return;
+    const block=currentEditorBlock();if(!block)return;
     const tag=block.tagName;
-    if(/^H[1-6]$/.test(tag)||tag==='BLOCKQUOTE'){
+    if(/^H[1-6]$/.test(tag)||tag==='BLOCKQUOTE'||tag==='PRE'){
       setTimeout(function(){
-        const next=currentBlock();
-        if(next && next!==block && (/^H[1-6]$/.test(next.tagName)||next.tagName==='BLOCKQUOTE') && !next.textContent.trim()){
-          const p=document.createElement('p');p.innerHTML='<br>';
-          next.replaceWith(p);
+        const next=currentEditorBlock();
+        if(next&&next!==block&&(/^(H[1-6])$/.test(next.tagName)||next.tagName==='BLOCKQUOTE'||next.tagName==='PRE')&&!next.textContent.trim()){
+          const p=document.createElement('p');p.innerHTML='<br>';next.replaceWith(p);
           const range=document.createRange();range.selectNodeContents(p);range.collapse(true);
-          const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);savedRange=range.cloneRange();sync();updateState();
+          const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);savedEditorRange=range.cloneRange();sync();updateEditorToolbarState();
         }
       },0);
     }
   });
-
-  // Ensure an explicit Paragraph selection is always a real paragraph.
-  const format=document.getElementById('block-format');
-  if(format)format.addEventListener('change',function(){
-    if(this.value!=='p')return;
-    restoreSelection();
-    const block=currentBlock();
-    if(block && block.tagName!=='P'){
-      document.execCommand('formatBlock',false,'p');
-      sync();updateState();
-    }
-  },true);
-
-  // Dynamic status indicator: format + current rendered font size.
-  if(!document.getElementById('editor-format-status')){
-    const status=document.createElement('span');
-    status.id='editor-format-status';
-    status.className='editor-status';
-    status.setAttribute('aria-live','polite');
-    status.innerHTML='<strong>Paragraph</strong><span class="status-sep">•</span><span>—</span>';
-    bar.appendChild(status);
-  }
-
-  document.addEventListener('selectionchange',function(){
-    const sel=window.getSelection();
-    if(sel&&sel.rangeCount&&ed.contains(sel.anchorNode)){savedRange=sel.getRangeAt(0).cloneRange();updateState();}
-  });
-  ['keyup','mouseup','input','focus'].forEach(ev=>ed.addEventListener(ev,function(){saveSelection();updateState()}));
-  window.addEventListener('resize',updateState);
-  setTimeout(updateState,50);
 })();
 </script>@endpush
