@@ -22,7 +22,8 @@ class HelpDeskController extends Controller
     {
         $items = collect();
 
-        Inquiry::query()->latest()->get()->each(function ($item) use ($items) {
+        // Keep the unified Help Desk inbox responsive as records grow: load only the fields needed for the list.
+        Inquiry::query()->select(['id','name','email','subject','message','status','created_at'])->latest()->get()->each(function ($item) use ($items) {
             $items->push((object) [
                 'type'=>'contact','channel'=>'contact','id'=>$item->id,'name'=>$item->name,'email'=>$item->email,
                 'subject'=>$item->subject ?: '(No subject)','message'=>$item->message,'status'=>$item->status,
@@ -30,7 +31,7 @@ class HelpDeskController extends Controller
             ]);
         });
 
-        CareerApplication::query()->latest()->get()->each(function ($item) use ($items) {
+        CareerApplication::query()->select(['id','name','email','position','message','status','created_at'])->latest()->get()->each(function ($item) use ($items) {
             $items->push((object) [
                 'type'=>'career','channel'=>'career','id'=>$item->id,'name'=>$item->name,'email'=>$item->email,
                 'subject'=>'Career application'.($item->position ? ': '.$item->position : ''),
@@ -39,7 +40,7 @@ class HelpDeskController extends Controller
             ]);
         });
 
-        HelpdeskEmail::query()->latest('received_at')->get()->each(function ($item) use ($items) {
+        HelpdeskEmail::query()->select(['id','mailbox_group','sender_name','sender_email','subject','body_text','status','received_at','created_at'])->latest('received_at')->get()->each(function ($item) use ($items) {
             $items->push((object) [
                 'type'=>'email','channel'=>$item->mailbox_group,'id'=>$item->id,
                 'name'=>$item->sender_name ?: $item->sender_email,'email'=>$item->sender_email,
