@@ -94,7 +94,8 @@
         <i class="fa-solid fa-house-laptop"></i>
     </div>
 
-    <div class="home-options">
+    <input type="hidden" name="home[hero_enabled]" value="0"><input type="hidden" name="home[statistics_enabled]" value="0"><input type="hidden" name="home[projects_enabled]" value="0"><input type="hidden" name="home[cta_enabled]" value="0">
+<div class="home-options">
         @foreach([
             'slider_enabled'=>['Slider','Rotating company highlights at the top.','fa-images',null],
             'welcome_enabled'=>['Welcome message','Company introduction displayed below the slider.','fa-envelope',null],
