@@ -68,7 +68,7 @@
 </section>
 
 <dialog id="folder-modal"><form method="POST" action="{{ route('admin.documents.folders.store') }}">@csrf<h2>New folder</h2><p>Create a folder inside the current location.</p><input name="name" placeholder="Folder name" maxlength="150" required>@if($folder)<input type="hidden" name="parent_id" value="{{ $folder->id }}">@endif<div class="modal-actions"><button type="button" onclick="this.closest('dialog').close()">Cancel</button><button class="primary" type="submit">Create folder</button></div></form></dialog>
-<dialog id="upload-modal"><form method="POST" action="{{ route('admin.documents.store') }}" enctype="multipart/form-data">@csrf<h2>Upload files</h2><p>Select a file up to 50 MB.</p><input id="file-upload-input" type="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.zip,.jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.mov" required>@if($folder)<input type="hidden" name="folder_id" value="{{ $folder->id }}">@endif<div class="modal-note">Maximum file size: 50 MB. Upload sessions expire after 2 hours. Available storage and server limits still apply.</div><div class="modal-actions"><button type="button" onclick="this.closest('dialog').close()">Cancel</button><button class="primary" type="submit">Upload securely</button></div></form></dialog>
+<dialog id="upload-modal"><form method="POST" action="{{ route('admin.documents.store') }}" enctype="multipart/form-data">@csrf<h2>Upload files</h2><p>Select a file up to {{ $maxUploadMb ?? 50 }} MB.</p><input id="file-upload-input" type="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.zip,.jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.mov" required>@if($folder)<input type="hidden" name="folder_id" value="{{ $folder->id }}">@endif<div class="modal-note">Maximum file size: {{ $maxUploadMb ?? 50 }} MB. Upload sessions expire after 2 hours. Available storage and server limits still apply.</div><div class="modal-actions"><button type="button" onclick="this.closest('dialog').close()">Cancel</button><button class="primary" type="submit">Upload securely</button></div></form></dialog>
 
 @foreach($folders as $item)
 <dialog id="rename-folder-{{ $item->id }}"><form method="POST" action="{{ route('admin.documents.folders.rename', $item) }}">@csrf @method('PATCH')<h2>Rename folder</h2><input name="name" value="{{ $item->name }}" maxlength="150" required><div class="modal-actions"><button type="button" onclick="this.closest('dialog').close()">Cancel</button><button class="primary">Save</button></div></form></dialog>
@@ -88,7 +88,7 @@
 @push('scripts')
 <script>
 document.getElementById('file-upload-input')?.addEventListener('change', function () {
-    const max = 50 * 1024 * 1024;
+    const max = {{ ((int) ($maxUploadMb ?? 50)) * 1024 * 1024 }};
     const file = this.files?.[0];
     if (file && file.size > max) {
         this.value = '';
