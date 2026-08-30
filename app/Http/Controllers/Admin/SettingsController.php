@@ -20,7 +20,7 @@ class SettingsController
         $defaults=[
             'company.name'=>config('fuelfree.company.name'),'company.domain'=>config('fuelfree.company.domain'),'company.tagline'=>config('fuelfree.company.tagline'),
             'company.timezone'=>config('fuelfree.company.timezone'),'company.logo_path'=>'',
-            'storage.quota_gib'=>(string)round(config('fuelfree.storage.quota_bytes',53687091200)/1073741824),'home.news_limit'=>'3','home.gallery_limit'=>'4',
+            'storage.quota_gib'=>(string)round(config('fuelfree.storage.quota_bytes',53687091200)/1073741824),'uploads.max_mb'=>(string)config('fuelfree.upload.max_mb',50),'home.news_limit'=>'3','home.gallery_limit'=>'4',
             'mail.contact_account_id'=>'','mail.career_account_id'=>'',
             'header.home_label'=>'Home','header.management_label'=>'Management Team','header.gallery_label'=>'Gallery','header.news_label'=>'News & Notices',
             'header.career_label'=>'Career','header.contact_label'=>'Contact','header.webmail_label'=>'Webmail','header.portal_label'=>'Portal','header.login_label'=>'Login',
@@ -105,7 +105,7 @@ class SettingsController
     {
         $validated=$request->validate([
             'company.name'=>['required','string','max:150'],'company.domain'=>['required','string','max:255'],'company.tagline'=>['nullable','string','max:255'],
-            'company.timezone'=>['required','timezone'],'storage.quota_gib'=>['required','numeric','min:1','max:1048576'],
+            'company.timezone'=>['required','timezone'],'storage.quota_gib'=>['required','numeric','min:1','max:1048576'],'uploads.max_mb'=>['required','integer','min:1','max:2048'],
             'home.news_limit'=>['required','integer','min:1','max:12'],'home.gallery_limit'=>['required','integer','min:1','max:12'],
             'home.slider_enabled'=>['nullable','boolean'],'home.welcome_enabled'=>['nullable','boolean'],'home.news_enabled'=>['nullable','boolean'],'home.gallery_enabled'=>['nullable','boolean'],'home.hero_enabled'=>['nullable','boolean'],'home.statistics_enabled'=>['nullable','boolean'],'home.projects_enabled'=>['nullable','boolean'],'home.cta_enabled'=>['nullable','boolean'],
             'mail.contact_email'=>['nullable','email:rfc,dns','ends_with:@fuelfreepowerplant.com','max:255'],'mail.contact_password'=>['nullable','string','max:1000'],
@@ -119,7 +119,7 @@ class SettingsController
 
         $data=[
             'company.name'=>data_get($validated,'company.name'),'company.domain'=>data_get($validated,'company.domain'),'company.tagline'=>data_get($validated,'company.tagline'),
-            'company.timezone'=>data_get($validated,'company.timezone'),'storage.quota_gib'=>data_get($validated,'storage.quota_gib'),
+            'company.timezone'=>data_get($validated,'company.timezone'),'storage.quota_gib'=>data_get($validated,'storage.quota_gib'),'uploads.max_mb'=>data_get($validated,'uploads.max_mb'),
             'home.news_limit'=>data_get($validated,'home.news_limit'),'home.gallery_limit'=>data_get($validated,'home.gallery_limit'),
             'home.slider_enabled'=>$request->boolean('home.slider_enabled')?'1':'0','home.welcome_enabled'=>$request->boolean('home.welcome_enabled')?'1':'0',
             'home.news_enabled'=>$request->boolean('home.news_enabled')?'1':'0','home.gallery_enabled'=>$request->boolean('home.gallery_enabled')?'1':'0','home.hero_enabled'=>$request->boolean('home.hero_enabled')?'1':'0','home.statistics_enabled'=>$request->boolean('home.statistics_enabled')?'1':'0','home.projects_enabled'=>$request->boolean('home.projects_enabled')?'1':'0','home.cta_enabled'=>$request->boolean('home.cta_enabled')?'1':'0',
