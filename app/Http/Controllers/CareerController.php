@@ -26,7 +26,8 @@ class CareerController extends Controller
             ->whereIn('type', ['career','careers','job'])
             ->orderBy('sort_order')->orderBy('title')->get();
 
-        return view('career', compact('brand','page'));
+        $maxUploadMb = $this->maxUploadMb();
+        return view('career', compact('brand','page','maxUploadMb'));
     }
 
     public function store(Request $request): RedirectResponse
