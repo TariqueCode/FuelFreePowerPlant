@@ -4,6 +4,7 @@ use App\Models\HomepageSection;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -34,7 +35,7 @@ return new class extends Migration
 
         $savedOrder = [];
         if (Schema::hasTable('system_settings')) {
-            $saved = IlluminateSupportFacades\DB::table('system_settings')
+            $saved = DB::table('system_settings')
                 ->whereIn('key', [
                     'home.section_order','home.hero_enabled','home.welcome_enabled','home.statistics_enabled',
                     'home.projects_enabled','home.news_enabled','home.gallery_enabled','home.cta_enabled',
@@ -55,7 +56,7 @@ return new class extends Migration
             if (isset($saved[$enabledKey])) {
                 $enabled = filter_var($saved[$enabledKey], FILTER_VALIDATE_BOOLEAN);
             }
-            App\Models\HomepageSection::query()->create([
+            HomepageSection::query()->create([
                 'key' => $sectionKey,
                 'label' => $label,
                 'description' => $description,
