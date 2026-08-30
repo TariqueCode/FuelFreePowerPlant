@@ -21,14 +21,29 @@ jobs:
           extensions: mbstring, sqlite3, pdo_sqlite
           coverage: none
 
-      - name: Lint application PHP
+      - name: Lint controllers
         shell: bash
         run: |
           set -euo pipefail
-          while IFS= read -r -d '' file; do
-            echo "Linting $file"
-            php -l "$file"
-          done < <(find app -type f -name '*.php' -print0)
+          while IFS= read -r -d '' file; do echo "Linting $file"; php -l "$file"; done < <(find app/Http/Controllers -type f -name '*.php' -print0)
+
+      - name: Lint middleware
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do echo "Linting $file"; php -l "$file"; done < <(find app/Http/Middleware -type f -name '*.php' -print0)
+
+      - name: Lint models and services
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do echo "Linting $file"; php -l "$file"; done < <(find app/Models app/Services app/Support -type f -name '*.php' -print0)
+
+      - name: Lint console and remaining app PHP
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do echo "Linting $file"; php -l "$file"; done < <(find app/Console -type f -name '*.php' -print0)
 
       - name: Lint config and routes
         shell: bash
