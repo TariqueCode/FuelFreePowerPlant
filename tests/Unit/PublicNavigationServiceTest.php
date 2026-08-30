@@ -17,14 +17,14 @@ class PublicNavigationServiceTest extends TestCase
         Cache::forget('public.navigation.main');
 
         $folder = NavigationMenuItem::create([
-            'menu' => 'main',
+            'menu' => 'test-navigation',
             'label' => 'Company',
             'is_visible' => true,
             'sort_order' => 0,
         ]);
 
         $subFolder = NavigationMenuItem::create([
-            'menu' => 'main',
+            'menu' => 'test-navigation',
             'parent_id' => $folder->id,
             'label' => 'Projects',
             'is_visible' => true,
@@ -32,7 +32,7 @@ class PublicNavigationServiceTest extends TestCase
         ]);
 
         $page = NavigationMenuItem::create([
-            'menu' => 'main',
+            'menu' => 'test-navigation',
             'parent_id' => $subFolder->id,
             'label' => 'Future Project',
             'url' => '/future-project',
@@ -41,7 +41,7 @@ class PublicNavigationServiceTest extends TestCase
         ]);
 
         $hidden = NavigationMenuItem::create([
-            'menu' => 'main',
+            'menu' => 'test-navigation',
             'parent_id' => $folder->id,
             'label' => 'Hidden',
             'url' => '/hidden',
@@ -49,7 +49,7 @@ class PublicNavigationServiceTest extends TestCase
             'sort_order' => 1,
         ]);
 
-        $tree = app(PublicNavigationService::class)->tree('main');
+        $tree = app(PublicNavigationService::class)->tree('test-navigation');
 
         $this->assertCount(1, $tree);
         $this->assertSame($folder->id, $tree->first()->id);
