@@ -62,7 +62,7 @@ class DocumentController extends Controller
         if ($uploadId === '') {
             $data = $request->validate([
                 'filename' => ['required', 'string', 'max:255'],
-                'size' => ['required', 'integer', 'min:1'],
+                'size' => ['required', 'integer', 'min:1', 'max:52428800'],
                 'folder_id' => ['nullable', 'integer', 'exists:document_folders,id'],
             ]);
             if (! empty($data['folder_id']) && ! DocumentFolder::whereKey($data['folder_id'])->where('user_id', $user->id)->exists()) abort(403);
@@ -96,6 +96,7 @@ class DocumentController extends Controller
         if ($request->boolean('finalize')) {
             $currentSize = Storage::disk('local')->exists($partPath) ? Storage::disk('local')->size($partPath) : 0;
             abort_unless($currentSize === (int) $meta['size'], 422, 'The upload is incomplete.');
+            abort_if((int) $meta['size'] > 52428800, 422, 'The file exceeds the 50 MB limit.');
             $extension = strtolower(pathinfo($meta['filename'], PATHINFO_EXTENSION));
             $storedName = (string) str()->uuid().($extension ? '.'.$extension : '');
             $finalPath = "private/{$user->id}/{$storedName}";
