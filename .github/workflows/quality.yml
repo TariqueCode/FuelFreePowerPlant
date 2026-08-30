@@ -39,11 +39,12 @@ jobs:
           set -euo pipefail
           while IFS= read -r -d '' file; do echo "Linting $file"; php -l "$file"; done < <(find app/Models app/Services app/Support -type f -name '*.php' -print0)
 
-      - name: Lint console and remaining app PHP
-        shell: bash
-        run: |
-          set -euo pipefail
-          while IFS= read -r -d '' file; do echo "Linting $file"; php -l "$file"; done < <(find app/Console -type f -name '*.php' -print0)
+      - name: Lint Cleanup command
+        run: php -l app/Console/Commands/CleanupUploadSessions.php
+      - name: Lint admin creation command
+        run: php -l app/Console/Commands/CreateFuelFreeAdmin.php
+      - name: Lint helpdesk sync command
+        run: php -l app/Console/Commands/SyncHelpdeskMail.php
 
       - name: Lint config and routes
         shell: bash
