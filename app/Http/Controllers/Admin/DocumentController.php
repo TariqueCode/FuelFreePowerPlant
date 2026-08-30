@@ -23,7 +23,8 @@ class DocumentController extends Controller
         $documents = Document::query()->where('user_id', $user->id)->where('folder_id', $folder?->id)->when($search !== '', fn ($query) => $query->where('original_name', 'like', "%{$search}%"))->latest()->paginate(20)->withQueryString();
         $storageFiles = Storage::disk('local')->allFiles("private/{$user->id}"); $usedBytes = collect($storageFiles)->sum(fn ($file) => (int) Storage::disk('local')->size($file));
         $quotaBytes = (int) config('fuelfree.storage.quota_bytes', 50 * 1024 * 1024 * 1024); $availableBytes = max(0, $quotaBytes - $usedBytes); $usedPercent = $quotaBytes > 0 ? min(100, round(($usedBytes / $quotaBytes) * 100, 1)) : 0;
-        return view('admin.documents.index', compact('folder', 'folders', 'allFolders', 'documents', 'search', 'usedBytes', 'availableBytes', 'quotaBytes', 'usedPercent'));
+        $maxUploadMb = (int) ($this->maxUploadBytes() / 1048576);
+        return view('admin.documents.index', compact('folder', 'folders', 'allFolders', 'documents', 'search', 'usedBytes', 'availableBytes', 'quotaBytes', 'usedPercent', 'maxUploadMb'));
     }
 
     public function storeFolder(Request $request): RedirectResponse
