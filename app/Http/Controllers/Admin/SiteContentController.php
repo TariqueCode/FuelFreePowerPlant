@@ -127,7 +127,7 @@ class SiteContentController extends Controller
 
     public function uploadMedia(Request $request): JsonResponse
     {
-        $data = $request->validate(['media'=>['required','file','mimes:jpg,jpeg,png,webp,gif,mp4,webm,mov','max:102400']]);
+        $data = $request->validate(['media'=>['required','file','mimes:jpg,jpeg,png,webp,gif,mp4,webm,mov','max:'.$this->maxUploadKb()]]);
         $file = $data['media']->store('site-content/media','public');
         return response()->json(['url'=>Storage::disk('public')->url($file),'mime'=>$data['media']->getMimeType(),'name'=>$data['media']->getClientOriginalName()]);
     }
@@ -185,3 +185,10 @@ class SiteContentController extends Controller
         return $item;
     }
 }
+
+
+    private function maxUploadKb(): int
+    {
+        $mb=(int) \App\Models\SystemSetting::query()->where('key','uploads.content_media_max_mb')->value('value');
+        return max(1,$mb ?: (int) config('fuelfree.upload.content_media_max_mb',100))*1024;
+    }
