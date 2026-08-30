@@ -84,7 +84,7 @@
     </div>
 </div>
 
-<div class="form-card homepage-card">
+<div class="form-card builder-links-card"><div class="section-heading"><div><div class="eyebrow">DESIGN &amp; LAYOUT</div><h2>Visual builders</h2><p>Use dedicated builders for homepage composition, navigation and global visual styling.</p></div><i class="fa-solid fa-wand-magic-sparkles"></i></div><div class="builder-links"><a href="{{route('admin.homepage-builder.index')}}"><i class="fa-solid fa-house"></i><span><b>Homepage Builder</b><small>Sections, visibility &amp; ordering</small></span></a><a href="{{route('admin.navigation.index')}}"><i class="fa-solid fa-bars-staggered"></i><span><b>Menu Builder</b><small>Menus, submenus &amp; drag ordering</small></span></a><a href="{{route('admin.cms.index')}}"><i class="fa-solid fa-file-lines"></i><span><b>Page Builder</b><small>Pages, blocks &amp; publishing</small></span></a><a href="{{route('admin.design.index',['area'=>'header'])}}"><i class="fa-solid fa-window-maximize"></i><span><b>Header Builder</b><small>Header components &amp; visibility</small></span></a><a href="{{route('admin.design.index',['area'=>'footer'])}}"><i class="fa-solid fa-table-columns"></i><span><b>Footer Builder</b><small>Footer components &amp; visibility</small></span></a><a href="{{route('admin.theme.index')}}"><i class="fa-solid fa-palette"></i><span><b>Theme Builder</b><small>Colors, typography &amp; layout</small></span></a></div></div><div class="form-card homepage-card">
     <div class="section-heading">
         <div>
             <div class="eyebrow">HOMEPAGE</div>
