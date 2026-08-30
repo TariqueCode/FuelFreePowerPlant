@@ -73,11 +73,10 @@ class SitePopupController extends Controller
         $data['is_published']=$request->boolean('is_published');
         $popup->fill($data)->save();
     }
-}
-
 
     private function maxUploadKb(): int
     {
         $mb=(int) \App\Models\SystemSetting::query()->where('key','uploads.popups_max_mb')->value('value');
         return max(1,$mb ?: (int) config('fuelfree.upload.popups_max_mb',50))*1024;
     }
+}
