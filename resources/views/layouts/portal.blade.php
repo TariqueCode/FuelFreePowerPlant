@@ -30,7 +30,7 @@ $canCommunications=$canMail || $canCareer;
 <a class="{{ request()->routeIs('admin.homepage-builder.*')?'active':'' }}" href="{{ route('admin.homepage-builder.index') }}"><span>Homepage</span></a>
 <a class="{{ request()->routeIs('admin.management.*')?'active':'' }}" href="{{ route('admin.management.index') }}"><span>Management Team</span></a>
 <a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='news'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news']) }}"><span>News &amp; Events</span></a>
-<a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='notice'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'notice']) }}"><span>Notices</span></a>
+<a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='notice'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news','filter'=>'announcement']) }}"><span>Notices</span></a>
 <a class="{{ request()->routeIs('admin.gallery.*')?'active':'' }}" href="{{ route('admin.gallery.index') }}"><span>Gallery</span></a>
 <a class="{{ request()->routeIs('admin.sliders.*')?'active':'' }}" href="{{ route('admin.sliders.index') }}"><span>Slider</span></a>
 <a class="{{ request()->routeIs('admin.site-popups.*')?'active':'' }}" href="{{ route('admin.site-popups.index') }}"><span>Highlights</span></a>
