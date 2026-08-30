@@ -37,13 +37,13 @@ class UserController extends Controller
         ]);
 
         $user = DB::transaction(function () use ($data) {
-        $user = User::create([
+            $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-        ]);
-        $user->roles()->sync([$data['role_id']]);
-        return $user;
+            ]);
+            $user->roles()->sync([$data['role_id']]);
+            return $user;
         });
 
         return redirect()->route('admin.users.index')->with('status', 'User account created successfully.');
