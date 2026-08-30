@@ -104,6 +104,14 @@ class NavigationMenuController extends Controller
                 ->findOrFail($parentId);
 
             abort_if($items->has($parent->id), 422, 'A menu item cannot be its own parent.');
+
+            foreach ($items as $item) {
+                abort_if(
+                    $item->id !== $parent->id && $this->isDescendantOf($parent->id, $item->id),
+                    422,
+                    'A menu item cannot be placed inside its own descendant.'
+                );
+            }
         }
 
         DB::transaction(function () use ($data, $items, $parentId): void {
