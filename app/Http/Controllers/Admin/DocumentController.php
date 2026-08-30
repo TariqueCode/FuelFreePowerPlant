@@ -101,6 +101,8 @@ class DocumentController extends Controller
             $storedName = (string) str()->uuid().($extension ? '.'.$extension : '');
             $finalPath = "private/{$user->id}/{$storedName}";
             Storage::disk('local')->move($partPath, $finalPath);
+            $allowed = ['pdf','doc','docx','xls','xlsx','csv','txt','zip','jpg','jpeg','png','webp','gif','mp4','webm','mov'];
+            abort_if($extension !== '' && !in_array($extension, $allowed, true), 422, 'This file type is not supported.');
             $mime = 'application/octet-stream';
             $absolute = Storage::disk('local')->path($finalPath);
             if (function_exists('finfo_open')) { $finfo = finfo_open(FILEINFO_MIME_TYPE); $detected = finfo_file($finfo, $absolute); finfo_close($finfo); if ($detected) $mime = $detected; }
@@ -154,6 +156,7 @@ class DocumentController extends Controller
             $document->share_token = bin2hex(random_bytes(32));
         }
         $document->share_enabled = true;
+        $document->share_expires_at = now()->addDays(7);
         $document->save();
 
         return back()->with('success', 'Secure download link created.');
@@ -168,7 +171,7 @@ class DocumentController extends Controller
 
     public function sharedDownload(string $token): mixed
     {
-        $document = Document::where('share_token', $token)->where('share_enabled', true)->firstOrFail();
+        $document = Document::where('share_token', $token)->where('share_enabled', true)->where(function ($q) { $q->whereNull('share_expires_at')->orWhere('share_expires_at', '>', now()); })->firstOrFail();
         abort_unless(Storage::disk($document->disk)->exists($document->path), 404);
         return Storage::disk($document->disk)->download($document->path, $document->original_name);
     }
