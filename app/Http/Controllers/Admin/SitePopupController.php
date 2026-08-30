@@ -58,7 +58,7 @@ class SitePopupController extends Controller
     {
         $data=$request->validate([
             'title'=>['nullable','string','max:255'],
-            'image'=>[$popup->exists?'nullable':'required','image','mimes:jpg,jpeg,png,webp,avif','max:5120'],
+            'image'=>[$popup->exists?'nullable':'required','image','mimes:jpg,jpeg,png,webp,avif','max:'.$this->maxUploadKb()],
             'link_url'=>['nullable','url','max:1000'],
             'display_seconds'=>['nullable','integer','min:1','max:3600'],
             'is_published'=>['nullable','boolean'],
@@ -74,3 +74,10 @@ class SitePopupController extends Controller
         $popup->fill($data)->save();
     }
 }
+
+
+    private function maxUploadKb(): int
+    {
+        $mb=(int) \App\Models\SystemSetting::query()->where('key','uploads.popups_max_mb')->value('value');
+        return max(1,$mb ?: (int) config('fuelfree.upload.popups_max_mb',50))*1024;
+    }
