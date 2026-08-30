@@ -29,7 +29,7 @@ class GalleryController extends Controller
     public function deleteMedia(GalleryMedia $media): JsonResponse{Storage::disk('public')->delete($media->path);$media->delete();return response()->json(['ok'=>true]);}
     private function maxUploadKb(): int
     {
-        $mb = (int) SystemSetting::query()->where('key', 'uploads.max_mb')->value('value');
+        $mb = (int) SystemSetting::query()->where('key', 'uploads.gallery_max_mb')->value('value');
         if ($mb < 1) $mb = (int) config('fuelfree.upload.max_mb', 50);
         return $mb * 1024;
     }
