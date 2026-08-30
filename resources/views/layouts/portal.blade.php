@@ -1,4 +1,9 @@
 @php
+$canCms=auth()->user()->hasPermission('cms.view') || auth()->user()->hasRole(['super-admin','administrator']);
+$canDesign=auth()->user()->hasPermission('website.view') || auth()->user()->hasRole(['super-admin','administrator']);
+$canMail=auth()->user()->hasPermission('mail.view');
+$canCareer=auth()->user()->hasPermission('career.view');
+$canDocs=auth()->user()->hasPermission('documents.view');
 $brand=\App\Models\SystemSetting::query()->whereIn('key',['company.name','company.logo_path'])->pluck('value','key');
 $dashboardName=$brand->get('company.name')?:config('fuelfree.company.name');
 $dashboardLogo=$brand->get('company.logo_path');
