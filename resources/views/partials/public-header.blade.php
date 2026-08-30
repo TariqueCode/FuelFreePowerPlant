@@ -18,18 +18,7 @@
 
     $publicMenuItems = collect();
     if (\Illuminate\Support\Facades\Schema::hasTable('navigation_menu_items')) {
-        $publicMenuItems = \App\Models\NavigationMenuItem::query()
-            ->where('menu', 'main')
-            ->where('is_visible', true)
-            ->whereNull('parent_id')
-            ->with(['children' => fn ($q) => $q
-                ->where('is_visible', true)
-                ->orderBy('sort_order')
-                ->orderBy('id')
-            ])
-            ->orderBy('sort_order')
-            ->orderBy('id')
-            ->get();
+        $publicMenuItems = app(\App\Services\PublicNavigationService::class)->tree('main');
     }
 
     $publicSocials = \Illuminate\Support\Facades\Cache::remember(
