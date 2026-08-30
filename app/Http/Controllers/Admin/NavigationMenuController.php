@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class NavigationMenuController extends Controller
@@ -68,6 +69,7 @@ class NavigationMenuController extends Controller
         ) + 1;
 
         NavigationMenuItem::create($data);
+        Cache::forget("public.navigation.{$data['menu']}");
 
         return back()->with('status', 'Menu item added.');
     }
@@ -80,6 +82,7 @@ class NavigationMenuController extends Controller
         $data['sort_order'] = $item->sort_order;
 
         $item->update($data);
+        Cache::forget("public.navigation.{$item->menu}");
 
         return back()->with('status', 'Menu item updated.');
     }
@@ -92,6 +95,7 @@ class NavigationMenuController extends Controller
 
             $item->delete();
         });
+        Cache::forget("public.navigation.{$item->menu}");
 
         return back()->with('status', 'Menu item deleted.');
     }
@@ -139,6 +143,7 @@ class NavigationMenuController extends Controller
                 ]);
             }
         });
+        Cache::forget("public.navigation.{$data['menu']}");
 
         return response()->json(['ok' => true]);
     }
