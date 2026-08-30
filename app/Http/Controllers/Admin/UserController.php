@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class UserController extends Controller
@@ -35,12 +36,15 @@ class UserController extends Controller
             'role_id' => ['required', 'integer', 'exists:roles,id'],
         ]);
 
+        $user = DB::transaction(function () use ($data) {
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
         $user->roles()->sync([$data['role_id']]);
+        return $user;
+        });
 
         return redirect()->route('admin.users.index')->with('status', 'User account created successfully.');
     }
@@ -67,8 +71,10 @@ class UserController extends Controller
         if (!empty($data['password'])) {
             $user->password = Hash::make($data['password']);
         }
-        $user->save();
-        $user->roles()->sync([$data['role_id']]);
+        DB::transaction(function () use ($user, $data) {
+            $user->save();
+            $user->roles()->sync([$data['role_id']]);
+        });
 
         return redirect()->route('admin.users.index')->with('status', 'User account updated successfully.');
     }
