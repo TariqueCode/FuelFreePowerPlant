@@ -45,7 +45,7 @@
                 @foreach([
                     'career_max_mb'=>['Career applications','CV / resume uploads from the public Career page.'],
                     'documents_max_mb'=>['File Manager','Documents and media uploaded through the Admin File Manager.'],
-                    'gallery_max_mb'=>['Gallery & media','Gallery cover images and gallery image/video uploads.'],'sliders_max_mb'=>['Sliders','Homepage and site slider image uploads.'],
+                    'gallery_max_mb'=>['Gallery & media','Gallery cover images and gallery image/video uploads.'],'sliders_max_mb'=>['Sliders','Homepage and site slider image uploads.'],'popups_max_mb'=>['Popups','Website popup image uploads.'],'content_media_max_mb'=>['CMS media','Images and videos inserted into website content.'],
                 ] as $key=>$policy)
                     <div class="upload-policy-field">
                         <label>{{ $policy[0] }} <span>(MB)</span></label>
