@@ -67,6 +67,7 @@
         @foreach($all as $item)
             <form id="edit-{{ $item->id }}" method="POST" action="{{ route('admin.navigation.update',$item) }}" class="edit-box">
                 @csrf @method('PATCH')
+                <input type="hidden" name="kind" value="{{ ($item->url || $item->route_name) ? 'link' : 'folder' }}">
                 <div class="edit-title"><strong>{{ $item->label }}</strong><button type="submit">Save</button></div>
                 <input name="label" value="{{ $item->label }}" required maxlength="160">
                 <input name="url" value="{{ $item->url }}" maxlength="500" placeholder="/url">
