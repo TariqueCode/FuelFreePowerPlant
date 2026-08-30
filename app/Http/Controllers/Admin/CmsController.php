@@ -61,6 +61,11 @@ class CmsController extends Controller
 
     private function validatePage(Request $request): array
     {
+        $rawBlocks = $request->input('builder_blocks');
+        if (is_string($rawBlocks)) {
+            $decoded = json_decode($rawBlocks, true);
+            $request->merge(['builder_blocks' => is_array($decoded) ? $decoded : []]);
+        }
         return $request->validate([
             'title' => ['required', 'string', 'max:180'],
             'slug' => ['nullable', 'string', 'max:180', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
