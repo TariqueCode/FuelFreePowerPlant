@@ -120,5 +120,8 @@ jobs:
       - name: Check Composer platform requirements
         run: composer check-platform-reqs --lock
 
-      - name: Run application tests
-        run: php artisan test
+      - name: Run unit tests
+        run: php artisan test tests/Unit
+
+      - name: Run feature tests
+        run: php artisan test tests/Feature
