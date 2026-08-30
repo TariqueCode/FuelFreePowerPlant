@@ -109,7 +109,6 @@
     @endif
 
     @if($home['welcome'])
-    @if($home['welcome'])
 <section class="welcome">
         <div class="welcome-heading"><span class="eyebrow">Welcome to {{ $siteName }}</span><h1>Building a <em>stronger</em> energy future.</h1><div class="welcome-rule"></div></div>
         <div class="welcome-copy">
