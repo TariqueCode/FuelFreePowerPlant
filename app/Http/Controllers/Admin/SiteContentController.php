@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class SiteContentController extends Controller
@@ -131,6 +132,24 @@ class SiteContentController extends Controller
         return response()->json(['url'=>Storage::disk('public')->url($file),'mime'=>$data['media']->getMimeType(),'name'=>$data['media']->getClientOriginalName()]);
     }
 
+    private function uniqueSlug(string $slug, string $title, ?int $ignoreId, string $type): string
+    {
+        $base = Str::slug($slug !== '' ? $slug : $title);
+        abort_if($base === '', 422, 'A valid content slug could not be generated.');
+
+        $candidate = $base;
+        $counter = 2;
+        while (SiteContentItem::query()
+            ->where('type', $type)
+            ->where('slug', $candidate)
+            ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
+            ->exists()) {
+            $candidate = $base.'-'.$counter++;
+        }
+
+        return $candidate;
+    }
+
     private function saveItem(SiteContentItem $item, Request $request): SiteContentItem
     {
         $data = $request->validate([
@@ -153,7 +172,7 @@ class SiteContentController extends Controller
         if (in_array($data['type'], ['news','announcement'], true) && !empty($data['publication_type'])) $data['type'] = $data['publication_type'];
         unset($data['publication_type']);
 
-        if (($data['slug'] ?? '') === '') $data['slug'] = str($data['title'])->slug();
+        $data['slug'] = $this->uniqueSlug($data['slug'] ?? '', $data['title'], $item->id, $data['type']);
         $data['is_featured'] = in_array($data['type'], ['news','announcement'], true) && (bool)($data['is_featured'] ?? false);
         $data['show_in_navigation'] = $data['type'] === 'company' && (bool)($data['show_in_navigation'] ?? false);
 
