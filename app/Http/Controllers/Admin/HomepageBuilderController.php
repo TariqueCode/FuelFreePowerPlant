@@ -1,28 +1,54 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
+
 use App\Http\Controllers\Controller;
+use App\Models\HomepageSection;
 use App\Models\PowerPlant;
 use App\Models\SiteContentItem;
-use App\Models\SystemSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class HomepageBuilderController extends Controller
 {
- public function index(): View {
-  $defaults=['hero','welcome','statistics','projects','news','gallery','cta'];
-  $saved=SystemSetting::query()->whereIn('key',['home.section_order','home.hero_enabled','home.welcome_enabled','home.statistics_enabled','home.projects_enabled','home.news_enabled','home.gallery_enabled','home.cta_enabled'])->pluck('value','key')->all();
-  $order=json_decode($saved['home.section_order']??'[]',true); $order=is_array($order)&&count($order)===count($defaults)&&!array_diff($order,$defaults)?$order:$defaults;
-  $sections=[]; foreach($order as $key)$sections[$key]=filter_var($saved['home.'.$key.'_enabled']??'1',FILTER_VALIDATE_BOOLEAN);
-  $counts=['projects'=>PowerPlant::count(),'news'=>SiteContentItem::whereIn('type',['news','announcement'])->where('status','published')->count(),'gallery'=>SiteContentItem::where('type','gallery')->where('status','published')->count()];
-  return view('admin.homepage-builder.index',compact('order','sections','counts'));
- }
- public function update(Request $request): RedirectResponse {
-  $allowed=['hero','welcome','statistics','projects','news','gallery','cta'];
-  $order=$request->input('section_order',[]); if(!is_array($order)||count($order)!==count($allowed)||array_diff($order,$allowed)) return back()->withErrors(['section_order'=>'Invalid homepage section order.']);
-  foreach($allowed as $key) SystemSetting::updateOrCreate(['key'=>'home.'.$key.'_enabled'],['value'=>$request->boolean('sections.'.$key)?'1':'0']);
-  SystemSetting::updateOrCreate(['key'=>'home.section_order'],['value'=>json_encode(array_values($order))]);
-  return back()->with('status','Homepage layout saved successfully.');
- }
+    public function index(): View
+    {
+        $sections = HomepageSection::query()->ordered()->get();
+
+        $counts = [
+            'projects' => PowerPlant::query()->count(),
+            'management' => SiteContentItem::query()->where('type', 'management')->where('status', 'published')->count(),
+            'news' => SiteContentItem::query()->whereIn('type', ['news', 'announcement'])->where('status', 'published')->count(),
+            'gallery' => SiteContentItem::query()->where('type', 'gallery')->where('status', 'published')->count(),
+            'sliders' => \App\Models\SiteSlider::query()->where('is_published', true)->count(),
+        ];
+
+        return view('admin.homepage-builder.index', compact('sections', 'counts'));
+    }
+
+    public function update(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'section_order' => ['required', 'array'],
+            'section_order.*' => ['required', 'string', 'max:60'],
+            'sections' => ['nullable', 'array'],
+        ]);
+
+        $existing = HomepageSection::query()->pluck('key')->all();
+        $order = array_values($data['section_order']);
+
+        if (count($order) !== count($existing) || count(array_unique($order)) !== count($order) || array_diff($order, $existing) || array_diff($existing, $order)) {
+            return back()->withErrors(['section_order' => 'The homepage section list is invalid.']);
+        }
+
+        foreach ($order as $position => $key) {
+            HomepageSection::query()->where('key', $key)->update([
+                'sort_order' => $position,
+                'is_enabled' => $request->boolean("sections.{$key}"),
+            ]);
+        }
+
+        return back()->with('status', 'Homepage layout saved successfully.');
+    }
 }
