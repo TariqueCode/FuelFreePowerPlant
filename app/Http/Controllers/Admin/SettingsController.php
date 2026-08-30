@@ -29,7 +29,7 @@ class SettingsController
             'footer.contact_heading'=>'Contact','footer.email'=>'info@fuelfreepowerplant.com','footer.phone'=>'+880 1712-251892',
             'footer.website'=>'www.fuelfreepowerplant.com','footer.website_url'=>'https://www.fuelfreepowerplant.com','footer.get_in_touch_label'=>'Get in touch',
             'footer.get_in_touch_url'=>'/contact','footer.copyright_text'=>'All rights reserved.',
-            'home.slider_enabled'=>'1','home.welcome_enabled'=>'1','home.news_enabled'=>'1','home.gallery_enabled'=>'1',
+            'home.slider_enabled'=>'1','home.welcome_enabled'=>'1','home.news_enabled'=>'1','home.gallery_enabled'=>'1','home.hero_enabled'=>'1','home.statistics_enabled'=>'1','home.projects_enabled'=>'1','home.cta_enabled'=>'1',
         ];
         $saved=SystemSetting::query()->pluck('value','key')->all();
         $settings=array_merge($defaults,$saved);
