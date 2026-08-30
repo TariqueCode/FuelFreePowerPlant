@@ -105,7 +105,7 @@ class SiteSliderController extends Controller
             'image.required' => 'Please choose a slider image before saving.',
             'image.file' => 'The selected image could not be uploaded. Please choose it again.',
             'image.mimes' => 'Slider image must be JPG, JPEG, PNG or WebP.',
-            'image.max' => 'Slider image must be 10 MB or smaller.',
+            'image.max' => 'Slider image exceeds the upload limit configured in Admin Settings.',
             'link_url.url' => 'Destination URL must be a valid URL, for example https://example.com.',
             'ends_at.after_or_equal' => 'End time must be after or equal to the start time.',
         ]);
@@ -139,11 +139,10 @@ class SiteSliderController extends Controller
 
         $slider->fill($data)->save();
     }
-}
-
 
     private function maxUploadKb(): int
     {
         $mb = (int) \App\Models\SystemSetting::query()->where('key', 'uploads.sliders_max_mb')->value('value');
         return max(1, $mb ?: (int) config('fuelfree.upload.sliders_max_mb', 50)) * 1024;
     }
+}
