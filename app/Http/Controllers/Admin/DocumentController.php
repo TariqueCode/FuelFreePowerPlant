@@ -187,7 +187,7 @@ class DocumentController extends Controller
     public function destroy(Request $request, Document $document): RedirectResponse { $this->ownDocument($request, $document); Storage::disk($document->disk)->delete($document->path); $document->delete(); return back()->with('success', 'File deleted permanently.'); }
     private function maxUploadBytes(): int
     {
-        $mb = (int) SystemSetting::query()->where('key', 'uploads.max_mb')->value('value');
+        $mb = (int) SystemSetting::query()->where('key', 'uploads.documents_max_mb')->value('value');
         if ($mb < 1) $mb = (int) config('fuelfree.upload.max_mb', 50);
         return $mb * 1024 * 1024;
     }
