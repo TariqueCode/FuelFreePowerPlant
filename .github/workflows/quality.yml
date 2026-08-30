@@ -67,12 +67,14 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
 
-      - name: Bootstrap test environment
-        shell: bash
-        run: |
-          cp .env.example .env
-          php artisan key:generate --force
-          php artisan package:discover --ansi
+      - name: Prepare test environment
+        run: cp .env.example .env
+
+      - name: Run Laravel package discovery
+        run: php artisan package:discover --ansi
+
+      - name: Generate test application key
+        run: php artisan key:generate --force
 
       - name: Check Composer platform requirements
         run: composer check-platform-reqs --lock
