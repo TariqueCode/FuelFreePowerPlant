@@ -184,11 +184,10 @@ class SiteContentController extends Controller
         $item->fill($data)->save();
         return $item;
     }
-}
-
 
     private function maxUploadKb(): int
     {
         $mb=(int) \App\Models\SystemSetting::query()->where('key','uploads.content_media_max_mb')->value('value');
         return max(1,$mb ?: (int) config('fuelfree.upload.content_media_max_mb',100))*1024;
     }
+}
