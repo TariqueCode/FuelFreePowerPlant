@@ -31,6 +31,23 @@ class NavigationMenuController extends Controller
             ->orderBy('id')
             ->get();
 
+        // Calculate hierarchy depth for a clear parent selector without
+        // changing the persisted navigation schema.
+        $byId = $all->keyBy('id');
+        $all->each(function (NavigationMenuItem $item) use ($byId): void {
+            $depth = 0;
+            $cursor = $item->parent_id;
+            $seen = [];
+
+            while ($cursor !== null && ! isset($seen[$cursor]) && isset($byId[$cursor])) {
+                $seen[$cursor] = true;
+                $depth++;
+                $cursor = $byId[$cursor]->parent_id;
+            }
+
+            $item->depth = $depth;
+        });
+
         $pages = CmsPage::query()
             ->orderBy('title')
             ->get(['id', 'title', 'slug', 'is_published']);
