@@ -34,20 +34,18 @@ $canWebsite=$canDesign;
 <div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-palette"></i></span><span>Design &amp; Layout</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
 <a class="{{ request()->routeIs('admin.design.*') && request('area')==='header'?'active':'' }}" href="{{ route('admin.design.index',['area'=>'header']) }}"><span>Header Builder</span></a>
 <a class="{{ request()->routeIs('admin.design.*') && request('area')==='footer'?'active':'' }}" href="{{ route('admin.design.index',['area'=>'footer']) }}"><span>Footer Builder</span></a>
-<a class="{{ request()->routeIs('admin.settings')?'active':'' }}" href="{{ route('admin.settings') }}"><span>Global Layout</span></a>
 <a class="{{ request()->routeIs('admin.theme.*')?'active':'' }}" href="{{ route('admin.theme.index') }}"><span>Theme Builder</span></a>
 </div></div>
 @endif
 @if(auth()->user()->hasPermission('settings.manage') || $canWebsite)
 <div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span>Settings</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
 <a class="{{ request()->routeIs('admin.settings')?'active':'' }}" href="{{ route('admin.settings') }}"><span>General</span></a>
-@if(auth()->user()->hasPermission('social-media.manage'))<a class="{{ request()->routeIs('admin.social-links.*')?'active':'' }}" href="{{ route('admin.social-links.index') }}"><span>Social Media</span></a>@endif
 </div></div>
 @endif
 @if(auth()->user()->hasPermission('users.view'))
 <div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span>Users &amp; Access</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
 <a class="{{ request()->routeIs('admin.users.*')?'active':'' }}" href="{{ route('admin.users.index') }}"><span>Users</span></a>
-<a class="{{ request()->routeIs('admin.roles.*') || request()->routeIs('admin.permissions.*')?'active':'' }}" href="{{ route('admin.users.index') }}"><span>Roles &amp; Permissions</span></a>
+<a class="{{ request()->routeIs('admin.users.*')?'active':'' }}" href="{{ route('admin.users.index') }}"><span>User accounts &amp; access</span></a>
 </div></div>
 @endif
 
