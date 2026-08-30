@@ -1,7 +1,7 @@
 @extends('layouts.portal')
 @section('title',$title)
 @section('content')
-<section class="hero"><div><span class="eyebrow">CONTENT MANAGEMENT</span><h1>{{ $title }}</h1><p>{{ $type==='company' ? 'Manage all company pages in one place. Drag enabled pages to set the public menu order.' : ($type==='news' ? 'Publish news, notices and announcements with cover photos, featured placement and a professional content workflow.' : 'Manage structured public website content.') }}</p></div>@if($type!=='news')<a class="primary" href="{{ route('admin.site-content.create', $type ? ['type'=>$type] : []) }}"><i class="fa-solid fa-plus"></i> {{ $type==='company'?'Add company content':'New content' }}</a>@endif</section>
+<section class="hero"><div><span class="eyebrow">CONTENT MANAGEMENT</span><h1>{{ $title }}</h1><p>{{ $type==='company' ? 'Manage company pages and corporate content in one place. Use Navigation / Menu Builder to control the public menu.' : ($type==='news' ? 'Publish news, notices and announcements with cover photos, featured placement and a professional content workflow.' : 'Manage structured public website content.') }}</p></div>@if($type!=='news')<a class="primary" href="{{ route('admin.site-content.create', $type ? ['type'=>$type] : []) }}"><i class="fa-solid fa-plus"></i> {{ $type==='company'?'Add company content':'New content' }}</a>@endif</section>
 @if(session('status'))<div class="notice">{{ session('status') }}</div>@endif
 @if(!$type)
 <div class="workspace"><a href="{{ route('admin.site-content.index',['type'=>'company']) }}"><i class="fa-solid fa-building"></i><strong>Company CMS</strong><span>About Us and corporate information</span></a><a href="{{ route('admin.site-content.index',['type'=>'news']) }}"><i class="fa-solid fa-newspaper"></i><strong>News &amp; Notices CMS</strong><span>News, notices and announcements</span></a></div>
@@ -21,13 +21,13 @@
     <div class="publish-count"><strong>{{ $publishedCount }}</strong><span> published</span></div>
 </div>
 @elseif($type==='company')
-<div class="toolbar"><div><strong>{{ $items->total() }}</strong><span> company pages</span></div><span class="hint"><i class="fa-solid fa-grip-vertical"></i> Drag enabled pages to reorder</span></div>
+<div class="toolbar"><div><strong>{{ $items->total() }}</strong><span> company pages</span></div><span class="hint"><i class="fa-solid fa-circle-info"></i> Public menu order is managed in Navigation Builder</span></div>
 @endif
 <div class="content-list {{ $type==='company' ? 'company-list' : '' }} {{ $type==='news' ? 'news-list' : '' }}">
 @forelse($items as $item)
-<article class="content-card {{ $type==='company' ? 'company-card' : '' }} {{ $type==='news' ? 'news-card' : '' }} {{ $item->show_in_navigation ? 'nav-enabled' : '' }}" data-edit-url="{{ route('admin.site-content.edit',$item) }}" @if($type==='company' && $item->show_in_navigation) draggable="true" data-id="{{ $item->id }}" @endif>
+<article class="content-card {{ $type==='company' ? 'company-card' : '' }} {{ $type==='news' ? 'news-card' : '' }}" data-edit-url="{{ route('admin.site-content.edit',$item) }}">
     @if($type==='company')
-        <div class="handle" title="Drag to reorder">@if($item->show_in_navigation)<i class="fa-solid fa-grip-vertical"></i>@else<span>—</span>@endif</div>
+        <div class="handle" title="Company content"><i class="fa-solid fa-building"></i></div>
         <div class="content-icon"><i class="fa-regular fa-file-lines"></i></div>
     @else
         <div class="news-cover">@if($item->image_path)<img src="{{ asset('storage/'.$item->image_path) }}" alt="{{ $item->cover_alt ?: $item->title }}" loading="lazy">@else<i class="fa-regular fa-newspaper"></i>@endif</div>
@@ -80,9 +80,11 @@
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
 (function(){
- const list=document.querySelector('.company-list');let dragged=null,wasDragged=false;
- document.querySelectorAll('.content-card').forEach(card=>{card.addEventListener('dragstart',()=>{dragged=card;wasDragged=true;card.classList.add('dragging')});card.addEventListener('dragend',()=>{card.classList.remove('dragging');setTimeout(()=>wasDragged=false,0)});card.addEventListener('click',e=>{if(wasDragged||e.target.closest('form,button,a,.handle'))return;const url=card.dataset.editUrl;if(url)window.location.href=url})});
- if(!list)return;
- list.querySelectorAll('.content-card.nav-enabled').forEach(card=>{card.addEventListener('dragover',e=>{e.preventDefault();if(!dragged||dragged===card)return;const rect=card.getBoundingClientRect();if(e.clientY>rect.top+rect.height/2)card.after(dragged);else card.before(dragged)});card.addEventListener('dragend',async()=>{const ids=[...list.querySelectorAll('.content-card.nav-enabled')].map(el=>el.dataset.id);try{const res=await fetch('{{ route('admin.site-content.navigation.reorder') }}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':document.querySelector('meta[name="csrf-token"]')?.content,'Accept':'application/json'},body:JSON.stringify({ids})});if(!res.ok)throw new Error()}catch(e){window.location.reload()}dragged=null})});
+ const cards=document.querySelectorAll('.content-card');
+ cards.forEach(card=>card.addEventListener('click',e=>{
+   if(e.target.closest('form,button,a')) return;
+   const url=card.dataset.editUrl;
+   if(url) window.location.href=url;
+ }));
 })();
 </script>@endpush
