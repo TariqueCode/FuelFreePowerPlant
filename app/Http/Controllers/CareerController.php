@@ -161,7 +161,7 @@ class CareerController extends Controller
 
     private function maxUploadMb(): int
     {
-        $mb = (int) SystemSetting::query()->where('key', 'uploads.max_mb')->value('value');
+        $mb = (int) SystemSetting::query()->where('key', 'uploads.career_max_mb')->value('value');
         return $mb > 0 ? $mb : (int) config('fuelfree.upload.max_mb', 50);
     }
 
