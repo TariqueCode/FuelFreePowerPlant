@@ -52,6 +52,7 @@ return [
         'career_max_mb' => (int) env('FUELFREE_CAREER_UPLOAD_MAX_MB', 50),
         'documents_max_mb' => (int) env('FUELFREE_DOCUMENTS_UPLOAD_MAX_MB', 50),
         'gallery_max_mb' => (int) env('FUELFREE_GALLERY_UPLOAD_MAX_MB', 50),
+        'sliders_max_mb' => (int) env('FUELFREE_SLIDERS_UPLOAD_MAX_MB', 50),
     ],
 
     'roles' => [
