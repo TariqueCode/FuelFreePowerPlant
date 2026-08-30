@@ -71,11 +71,45 @@ jobs:
         run: cp .env.example .env
 
       - name: Prepare SQLite database
-        shell: bash
         run: |
           mkdir -p database
           touch database/database.sqlite
-          php artisan migrate --force
+
+      - name: Migrate schema batch 1
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in $(find database/migrations -type f -name '*.php' | sort | sed -n '1,10p'); do echo "Migrating $file"; php artisan migrate --force --path="$file"; done
+
+      - name: Migrate schema batch 2
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in $(find database/migrations -type f -name '*.php' | sort | sed -n '11,20p'); do echo "Migrating $file"; php artisan migrate --force --path="$file"; done
+
+      - name: Migrate schema batch 3
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in $(find database/migrations -type f -name '*.php' | sort | sed -n '21,30p'); do echo "Migrating $file"; php artisan migrate --force --path="$file"; done
+
+      - name: Migrate schema batch 4
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in $(find database/migrations -type f -name '*.php' | sort | sed -n '31,40p'); do echo "Migrating $file"; php artisan migrate --force --path="$file"; done
+
+      - name: Migrate schema batch 5
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in $(find database/migrations -type f -name '*.php' | sort | sed -n '41,50p'); do echo "Migrating $file"; php artisan migrate --force --path="$file"; done
+
+      - name: Migrate schema batch 6
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in $(find database/migrations -type f -name '*.php' | sort | sed -n '51,70p'); do echo "Migrating $file"; php artisan migrate --force --path="$file"; done
 
       - name: Run Laravel package discovery
         run: php artisan package:discover --ansi
