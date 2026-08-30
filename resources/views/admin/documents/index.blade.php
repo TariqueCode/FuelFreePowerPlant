@@ -68,7 +68,7 @@
 </section>
 
 <dialog id="folder-modal"><form method="POST" action="{{ route('admin.documents.folders.store') }}">@csrf<h2>New folder</h2><p>Create a folder inside the current location.</p><input name="name" placeholder="Folder name" maxlength="150" required>@if($folder)<input type="hidden" name="parent_id" value="{{ $folder->id }}">@endif<div class="modal-actions"><button type="button" onclick="this.closest('dialog').close()">Cancel</button><button class="primary" type="submit">Create folder</button></div></form></dialog>
-<dialog id="upload-modal"><form method="POST" action="{{ route('admin.documents.store') }}" enctype="multipart/form-data">@csrf<h2>Upload files</h2><p>Select a file up to 50 MB.</p><input type="file" name="file" required>@if($folder)<input type="hidden" name="folder_id" value="{{ $folder->id }}">@endif<div class="modal-note">Maximum file size: 50 MB. Upload sessions expire after 2 hours. Available storage and server limits still apply.</div><div class="modal-actions"><button type="button" onclick="this.closest('dialog').close()">Cancel</button><button class="primary" type="submit">Upload securely</button></div></form></dialog>
+<dialog id="upload-modal"><form method="POST" action="{{ route('admin.documents.store') }}" enctype="multipart/form-data">@csrf<h2>Upload files</h2><p>Select a file up to 50 MB.</p><input id="file-upload-input" type="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.zip,.jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.mov" required>@if($folder)<input type="hidden" name="folder_id" value="{{ $folder->id }}">@endif<div class="modal-note">Maximum file size: 50 MB. Upload sessions expire after 2 hours. Available storage and server limits still apply.</div><div class="modal-actions"><button type="button" onclick="this.closest('dialog').close()">Cancel</button><button class="primary" type="submit">Upload securely</button></div></form></dialog>
 
 @foreach($folders as $item)
 <dialog id="rename-folder-{{ $item->id }}"><form method="POST" action="{{ route('admin.documents.folders.rename', $item) }}">@csrf @method('PATCH')<h2>Rename folder</h2><input name="name" value="{{ $item->name }}" maxlength="150" required><div class="modal-actions"><button type="button" onclick="this.closest('dialog').close()">Cancel</button><button class="primary">Save</button></div></form></dialog>
@@ -84,6 +84,19 @@
 <dialog id="delete-file-{{ $document->id }}"><form method="POST" action="{{ route('admin.documents.destroy', $document) }}">@csrf @method('DELETE')<h2>Delete file?</h2><p class="warning">This permanently removes the stored file.</p><div class="modal-actions"><button type="button" onclick="this.closest('dialog').close()">Cancel</button><button class="danger-btn">Delete permanently</button></div></form></dialog><dialog id="share-file-{{ $document->id }}"><div class="share-dialog"><div class="share-icon"><i class="fa-solid fa-link"></i></div><div><h2>Share document</h2><p>Anyone with this link can download this file. You can revoke the link anytime.</p></div>@if($document->share_enabled && $document->share_token)<label class="share-label">Download link</label><div class="share-url"><input id="share-url-{{ $document->id }}" readonly value="{{ $document->share_url }}"><button type="button" onclick="copyShareLink('share-url-{{ $document->id }}',this)" aria-label="Copy link"><i class="fa-solid fa-copy"></i></button></div><div class="share-status"><i class="fa-solid fa-circle-check"></i> Link is active</div><div class="modal-actions"><button type="button" onclick="this.closest('dialog').close()">Done</button><form method="POST" action="{{ route('admin.documents.unshare', $document) }}">@csrf @method('DELETE')<button class="danger-btn" type="submit">Revoke link</button></form></div>@else<form method="POST" action="{{ route('admin.documents.share', $document) }}">@csrf<div class="modal-note">Create a private-looking, non-guessable download URL for sharing this document.</div><div class="modal-actions"><button type="button" onclick="this.closest('dialog').close()">Cancel</button><button class="primary" type="submit"><i class="fa-solid fa-link"></i> Create link</button></div></form>@endif</div></dialog>
 @endforeach
 @endsection
+
+@push('scripts')
+<script>
+document.getElementById('file-upload-input')?.addEventListener('change', function () {
+    const max = 50 * 1024 * 1024;
+    const file = this.files?.[0];
+    if (file && file.size > max) {
+        this.value = '';
+        alert('The selected file is larger than the 50 MB limit.');
+    }
+});
+</script>
+@endpush
 
 @push('head')
 <style>
