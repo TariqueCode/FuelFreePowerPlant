@@ -248,6 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
 @endsection
 
 @push('styles')
+<style>.builder-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.builder-links a{display:flex;gap:10px;align-items:center;padding:12px;border:1px solid rgba(104,204,235,.1);border-radius:11px;background:rgba(2,15,23,.5);text-decoration:none;color:#dff4f7}.builder-links a>i{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:rgba(67,194,229,.08);color:#62d9ee}.builder-links b,.builder-links small{display:block}.builder-links b{font-size:10px}.builder-links small{font-size:8px;color:#6d8c97;margin-top:3px}@media(max-width:800px){.builder-links{grid-template-columns:1fr 1fr}}@media(max-width:520px){.builder-links{grid-template-columns:1fr}}</style>
 <style>
 .settings-stack{max-width:980px;display:grid;gap:18px}
 .chrome-section{padding-top:18px;margin-top:18px;border-top:1px solid rgba(76,205,233,.09)}
