@@ -47,7 +47,9 @@ class DocumentController extends Controller
     public function destroyFolder(Request $request, DocumentFolder $folder): RedirectResponse { $this->ownFolder($request, $folder); $this->deleteFolderTree($folder); return redirect()->route('admin.documents')->with('success', 'Folder and all its contents were permanently deleted.'); }
     public function store(Request $request): RedirectResponse
     {
-        $data = $request->validate(['file' => ['required', 'file', 'max:51200'], 'folder_id' => ['nullable', 'integer', 'exists:document_folders,id']]); $user = $request->user(); $folderId = $data['folder_id'] ?? null;
+        $data = $request->validate(['file' => ['required', 'file', 'max:51200'], 'folder_id' => ['nullable', 'integer', 'exists:document_folders,id']]); $user = $request->user();
+        $allowed = ['pdf','doc','docx','xls','xlsx','csv','txt','zip','jpg','jpeg','png','webp','gif','mp4','webm','mov'];
+        abort_unless(in_array(strtolower($data['file']->getClientOriginalExtension()), $allowed, true), 422, 'This file type is not supported.'); $folderId = $data['folder_id'] ?? null;
         if ($folderId && ! DocumentFolder::whereKey($folderId)->where('user_id', $user->id)->exists()) abort(403); $file = $data['file']; $storedName = $file->hashName(); $path = $file->storeAs("private/{$user->id}", $storedName, 'local');
         Document::create(['user_id' => $user->id, 'folder_id' => $folderId, 'original_name' => $file->getClientOriginalName(), 'stored_name' => $storedName, 'disk' => 'local', 'path' => $path, 'mime_type' => $file->getMimeType(), 'size' => $file->getSize(), 'extension' => strtolower($file->getClientOriginalExtension())]); return back()->with('success', 'File uploaded securely.');
     }
@@ -98,11 +100,11 @@ class DocumentController extends Controller
             abort_unless($currentSize === (int) $meta['size'], 422, 'The upload is incomplete.');
             abort_if((int) $meta['size'] > 52428800, 422, 'The file exceeds the 50 MB limit.');
             $extension = strtolower(pathinfo($meta['filename'], PATHINFO_EXTENSION));
+            $allowed = ['pdf','doc','docx','xls','xlsx','csv','txt','zip','jpg','jpeg','png','webp','gif','mp4','webm','mov'];
+            abort_if($extension === '' || !in_array($extension, $allowed, true), 422, 'This file type is not supported.');
             $storedName = (string) str()->uuid().($extension ? '.'.$extension : '');
             $finalPath = "private/{$user->id}/{$storedName}";
             Storage::disk('local')->move($partPath, $finalPath);
-            $allowed = ['pdf','doc','docx','xls','xlsx','csv','txt','zip','jpg','jpeg','png','webp','gif','mp4','webm','mov'];
-            abort_if($extension !== '' && !in_array($extension, $allowed, true), 422, 'This file type is not supported.');
             $mime = 'application/octet-stream';
             $absolute = Storage::disk('local')->path($finalPath);
             if (function_exists('finfo_open')) { $finfo = finfo_open(FILEINFO_MIME_TYPE); $detected = finfo_file($finfo, $absolute); finfo_close($finfo); if ($detected) $mime = $detected; }
