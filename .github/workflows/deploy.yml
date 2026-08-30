@@ -113,8 +113,18 @@ jobs:
 
           echo "==> Checking production PHP runtime"
           php -r 'if (PHP_VERSION_ID < 80400) { fwrite(STDERR, "ERROR: FuelFree PowerPlant requires PHP 8.4+ on production. Current: ".PHP_VERSION."\\n"); exit(1); }'
-          php -m | grep -E '^(dom|fileinfo|mbstring|xml|xmlwriter)
-          "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+          for ext in dom fileinfo mbstring xml xmlwriter; do
+              if ! php -m | grep -qi "^$ext$"; then
+                  echo "ERROR: Required PHP extension is missing: $ext"
+                  exit 1
+              fi
+          done
+
+          echo "==> Installing PHP dependencies"
+          "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts
+
+          echo "==> Refreshing Laravel package discovery"
+          php artisan package:discover --ansi
 
           if command -v npm >/dev/null 2>&1; then
               echo "==> Building frontend assets"
