@@ -13,13 +13,14 @@ use Illuminate\View\View;
 
 class SiteContentController extends Controller
 {
-    private array $types = ['company','management','news','gallery','announcement'];
+    private array $types = ['company','news','gallery','announcement'];
     private array $labels = ['company'=>'Company & About','management'=>'Management','news'=>'News & Notices','gallery'=>'Gallery','announcement'=>'Announcements'];
 
     public function index(Request $request): View|RedirectResponse
     {
         $type = $request->string('type')->toString();
         if ($type === 'gallery') return redirect()->route('admin.gallery.index');
+        if ($type === 'management') return redirect()->route('admin.management.index');
         abort_unless($type === '' || in_array($type, $this->types, true), 404);
 
         $items = SiteContentItem::query()
@@ -75,8 +76,9 @@ class SiteContentController extends Controller
 
     public function edit(SiteContentItem $item): View|RedirectResponse
     {
-        abort_unless(in_array($item->type, $this->types, true), 404);
+        abort_unless(in_array($item->type, array_merge($this->types, ['management']), true), 404);
         if ($item->type === 'gallery') return redirect()->route('admin.gallery.edit', $item);
+        if ($item->type === 'management') return redirect()->route('admin.management.edit', $item);
         $lockedType = in_array($item->type, ['news','announcement'], true) ? 'news' : $item->type;
         return view('admin.site-content.create', ['item'=>$item,'types'=>$this->types,'labels'=>$this->labels,'lockedType'=>$lockedType]);
     }
@@ -102,27 +104,6 @@ class SiteContentController extends Controller
         if ($item->status === 'published' && empty($item->published_at)) $item->published_at = now();
         $item->save();
         return redirect()->route('admin.site-content.index', ['type'=>'news'])->with('status', $item->status === 'published' ? 'Publication activated.' : 'Publication deactivated.');
-    }
-
-    public function toggleNavigation(Request $request, SiteContentItem $item): JsonResponse
-    {
-        abort_unless($item->type === 'company', 404);
-        $enabled = $request->boolean('enabled');
-        $item->show_in_navigation = $enabled;
-        $item->navigation_order = $enabled
-            ? (int)(SiteContentItem::query()->where('type','company')->where('show_in_navigation',true)->where('id','!=',$item->id)->min('navigation_order') ?? 1) - 1
-            : null;
-        $item->save();
-        return response()->json(['ok'=>true,'enabled'=>$enabled]);
-    }
-
-    public function reorderNavigation(Request $request): JsonResponse
-    {
-        $data = $request->validate(['ids'=>['required','array'],'ids.*'=>['integer','distinct','exists:site_content_items,id']]);
-        $items = SiteContentItem::query()->where('type','company')->where('show_in_navigation',true)->whereIn('id',$data['ids'])->get()->keyBy('id');
-        abort_unless($items->count() === count($data['ids']), 422, 'Invalid navigation items.');
-        foreach ($data['ids'] as $position => $id) $items[$id]->update(['navigation_order'=>$position+1]);
-        return response()->json(['ok'=>true]);
     }
 
     public function uploadMedia(Request $request): JsonResponse
@@ -153,7 +134,7 @@ class SiteContentController extends Controller
     private function saveItem(SiteContentItem $item, Request $request): SiteContentItem
     {
         $data = $request->validate([
-            'type'=>['required','in:company,management,news,announcement,gallery'],
+            'type'=>['required','in:company,news,announcement,gallery'],
             'publication_type'=>['nullable','in:news,announcement'],
             'title'=>['required','string','max:255'],
             'slug'=>['nullable','string','max:255'],
