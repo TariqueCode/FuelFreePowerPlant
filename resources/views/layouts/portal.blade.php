@@ -46,8 +46,10 @@ $canWebsite=auth()->user()->hasPermission('website.view') || auth()->user()->has
 </div></div>
 @endif
 
-@if(auth()->user()->hasPermission('mail.view'))<a class="{{ request()->routeIs('admin.helpdesk*')?'active':'' }}" href="{{ route('admin.helpdesk') }}"><span class="nav-icon"><i class="fa-solid fa-headset"></i></span>Help Desk</a>@endif
-@if(auth()->user()->hasPermission('career.view'))<a class="{{ request()->routeIs('admin.career-applications.*')?'active':'' }}" href="{{ route('admin.career-applications.index') }}"><span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>Career</a>@endif
+<div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-comments"></i></span><span>Communications</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
+@if(auth()->user()->hasPermission('mail.view'))<a class="{{ request()->routeIs('admin.helpdesk*')?'active':'' }}" href="{{ route('admin.helpdesk') }}"><span>Help Desk</span></a>@endif
+@if(auth()->user()->hasPermission('career.view'))<a class="{{ request()->routeIs('admin.career-applications.*')?'active':'' }}" href="{{ route('admin.career-applications.index') }}"><span>Careers</span></a>@endif
+</div></div>
 </nav></aside><main class="main"><header class="topbar"><a class="topbar-brand" href="{{ route('admin.dashboard') }}">@if($dashboardLogo)<img src="{{ asset('storage/'.$dashboardLogo) }}" alt="{{ $dashboardName }}">@else<span class="brand-mark"><i class="fa-solid fa-bolt"></i></span>@endif<span class="topbar-title">{{ $dashboardName }}</span></a><a class="profile-trigger" href="{{ route('profile') }}" aria-label="My profile"><i class="fa-solid fa-user"></i></a></header><div class="content">@yield('content')</div></main></div>
 <div class="mobile-nav-wrap"><div class="mobile-nav-side"><button class="mobile-arrow left" id="mobile-nav-left" type="button" aria-label="Scroll navigation left"><i class="fa-solid fa-chevron-left"></i></button></div><nav class="mobile-nav" id="mobile-nav" aria-label="Mobile dashboard navigation">
 @if(auth()->user()->hasRole(['super-admin','administrator','project-manager']))<a class="{{ request()->routeIs('admin.dashboard')?'active':'' }}" href="{{ route('admin.dashboard') }}"><i class="fa-solid fa-house"></i><span>Overview</span></a>@endif
