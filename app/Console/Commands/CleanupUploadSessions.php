@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Storage;
 
 class CleanupUploadSessions extends Command
 {
-    protected $signature = 'fuel-free:cleanup-upload-sessions {--hours=24 : Remove sessions older than this many hours}';
+    protected $signature = 'fuel-free:cleanup-upload-sessions {--hours=2 : Remove sessions older than this many hours}';
 
     protected $description = 'Remove abandoned large-file upload sessions and their temporary buffers.';
 
