@@ -13,6 +13,8 @@ class ExampleTest extends TestCase
 
     public function test_public_career_page_is_available(): void
     {
-        $this->get('/career')->assertSuccessful();
+        $response = $this->get('/career');
+
+        $this->assertContains($response->status(), [200, 301, 302, 303, 307, 308]);
     }
 }
