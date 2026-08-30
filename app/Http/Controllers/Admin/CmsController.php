@@ -70,7 +70,7 @@ class CmsController extends Controller
             'title' => ['required', 'string', 'max:180'],
             'slug' => ['nullable', 'string', 'max:180', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
             'excerpt' => ['nullable', 'string', 'max:1000'],
-            'content' => ['required', 'string'],
+            'content' => ['nullable', 'string'],
             'template' => ['nullable', 'string', 'max:80'],
             'builder_blocks' => ['nullable', 'array'],
             'builder_blocks.*.type' => ['required', 'string', 'max:40'],
