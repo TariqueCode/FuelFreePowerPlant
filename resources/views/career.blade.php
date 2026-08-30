@@ -90,6 +90,7 @@
     if(!form||!fileInput||!submit)return;
 
     const MAX_SIZE=50*1024*1024;
+    const ALLOWED=/\.(pdf|doc|docx)$/i;
     const FALLBACK_CHUNK_SIZE=256*1024;
     const endpoint='{{ route('career.chunks') }}';
 
@@ -120,6 +121,14 @@
         }
 
         const file=fileInput.files[0];
+        if(!ALLOWED.test(file.name)){
+            setProgress(0,file.size,'Only PDF, DOC or DOCX files are allowed.');
+            return;
+        }
+        if(file.size===0){
+            setProgress(0,file.size,'The selected file is empty.');
+            return;
+        }
         if(file.size>MAX_SIZE){
             setProgress(0,file.size,'File is larger than 50 MB.');
             return;
@@ -147,6 +156,7 @@
                 })
             });
             const session=await readJson(start);
+            if(!session.upload_id) throw new Error('Upload session could not be created.');
             const uploadId=session.upload_id;
             const chunkSize=Number(session.chunk_size)||FALLBACK_CHUNK_SIZE;
             const totalChunks=Math.max(1,Math.ceil(file.size/chunkSize));
