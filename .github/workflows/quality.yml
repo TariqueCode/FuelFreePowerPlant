@@ -70,6 +70,13 @@ jobs:
       - name: Prepare test environment
         run: cp .env.example .env
 
+      - name: Prepare SQLite database
+        shell: bash
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+          php artisan migrate --force
+
       - name: Run Laravel package discovery
         run: php artisan package:discover --ansi
 
