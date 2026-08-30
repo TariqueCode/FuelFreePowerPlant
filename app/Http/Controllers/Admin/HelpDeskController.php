@@ -55,6 +55,7 @@ class HelpDeskController extends Controller
         $channel = (string) $request->query('channel', 'all');
         $status = (string) $request->query('status', 'all');
 
+        // Filter in-memory after merging the three sources; pagination stays consistent across channels.
         $items = $allItems->filter(function ($item) use ($search, $channel, $status) {
             if ($channel !== 'all' && $item->channel !== $channel) return false;
             if ($status !== 'all' && $item->status !== $status) return false;
