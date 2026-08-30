@@ -118,7 +118,7 @@ class SyncHelpdeskMail extends Command
 
     private function parseSender(string $value): array
     {
-        if(preg_match('/^(.*?)\\s*<([^>]+)>$/',$value,$m)) return ['name'=>trim($m[1],' "\\''),'email'=>trim($m[2])];
+        if(preg_match('/^(.*?)\\s*<([^>]+)>$/',$value,$m)) return ['name'=>trim($m[1], " \"'"),'email'=>trim($m[2])];
         return ['name'=>'','email'=>trim($value)];
     }
 
