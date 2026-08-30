@@ -144,7 +144,7 @@ input{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radiu
         if (!file) return;
 
         const allowed = ['image/jpeg', 'image/png', 'image/webp'];
-        const maxBytes = 10 * 1024 * 1024;
+        const maxBytes = {{ ((int) ($maxUploadMb ?? 50)) * 1024 * 1024 }};
 
         if (!allowed.includes(file.type)) {
             input.value = '';
@@ -155,7 +155,7 @@ input{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radiu
 
         if (file.size > maxBytes) {
             input.value = '';
-            feedback.textContent = 'The image is larger than 10 MB. Please choose a smaller image.';
+            feedback.textContent = 'The image is larger than {{ $maxUploadMb ?? 50 }} MB. Please choose a smaller image.';
             feedback.style.display = 'block';
             return;
         }
@@ -175,8 +175,8 @@ input{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radiu
             return;
         }
 
-        if (file && file.size > 10 * 1024 * 1024) {
-            feedback.textContent = 'The image is larger than 10 MB. Please choose a smaller image.';
+        if (file && file.size > {{ ((int) ($maxUploadMb ?? 50)) * 1024 * 1024 }}) {
+            feedback.textContent = 'The image is larger than {{ $maxUploadMb ?? 50 }} MB. Please choose a smaller image.';
             feedback.style.display = 'block';
             feedback.style.color = '#ffb1ba';
             return;
