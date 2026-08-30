@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CmsPage;
+use App\Models\HomepageSection;
 use App\Models\PowerPlant;
 use App\Models\SiteContentItem;
 use App\Models\SiteSlider;
@@ -19,19 +20,21 @@ class HomeController
         $gallery=SiteContentItem::published()->where('type','gallery')->whereNotNull('image_path')->withCount('galleryMedia')->orderBy('sort_order')->latest('published_at')->get();
         $sliders=SiteSlider::active()->get();
         $settings=SystemSetting::query()->pluck('value','key')->all();
-        $homeOrder=json_decode($settings['home.section_order']??'[]',true);
-
         $brand=['name'=>$settings['company.name']??config('fuelfree.company.name'),'domain'=>$settings['company.domain']??config('fuelfree.company.domain'),'tagline'=>$settings['company.tagline']??config('fuelfree.company.tagline'),'logo_path'=>$settings['company.logo_path']??null];
 
+        $configuredSections = HomepageSection::query()->ordered()->get();
+        $sectionOrder = $configuredSections->pluck('key')->all();
+        $enabledSections = $configuredSections->where('is_enabled', true)->pluck('key')->flip();
         $home = [
-            'slider' => filter_var($settings['home.slider_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
-            'welcome' => filter_var($settings['home.welcome_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
-            'news' => filter_var($settings['home.news_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
-            'gallery' => filter_var($settings['home.gallery_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
-            'statistics' => filter_var($settings['home.statistics_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
-            'projects' => filter_var($settings['home.projects_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
-            'cta' => filter_var($settings['home.cta_enabled'] ?? '1', FILTER_VALIDATE_BOOLEAN),
-            'section_order' => is_array($homeOrder) && $homeOrder ? $homeOrder : ['hero','welcome','statistics','projects','news','gallery','cta'],
+            'slider' => isset($enabledSections['hero']),
+            'welcome' => isset($enabledSections['welcome']),
+            'statistics' => isset($enabledSections['statistics']),
+            'projects' => isset($enabledSections['projects']),
+            'management' => isset($enabledSections['management']),
+            'news' => isset($enabledSections['news']),
+            'gallery' => isset($enabledSections['gallery']),
+            'cta' => isset($enabledSections['cta']),
+            'section_order' => $sectionOrder ?: ['hero','welcome','statistics','projects','management','news','gallery','cta'],
         ];
 
         $newsLimit=max(1,min(12,(int)($settings['home.news_limit']??3)));
