@@ -17,13 +17,13 @@ $canWebsite=auth()->user()->hasPermission('website.view') || auth()->user()->has
 @endif
 @if($canWebsite)
 <div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span>Website</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
-<a class="{{ request()->routeIs('admin.homepage-builder.*')?'active':'' }}" href="{{ route('admin.homepage-builder.index') }}"><span>Homepage Builder</span></a><a class="{{ request()->routeIs('admin.site-content.*')?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'company']) }}"><span>Content Library</span></a>
+<a class="{{ request()->routeIs('admin.homepage-builder.*')?'active':'' }}" href="{{ route('admin.homepage-builder.index') }}"><span>Homepage Builder</span></a><a class="{{ request()->routeIs('admin.site-content.*') && in_array(request('type'),['company','management'])?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'company']) }}"><span>Company &amp; About</span></a>
 <a class="{{ request()->routeIs('admin.navigation.*')?'active':'' }}" href="{{ route('admin.navigation.index') }}"><span>Navigation / Menu Builder</span></a>
 <a class="{{ request()->routeIs('admin.cms.*')?'active':'' }}" href="{{ route('admin.cms.index') }}"><span>Pages / Page Builder</span></a>
 <a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='news'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news']) }}"><span>News &amp; Notices</span></a>
 <a class="{{ request()->routeIs('admin.gallery.*')?'active':'' }}" href="{{ route('admin.gallery.index') }}"><span>Gallery</span></a>
 <a class="{{ request()->routeIs('admin.sliders.*')?'active':'' }}" href="{{ route('admin.sliders.index') }}"><span>Sliders</span></a>
-<a class="{{ request()->routeIs('admin.documents*')?'active':'' }}" href="{{ route('admin.documents') }}"><span>Media / Documents</span></a>
+<a class="{{ request()->routeIs('admin.documents*')?'active':'' }}" href="{{ route('admin.documents') }}"><span>Media Library</span></a>
 <a class="{{ request()->routeIs('admin.social-links.*')?'active':'' }}" href="{{ route('admin.social-links.index') }}"><span>Social Media</span></a>
 </div></div>
 <div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-palette"></i></span><span>Design &amp; Layout</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
@@ -45,7 +45,7 @@ $canWebsite=auth()->user()->hasPermission('website.view') || auth()->user()->has
 <a href="{{ route('admin.users.index') }}"><span>Roles &amp; Permissions</span></a>
 </div></div>
 @endif
-@if(auth()->user()->hasPermission('documents.view'))<a class="{{ request()->routeIs('admin.documents')?'active':'' }}" href="{{ route('admin.documents') }}"><span class="nav-icon"><i class="fa-solid fa-folder-open"></i></span>Media Library</a>@endif
+
 @if(auth()->user()->hasPermission('mail.view'))<a class="{{ request()->routeIs('admin.helpdesk*')?'active':'' }}" href="{{ route('admin.helpdesk') }}"><span class="nav-icon"><i class="fa-solid fa-headset"></i></span>Help Desk</a>@endif
 @if(auth()->user()->hasPermission('career.view'))<a class="{{ request()->routeIs('admin.career-applications.*')?'active':'' }}" href="{{ route('admin.career-applications.index') }}"><span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>Career</a>@endif
 </nav></aside><main class="main"><header class="topbar"><a class="topbar-brand" href="{{ route('admin.dashboard') }}">@if($dashboardLogo)<img src="{{ asset('storage/'.$dashboardLogo) }}" alt="{{ $dashboardName }}">@else<span class="brand-mark"><i class="fa-solid fa-bolt"></i></span>@endif<span class="topbar-title">{{ $dashboardName }}</span></a><a class="profile-trigger" href="{{ route('profile') }}" aria-label="My profile"><i class="fa-solid fa-user"></i></a></header><div class="content">@yield('content')</div></main></div>
