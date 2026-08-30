@@ -17,7 +17,7 @@ $canWebsite=auth()->user()->hasPermission('website.view') || auth()->user()->has
 @endif
 @if($canWebsite)
 <div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span>Website</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
-<a class="{{ request()->routeIs('admin.site-content.*')?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'company']) }}"><span>Homepage / Content</span></a>
+<a class="{{ request()->routeIs('admin.homepage-builder.*')?'active':'' }}" href="{{ route('admin.homepage-builder.index') }}"><span>Homepage Builder</span></a><a class="{{ request()->routeIs('admin.site-content.*')?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'company']) }}"><span>Content Library</span></a>
 <a class="{{ request()->routeIs('admin.navigation.*')?'active':'' }}" href="{{ route('admin.navigation.index') }}"><span>Navigation / Menu Builder</span></a>
 <a class="{{ request()->routeIs('admin.cms.*')?'active':'' }}" href="{{ route('admin.cms.index') }}"><span>Pages / Page Builder</span></a>
 <a class="{{ request()->routeIs('admin.cms.*')?'active':'' }}" href="{{ route('admin.cms.index') }}"><span>Pages</span></a>
