@@ -56,7 +56,7 @@ Route::get('/news', [NewsController::class,'index'])->name('news.index');
 Route::get('/news/{slug}', [NewsController::class,'show'])->name('news.show');
 Route::get('/resources', [ResourceController::class,'index'])->name('resources.index');
 Route::get('/resources/{slug}', [ResourceController::class,'show'])->name('resources.show');
-Route::get('/shared/documents/{token}', [DocumentController::class,'sharedDownload'])->where('token', '[A-Fa-f0-9]{64}')->name('documents.shared-download');
+Route::get('/shared/documents/{token}', [DocumentController::class,'sharedDownload'])->where('token', '[A-Fa-f0-9]{64}')->middleware('throttle:30,1')->name('documents.shared-download');
 Route::get('/sustainability', SustainabilityController::class)->name('sustainability');
 Route::get('/contact', [ContactController::class,'show'])->name('contact');
 Route::post('/contact', [ContactController::class,'store'])->middleware('throttle:5,1')->name('contact.store');
