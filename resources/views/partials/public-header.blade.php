@@ -1,6 +1,8 @@
 @php
     $publicBrand = $brand ?? [];
     $headerLabels = config('fuelfree.header', []);
+    $headerVisibility = \App\Models\SystemSetting::query()->whereIn('key',['design.header.logo_enabled','design.header.navigation_enabled','design.header.social_enabled','design.header.mobile_enabled','design.header.portal_enabled'])->pluck('value','key');
+    $headerVisible = fn($key) => filter_var($headerVisibility->get('design.header.'.$key.'_enabled','1'), FILTER_VALIDATE_BOOLEAN);
     $publicName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
     $publicLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
     $publicNameParts = preg_split('/\s+/', trim((string) $publicName), 2);
@@ -117,7 +119,7 @@
     <div class="public-shell">
         <div class="public-header-top">
             <a class="public-brand" href="{{ route('home') }}" aria-label="{{ $publicName }}">
-                @if($publicLogo)<img src="{{ asset('storage/'.ltrim($publicLogo,'/')) }}" alt="{{ $publicName }}">@else<span class="public-brand-fallback" aria-hidden="true">⚡</span>@endif
+                @if($publicLogo && $headerVisible('logo'))<img src="{{ asset('storage/'.ltrim($publicLogo,'/')) }}" alt="{{ $publicName }}">@else<span class="public-brand-fallback" aria-hidden="true">⚡</span>@endif
                 <span class="public-brand-name"><span class="public-brand-name-first">{{ $publicNameFirst }}</span>@if($publicNameRest) <span class="public-brand-name-rest">{{ $publicNameRest }}</span>@endif</span>
             </a>
             <div class="public-header-tools">
@@ -167,7 +169,7 @@
                     <span>{{ $isPortalUser ? 'Portal' : 'Login' }}</span>
                 </a>
             </nav>
-        </div>
+        </div>@endif
     </div>
 </header>
 <script>
@@ -243,7 +245,7 @@
 <i class="fa-solid {{ $isPortalUser ? 'fa-circle-user' : 'fa-right-to-bracket' }}" aria-hidden="true"></i><span>{{ $isPortalUser ? 'Portal' : 'Login' }}</span>
 </a>
 </div></nav>
-        </div>
+        </div>@endif
     </div>
 </header>
 <script>
