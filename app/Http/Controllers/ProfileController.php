@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -21,7 +22,11 @@ class ProfileController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id],
-            'current_password' => ['nullable', 'current_password'],
+            'current_password' => [
+                Rule::requiredIf(fn () => filled($request->input('password'))),
+                'nullable',
+                'current_password',
+            ],
             'password' => ['nullable', 'string', 'min:12', 'confirmed'],
         ]);
 
