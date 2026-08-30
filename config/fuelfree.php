@@ -46,6 +46,14 @@ return [
         'quota_bytes' => (int) env('FUELFREE_STORAGE_QUOTA_BYTES', 53687091200),
     ],
 
+    'upload' => [
+        // Application-level defaults. Admin System Settings can override these per module.
+        'max_mb' => (int) env('FUELFREE_UPLOAD_MAX_MB', 50),
+        'career_max_mb' => (int) env('FUELFREE_CAREER_UPLOAD_MAX_MB', 50),
+        'documents_max_mb' => (int) env('FUELFREE_DOCUMENTS_UPLOAD_MAX_MB', 50),
+        'gallery_max_mb' => (int) env('FUELFREE_GALLERY_UPLOAD_MAX_MB', 50),
+    ],
+
     'roles' => [
         'super_admin' => 'super-admin',
         'administrator' => 'administrator',
