@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rules\File;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Validator;
 
 class CareerController extends Controller
 {
@@ -34,7 +35,7 @@ class CareerController extends Controller
 
         unset($data['website']);
         $file = $request->file('cv');
-        $path = $file->store('career/cv', 'local');
+        $path = $file->store('private/career/cv', 'local');
 
         CareerApplication::create([
             ...$data,
@@ -69,6 +70,7 @@ class CareerController extends Controller
                 'filename' => basename($data['filename']),
                 'size' => (int) $data['size'],
                 'mime_type' => (string) $request->input('mime_type', 'application/octet-stream'),
+                'created_at' => now()->toIso8601String(),
                 'chunk_size' => 262144,
                 'part_path' => $partPath,
             ], JSON_THROW_ON_ERROR));
@@ -80,6 +82,7 @@ class CareerController extends Controller
         $partPath = "{$uploadsDir}/{$uploadId}.part";
         abort_unless($disk->exists($metaPath), 404, 'Upload session not found.');
         $meta = json_decode($disk->get($metaPath), true, 512, JSON_THROW_ON_ERROR);
+        abort_if((string)($meta['created_at'] ?? '') !== '' && now()->diffInMinutes(\Carbon\Carbon::parse($meta['created_at'])) > 120, 410, 'Upload session expired. Please start again.');
 
         if ($request->boolean('finalize')) {
             $currentSize = $disk->exists($partPath) ? $disk->size($partPath) : 0;
