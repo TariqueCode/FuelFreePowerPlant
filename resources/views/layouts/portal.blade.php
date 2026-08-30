@@ -8,6 +8,11 @@ $brand=\App\Models\SystemSetting::query()->whereIn('key',['company.name','compan
 $dashboardName=$brand->get('company.name')?:config('fuelfree.company.name');
 $dashboardLogo=$brand->get('company.logo_path');
 $canWebsite=$canDesign;
+$canCms=auth()->user()->hasPermission('cms.view') || auth()->user()->hasRole(['super-admin','administrator']);
+$canSocial=auth()->user()->hasPermission('social-media.manage');
+$canSettings=auth()->user()->hasPermission('settings.manage');
+$canUsers=auth()->user()->hasPermission('users.view');
+$canCommunications=$canMail || $canCareer;
 @endphp
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><title>@yield('title','Dashboard') — {{ $dashboardName }}</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><style>
 :root{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color-scheme:dark;--bg:#031019;--line:rgba(104,204,235,.13);--text:#eaf8fb;--muted:#86a5b4}*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 75% 0,rgba(25,147,181,.14),transparent 28%),var(--bg);color:var(--text);overflow-x:hidden}a,button{font:inherit}.app{min-height:100vh;display:grid;grid-template-columns:250px 1fr}.sidebar{position:sticky;top:0;height:100vh;padding:18px 14px;border-right:1px solid var(--line);background:rgba(3,16,25,.86);backdrop-filter:blur(18px);overflow-y:auto}.brand{display:flex;align-items:center;gap:10px;padding:8px 9px 22px}.brand-logo{width:38px;height:38px;object-fit:contain;border-radius:10px}.brand-mark{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:rgba(67,194,229,.08);color:#61d8f1;border:1px solid var(--line)}.brand-text{min-width:0}.brand-text small{display:block;letter-spacing:.16em;color:#61c9e8;font-size:8px;text-transform:uppercase}.brand-text strong{display:block;margin-top:4px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nav{display:flex;flex-direction:column;gap:4px;margin-top:2px}.nav>a{min-height:42px;display:flex;align-items:center;gap:11px;padding:9px 11px;border:1px solid transparent;border-radius:12px;color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;cursor:pointer;transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease}.nav>a:hover{background:rgba(67,194,229,.055);border-color:rgba(104,204,235,.07);color:#d9f1f5;transform:translateX(1px)}.nav>a.active{background:linear-gradient(90deg,rgba(67,194,229,.13),rgba(67,194,229,.045));border-color:rgba(104,204,235,.11);color:var(--text);box-shadow:inset 3px 0 0 #49c8e6}.nav-icon{width:22px;height:22px;display:grid;place-items:center;flex:0 0 22px;color:#6e9fac}.nav>a.active .nav-icon,.nav>a:hover .nav-icon{color:#72d8ef}.nav-icon i{font-size:13px}.main{min-width:0}.topbar{height:70px;display:flex;align-items:center;justify-content:flex-end;padding:0 clamp(16px,4vw,42px);border-bottom:1px solid var(--line);background:rgba(3,16,25,.62);backdrop-filter:blur(16px);position:sticky;top:0;z-index:1000}.topbar-brand{display:none;align-items:center;gap:9px;min-width:0;flex:1;color:inherit;text-decoration:none}.topbar-brand img{width:32px;height:32px;object-fit:contain;border-radius:9px}.topbar-title{font-size:13px;color:#c6e1e8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.profile-trigger{width:42px;height:42px;flex:0 0 42px;margin-left:0;justify-self:end;border:1px solid rgba(104,204,235,.18);border-radius:13px;background:rgba(67,194,229,.08);color:#9fd8e8;display:grid;place-items:center;text-decoration:none;transition:background .18s ease,border-color .18s ease,transform .18s ease}.profile-trigger:hover{background:rgba(67,194,229,.13);border-color:rgba(104,204,235,.3);transform:translateY(-1px)}.content{padding:clamp(18px,4vw,40px);max-width:1500px}.mobile-nav-wrap{display:none!important}.mobile-nav{display:none!important}.mobile-arrow{display:none!important}.desktop-only-nav{display:block}.mobile-menu-toggle{display:none}.mobile-drawer-backdrop{display:none}
@@ -24,12 +29,12 @@ $canWebsite=$canDesign;
 <div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span>Website</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
 <a class="{{ request()->routeIs('admin.homepage-builder.*')?'active':'' }}" href="{{ route('admin.homepage-builder.index') }}"><span>Homepage Builder</span></a><a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='company'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'company']) }}"><span>Company &amp; About</span></a>
 <a class="{{ request()->routeIs('admin.navigation.*')?'active':'' }}" href="{{ route('admin.navigation.index') }}"><span>Navigation / Menu Builder</span></a>
-<a class="{{ request()->routeIs('admin.cms.*')?'active':'' }}" href="{{ route('admin.cms.index') }}"><span>Pages / Page Builder</span></a>
+@if($canCms)<a class="{{ request()->routeIs('admin.cms.*')?'active':'' }}" href="{{ route('admin.cms.index') }}"><span>Pages / Page Builder</span></a>@endif
 <a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='news'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news']) }}"><span>News &amp; Notices</span></a>
 <a class="{{ request()->routeIs('admin.gallery.*')?'active':'' }}" href="{{ route('admin.gallery.index') }}"><span>Gallery</span></a>
 <a class="{{ request()->routeIs('admin.sliders.*')?'active':'' }}" href="{{ route('admin.sliders.index') }}"><span>Sliders</span></a>
 <a class="{{ request()->routeIs('admin.documents*')?'active':'' }}" href="{{ route('admin.documents') }}"><span>Media Library</span></a>
-<a class="{{ request()->routeIs('admin.social-links.*')?'active':'' }}" href="{{ route('admin.social-links.index') }}"><span>Social Media</span></a>
+@if($canSocial)<a class="{{ request()->routeIs('admin.social-links.*')?'active':'' }}" href="{{ route('admin.social-links.index') }}"><span>Social Media</span></a>@endif
 </div></div>
 <div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-palette"></i></span><span>Design &amp; Layout</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
 <a class="{{ request()->routeIs('admin.design.*') && request('area')==='header'?'active':'' }}" href="{{ route('admin.design.index',['area'=>'header']) }}"><span>Header Builder</span></a>
@@ -37,12 +42,12 @@ $canWebsite=$canDesign;
 <a class="{{ request()->routeIs('admin.theme.*')?'active':'' }}" href="{{ route('admin.theme.index') }}"><span>Theme Builder</span></a>
 </div></div>
 @endif
-@if(auth()->user()->hasPermission('settings.manage') || $canWebsite)
+@if($canSettings)
 <div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span>Settings</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
 <a class="{{ request()->routeIs('admin.settings')?'active':'' }}" href="{{ route('admin.settings') }}"><span>General</span></a>
 </div></div>
 @endif
-@if(auth()->user()->hasPermission('users.view'))
+@if($canUsers)
 <div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span>Users &amp; Access</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
 <a class="{{ request()->routeIs('admin.users.*')?'active':'' }}" href="{{ route('admin.users.index') }}"><span>Users &amp; Access</span></a>
 </div></div>
