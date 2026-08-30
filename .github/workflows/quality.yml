@@ -21,14 +21,32 @@ jobs:
           extensions: mbstring, sqlite3, pdo_sqlite
           coverage: none
 
-      - name: Validate PHP syntax
+      - name: Lint application PHP
         shell: bash
         run: |
           set -euo pipefail
           while IFS= read -r -d '' file; do
-            php -l "$file" >/dev/null
-          done < <(find app config routes database -type f -name '*.php' -print0)
-          echo "PHP syntax check passed."
+            echo "Linting $file"
+            php -l "$file"
+          done < <(find app -type f -name '*.php' -print0)
+
+      - name: Lint config and routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            echo "Linting $file"
+            php -l "$file"
+          done < <(find config routes -type f -name '*.php' -print0)
+
+      - name: Lint database PHP
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            echo "Linting $file"
+            php -l "$file"
+          done < <(find database -type f -name '*.php' -print0)
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
