@@ -43,7 +43,7 @@ Route::get('/plants', [PublicSiteController::class,'show'])->defaults('section',
 Route::get('/future-project', [PublicSiteController::class,'show'])->defaults('section','future-project')->name('site.future-project');
 Route::get('/career', [CareerController::class,'show'])->name('site.career');
 Route::post('/career', [CareerController::class,'store'])->middleware('throttle:5,10')->name('career.store');
-Route::post('/career/chunks', [CareerController::class,'chunkUpload'])->middleware('throttle:150,10')->name('career.chunks');
+Route::post('/career/chunks', [CareerController::class,'chunkUpload'])->middleware(['throttle:150,10','throttle:30,1'])->name('career.chunks');
 Route::get('/solutions', [PublicSiteController::class,'show'])->defaults('section','solutions')->name('site.solutions');
 Route::get('/gallery', [PublicSiteController::class,'show'])->defaults('section','gallery')->name('site.gallery');
 Route::get('/gallery/{item}', [PublicSiteController::class,'showGallery'])->name('gallery.show');
