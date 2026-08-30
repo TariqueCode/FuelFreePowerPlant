@@ -15,7 +15,6 @@ class HomeController
     {
         $plants=PowerPlant::query()->orderByRaw("CASE WHEN status='operational' THEN 0 ELSE 1 END")->latest()->take(6)->get();
         $homePage=CmsPage::query()->where('slug','home')->where('is_published',true)->first();
-        $homeOrder=json_decode($settings['home.section_order']??'[]',true);
         $content=SiteContentItem::published()->whereIn('type',['news','announcement'])->orderBy('sort_order')->latest('published_at')->get()->groupBy(fn ($item) => in_array($item->type, ['news','announcement'], true) ? 'news' : $item->type);
         $gallery=SiteContentItem::published()->where('type','gallery')->whereNotNull('image_path')->withCount('galleryMedia')->orderBy('sort_order')->latest('published_at')->get();
         $sliders=SiteSlider::active()->get();
