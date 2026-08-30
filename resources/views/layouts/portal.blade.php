@@ -30,7 +30,7 @@ $canWebsite=auth()->user()->hasPermission('website.view') || auth()->user()->has
 <a class="{{ request()->routeIs('admin.design.*') && request('area')==='header'?'active':'' }}" href="{{ route('admin.design.index',['area'=>'header']) }}"><span>Header Builder</span></a>
 <a class="{{ request()->routeIs('admin.design.*') && request('area')==='footer'?'active':'' }}" href="{{ route('admin.design.index',['area'=>'footer']) }}"><span>Footer Builder</span></a>
 <a href="{{ route('admin.settings') }}"><span>Global Layout</span></a>
-<a href="{{ route('admin.settings') }}"><span>Theme &amp; Branding</span></a>
+<a class="{{ request()->routeIs('admin.theme.*')?'active':'' }}" href="{{ route('admin.theme.index') }}"><span>Theme Builder</span></a>
 </div></div>
 @endif
 @if(auth()->user()->hasPermission('settings.manage') || $canWebsite)
