@@ -7,6 +7,10 @@
     $publicNameFirst = $publicNameParts[0] ?? '';
     $publicNameRest = $publicNameParts[1] ?? '';
     $publicNavPages = \App\Models\SiteContentItem::query()->where('type','company')->where('status','published')->where('show_in_navigation',true)->orderByRaw("CASE WHEN slug = 'about-us' THEN 0 ELSE 1 END")->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')->orderBy('navigation_order')->orderByDesc('created_at')->get(['title','slug']);
+    $publicMenuItems = collect();
+    if (\Illuminate\Support\Facades\Schema::hasTable('navigation_menu_items')) {
+        $publicMenuItems = \App\Models\NavigationMenuItem::query()->where('menu','main')->where('is_visible',true)->whereNull('parent_id')->with(['children'=>fn($q)=>$q->where('is_visible',true)->orderBy('sort_order')->orderBy('id')])->orderBy('sort_order')->orderBy('id')->get();
+    }
     $publicCompanyActive = request()->routeIs('site.about') || request()->routeIs('company.page');
     $publicSocials = \Illuminate\Support\Facades\Cache::remember('public.social-links', 600, fn () => \App\Models\SocialLink::active()->get(['platform','label','url','icon'])->map(fn ($social) => ['platform' => $social->platform, 'label' => $social->label, 'url' => $social->url, 'icon' => $social->icon, 'color' => data_get(config('fuelfree.social.platforms'), $social->platform.'.color', '#51D8F0')])->values()->all());
     $isPortalUser = auth()->check();
@@ -163,6 +167,82 @@
                     <span>{{ $isPortalUser ? 'Portal' : 'Login' }}</span>
                 </a>
             </nav>
+        </div>
+    </div>
+</header>
+<script>
+(function(){
+  document.querySelectorAll('.public-menu-toggle').forEach(function(button){
+    if(button.dataset.bound === '1') return;
+    button.dataset.bound = '1';
+    var shell = button.closest('.public-shell');
+    var menu = shell && shell.querySelector('.public-header-nav');
+    if(!menu) return;
+    var icon = button.querySelector('.public-menu-icon');
+    var bars = '<path d="M4 6h16M4 12h16M4 18h16"/>';
+    var close = '<path d="M6 6l12 12M18 6L6 18"/>';
+    function setOpen(open){
+      menu.classList.toggle('is-open', open);
+      button.setAttribute('aria-expanded', open ? 'true' : 'false');
+      button.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+      if(icon) icon.innerHTML = open ? close : bars;
+    }
+    button.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); setOpen(!menu.classList.contains('is-open')); });
+    menu.querySelectorAll('a').forEach(function(link){ link.addEventListener('click', function(){ setOpen(false); }); });
+    document.addEventListener('click', function(e){ if(menu.classList.contains('is-open') && !shell.contains(e.target)) setOpen(false); });
+    window.addEventListener('resize', function(){ if(window.innerWidth > 720) setOpen(false); });
+  });
+})();
+</script>
+<script>
+(function(){
+  document.querySelectorAll('[data-company-menu]').forEach(function(dropdown){
+    var toggle = dropdown.querySelector('.public-menu-dropdown-toggle');
+    if(!toggle || toggle.dataset.bound === '1') return;
+    toggle.dataset.bound = '1';
+    function setOpen(open){
+      dropdown.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    toggle.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(window.innerWidth <= 720) setOpen(!dropdown.classList.contains('is-open'));
+    });
+    document.addEventListener('click', function(e){ if(!dropdown.contains(e.target)) setOpen(false); });
+    window.addEventListener('resize', function(){ if(window.innerWidth > 720) setOpen(false); });
+  });
+})();
+</script>
+<script>
+(function(){document.querySelectorAll('.public-header-social').forEach(function(el){el.addEventListener('pointerdown',function(){el.classList.add('is-touched')},{passive:true});el.addEventListener('blur',function(){el.classList.remove('is-touched')});});})();
+</script><div class="public-menu">
+@if($publicMenuItems->isNotEmpty())
+    @foreach($publicMenuItems as $menuItem)
+        @include('partials.public-menu-item',['menuItem'=>$menuItem])
+    @endforeach
+@else
+    <div class="public-menu-dropdown" data-company-menu>
+        <button class="public-menu-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false"><span>Company</span><span class="public-menu-dropdown-chevron" aria-hidden="true"></span></button>
+        <div class="public-menu-dropdown-panel">
+            @foreach($publicNavPages as $navPage)
+                @php $navUrl=$navPage->slug==='about-us'?route('site.about'):route('company.page',$navPage->slug); @endphp
+                <a href="{{ $navUrl }}">{{ $navPage->title }}</a>
+            @endforeach
+        </div>
+    </div>
+    <a href="{{ route('management') }}">{{ $headerLabels['management_label'] ?? 'Management Team' }}</a>
+    <a href="{{ route('site.gallery') }}">{{ $headerLabels['gallery_label'] ?? 'Gallery' }}</a>
+    <a href="{{ route('news.index') }}">{{ $headerLabels['news_label'] ?? 'News &amp; Notices' }}</a>
+    <a href="{{ route('site.career') }}">{{ $headerLabels['career_label'] ?? 'Career' }}</a>
+    <a href="{{ route('contact') }}">{{ $headerLabels['contact_label'] ?? 'Contact' }}</a>
+    <a href="{{ route('webmail.redirect') }}" target="_blank" rel="noopener noreferrer">{{ $headerLabels['webmail_label'] ?? 'Webmail' }}</a>
+@endif
+<span class="mobile-portal-separator" aria-hidden="true"></span>
+<a class="mobile-menu-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer">
+<i class="fa-solid {{ $isPortalUser ? 'fa-circle-user' : 'fa-right-to-bracket' }}" aria-hidden="true"></i><span>{{ $isPortalUser ? 'Portal' : 'Login' }}</span>
+</a>
+</div></nav>
         </div>
     </div>
 </header>
