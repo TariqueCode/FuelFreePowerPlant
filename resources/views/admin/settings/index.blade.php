@@ -37,6 +37,7 @@
         <div class="full"><label>Tagline</label><input name="company[tagline]" value="{{ old('company.tagline',$settings['company.tagline']) }}" maxlength="255"></div>
         <div><label>Timezone</label><input name="company[timezone]" value="{{ old('company.timezone',$settings['company.timezone']) }}" required placeholder="Asia/Dhaka"></div>
         <div><label>Storage quota (GiB)</label><input name="storage[quota_gib]" type="number" min="1" step="1" value="{{ old('storage.quota_gib',$settings['storage.quota_gib']) }}" required></div>
+        <div><label>Global upload limit (MB)</label><input name="uploads[max_mb]" type="number" min="1" max="2048" step="1" value="{{ old('uploads.max_mb',$settings['uploads.max_mb']) }}" required><small>Controls the application upload ceiling. Server PHP/web-server limits must be equal to or higher.</small></div>
     </div>
 </div>
 
