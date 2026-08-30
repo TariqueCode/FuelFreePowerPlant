@@ -90,42 +90,91 @@
 .welcome-copy p{font-size:14px!important;line-height:1.75}
 }
 
+
+.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.stat-card{padding:24px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,rgba(8,37,50,.92),rgba(3,19,27,.96));min-width:0}.stat-card i{color:var(--cyan);font-size:18px}.stat-card strong{display:block;font-size:30px;line-height:1.15;margin-top:18px;letter-spacing:-.03em}.stat-card span{display:block;color:#789aa5;font-size:10px;margin-top:7px}.project-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.project-card{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:linear-gradient(145deg,rgba(8,37,50,.92),rgba(3,19,27,.96));transition:.25s}.project-card:hover{transform:translateY(-4px);border-color:rgba(72,216,241,.4)}.project-media{height:180px;background:#061923;display:grid;place-items:center;color:#5e8490;font-size:30px;overflow:hidden}.project-media img{width:100%;height:100%;object-fit:cover}.project-body{padding:17px}.project-top{display:flex;justify-content:space-between;gap:8px;color:#72dfbf;font-size:8px;text-transform:uppercase;letter-spacing:.12em}.project-top i{color:var(--cyan)}.project-body h3{font-size:17px;margin:11px 0 7px}.project-body p{color:var(--muted);font-size:10px;margin:0 0 14px}.project-body>strong{font-size:12px;color:#a9f5ff}.management-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.member-card{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:linear-gradient(145deg,rgba(8,37,50,.92),rgba(3,19,27,.96));transition:.25s}.member-card:hover{transform:translateY(-4px);border-color:rgba(72,216,241,.4)}.member-photo{aspect-ratio:1/1;background:#061923;display:grid;place-items:center;color:#5e8490;font-size:34px;overflow:hidden}.member-photo img{width:100%;height:100%;object-fit:cover}.member-card>div:last-child{padding:15px}.member-card h3{margin:0;font-size:14px}.member-card p{margin:7px 0 0;color:var(--muted);font-size:9px;line-height:1.5}.cta-card{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:34px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(120deg,rgba(10,54,70,.95),rgba(4,24,34,.95));box-shadow:0 20px 60px rgba(0,0,0,.16)}.cta-card h2{margin:9px 0 8px;font-size:clamp(25px,4vw,42px);letter-spacing:-.04em}.cta-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.7}.cta-card .btn{flex:0 0 auto}
+@media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr)}.project-grid{grid-template-columns:repeat(2,1fr)}.management-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.stats-grid,.project-grid,.management-grid{grid-template-columns:1fr 1fr;gap:10px}.stat-card{padding:17px}.stat-card strong{font-size:23px;margin-top:13px}.project-media{height:135px}.project-body{padding:13px}.project-body h3{font-size:14px}.cta-card{display:block;padding:25px}.cta-card .btn{display:inline-flex;margin-top:20px}}
+@media(max-width:380px){.stats-grid,.project-grid,.management-grid{grid-template-columns:1fr}.project-media{height:180px}}
 </style>
 <main class="shell">
-    @if($home['slider'] && $sliders->isNotEmpty())
-    <section class="home-slider" aria-label="Company highlights">
-        <div class="slider-track">
-            @foreach($sliders as $index => $slider)
-                @php $sliderUrl=$slider->link_url; @endphp
-                @if($sliderUrl)<a class="slide {{ $index===0?'is-active':'' }}" href="{{ $sliderUrl }}" @if(str_starts_with($sliderUrl,'http')) target="_blank" rel="noopener" @endif>@else<div class="slide {{ $index===0?'is-active':'' }}">@endif
-                    <div class="slide-media">
-                        <img src="{{ asset('storage/'.ltrim($slider->image_path,'/')) }}" alt="{{ $slider->title ?: $siteName }}" @if($index>0)loading="lazy"@endif>
-                    </div>
-                    @if($slider->title)<div class="slide-caption" aria-label="{{ $slider->title }}"><strong>{{ $slider->title }}</strong></div>@endif
-                @if($sliderUrl)</a>@else</div>@endif
-            @endforeach
-        </div>
-    </section>
-    @endif
+@foreach($home['section_order'] as $section)
+@if($section==='hero' && $home['slider'] && $sliders->isNotEmpty())
+<section class="home-slider" aria-label="Company highlights">
+<div class="slider-track">
+@foreach($sliders as $index => $slider)
+@php($sliderUrl=$slider->link_url)
+@if($sliderUrl)<a class="slide {{ $index===0?'is-active':'' }}" href="{{ $sliderUrl }}" @if(str_starts_with($sliderUrl,'http')) target="_blank" rel="noopener" @endif>@else<div class="slide {{ $index===0?'is-active':'' }}">@endif
+<div class="slide-media"><img src="{{ asset('storage/'.ltrim($slider->image_path,'/')) }}" alt="{{ $slider->title ?: $siteName }}" @if($index>0)loading="lazy"@endif></div>
+@if($slider->title)<div class="slide-caption" aria-label="{{ $slider->title }}"><strong>{{ $slider->title }}</strong></div>@endif
+@if($sliderUrl)</a>@else</div>@endif
+@endforeach
+</div>
+</section>
+@endif
 
-    @if($home['welcome'])
+@if($section==='welcome' && $home['welcome'])
 <section class="welcome">
-        <div class="welcome-heading"><span class="eyebrow">Welcome to {{ $siteName }}</span><h1>Building a <em>stronger</em> energy future.</h1><div class="welcome-rule"></div></div>
-        <div class="welcome-copy">
-            <p><strong>{{ $siteName }}</strong> is a forward-thinking energy company committed to contributing to Bangladesh’s sustainable energy future. Our vision is to develop efficient, reliable, and innovative power solutions that support the country’s growing energy needs and economic development.</p>
-            <p>We are dedicated to building a cleaner and smarter energy future through innovation, responsible development, and world-class management practices. We aim to strengthen our capabilities, expand our projects, embrace modern technologies, and deliver dependable energy solutions while maintaining our commitment to quality, sustainability, and excellence.</p>
-            <div class="welcome-signoff">{{ $siteName }} <span>— Powering a cleaner, smarter future.</span></div>
-        </div>
-    </section>
-    @endif
+<div class="welcome-heading"><span class="eyebrow">Welcome to {{ $siteName }}</span><h1>{{ $homePage?->title ?: 'Building a stronger energy future.' }}</h1><div class="welcome-rule"></div></div>
+<div class="welcome-copy">
+@if($homePage?->content)
+{!! $homePage->content !!}
+@else
+<p><strong>{{ $siteName }}</strong> is a forward-thinking energy company committed to contributing to Bangladesh’s sustainable energy future. Our vision is to develop efficient, reliable, and innovative power solutions that support the country’s growing energy needs and economic development.</p>
+<p>We are dedicated to building a cleaner and smarter energy future through innovation, responsible development, and world-class management practices. We aim to strengthen our capabilities, expand our projects, embrace modern technologies, and deliver dependable energy solutions while maintaining our commitment to quality, sustainability, and excellence.</p>
+@endif
+<div class="welcome-signoff">{{ $siteName }} <span>— Powering a cleaner, smarter future.</span></div>
+</div>
+</section>
+@endif
 
-    @if($home['news'])
-    <section class="section"><div class="head"><div><span class="eyebrow">Latest updates</span><h2>News &amp; Notices</h2></div><a class="more" href="{{ route('news.index') }}">View all →</a></div><div class="news-grid">@if(($content['news']??collect())->isNotEmpty())@foreach(($content['news']??collect())->take(6) as $item)<a class="news" href="{{ route('news.show',$item->slug) }}"><div class="news-media">@if($item->image_path)<img src="{{ asset('storage/'.$item->image_path) }}" alt="{{ $item->cover_alt ?: $item->title }}" loading="lazy">@else<div class="news-placeholder">▣</div>@endif</div><div class="news-kind {{ $item->type==='announcement'?'notice':'' }}">{{ $item->type==='announcement'?'Notice':'News' }}</div><div class="news-body"><h3>{{ $item->title }}</h3><p>{{ $item->excerpt ?: \Illuminate\Support\Str::limit(strip_tags((string) $item->content), 180) }}</p><div class="news-footer"><span class="date">{{ $item->published_at?->format('d F Y') }}</span><span class="read">Read more →</span></div></div></a>@endforeach @else<div class="empty" style="grid-column:1/-1">No news has been published yet.</div>@endif</div></section>
-    @endif
+@if($section==='statistics' && $home['statistics'])
+<section class="section"><div class="head"><div><span class="eyebrow">Power at a glance</span><h2>Our footprint.</h2></div><p>Key figures are calculated directly from the power plant records managed in the admin portal.</p></div>
+<div class="stats-grid">
+<div class="stat-card"><i class="fa-solid fa-industry"></i><strong>{{ number_format($stats['projects']) }}</strong><span>Projects</span></div>
+<div class="stat-card"><i class="fa-solid fa-bolt"></i><strong>{{ number_format($stats['capacity_mw'],2) }} MW</strong><span>Total capacity</span></div>
+<div class="stat-card"><i class="fa-solid fa-circle-check"></i><strong>{{ number_format($stats['operational']) }}</strong><span>Operational plants</span></div>
+<div class="stat-card"><i class="fa-solid fa-leaf"></i><strong>Future-ready</strong><span>Energy development</span></div>
+</div></section>
+@endif
 
-    @if($home['gallery'])
-    <section class="section"><div class="head"><div><span class="eyebrow">Photo collections</span><h2>Gallery</h2></div><a class="more" href="{{ route('site.gallery') }}">View all →</a></div><div class="folders">@if($gallery->isNotEmpty())@foreach($gallery->take(8) as $item)<a class="folder" href="{{ route('gallery.show',['item'=>$item->slug ?: $item->id]) }}"><div class="folder-media">@if($item->image_path)<img src="{{ asset('storage/'.ltrim($item->image_path,'/')) }}" alt="{{ $item->cover_alt ?: $item->title }}" loading="lazy">@else<div class="folder-placeholder"><i class="fa-regular fa-images"></i></div>@endif</div><div class="folder-body"><h3>{{ $item->title }}</h3><div class="folder-meta"><span class="folder-date"><i class="fa-regular fa-calendar"></i>{{ $item->published_at?->format('d F Y') ?? $item->created_at?->format('d F Y') }}</span><span class="folder-count"><i class="fa-regular fa-images"></i>{{ $item->gallery_media_count }} {{ $item->gallery_media_count === 1 ? 'photo' : 'photos' }}</span></div></div></a>@endforeach @else<div class="empty" style="grid-column:1/-1">No photo galleries have been published yet.</div>@endif</div></section>
-    @endif
+@if($section==='projects' && $home['projects'])
+<section class="section"><div class="head"><div><span class="eyebrow">Our power plants</span><h2>Projects &amp; plants.</h2></div><a class="more" href="{{ route('site.plants') }}">View all →</a></div>
+<div class="project-grid">
+@if($plants->isNotEmpty())
+@foreach($plants as $plant)
+<a class="project-card" href="{{ route('projects.show',$plant->slug) }}">
+<div class="project-media">@if($plant->image_path)<img src="{{ asset('storage/'.$plant->image_path) }}" alt="{{ $plant->name }}" loading="lazy">@else<i class="fa-solid fa-industry"></i>@endif</div>
+<div class="project-body"><div class="project-top"><span>{{ ucfirst(str_replace('_',' ',$plant->status)) }}</span><i class="fa-solid fa-arrow-up-right-from-square"></i></div><h3>{{ $plant->name }}</h3><p>{{ $plant->location ?: $plant->technology ?: 'Power generation project' }}</p><strong>{{ number_format((float)$plant->capacity_kw/1000,2) }} MW</strong></div>
+</a>
+@endforeach
+@else<div class="empty" style="grid-column:1/-1">No power plant projects have been published yet.</div>@endif
+</div></section>
+@endif
+
+@if($section==='management' && $home['management'])
+@php($homeManagement=\App\Models\SiteContentItem::query()->where('type','management')->published()->orderBy('sort_order')->orderBy('title')->take(4)->get())
+<section class="section"><div class="head"><div><span class="eyebrow">Leadership</span><h2>Management team.</h2></div><a class="more" href="{{ route('management') }}">Meet the team →</a></div>
+<div class="management-grid">
+@if($homeManagement->isNotEmpty())
+@foreach($homeManagement as $member)
+<a class="member-card" href="{{ route('management') }}#member-{{ $member->id }}"><div class="member-photo">@if($member->image_path)<img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}" loading="lazy">@else<i class="fa-solid fa-user"></i>@endif</div><div><h3>{{ $member->title }}</h3><p>{{ $member->designation ?: $member->excerpt }}</p></div></a>
+@endforeach
+@else<div class="empty" style="grid-column:1/-1">Management profiles will appear here when published.</div>@endif
+</div></section>
+@endif
+
+@if($section==='news' && $home['news'])
+<section class="section"><div class="head"><div><span class="eyebrow">Latest updates</span><h2>News &amp; Notices</h2></div><a class="more" href="{{ route('news.index') }}">View all →</a></div><div class="news-grid">@if(($content['news']??collect())->isNotEmpty())@foreach(($content['news']??collect())->take(6) as $item)<a class="news" href="{{ route('news.show',$item->slug) }}"><div class="news-media">@if($item->image_path)<img src="{{ asset('storage/'.$item->image_path) }}" alt="{{ $item->cover_alt ?: $item->title }}" loading="lazy">@else<div class="news-placeholder">▣</div>@endif</div><div class="news-kind {{ $item->type==='announcement'?'notice':'' }}">{{ $item->type==='announcement'?'Notice':'News' }}</div><div class="news-body"><h3>{{ $item->title }}</h3><p>{{ $item->excerpt ?: \Illuminate\Support\Str::limit(strip_tags((string) $item->content), 180) }}</p><div class="news-footer"><span class="date">{{ $item->published_at?->format('d F Y') }}</span><span class="read">Read more →</span></div></div></a>@endforeach @else<div class="empty" style="grid-column:1/-1">No news has been published yet.</div>@endif</div></section>
+@endif
+
+@if($section==='gallery' && $home['gallery'])
+<section class="section"><div class="head"><div><span class="eyebrow">Photo collections</span><h2>Gallery</h2></div><a class="more" href="{{ route('site.gallery') }}">View all →</a></div><div class="folders">@if($gallery->isNotEmpty())@foreach($gallery->take(8) as $item)<a class="folder" href="{{ route('gallery.show',['item'=>$item->slug ?: $item->id]) }}"><div class="folder-media">@if($item->image_path)<img src="{{ asset('storage/'.ltrim($item->image_path,'/')) }}" alt="{{ $item->cover_alt ?: $item->title }}" loading="lazy">@else<div class="folder-placeholder"><i class="fa-regular fa-images"></i></div>@endif</div><div class="folder-body"><h3>{{ $item->title }}</h3><div class="folder-meta"><span class="folder-date"><i class="fa-regular fa-calendar"></i>{{ $item->published_at?->format('d F Y') ?? $item->created_at?->format('d F Y') }}</span><span class="folder-count"><i class="fa-regular fa-images"></i>{{ $item->gallery_media_count }} {{ $item->gallery_media_count === 1 ? 'photo' : 'photos' }}</span></div></div></a>@endforeach @else<div class="empty" style="grid-column:1/-1">No photo galleries have been published yet.</div>@endif</div></section>
+@endif
+
+@if($section==='cta' && $home['cta'])
+<section class="section cta-section"><div class="cta-card"><div><span class="eyebrow">Let's build the future</span><h2>Reliable energy. Responsible growth.</h2><p>{{ $brand['tagline'] }}</p></div><a class="btn" href="{{ route('contact') }}">Contact us <i class="fa-solid fa-arrow-right"></i></a></div></section>
+@endif
+@endforeach
 </main>
 @push('scripts')
 <script>
