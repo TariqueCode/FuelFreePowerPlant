@@ -13,14 +13,14 @@ class HomepageSectionTest extends TestCase
     public function test_homepage_sections_can_be_enabled_disabled_and_ordered(): void
     {
         HomepageSection::create([
-            'key' => 'hero',
+            'key' => 'test-hero',
             'label' => 'Hero & Slider',
             'is_enabled' => true,
             'sort_order' => 1,
         ]);
 
         HomepageSection::create([
-            'key' => 'welcome',
+            'key' => 'test-welcome',
             'label' => 'Company Introduction',
             'is_enabled' => false,
             'sort_order' => 0,
@@ -28,7 +28,7 @@ class HomepageSectionTest extends TestCase
 
         $sections = HomepageSection::ordered()->get();
 
-        $this->assertSame(['welcome', 'hero'], $sections->pluck('key')->all());
+        $this->assertSame(['test-welcome', 'test-hero'], $sections->pluck('key')->all());
         $this->assertFalse($sections->first()->is_enabled);
         $this->assertTrue($sections->last()->is_enabled);
     }
