@@ -37,7 +37,25 @@
         <div class="full"><label>Tagline</label><input name="company[tagline]" value="{{ old('company.tagline',$settings['company.tagline']) }}" maxlength="255"></div>
         <div><label>Timezone</label><input name="company[timezone]" value="{{ old('company.timezone',$settings['company.timezone']) }}" required placeholder="Asia/Dhaka"></div>
         <div><label>Storage quota (GiB)</label><input name="storage[quota_gib]" type="number" min="1" step="1" value="{{ old('storage.quota_gib',$settings['storage.quota_gib']) }}" required></div>
-        <div><label>Global upload limit (MB)</label><input name="uploads[max_mb]" type="number" min="1" max="2048" step="1" value="{{ old('uploads.max_mb',$settings['uploads.max_mb']) }}" required><small>Controls the application upload ceiling. Server PHP/web-server limits must be equal to or higher.</small></div>
+        <div class="full"><label>Default upload limit (MB)</label><input name="uploads[max_mb]" type="number" min="1" max="1048576" step="1" value="{{ old('uploads.max_mb',$settings['uploads.max_mb']) }}" required><small>Fallback limit for upload modules that do not have their own policy. Enter any value you need; do not choose from a fixed list.</small></div>
+        <div class="full upload-policy-panel">
+            <div class="chrome-section-title"><i class="fa-solid fa-file-arrow-up"></i><span>Custom upload limits</span></div>
+            <p class="upload-policy-intro">Set an independent maximum for each upload area. Values are entered directly in MB, so you can use 1, 7, 25, 50, 100, 512 or any other value allowed by your server.</p>
+            <div class="upload-policy-grid">
+                @foreach([
+                    'career_max_mb'=>['Career applications','CV / resume uploads from the public Career page.'],
+                    'documents_max_mb'=>['File Manager','Documents and media uploaded through the Admin File Manager.'],
+                    'gallery_max_mb'=>['Gallery & media','Gallery cover images and gallery image/video uploads.'],
+                ] as $key=>$policy)
+                    <div class="upload-policy-field">
+                        <label>{{ $policy[0] }} <span>(MB)</span></label>
+                        <div class="mb-input"><input name="uploads[{{ $key }}]" type="number" min="1" max="1048576" step="1" value="{{ old('uploads.'.$key,$settings['uploads.'.$key]) }}" required><span>MB</span></div>
+                        <small>{{ $policy[1] }}</small>
+                    </div>
+                @endforeach
+            </div>
+            <div class="chrome-note"><i class="fa-solid fa-circle-info"></i><span>These are application-level limits. Your PHP, web-server/proxy and hosting limits must be equal to or higher than the largest value you configure.</span></div>
+        </div>
     </div>
 </div>
 
@@ -250,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
 @endsection
 
 @push('styles')
-<style>.builder-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.builder-links a{display:flex;gap:10px;align-items:center;padding:12px;border:1px solid rgba(104,204,235,.1);border-radius:11px;background:rgba(2,15,23,.5);text-decoration:none;color:#dff4f7}.builder-links a>i{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:rgba(67,194,229,.08);color:#62d9ee}.builder-links b,.builder-links small{display:block}.builder-links b{font-size:10px}.builder-links small{font-size:8px;color:#6d8c97;margin-top:3px}@media(max-width:800px){.builder-links{grid-template-columns:1fr 1fr}}@media(max-width:520px){.builder-links{grid-template-columns:1fr}}</style>
+<style>.builder-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.builder-links a{display:flex;gap:10px;align-items:center;padding:12px;border:1px solid rgba(104,204,235,.1);border-radius:11px;background:rgba(2,15,23,.5);text-decoration:none;color:#dff4f7}.builder-links a>i{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:rgba(67,194,229,.08);color:#62d9ee}.builder-links b,.builder-links small{display:block}.builder-links b{font-size:10px}.builder-links small{font-size:8px;color:#6d8c97;margin-top:3px}@media(max-width:800px){.builder-links{grid-template-columns:1fr 1fr}}@media(max-width:520px){.builder-links{grid-template-columns:1fr}}.upload-policy-panel{margin-top:16px;padding-top:18px;border-top:1px solid var(--line)}.upload-policy-intro{color:var(--muted);font-size:11px;line-height:1.6;margin:8px 0 14px}.upload-policy-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.upload-policy-field{padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.018)}.upload-policy-field label{display:block;font-weight:700}.upload-policy-field label span{color:var(--muted);font-weight:500}.mb-input{display:flex;align-items:center;gap:7px;margin-top:7px}.mb-input input{min-width:0;flex:1}.mb-input span{color:var(--muted);font-size:11px}.upload-policy-field small{display:block;margin-top:7px;color:var(--muted);font-size:9px;line-height:1.5}@media(max-width:800px){.upload-policy-grid{grid-template-columns:1fr}}</style>
 <style>
 .settings-stack{max-width:980px;display:grid;gap:18px}
 .chrome-section{padding-top:18px;margin-top:18px;border-top:1px solid rgba(76,205,233,.09)}
