@@ -18,6 +18,8 @@ $canWebsite=auth()->user()->hasPermission('website.view') || auth()->user()->has
 @if($canWebsite)
 <div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span>Website</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
 <a class="{{ request()->routeIs('admin.site-content.*')?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'company']) }}"><span>Homepage / Content</span></a>
+<a class="{{ request()->routeIs('admin.navigation.*')?'active':'' }}" href="{{ route('admin.navigation.index') }}"><span>Navigation / Menu Builder</span></a>
+<a class="{{ request()->routeIs('admin.cms.*')?'active':'' }}" href="{{ route('admin.cms.index') }}"><span>Pages / Page Builder</span></a>
 <a class="{{ request()->routeIs('admin.cms.*')?'active':'' }}" href="{{ route('admin.cms.index') }}"><span>Pages</span></a>
 <a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='news'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news']) }}"><span>News &amp; Notices</span></a>
 <a class="{{ request()->routeIs('admin.gallery.*')?'active':'' }}" href="{{ route('admin.gallery.index') }}"><span>Gallery</span></a>
