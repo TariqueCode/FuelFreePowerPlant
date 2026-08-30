@@ -22,7 +22,7 @@ $canWebsite=$canDesign;
 @endif
 @if($canWebsite)
 <div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span>Website</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
-<a class="{{ request()->routeIs('admin.homepage-builder.*')?'active':'' }}" href="{{ route('admin.homepage-builder.index') }}"><span>Homepage Builder</span></a><a class="{{ request()->routeIs('admin.site-content.*') && in_array(request('type'),['company','management'])?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'company']) }}"><span>Company &amp; About</span></a>
+<a class="{{ request()->routeIs('admin.homepage-builder.*')?'active':'' }}" href="{{ route('admin.homepage-builder.index') }}"><span>Homepage Builder</span></a><a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='company'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'company']) }}"><span>Company &amp; About</span></a>
 <a class="{{ request()->routeIs('admin.navigation.*')?'active':'' }}" href="{{ route('admin.navigation.index') }}"><span>Navigation / Menu Builder</span></a>
 <a class="{{ request()->routeIs('admin.cms.*')?'active':'' }}" href="{{ route('admin.cms.index') }}"><span>Pages / Page Builder</span></a>
 <a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='news'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news']) }}"><span>News &amp; Notices</span></a>
@@ -44,8 +44,7 @@ $canWebsite=$canDesign;
 @endif
 @if(auth()->user()->hasPermission('users.view'))
 <div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span>Users &amp; Access</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
-<a class="{{ request()->routeIs('admin.users.*')?'active':'' }}" href="{{ route('admin.users.index') }}"><span>Users</span></a>
-<a class="{{ request()->routeIs('admin.users.*')?'active':'' }}" href="{{ route('admin.users.index') }}"><span>User accounts &amp; access</span></a>
+<a class="{{ request()->routeIs('admin.users.*')?'active':'' }}" href="{{ route('admin.users.index') }}"><span>Users &amp; Access</span></a>
 </div></div>
 @endif
 
