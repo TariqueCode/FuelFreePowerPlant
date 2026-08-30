@@ -47,7 +47,7 @@ class DocumentController extends Controller
     public function destroyFolder(Request $request, DocumentFolder $folder): RedirectResponse { $this->ownFolder($request, $folder); $this->deleteFolderTree($folder); return redirect()->route('admin.documents')->with('success', 'Folder and all its contents were permanently deleted.'); }
     public function store(Request $request): RedirectResponse
     {
-        $data = $request->validate(['file' => ['required', 'file'], 'folder_id' => ['nullable', 'integer', 'exists:document_folders,id']]); $user = $request->user(); $folderId = $data['folder_id'] ?? null;
+        $data = $request->validate(['file' => ['required', 'file', 'max:51200'], 'folder_id' => ['nullable', 'integer', 'exists:document_folders,id']]); $user = $request->user(); $folderId = $data['folder_id'] ?? null;
         if ($folderId && ! DocumentFolder::whereKey($folderId)->where('user_id', $user->id)->exists()) abort(403); $file = $data['file']; $storedName = $file->hashName(); $path = $file->storeAs("private/{$user->id}", $storedName, 'local');
         Document::create(['user_id' => $user->id, 'folder_id' => $folderId, 'original_name' => $file->getClientOriginalName(), 'stored_name' => $storedName, 'disk' => 'local', 'path' => $path, 'mime_type' => $file->getMimeType(), 'size' => $file->getSize(), 'extension' => strtolower($file->getClientOriginalExtension())]); return back()->with('success', 'File uploaded securely.');
     }
@@ -78,6 +78,7 @@ class DocumentController extends Controller
                 'filename' => basename($data['filename']),
                 'size' => (int) $data['size'],
                 'mime_type' => (string) $request->input('mime_type', 'application/octet-stream'),
+                'created_at' => now()->toIso8601String(),
                 'chunk_size' => 524288,
                 'part_path' => $partPath,
             ], JSON_THROW_ON_ERROR));
@@ -89,6 +90,8 @@ class DocumentController extends Controller
         abort_unless(Storage::disk('local')->exists($metaPath), 404, 'Upload session not found.');
         $meta = json_decode(Storage::disk('local')->get($metaPath), true, 512, JSON_THROW_ON_ERROR);
         abort_unless((int) ($meta['user_id'] ?? 0) === (int) $user->id, 403);
+        $createdAt = (string) ($meta['created_at'] ?? '');
+        if ($createdAt !== '') { try { abort_if(now()->diffInMinutes(\Carbon\Carbon::parse($createdAt)) > 120, 410, 'Upload session expired. Please start again.'); } catch (\Throwable $e) { abort(410, 'Upload session expired. Please start again.'); } }
 
         if ($request->boolean('finalize')) {
             $currentSize = Storage::disk('local')->exists($partPath) ? Storage::disk('local')->size($partPath) : 0;
