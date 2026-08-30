@@ -7,6 +7,7 @@ use App\Models\CmsPage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
 class CmsController extends Controller
@@ -46,6 +47,16 @@ class CmsController extends Controller
     {
         $page->delete();
         return back()->with('status', 'CMS page deleted successfully.');
+    }
+
+    public function duplicate(CmsPage $page): RedirectResponse
+    {
+        $copy = $page->replicate();
+        $copy->title = Str::limit($page->title.' Copy', 180, '');
+        $copy->slug = $this->uniqueSlug($page->slug.'-copy');
+        $copy->is_published = false;
+        $copy->save();
+        return redirect()->route('admin.cms.edit', $copy)->with('status', 'Draft copy created.');
     }
 
     private function validatePage(Request $request): array
