@@ -27,36 +27,22 @@ $canCommunications=$canMail || $canCareer;
 @endif
 @if($canWebsite)
 <div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span>Website</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
-<a class="{{ request()->routeIs('admin.homepage-builder.*')?'active':'' }}" href="{{ route('admin.homepage-builder.index') }}"><span>Homepage Builder</span></a><a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='company'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'company']) }}"><span>Company &amp; About</span></a>
-<a class="{{ request()->routeIs('admin.navigation.*')?'active':'' }}" href="{{ route('admin.navigation.index') }}"><span>Navigation / Menu Builder</span></a>
-@if($canCms)<a class="{{ request()->routeIs('admin.cms.*')?'active':'' }}" href="{{ route('admin.cms.index') }}"><span>Pages / Page Builder</span></a>@endif
-<a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='news'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news']) }}"><span>News &amp; Notices</span></a>
+<a class="{{ request()->routeIs('admin.homepage-builder.*')?'active':'' }}" href="{{ route('admin.homepage-builder.index') }}"><span>Homepage</span></a>
+<a class="{{ request()->routeIs('admin.management.*')?'active':'' }}" href="{{ route('admin.management.index') }}"><span>Management Team</span></a>
+<a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='news'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news']) }}"><span>News &amp; Events</span></a>
+<a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='notice'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'notice']) }}"><span>Notices</span></a>
 <a class="{{ request()->routeIs('admin.gallery.*')?'active':'' }}" href="{{ route('admin.gallery.index') }}"><span>Gallery</span></a>
-<a class="{{ request()->routeIs('admin.sliders.*')?'active':'' }}" href="{{ route('admin.sliders.index') }}"><span>Sliders</span></a>
-<a class="{{ request()->routeIs('admin.documents*')?'active':'' }}" href="{{ route('admin.documents') }}"><span>Media Library</span></a>
+<a class="{{ request()->routeIs('admin.sliders.*')?'active':'' }}" href="{{ route('admin.sliders.index') }}"><span>Slider</span></a>
+<a class="{{ request()->routeIs('admin.site-popups.*')?'active':'' }}" href="{{ route('admin.site-popups.index') }}"><span>Highlights</span></a>
+@if($canCms)<a class="{{ request()->routeIs('admin.cms.*')?'active':'' }}" href="{{ route('admin.cms.index') }}"><span>Pages</span></a>@endif
 @if($canSocial)<a class="{{ request()->routeIs('admin.social-links.*')?'active':'' }}" href="{{ route('admin.social-links.index') }}"><span>Social Media</span></a>@endif
+<a class="{{ request()->routeIs('admin.navigation.*')?'active':'' }}" href="{{ route('admin.navigation.index') }}"><span>Navigation</span></a>
+<a class="{{ request()->routeIs('admin.documents*')?'active':'' }}" href="{{ route('admin.documents') }}"><span>Documents &amp; Media</span></a>
 </div></div>
-<div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-palette"></i></span><span>Design &amp; Layout</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
-<a class="{{ request()->routeIs('admin.design.*') && request('area')==='header'?'active':'' }}" href="{{ route('admin.design.index',['area'=>'header']) }}"><span>Header Builder</span></a>
-<a class="{{ request()->routeIs('admin.design.*') && request('area')==='footer'?'active':'' }}" href="{{ route('admin.design.index',['area'=>'footer']) }}"><span>Footer Builder</span></a>
-<a class="{{ request()->routeIs('admin.theme.*')?'active':'' }}" href="{{ route('admin.theme.index') }}"><span>Theme Builder</span></a>
-</div></div>
-@endif
-@if($canSettings)
-<div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span>Settings</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
-<a class="{{ request()->routeIs('admin.settings')?'active':'' }}" href="{{ route('admin.settings') }}"><span>General</span></a>
+<div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-server"></i></span><span>Operations</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
+@if(auth()->user()->hasPermission('plants.view'))<a class="{{ request()->routeIs('admin.plants.*')?'active':'' }}" href="{{ route('admin.plants.index') }}"><span>Power Plants</span></a>@endif
 </div></div>
 @endif
-@if($canUsers)
-<div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span>Users &amp; Access</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
-<a class="{{ request()->routeIs('admin.users.*')?'active':'' }}" href="{{ route('admin.users.index') }}"><span>Users &amp; Access</span></a>
-</div></div>
-@endif
-
-<div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-comments"></i></span><span>Communications</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
-@if(auth()->user()->hasPermission('mail.view'))<a class="{{ request()->routeIs('admin.helpdesk*')?'active':'' }}" href="{{ route('admin.helpdesk') }}"><span>Help Desk</span></a>@endif
-@if(auth()->user()->hasPermission('career.view'))<a class="{{ request()->routeIs('admin.career-applications.*')?'active':'' }}" href="{{ route('admin.career-applications.index') }}"><span>Careers</span></a>@endif
-</div></div>
 </nav></aside><main class="main"><header class="topbar"><button class="mobile-menu-toggle" id="mobile-menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false"><i class="fa-solid fa-bars"></i></button><a class="topbar-brand" href="{{ route('admin.dashboard') }}">@if($dashboardLogo)<img src="{{ asset('storage/'.$dashboardLogo) }}" alt="{{ $dashboardName }}">@else<span class="brand-mark"><i class="fa-solid fa-bolt"></i></span>@endif<span class="topbar-title">{{ $dashboardName }}</span></a><a class="profile-trigger" href="{{ route('profile') }}" aria-label="My profile"><i class="fa-solid fa-user"></i></a></header><div class="content">@yield('content')</div></main></div><div class="mobile-drawer-backdrop" id="mobile-drawer-backdrop"></div>
 <script>(()=>{const toggle=document.getElementById('mobile-menu-toggle'),sidebar=document.querySelector('.sidebar'),backdrop=document.getElementById('mobile-drawer-backdrop');if(toggle&&sidebar&&backdrop){const close=()=>{sidebar.classList.remove('mobile-open');backdrop.classList.remove('open');toggle.setAttribute('aria-expanded','false')};toggle.addEventListener('click',()=>{const open=sidebar.classList.toggle('mobile-open');backdrop.classList.toggle('open',open);toggle.setAttribute('aria-expanded',String(open))});backdrop.addEventListener('click',close);sidebar.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));window.addEventListener('keydown',e=>{if(e.key==='Escape')close()})}})();</script>
 <script>
