@@ -51,7 +51,9 @@ class DocumentController extends Controller
     {
         $data = $request->validate(['file' => ['required', 'file'], 'folder_id' => ['nullable', 'integer', 'exists:document_folders,id']]); $user = $request->user();
         $maxUploadBytes = $this->maxUploadBytes();
-        abort_if((int) $data['file']->getSize() > $maxUploadBytes, 422, 'The selected file exceeds the configured upload limit of '.($maxUploadBytes / 1048576).' MB.');
+        $fileSize = (int) $data['file']->getSize();
+        abort_if($fileSize > $maxUploadBytes, 422, 'The selected file exceeds the configured upload limit of '.($maxUploadBytes / 1048576).' MB.');
+        $this->ensureQuotaAvailable($user->id, $fileSize);
         $allowed = ['pdf','doc','docx','xls','xlsx','csv','txt','zip','jpg','jpeg','png','webp','gif','mp4','webm','mov'];
         abort_unless(in_array(strtolower($data['file']->getClientOriginalExtension()), $allowed, true), 422, 'This file type is not supported.'); $folderId = $data['folder_id'] ?? null;
         if ($folderId && ! DocumentFolder::whereKey($folderId)->where('user_id', $user->id)->exists()) abort(403); $file = $data['file']; $storedName = $file->hashName(); $path = $file->storeAs("private/{$user->id}", $storedName, 'local');
@@ -105,7 +107,9 @@ class DocumentController extends Controller
             $currentSize = Storage::disk('local')->exists($partPath) ? Storage::disk('local')->size($partPath) : 0;
             abort_unless($currentSize === (int) $meta['size'], 422, 'The upload is incomplete.');
             $maxUploadBytes = $this->maxUploadBytes();
-            abort_if((int) $meta['size'] > $maxUploadBytes, 422, 'The file exceeds the configured upload limit of '.($maxUploadBytes / 1048576).' MB.');
+            $fileSize = (int) $meta['size'];
+            abort_if($fileSize > $maxUploadBytes, 422, 'The file exceeds the configured upload limit of '.($maxUploadBytes / 1048576).' MB.');
+            $this->ensureQuotaAvailable($user->id, $fileSize);
             $extension = strtolower(pathinfo($meta['filename'], PATHINFO_EXTENSION));
             $allowed = ['pdf','doc','docx','xls','xlsx','csv','txt','zip','jpg','jpeg','png','webp','gif','mp4','webm','mov'];
             abort_if($extension === '' || !in_array($extension, $allowed, true), 422, 'This file type is not supported.');
@@ -153,7 +157,9 @@ class DocumentController extends Controller
     public function copy(Request $request, Document $document): RedirectResponse
     {
         $this->ownDocument($request, $document); $data = $request->validate(['folder_id' => ['nullable', 'integer', 'exists:document_folders,id']]); $folderId = $data['folder_id'] ?? null;
-        if ($folderId) DocumentFolder::whereKey($folderId)->where('user_id', $request->user()->id)->firstOrFail(); $disk = Storage::disk($document->disk); $storedName = (string) str()->uuid().($document->extension ? '.'.$document->extension : ''); $copyPath = "private/{$request->user()->id}/{$storedName}";
+        if ($folderId) DocumentFolder::whereKey($folderId)->where('user_id', $request->user()->id)->firstOrFail();
+        $this->ensureQuotaAvailable($request->user()->id, (int) $document->size);
+        $disk = Storage::disk($document->disk); $storedName = (string) str()->uuid().($document->extension ? '.'.$document->extension : ''); $copyPath = "private/{$request->user()->id}/{$storedName}";
         abort_unless($disk->copy($document->path, $copyPath), 500, 'Unable to copy the file.'); Document::create(['user_id' => $request->user()->id, 'folder_id' => $folderId, 'original_name' => pathinfo($document->original_name, PATHINFO_FILENAME).' - Copy'.($document->extension ? '.'.$document->extension : ''), 'stored_name' => $storedName, 'disk' => $document->disk, 'path' => $copyPath, 'mime_type' => $document->mime_type, 'size' => $document->size, 'extension' => $document->extension]); return back()->with('success', 'File copied successfully.');
     }
     public function download(Request $request, Document $document): mixed { $this->ownDocument($request, $document); abort_unless(Storage::disk($document->disk)->exists($document->path), 404); return Storage::disk($document->disk)->download($document->path, $document->original_name); }
@@ -197,6 +203,9 @@ class DocumentController extends Controller
     private function isDescendant(DocumentFolder $candidate, DocumentFolder $ancestor): bool { while ($candidate->parent_id) { if ((int) $candidate->parent_id === (int) $ancestor->id) return true; $candidate = $candidate->parent; } return false; }
     private function copyFolderTree(DocumentFolder $folder, int $userId, ?int $parentId): void
     {
+        $totalBytes = (int) $folder->documents()->sum('size');
+        foreach ($folder->children()->get() as $child) $totalBytes += (int) $child->documents()->sum('size');
+        $this->ensureQuotaAvailable($userId, $totalBytes);
         $copy = DocumentFolder::create(['user_id' => $userId, 'parent_id' => $parentId, 'name' => $folder->name.' - Copy']);
         foreach ($folder->documents()->get() as $document) { $disk = Storage::disk($document->disk); $storedName = (string) str()->uuid().($document->extension ? '.'.$document->extension : ''); $copyPath = "private/{$userId}/{$storedName}"; if ($disk->copy($document->path, $copyPath)) Document::create(['user_id' => $userId, 'folder_id' => $copy->id, 'original_name' => $document->original_name, 'stored_name' => $storedName, 'disk' => $document->disk, 'path' => $copyPath, 'mime_type' => $document->mime_type, 'size' => $document->size, 'extension' => $document->extension]); }
         foreach ($folder->children()->get() as $child) $this->copyFolderTree($child, $userId, $copy->id);
