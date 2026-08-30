@@ -28,7 +28,7 @@ class CareerApplicationController extends Controller
         return redirect()->route('admin.helpdesk.show', ['type' => 'career', 'id' => $application->id]);
     }
 
-    public function update(Request $request, CareerApplication $application): Response
+    public function update(Request $request, CareerApplication $application): RedirectResponse
     {
         $data = $request->validate(['status' => ['required','in:new,reviewing,shortlisted,rejected,hired']]);
         $application->update($data);
