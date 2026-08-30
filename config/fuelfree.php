@@ -53,6 +53,8 @@ return [
         'documents_max_mb' => (int) env('FUELFREE_DOCUMENTS_UPLOAD_MAX_MB', 50),
         'gallery_max_mb' => (int) env('FUELFREE_GALLERY_UPLOAD_MAX_MB', 50),
         'sliders_max_mb' => (int) env('FUELFREE_SLIDERS_UPLOAD_MAX_MB', 50),
+        'popups_max_mb' => (int) env('FUELFREE_POPUPS_UPLOAD_MAX_MB', 50),
+        'content_media_max_mb' => (int) env('FUELFREE_CONTENT_MEDIA_UPLOAD_MAX_MB', 100),
     ],
 
     'roles' => [
