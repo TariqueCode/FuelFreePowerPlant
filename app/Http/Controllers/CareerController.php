@@ -57,9 +57,11 @@ class CareerController extends Controller
         if ($uploadId === '') {
             $data = $request->validate([
                 'filename' => ['required','string','max:255'],
-                'size' => ['required','integer','min:1','max:52428800'],
+                'size' => ['required','integer','min:1'],
             ]);
 
+            $maxUploadMb = $this->maxUploadMb();
+            abort_if((int) $data['size'] > $maxUploadMb * 1024 * 1024, 422, 'The CV exceeds the configured upload limit of '.$maxUploadMb.' MB.');
             $extension = strtolower(pathinfo($data['filename'], PATHINFO_EXTENSION));
             abort_unless(in_array($extension, ['pdf','doc','docx'], true), 422, 'Please upload a PDF, DOC or DOCX file.');
             $uploadId = (string) str()->uuid();
@@ -156,6 +158,12 @@ class CareerController extends Controller
         return response()->json(['ok' => true, 'uploaded' => $offset + $length]);
     }
 
+    private function maxUploadMb(): int
+    {
+        $mb = (int) SystemSetting::query()->where('key', 'uploads.max_mb')->value('value');
+        return $mb > 0 ? $mb : (int) config('fuelfree.upload.max_mb', 50);
+    }
+
     private function validateApplication(Request $request): array
     {
         return $request->validate([
@@ -167,7 +175,7 @@ class CareerController extends Controller
             'experience' => ['nullable','string','max:180'],
             'location' => ['nullable','string','max:180'],
             'message' => ['nullable','string','max:5000'],
-            'cv' => ['required', File::types(['pdf','doc','docx'])->max('50mb')],
+            'cv' => ['required', File::types(['pdf','doc','docx'])->max($this->maxUploadMb().'mb')],
             'consent' => ['accepted'],
             'website' => ['nullable','string','max:0'],
         ]);
