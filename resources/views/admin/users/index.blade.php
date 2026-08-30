@@ -6,7 +6,7 @@
 @section('description', 'Create and manage secure staff and client accounts.')
 
 @section('content')
-<div class="toolbar">
+<div class="toolbar"><div class="user-summary"><strong>{{ $users->total() }}</strong><span>total account(s)</span></div>
     <a class="action" href="{{ route('admin.users.create') }}">+ Create user</a>
 </div>
 @if(session('status'))
@@ -49,6 +49,6 @@
 
 @push('styles')
 <style>
-.toolbar{display:flex;justify-content:flex-end;margin-bottom:14px}.action{display:inline-block;padding:11px 15px;border-radius:11px;background:#31afd2;color:#fff;text-decoration:none;font-weight:700;font-size:13px}.notice{padding:12px 14px;border-radius:12px;margin-bottom:14px;background:rgba(67,194,137,.1);border:1px solid rgba(67,194,137,.2);color:#a8e5ca}.notice.error{background:rgba(210,65,65,.12);border-color:rgba(210,65,65,.2);color:#ffb0b0}.table-card{background:rgba(255,255,255,.025);border:1px solid rgba(110,200,235,.12);border-radius:18px;overflow:hidden}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:760px}th,td{text-align:left;padding:15px 17px;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px}th{color:#74cce9;font-size:11px;letter-spacing:.08em;text-transform:uppercase}td{color:#b5cbd4}.row-actions{display:flex;align-items:center;gap:12px}.row-actions a{color:#74cce9;text-decoration:none}.row-actions form{margin:0}.row-actions button{border:0;background:transparent;color:#ff9eaa;padding:0;cursor:pointer;font:inherit}.pagination{padding:12px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.user-summary{display:flex;align-items:baseline;gap:7px;color:#b5cbd4}.user-summary strong{font-size:18px}.user-summary span{font-size:11px;color:#78919b}.action{display:inline-block;padding:11px 15px;border-radius:11px;background:#31afd2;color:#fff;text-decoration:none;font-weight:700;font-size:13px}.notice{padding:12px 14px;border-radius:12px;margin-bottom:14px;background:rgba(67,194,137,.1);border:1px solid rgba(67,194,137,.2);color:#a8e5ca}.notice.error{background:rgba(210,65,65,.12);border-color:rgba(210,65,65,.2);color:#ffb0b0}.table-card{background:rgba(255,255,255,.025);border:1px solid rgba(110,200,235,.12);border-radius:18px;overflow:hidden}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:760px}th,td{text-align:left;padding:15px 17px;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px}th{color:#74cce9;font-size:11px;letter-spacing:.08em;text-transform:uppercase}td{color:#b5cbd4}.row-actions{display:flex;align-items:center;gap:12px}.row-actions a{color:#74cce9;text-decoration:none}.row-actions form{margin:0}.row-actions button{border:0;background:transparent;color:#ff9eaa;padding:0;cursor:pointer;font:inherit}.pagination{padding:12px}
 </style>
 @endpush
