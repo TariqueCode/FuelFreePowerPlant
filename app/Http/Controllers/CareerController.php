@@ -82,7 +82,11 @@ class CareerController extends Controller
         $partPath = "{$uploadsDir}/{$uploadId}.part";
         abort_unless($disk->exists($metaPath), 404, 'Upload session not found.');
         $meta = json_decode($disk->get($metaPath), true, 512, JSON_THROW_ON_ERROR);
-        abort_if((string)($meta['created_at'] ?? '') !== '' && now()->diffInMinutes(\Carbon\Carbon::parse($meta['created_at'])) > 120, 410, 'Upload session expired. Please start again.');
+        $createdAt = (string) ($meta['created_at'] ?? '');
+        if ($createdAt !== '') {
+            try { abort_if(now()->diffInMinutes(\Carbon\Carbon::parse($createdAt)) > 120, 410, 'Upload session expired. Please start again.'); }
+            catch (\Throwable $e) { abort(410, 'Upload session expired. Please start again.'); }
+        }
 
         if ($request->boolean('finalize')) {
             $currentSize = $disk->exists($partPath) ? $disk->size($partPath) : 0;
