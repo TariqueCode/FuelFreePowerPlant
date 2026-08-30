@@ -32,16 +32,6 @@
             ->get();
     }
 
-    $publicNavPages = \App\Models\SiteContentItem::query()
-        ->where('type', 'company')
-        ->where('status', 'published')
-        ->where('show_in_navigation', true)
-        ->orderByRaw("CASE WHEN slug = 'about-us' THEN 0 ELSE 1 END")
-        ->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')
-        ->orderBy('navigation_order')
-        ->orderByDesc('created_at')
-        ->get(['title', 'slug']);
-
     $publicSocials = \Illuminate\Support\Facades\Cache::remember(
         'public.social-links',
         600,
@@ -152,10 +142,10 @@
                             <span>Company</span><span class="public-menu-dropdown-chevron" aria-hidden="true"></span>
                         </button>
                         <div class="public-menu-dropdown-panel">
-                            @foreach($publicNavPages as $navPage)
-                                @php $navUrl = $navPage->slug === 'about-us' ? route('site.about') : route('company.page', $navPage->slug); @endphp
-                                <a href="{{ $navUrl }}">{{ $navPage->title }}</a>
-                            @endforeach
+                            <a href="{{ route('site.about') }}">{{ $headerLabels['about_label'] ?? 'About Us' }}</a>
+                            <a href="{{ route('site.plants') }}">{{ $headerLabels['plants_label'] ?? 'Our Plants' }}</a>
+                            <a href="{{ route('site.future-project') }}">{{ $headerLabels['future_project_label'] ?? 'Future Project' }}</a>
+                            <a href="{{ route('site.solutions') }}">{{ $headerLabels['solutions_label'] ?? 'Solutions' }}</a>
                         </div>
                     </div>
                     <a href="{{ route('management') }}">{{ $headerLabels['management_label'] ?? 'Management Team' }}</a>
