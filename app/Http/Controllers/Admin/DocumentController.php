@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\DocumentFolder;
+use App\Models\SystemSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +48,9 @@ class DocumentController extends Controller
     public function destroyFolder(Request $request, DocumentFolder $folder): RedirectResponse { $this->ownFolder($request, $folder); $this->deleteFolderTree($folder); return redirect()->route('admin.documents')->with('success', 'Folder and all its contents were permanently deleted.'); }
     public function store(Request $request): RedirectResponse
     {
-        $data = $request->validate(['file' => ['required', 'file', 'max:51200'], 'folder_id' => ['nullable', 'integer', 'exists:document_folders,id']]); $user = $request->user();
+        $data = $request->validate(['file' => ['required', 'file'], 'folder_id' => ['nullable', 'integer', 'exists:document_folders,id']]); $user = $request->user();
+        $maxUploadBytes = $this->maxUploadBytes();
+        abort_if((int) $data['file']->getSize() > $maxUploadBytes, 422, 'The selected file exceeds the configured upload limit of '.($maxUploadBytes / 1048576).' MB.');
         $allowed = ['pdf','doc','docx','xls','xlsx','csv','txt','zip','jpg','jpeg','png','webp','gif','mp4','webm','mov'];
         abort_unless(in_array(strtolower($data['file']->getClientOriginalExtension()), $allowed, true), 422, 'This file type is not supported.'); $folderId = $data['folder_id'] ?? null;
         if ($folderId && ! DocumentFolder::whereKey($folderId)->where('user_id', $user->id)->exists()) abort(403); $file = $data['file']; $storedName = $file->hashName(); $path = $file->storeAs("private/{$user->id}", $storedName, 'local');
@@ -64,9 +67,11 @@ class DocumentController extends Controller
         if ($uploadId === '') {
             $data = $request->validate([
                 'filename' => ['required', 'string', 'max:255'],
-                'size' => ['required', 'integer', 'min:1', 'max:52428800'],
+                'size' => ['required', 'integer', 'min:1'],
                 'folder_id' => ['nullable', 'integer', 'exists:document_folders,id'],
             ]);
+            $maxUploadBytes = $this->maxUploadBytes();
+            abort_if((int) $data['size'] > $maxUploadBytes, 422, 'The file exceeds the configured upload limit of '.($maxUploadBytes / 1048576).' MB.');
             if (! empty($data['folder_id']) && ! DocumentFolder::whereKey($data['folder_id'])->where('user_id', $user->id)->exists()) abort(403);
             $usedBytes = collect(Storage::disk('local')->allFiles("private/{$user->id}"))->sum(fn ($file) => (int) Storage::disk('local')->size($file));
             $quotaBytes = (int) config('fuelfree.storage.quota_bytes', 50 * 1024 * 1024 * 1024);
@@ -98,7 +103,8 @@ class DocumentController extends Controller
         if ($request->boolean('finalize')) {
             $currentSize = Storage::disk('local')->exists($partPath) ? Storage::disk('local')->size($partPath) : 0;
             abort_unless($currentSize === (int) $meta['size'], 422, 'The upload is incomplete.');
-            abort_if((int) $meta['size'] > 52428800, 422, 'The file exceeds the 50 MB limit.');
+            $maxUploadBytes = $this->maxUploadBytes();
+            abort_if((int) $meta['size'] > $maxUploadBytes, 422, 'The file exceeds the configured upload limit of '.($maxUploadBytes / 1048576).' MB.');
             $extension = strtolower(pathinfo($meta['filename'], PATHINFO_EXTENSION));
             $allowed = ['pdf','doc','docx','xls','xlsx','csv','txt','zip','jpg','jpeg','png','webp','gif','mp4','webm','mov'];
             abort_if($extension === '' || !in_array($extension, $allowed, true), 422, 'This file type is not supported.');
@@ -178,6 +184,13 @@ class DocumentController extends Controller
         return Storage::disk($document->disk)->download($document->path, $document->original_name);
     }
     public function destroy(Request $request, Document $document): RedirectResponse { $this->ownDocument($request, $document); Storage::disk($document->disk)->delete($document->path); $document->delete(); return back()->with('success', 'File deleted permanently.'); }
+    private function maxUploadBytes(): int
+    {
+        $mb = (int) SystemSetting::query()->where('key', 'uploads.max_mb')->value('value');
+        if ($mb < 1) $mb = (int) config('fuelfree.upload.max_mb', 50);
+        return $mb * 1024 * 1024;
+    }
+
     private function ownFolder(Request $request, DocumentFolder $folder): void { abort_unless($folder->user_id === $request->user()->id, 403); }
     private function ownDocument(Request $request, Document $document): void { abort_unless($document->user_id === $request->user()->id, 403); }
     private function isDescendant(DocumentFolder $candidate, DocumentFolder $ancestor): bool { while ($candidate->parent_id) { if ((int) $candidate->parent_id === (int) $ancestor->id) return true; $candidate = $candidate->parent; } return false; }
