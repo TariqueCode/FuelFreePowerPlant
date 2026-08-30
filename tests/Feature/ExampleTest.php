@@ -8,7 +8,7 @@ use Tests\TestCase;
 class ExampleTest extends TestCase
 {
     use RefreshDatabase;
-{
+
     public function test_application_health_endpoint_is_available(): void
     {
         $this->get('/up')->assertSuccessful();
