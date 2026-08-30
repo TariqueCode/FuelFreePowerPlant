@@ -20,7 +20,6 @@ $canWebsite=auth()->user()->hasPermission('website.view') || auth()->user()->has
 <a class="{{ request()->routeIs('admin.homepage-builder.*')?'active':'' }}" href="{{ route('admin.homepage-builder.index') }}"><span>Homepage Builder</span></a><a class="{{ request()->routeIs('admin.site-content.*')?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'company']) }}"><span>Content Library</span></a>
 <a class="{{ request()->routeIs('admin.navigation.*')?'active':'' }}" href="{{ route('admin.navigation.index') }}"><span>Navigation / Menu Builder</span></a>
 <a class="{{ request()->routeIs('admin.cms.*')?'active':'' }}" href="{{ route('admin.cms.index') }}"><span>Pages / Page Builder</span></a>
-<a class="{{ request()->routeIs('admin.cms.*')?'active':'' }}" href="{{ route('admin.cms.index') }}"><span>Pages</span></a>
 <a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='news'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news']) }}"><span>News &amp; Notices</span></a>
 <a class="{{ request()->routeIs('admin.gallery.*')?'active':'' }}" href="{{ route('admin.gallery.index') }}"><span>Gallery</span></a>
 <a class="{{ request()->routeIs('admin.sliders.*')?'active':'' }}" href="{{ route('admin.sliders.index') }}"><span>Sliders</span></a>
@@ -28,8 +27,9 @@ $canWebsite=auth()->user()->hasPermission('website.view') || auth()->user()->has
 <a class="{{ request()->routeIs('admin.social-links.*')?'active':'' }}" href="{{ route('admin.social-links.index') }}"><span>Social Media</span></a>
 </div></div>
 <div class="nav-group"><button type="button" class="nav-parent"><span class="nav-icon"><i class="fa-solid fa-palette"></i></span><span>Design &amp; Layout</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
+<a class="{{ request()->routeIs('admin.design.*') && request('area')==='header'?'active':'' }}" href="{{ route('admin.design.index',['area'=>'header']) }}"><span>Header Builder</span></a>
+<a class="{{ request()->routeIs('admin.design.*') && request('area')==='footer'?'active':'' }}" href="{{ route('admin.design.index',['area'=>'footer']) }}"><span>Footer Builder</span></a>
 <a href="{{ route('admin.settings') }}"><span>Global Layout</span></a>
-<a href="{{ route('admin.settings') }}"><span>Header / Footer</span></a>
 <a href="{{ route('admin.settings') }}"><span>Theme &amp; Branding</span></a>
 </div></div>
 @endif
