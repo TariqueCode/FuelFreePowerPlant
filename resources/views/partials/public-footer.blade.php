@@ -1,6 +1,8 @@
 @php
     $publicBrand = $brand ?? [];
     $footerSettings = config('fuelfree.footer', []);
+    $footerVisibility = \App\Models\SystemSetting::query()->whereIn('key',['design.footer.columns_enabled','design.footer.links_enabled','design.footer.social_enabled','design.footer.contact_enabled','design.footer.copyright_enabled'])->pluck('value','key');
+    $footerVisible = fn($key) => filter_var($footerVisibility->get('design.footer.'.$key.'_enabled','1'), FILTER_VALIDATE_BOOLEAN);
     $publicFooterName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
     $publicFooterTagline = $footerSettings['tagline'] ?? (is_object($publicBrand) ? ($publicBrand->get('tagline') ?: $publicBrand->get('company.tagline') ?: config('fuelfree.company.tagline')) : ($publicBrand['tagline'] ?? $publicBrand['company.tagline'] ?? config('fuelfree.company.tagline')));
     $publicFooterLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
@@ -80,7 +82,7 @@
                     <div class="public-footer-tagline">{{ $publicFooterTagline }}</div>
                 @endif
                 <div class="public-footer-tech">{{ $footerSettings['technology'] ?? 'Fuel-Free Flywheel-Based Clean Energy Technology' }}</div>
-                @if(!empty($publicSocials))
+                @if($footerVisible('social') && !empty($publicSocials))
                     <div class="public-footer-social-wrap" aria-label="Social media">
                         @foreach($publicSocials as $social)
                             <a class="public-footer-social" style="--social-color:{{ $social['color'] }}" href="{{ $social['url'] }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $social['label'] }}" title="{{ $social['label'] }}">
@@ -91,15 +93,15 @@
                 @endif
             </section>
 
-            <section class="public-footer-section">
+            @if($footerVisible('columns'))<section class="public-footer-section">
                 <h2 class="public-footer-heading">{{ $footerSettings['office_heading'] ?? 'Office' }}</h2>
                 <div class="public-footer-address">
                     <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
                     <span>{!! nl2br(e($footerSettings['address'] ?? 'House-141, 3rd Floor, Road-22, Mohakhali DOHS, Dhaka-1206, Bangladesh')) !!}</span>
                 </div>
-            </section>
+            </section>@endif
 
-            <section class="public-footer-section">
+            @if($footerVisible('contact'))<section class="public-footer-section">
                 <h2 class="public-footer-heading">{{ $footerSettings['contact_heading'] ?? 'Contact' }}</h2>
                 <div class="public-footer-contact">
                     <a href="mailto:{{ $footerSettings['email'] ?? 'info@fuelfreepowerplant.com' }}"><i class="fa-solid fa-envelope" aria-hidden="true"></i><span>{{ $footerSettings['email'] ?? 'info@fuelfreepowerplant.com' }}</span></a>
@@ -107,11 +109,11 @@
                     <a href="{{ $footerSettings['website_url'] ?? 'https://www.fuelfreepowerplant.com' }}"><i class="fa-solid fa-globe" aria-hidden="true"></i><span>{{ $footerSettings['website'] ?? 'www.fuelfreepowerplant.com' }}</span></a>
                     <a href="{{ $footerSettings['get_in_touch_url'] ?? route('contact') }}"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i><span>{{ $footerSettings['get_in_touch_label'] ?? 'Get in touch' }}</span></a>
                 </div>
-            </section>
+            </section>@endif
         </div>
 
         <div class="public-footer-bottom">
-            <div>© {{ date('Y') }} {{ $publicFooterName }} · {{ $footerSettings['copyright_text'] ?? 'All rights reserved.' }}</div>
+            @if($footerVisible('copyright'))<div>© {{ date('Y') }} {{ $publicFooterName }} · {{ $footerSettings['copyright_text'] ?? 'All rights reserved.' }}</div>@endif
             <div class="public-footer-developer">Developed by <a href="mailto:TariqueBN@gmail.com" aria-label="Email developer Saif Al-Islam">Saif Al-Islam</a></div>
         </div>
     </div>
