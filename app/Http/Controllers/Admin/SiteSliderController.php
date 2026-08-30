@@ -96,7 +96,7 @@ class SiteSliderController extends Controller
     {
         $data = $request->validate([
             'title' => ['nullable', 'string', 'max:255'],
-            'image' => [$slider->exists ? 'nullable' : 'required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'image' => [$slider->exists ? 'nullable' : 'required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:'.$this->maxUploadKb()],
             'link_url' => ['nullable', 'url', 'max:1000'],
             'is_published' => ['nullable', 'boolean'],
             'starts_at' => ['nullable', 'date'],
@@ -140,3 +140,10 @@ class SiteSliderController extends Controller
         $slider->fill($data)->save();
     }
 }
+
+
+    private function maxUploadKb(): int
+    {
+        $mb = (int) \App\Models\SystemSetting::query()->where('key', 'uploads.sliders_max_mb')->value('value');
+        return max(1, $mb ?: (int) config('fuelfree.upload.sliders_max_mb', 50)) * 1024;
+    }
