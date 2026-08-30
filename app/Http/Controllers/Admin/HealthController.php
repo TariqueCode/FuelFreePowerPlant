@@ -23,6 +23,7 @@ class HealthController extends Controller
             'Encryption key' => ['status' => (bool) config('app.key'), 'detail' => config('app.key') ? 'Configured' : 'Missing'],
             'Cache' => $this->cacheCheck(),
             'Queue' => $this->queueCheck(),
+            'PHP upload limits' => ['status' => $this->phpUploadLimitOk(), 'detail' => 'upload_max_filesize='.ini_get('upload_max_filesize').', post_max_size='.ini_get('post_max_size')],
         ];
 
         return view('admin.health.index', compact('checks'));
@@ -37,6 +38,8 @@ class HealthController extends Controller
     private function cacheCheck(): array { try { $key='admin.health.probe'; Cache::put($key,'ok',10); $ok=Cache::get($key)==='ok'; Cache::forget($key); return ['status'=>$ok,'detail'=>$ok?'Read/write healthy':'Read/write failed']; } catch (\Throwable $e) { Log::warning('Health cache check failed',['exception'=>$e]); return ['status'=>false,'detail'=>'Cache check failed']; } }
 
     private function queueCheck(): array { return ['status'=>config('queue.default') !== null,'detail'=>'Driver: '.(string) config('queue.default')]; }
+
+    private function phpUploadLimitOk(): bool { $toBytes=function($v){$v=trim((string)$v); $n=(float)$v; return $n*(match(strtoupper(substr($v,-1))){'G'=>1073741824,'M'=>1048576,'K'=>1024,default=>1});}; return $toBytes(ini_get('upload_max_filesize')) >= 50*1048576 && $toBytes(ini_get('post_max_size')) >= 50*1048576; }
 
     private function storageCheck(): array
     {
