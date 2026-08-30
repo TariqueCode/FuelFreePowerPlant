@@ -14,7 +14,9 @@ return new class extends Migration {
    ['label'=>'Contact','route_name'=>'contact'],
    ['label'=>'Webmail','route_name'=>'webmail.redirect','target'=>'_blank'],
   ];
-  foreach($items as $i=>$item)NavigationMenuItem::create($item+['menu'=>'main','target'=>$item['target']??'_self','is_visible'=>true,'sort_order'=>$i]);
+  $parents=[]; foreach($items as $i=>$item)$parents[$item['label']]=NavigationMenuItem::create($item+['menu'=>'main','target'=>$item['target']??'_self','is_visible'=>true,'sort_order'=>$i]);
+  $company=$parents['Company'];
+  foreach([['About Us','site.about'],['Our Plants','site.plants'],['Future Project','site.future-project'],['Solutions','site.solutions']] as $j=>$child)NavigationMenuItem::create(['menu'=>'main','parent_id'=>$company->id,'label'=>$child[0],'route_name'=>$child[1],'target'=>'_self','is_visible'=>true,'sort_order'=>$j]);
  }
  public function down():void{NavigationMenuItem::where('menu','main')->delete();}
 };
