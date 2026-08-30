@@ -145,7 +145,7 @@ class NavigationMenuController extends Controller
             ->whereKey($parentId);
 
         if ($ignoreId !== null) {
-            $query->whereKeyNot($ignoreId);
+            $query->where('id', '!=', $ignoreId);
         }
 
         abort_unless($query->exists(), 422, 'Invalid parent menu item.');
