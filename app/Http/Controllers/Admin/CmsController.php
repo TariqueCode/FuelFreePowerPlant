@@ -55,6 +55,8 @@ class CmsController extends Controller
             'slug' => ['nullable', 'string', 'max:180', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
             'excerpt' => ['nullable', 'string', 'max:1000'],
             'content' => ['required', 'string'],
+            'meta_title' => ['nullable', 'string', 'max:255'],
+            'meta_description' => ['nullable', 'string', 'max:1000'],
             'is_published' => ['nullable', 'boolean'],
         ]) + ['is_published' => $request->boolean('is_published')];
     }
