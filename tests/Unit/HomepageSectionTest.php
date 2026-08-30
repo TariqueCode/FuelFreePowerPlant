@@ -12,6 +12,8 @@ class HomepageSectionTest extends TestCase
 
     public function test_homepage_sections_can_be_enabled_disabled_and_ordered(): void
     {
+        HomepageSection::query()->delete();
+
         HomepageSection::create([
             'key' => 'test-hero',
             'label' => 'Hero & Slider',
