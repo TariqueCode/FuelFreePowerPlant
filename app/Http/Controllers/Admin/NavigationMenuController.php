@@ -150,7 +150,8 @@ class NavigationMenuController extends Controller
 
     private function validateItem(Request $request): array
     {
-        return $request->validate([
+        $data = $request->validate([
+            'kind' => ['required', 'in:link,folder'],
             'label' => ['required', 'string', 'max:160'],
             'url' => ['nullable', 'string', 'max:500'],
             'route_name' => ['nullable', 'string', 'max:160'],
@@ -162,6 +163,17 @@ class NavigationMenuController extends Controller
         ]) + [
             'is_visible' => $request->boolean('is_visible'),
         ];
+
+        // A folder is a structural navigation node. It intentionally has no
+        // destination; its children provide the actual navigation targets.
+        if ($data['kind'] === 'folder') {
+            $data['url'] = null;
+            $data['route_name'] = null;
+        }
+
+        unset($data['kind']);
+
+        return $data;
     }
 
     private function validatedParentId(?int $parentId, string $menu, ?int $ignoreId = null): ?int
