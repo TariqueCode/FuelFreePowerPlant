@@ -109,7 +109,8 @@
     @endif
 
     @if($home['welcome'])
-    <section class="welcome">
+    @if($home['welcome'])
+<section class="welcome">
         <div class="welcome-heading"><span class="eyebrow">Welcome to {{ $siteName }}</span><h1>Building a <em>stronger</em> energy future.</h1><div class="welcome-rule"></div></div>
         <div class="welcome-copy">
             <p><strong>{{ $siteName }}</strong> is a forward-thinking energy company committed to contributing to Bangladesh’s sustainable energy future. Our vision is to develop efficient, reliable, and innovative power solutions that support the country’s growing energy needs and economic development.</p>
