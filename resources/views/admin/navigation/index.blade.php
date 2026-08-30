@@ -27,8 +27,14 @@
         <form method="POST" action="{{ route('admin.navigation.store') }}" class="builder-form">
             @csrf
             <input type="hidden" name="menu" value="{{ $menu }}">
+            <label>Type
+                <select id="item-kind" name="kind">
+                    <option value="link">Page / Link</option>
+                    <option value="folder">Folder</option>
+                </select>
+            </label>
             <label>Label<input name="label" required maxlength="160" placeholder="About Us"></label>
-            <label>Page / custom URL
+            <label id="page-link-wrap">Page / custom URL
                 <select id="page-link">
                     <option value="">Custom URL</option>
                     @foreach($pages as $page)
@@ -36,8 +42,8 @@
                     @endforeach
                 </select>
             </label>
-            <label>URL<input id="item-url" name="url" maxlength="500" placeholder="/about-us"></label>
-            <label>Route name<input name="route_name" maxlength="160" placeholder="site.about"></label>
+            <label id="url-wrap">URL<input id="item-url" name="url" maxlength="500" placeholder="/about-us"></label>
+            <label id="route-wrap">Route name<input name="route_name" maxlength="160" placeholder="site.about"></label>
             <label>Parent
                 <select name="parent_id">
                     <option value="">Top-level</option>
@@ -89,16 +95,33 @@
 
 @push('styles')
 <style>
-.builder-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:16px}.builder-card{background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:18px;padding:18px}.full-card{margin-top:16px}.card-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:14px;color:#d9edf2}.card-head span{font-size:10px;color:#6e8d9a}.builder-form,.edit-grid{display:grid;gap:10px}.builder-form label,.edit-box label{font-size:10px;color:#88a6b1}.builder-form input,.builder-form select,.edit-box input,.edit-box select{width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border-radius:9px;border:1px solid var(--line);background:#071b27;color:#e8f6fa}.check{display:flex!important;align-items:center;gap:7px}.check input{width:auto!important;margin:0!important}.primary,.edit-title button,.danger{border:0;border-radius:9px;padding:10px 13px;background:#31afd2;color:#fff;font-weight:700;cursor:pointer}.danger{background:transparent;border:1px solid rgba(255,100,100,.25);color:#ff9a9a;font-size:10px}.edit-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.edit-box{padding:13px;border:1px solid var(--line);border-radius:12px}.edit-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:#dceff3}.edit-title button{padding:7px 10px;font-size:10px}.notice{padding:12px;border-radius:11px;margin-bottom:14px;background:rgba(67,194,137,.1);color:#a8e5ca}.error-notice{background:rgba(255,100,100,.1);color:#ffb0b0}.empty{text-align:center;color:#708d99;padding:28px}@media(max-width:800px){.builder-grid,.edit-grid{grid-template-columns:1fr}}
+.builder-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:16px}.builder-card{background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:18px;padding:18px}.full-card{margin-top:16px}.card-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:14px;color:#d9edf2}.card-head span{font-size:10px;color:#6e8d9a}.builder-form,.edit-grid{display:grid;gap:10px}.builder-form label,.edit-box label{font-size:10px;color:#88a6b1}.builder-form input,.builder-form select,.edit-box input,.edit-box select{width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border-radius:9px;border:1px solid var(--line);background:#071b27;color:#e8f6fa}.check{display:flex!important;align-items:center;gap:7px}.check input{width:auto!important;margin:0!important}.primary,.edit-title button,.danger{border:0;border-radius:9px;padding:10px 13px;background:#31afd2;color:#fff;font-weight:700;cursor:pointer}.danger{background:transparent;border:1px solid rgba(255,100,100,.25);color:#ff9a9a;font-size:10px}.edit-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.edit-box{padding:13px;border:1px solid var(--line);border-radius:12px}.edit-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:#dceff3}.edit-title button{padding:7px 10px;font-size:10px}.is-hidden{display:none!important}.notice{padding:12px;border-radius:11px;margin-bottom:14px;background:rgba(67,194,137,.1);color:#a8e5ca}.error-notice{background:rgba(255,100,100,.1);color:#ffb0b0}.empty{text-align:center;color:#708d99;padding:28px}@media(max-width:800px){.builder-grid,.edit-grid{grid-template-columns:1fr}}
 </style>
 @endpush
 
 @push('scripts')
 <script>
-document.getElementById('page-link')?.addEventListener('change', e => {
+const kind = document.getElementById('item-kind');
+const pageLink = document.getElementById('page-link');
+const urlWrap = document.getElementById('url-wrap');
+const routeWrap = document.getElementById('route-wrap');
+const pageWrap = document.getElementById('page-link-wrap');
+const syncKind = () => {
+    const folder = kind?.value === 'folder';
+    [pageWrap, urlWrap, routeWrap].forEach(el => el?.classList.toggle('is-hidden', folder));
+    if (folder) {
+        const url = document.getElementById('item-url');
+        const route = document.querySelector('input[name="route_name"]');
+        if (url) url.value = '';
+        if (route) route.value = '';
+    }
+};
+kind?.addEventListener('change', syncKind);
+pageLink?.addEventListener('change', e => {
     const url = document.getElementById('item-url');
     if (url) url.value = e.target.value;
 });
+syncKind();
 
 (() => {
     const tree = document.getElementById('menu-tree');
