@@ -103,6 +103,7 @@ class SiteContentController extends Controller
     public function toggleNews(SiteContentItem $item): RedirectResponse
     {
         abort_unless(in_array($item->type, ['news','announcement'], true), 404);
+        abort_unless($request->user()->hasPermission('website.publish'), 403, 'Publishing website content requires publishing permission.');
         $item->status = $item->status === 'published' ? 'draft' : 'published';
         if ($item->status === 'published' && empty($item->published_at)) $item->published_at = now();
         $item->save();
@@ -165,8 +166,14 @@ class SiteContentController extends Controller
         }
         if ($data['type'] !== 'company') $data['show_in_navigation'] = false;
         if ($data['status'] === 'published' && empty($data['published_at'])) $data['published_at'] = now();
+        $this->guardPublishing($request, $data['status'] === 'published');
         $item->fill($data)->save();
         return $item;
+    }
+
+    private function guardPublishing(Request $request, bool $publishing): void
+    {
+        abort_unless(! $publishing || $request->user()->hasPermission('website.publish'), 403, 'Publishing website content requires publishing permission.');
     }
 
     private function maxUploadKb(): int
