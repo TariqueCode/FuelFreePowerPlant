@@ -9,6 +9,8 @@ use App\Models\SiteContentItem;
 use App\Models\HomepageSection;
 use App\Models\PowerPlant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PublishingAuthorityTest extends TestCase
@@ -108,6 +110,46 @@ class PublishingAuthorityTest extends TestCase
         ])->assertForbidden();
 
         $this->assertDatabaseMissing('site_content_items', ['title' => 'QA Gallery']);
+    }
+
+    public function test_slider_publishing_denial_happens_before_file_storage(): void
+    {
+        Storage::fake('public');
+
+        $manage = Permission::firstOrCreate(['slug' => 'website.manage'], ['name' => 'Manage website']);
+        $role = Role::create(['name' => 'Slider Manager', 'slug' => 'slider-manager-publish-test', 'is_system' => false]);
+        $role->permissions()->sync([$manage->id]);
+        $user = User::factory()->create();
+        $user->roles()->attach($role);
+
+        $this->actingAs($user)->post(route('admin.sliders.store'), [
+            'title' => 'QA Slider',
+            'image' => UploadedFile::fake()->image('qa-slider.jpg'),
+            'is_published' => '1',
+        ])->assertForbidden();
+
+        $this->assertDatabaseMissing('site_sliders', ['title' => 'QA Slider']);
+        Storage::disk('public')->assertDirectoryEmpty('site-sliders');
+    }
+
+    public function test_highlight_publishing_denial_happens_before_file_storage(): void
+    {
+        Storage::fake('public');
+
+        $manage = Permission::firstOrCreate(['slug' => 'website.manage'], ['name' => 'Manage website']);
+        $role = Role::create(['name' => 'Highlight Manager', 'slug' => 'highlight-manager-publish-test', 'is_system' => false]);
+        $role->permissions()->sync([$manage->id]);
+        $user = User::factory()->create();
+        $user->roles()->attach($role);
+
+        $this->actingAs($user)->post(route('admin.site-popups.store'), [
+            'title' => 'QA Highlight',
+            'image' => UploadedFile::fake()->image('qa-highlight.jpg'),
+            'is_published' => '1',
+        ])->assertForbidden();
+
+        $this->assertDatabaseMissing('site_popups', ['title' => 'QA Highlight']);
+        Storage::disk('public')->assertDirectoryEmpty('site-popups');
     }
 
     public function test_homepage_selected_content_uses_admin_selected_order(): void
