@@ -48,6 +48,7 @@ class HomepageBuilderController extends Controller
             'settings.*.ids' => ['nullable', 'array', 'max:100'],
             'settings.*.ids.*' => ['integer', 'distinct'],
             'settings.welcome.eyebrow' => ['nullable', 'string', 'max:120'],
+            'settings.welcome.signoff' => ['nullable', 'string', 'max:240'],
             'settings.welcome.title' => ['nullable', 'string', 'max:240'],
             'settings.welcome.content' => ['nullable', 'string', 'max:30000'],
             'settings.welcome.preview_words' => ['nullable', 'integer', 'min:20', 'max:500'],
@@ -84,6 +85,7 @@ class HomepageBuilderController extends Controller
             if ($key === 'welcome' && $request->has('settings.welcome')) {
                 $welcome = (array) $request->input('settings.welcome', []);
                 $settings['eyebrow'] = trim((string) ($welcome['eyebrow'] ?? ''));
+                $settings['signoff'] = trim((string) ($welcome['signoff'] ?? ''));
                 $settings['title'] = trim((string) ($welcome['title'] ?? ''));
                 $settings['content'] = trim((string) ($welcome['content'] ?? ''));
                 $settings['preview_words'] = max(20, min(500, (int) ($welcome['preview_words'] ?? 180)));
