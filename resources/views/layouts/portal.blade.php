@@ -26,16 +26,16 @@ $canCommunications=$canMail || $canCareer || auth()->user()->hasPermission('inqu
 @endif
 @if($canWebsite)
 <div class="nav-group"><button type="button" class="nav-parent" aria-expanded="false"><span class="nav-icon"><i class="fa-solid fa-globe"></i></span><span>Website</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
-@if(auth()->user()->hasPermission('website.manage') || auth()->user()->hasRole(['super-admin','administrator']))<a class="{{ request()->routeIs('admin.homepage-builder.*')?'active':'' }}" href="{{ route('admin.homepage-builder.index') }}"><span>Homepage Builder</span></a>@endif
-@if(auth()->user()->hasPermission('cms.manage') || auth()->user()->hasRole(['super-admin','administrator']))<a class="{{ request()->routeIs('admin.management.*')?'active':'' }}" href="{{ route('admin.management.index') }}"><span>Management Team</span></a>@endif
-<a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='news'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news']) }}"><span>News &amp; Events</span></a>
-<a class="{{ request()->routeIs('admin.site-content.*') && request('filter')==='announcement'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news','filter'=>'announcement']) }}"><span>Notices</span></a>
-<a class="{{ request()->routeIs('admin.gallery.*')?'active':'' }}" href="{{ route('admin.gallery.index') }}"><span>Gallery</span></a>
+@if(auth()->user()->hasPermission('website.view'))<a class="{{ request()->routeIs('admin.homepage-builder.*')?'active':'' }}" href="{{ route('admin.homepage-builder.index') }}"><span>Homepage Builder</span></a>@endif
+@if(auth()->user()->hasPermission('website.view'))<a class="{{ request()->routeIs('admin.management.*')?'active':'' }}" href="{{ route('admin.management.index') }}"><span>Management Team</span></a>@endif
+@if(auth()->user()->hasPermission('website.view'))<a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='news'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news']) }}"><span>News &amp; Events</span></a>
+<a class="{{ request()->routeIs('admin.site-content.*') && request('filter')==='announcement'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news','filter'=>'announcement']) }}"><span>Notices</span></a>@endif
+@if(auth()->user()->hasPermission('website.view'))<a class="{{ request()->routeIs('admin.gallery.*')?'active':'' }}" href="{{ route('admin.gallery.index') }}"><span>Gallery</span></a>
 <a class="{{ request()->routeIs('admin.sliders.*')?'active':'' }}" href="{{ route('admin.sliders.index') }}"><span>Homepage Slides</span></a>
 <a class="{{ request()->routeIs('admin.site-popups.*')?'active':'' }}" href="{{ route('admin.site-popups.index') }}"><span>Homepage Highlights</span></a>
 @if($canCms)<a class="{{ request()->routeIs('admin.cms.*')?'active':'' }}" href="{{ route('admin.cms.index') }}"><span>Content Pages</span></a>@endif
 @if($canSocial)<a class="{{ request()->routeIs('admin.social-links.*')?'active':'' }}" href="{{ route('admin.social-links.index') }}"><span>Social Media</span></a>@endif
-@if(auth()->user()->hasPermission('navigation.manage') || auth()->user()->hasRole(['super-admin','administrator']))<a class="{{ request()->routeIs('admin.navigation.*')?'active':'' }}" href="{{ route('admin.navigation.index') }}"><span>Menu Builder</span></a>@endif
+@if(auth()->user()->hasPermission('website.view'))<a class="{{ request()->routeIs('admin.navigation.*')?'active':'' }}" href="{{ route('admin.navigation.index') }}"><span>Menu Builder</span></a>@endif
 @if($canDocs)<a class="{{ request()->routeIs('admin.documents*')?'active':'' }}" href="{{ route('admin.documents') }}"><span>Documents &amp; Media</span></a>@endif
 </div></div>
 @endif
@@ -46,7 +46,7 @@ $canCommunications=$canMail || $canCareer || auth()->user()->hasPermission('inqu
 @endif
 @if($canUsers)
 <div class="nav-group"><button type="button" class="nav-parent" aria-expanded="false"><span class="nav-icon"><i class="fa-solid fa-users-gear"></i></span><span>Users &amp; Access</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
-<a class="{{ request()->routeIs('admin.users.*')?'active':'' }}" href="{{ route('admin.users.index') }}"><span>Users</span></a>
+@if(auth()->user()->hasPermission('users.view'))<a class="{{ request()->routeIs('admin.users.*')?'active':'' }}" href="{{ route('admin.users.index') }}"><span>Users</span></a>@endif
 @if(auth()->user()->hasPermission('audit.view'))<a class="{{ request()->routeIs('admin.audit')?'active':'' }}" href="{{ route('admin.audit') }}"><span>Audit Log</span></a>@endif
 @if(auth()->user()->hasPermission('health.view'))<a class="{{ request()->routeIs('admin.health')?'active':'' }}" href="{{ route('admin.health') }}"><span>System Health</span></a>@endif
 </div></div>
