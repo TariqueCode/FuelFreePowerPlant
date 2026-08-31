@@ -10,7 +10,7 @@
 @endif
 @if($type==='news')
 <div class="news-control-row">
-    <a class="primary compact-primary" href="{{ route('admin.site-content.create',['type'=>'news']) }}"><i class="fa-solid fa-plus"></i><span>New news / notice</span></a>
+    @if(auth()->user()->hasPermission('website.manage'))<a class="primary compact-primary" href="{{ route('admin.site-content.create',['type'=>'news']) }}"><i class="fa-solid fa-plus"></i><span>New news / notice</span></a>@endif
     <form class="news-toolbar" method="GET" action="{{ route('admin.site-content.index') }}">
         <input type="hidden" name="type" value="news">
         <div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="news-search" name="q" value="{{ request('q') }}" placeholder="Search news &amp; notices..." autocomplete="off"></div>
