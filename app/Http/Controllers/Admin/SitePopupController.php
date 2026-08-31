@@ -39,6 +39,7 @@ class SitePopupController extends Controller
     public function update(Request $request, SitePopup $popup): RedirectResponse
     {
         if ($request->boolean('toggle')) {
+            abort_unless($request->user()->hasPermission('website.publish'), 403, 'Publishing highlights requires publishing permission.');
             $popup->update(['is_published' => !$popup->is_published]);
             return redirect()->route('admin.site-popups.index')->with('status', $popup->is_published ? 'Highlight activated.' : 'Highlight deactivated.');
         }
@@ -71,6 +72,7 @@ class SitePopupController extends Controller
         }
         unset($data['image']);
         $data['is_published']=$request->boolean('is_published');
+        abort_unless(! $data['is_published'] || $request->user()->hasPermission('website.publish'), 403, 'Publishing highlights requires publishing permission.');
         $popup->fill($data)->save();
     }
 
