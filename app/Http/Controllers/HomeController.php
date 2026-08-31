@@ -69,7 +69,8 @@ class HomeController
         $welcomePreviewWords = max(20, min(500, (int) ($welcomeSettings['preview_words'] ?? 180)));
         $welcomeMoreWords = max(20, min(2000, (int) ($welcomeSettings['more_words'] ?? 900)));
         $welcomeShowFull = (bool) ($welcomeSettings['show_full'] ?? false);
-        $welcomeLayout = in_array(($welcomeSettings['layout'] ?? 'left'), ['left','center','right'], true) ? $welcomeSettings['layout'] : 'left';
+        $requestedWelcomeLayout = $welcomeSettings['layout'] ?? 'left';
+        $welcomeLayout = in_array($requestedWelcomeLayout, ['left','center','right'], true) ? $requestedWelcomeLayout : 'left';
         $welcomeWords = preg_split('/\s+/u', trim($welcomeContent), -1, PREG_SPLIT_NO_EMPTY) ?: [];
         $welcomePreview = $welcomeShowFull ? $welcomeContent : implode(' ', array_slice($welcomeWords, 0, $welcomePreviewWords));
         $welcomeRemaining = $welcomeShowFull ? '' : implode(' ', array_slice($welcomeWords, $welcomePreviewWords, $welcomeMoreWords));
