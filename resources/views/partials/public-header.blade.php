@@ -191,6 +191,15 @@
             if(window.innerWidth <= 720) setOpen(!dropdown.classList.contains('is-open'));
         });
         document.addEventListener('click', function(e){ if(!dropdown.contains(e.target)) setOpen(false); });
+        document.addEventListener('keydown', function(e){
+            if(e.key === 'Escape') {
+                document.querySelectorAll('.public-menu-dropdown.is-open').forEach(function(openDropdown){
+                    var openToggle = openDropdown.querySelector(':scope > .public-menu-dropdown-toggle');
+                    openDropdown.classList.remove('is-open');
+                    if(openToggle) openToggle.setAttribute('aria-expanded','false');
+                });
+            }
+        });
         window.addEventListener('resize', function(){ if(window.innerWidth > 720) setOpen(false); });
     });
 })();
