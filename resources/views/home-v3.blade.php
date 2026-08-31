@@ -834,7 +834,9 @@ $profileShortMessage=\Illuminate\Support\Str::words($profileMessage,20);
 @endforeach
 </main>
 
-@php($welcomeModalManagement = $welcomeManagement->merge($homeManagement)->unique('id')->take(2))
+@php
+    $welcomeModalManagement = $welcomeManagement->merge($homeManagement)->unique('id')->take(2);
+@endphp
 @if($welcomeModalManagement->isNotEmpty())
 @foreach($welcomeModalManagement as $member)
 @php($profileMessage=trim(strip_tags((string) $member->content)))
