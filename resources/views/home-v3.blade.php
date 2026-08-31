@@ -153,6 +153,44 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
 @keyframes pulseTravel{0%,100%{opacity:.25;transform:scaleX(.92)}50%{opacity:.75;transform:scaleX(1)}}
 
 /* Desktop: editorial wide composition */
+/* Desktop welcome composition: selected leadership profiles beside the introduction. */
+.welcome-with-team .welcome-inner{display:grid;grid-template-columns:minmax(235px,285px) minmax(0,1fr);gap:42px;align-items:center}
+.welcome-team{display:grid;gap:14px;align-self:stretch;align-content:center}
+.welcome-team-label{color:#69d9ec;font-size:8px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+.welcome-profile{position:relative;display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:center;min-width:0;padding:11px;border:1px solid rgba(72,216,241,.13);border-radius:16px;background:linear-gradient(145deg,rgba(8,37,50,.88),rgba(3,19,27,.92));color:inherit;cursor:pointer;text-align:left;transition:transform .28s cubic-bezier(.2,.7,.2,1),border-color .28s ease,box-shadow .28s ease}
+.welcome-profile:before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(120deg,rgba(72,216,241,.08),transparent 45%);opacity:0;transition:opacity .28s ease;pointer-events:none}
+.welcome-profile:hover{transform:translateX(5px);border-color:rgba(72,216,241,.34);box-shadow:0 14px 34px rgba(0,0,0,.22),0 0 28px rgba(72,216,241,.045)}
+.welcome-profile:hover:before{opacity:1}
+.welcome-profile-photo{width:76px;height:76px;border-radius:13px;overflow:hidden;background:#061923;display:grid;place-items:center;color:#55d4ed;font-size:25px;border:1px solid rgba(72,216,241,.13)}
+.welcome-profile-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.welcome-profile-copy{min-width:0}
+.welcome-profile-name{margin:0;color:#eaf8fb;font-size:12px;line-height:1.3;font-weight:800;overflow-wrap:anywhere}
+.welcome-profile-role{margin-top:4px;color:#63d4e9;font-size:8px;line-height:1.4;font-weight:750}
+.welcome-profile-message{margin-top:7px;color:#7f9ea8;font-size:8px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.welcome-profile-hint{margin-top:6px;color:#5bcde4;font-size:7px;font-weight:800;letter-spacing:.04em}
+.welcome-with-team .welcome-content{min-width:0}
+.welcome-profile-modal{position:fixed;inset:0;z-index:160;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,5,9,.78);backdrop-filter:blur(16px) saturate(120%)}
+.welcome-profile-modal.is-open{display:flex}
+.welcome-profile-dialog{width:min(900px,94vw);max-height:min(720px,88vh);display:grid;grid-template-columns:260px minmax(0,1fr);overflow:hidden;border:1px solid rgba(72,216,241,.24);border-radius:24px;background:radial-gradient(420px 300px at 0 0,rgba(72,216,241,.09),transparent 70%),linear-gradient(145deg,#092936,#041923 62%,#021119);box-shadow:0 36px 110px rgba(0,0,0,.68),0 0 60px rgba(72,216,241,.06);animation:welcomeProfileIn .2s ease-out}
+@keyframes welcomeProfileIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+.welcome-profile-modal-photo{min-height:0;padding:22px;display:flex;align-items:center;justify-content:center;background:radial-gradient(300px 300px at 50% 35%,rgba(72,216,241,.08),transparent 72%),#061923;border-right:1px solid rgba(72,216,241,.12)}
+.welcome-profile-modal-photo img{width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;border-radius:14px;border:1px solid rgba(72,216,241,.45);box-shadow:0 18px 45px rgba(0,0,0,.35)}
+.welcome-profile-modal-photo .fallback{font-size:54px;color:#4fcde9}
+.welcome-profile-modal-body{min-width:0;display:flex;flex-direction:column;min-height:0}
+.welcome-profile-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;padding:25px 28px 18px}
+.welcome-profile-modal-kicker{color:#62d7eb;font-size:8px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+.welcome-profile-modal-title{margin:6px 0 0;color:#effbfc;font-size:26px;line-height:1.18;letter-spacing:-.03em}
+.welcome-profile-modal-role{margin-top:7px;color:#68d8eb;font-size:10px;font-weight:750}
+.welcome-profile-modal-close{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border:1px solid rgba(72,216,241,.15);border-radius:10px;background:rgba(72,216,241,.05);color:#b9d8df;cursor:pointer}
+.welcome-profile-modal-close:hover{background:rgba(72,216,241,.11);color:#fff}
+.welcome-profile-modal-divider{height:1px;margin:0 28px;background:rgba(72,216,241,.10)}
+.welcome-profile-modal-scroll{min-height:0;overflow:auto;padding:22px 28px 28px;color:#a4bdc6;font-size:12px;line-height:1.9;white-space:normal}
+.welcome-profile-modal-scroll p{margin:0 0 14px}.welcome-profile-modal-scroll p:last-child{margin-bottom:0}
+.welcome-profile-modal-label{margin:0 0 10px;color:#70ddec;font-size:8px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+@media(max-width:1099px){.welcome-with-team .welcome-inner{grid-template-columns:minmax(200px,245px) minmax(0,1fr);gap:24px}.welcome-profile{grid-template-columns:62px minmax(0,1fr);padding:9px;gap:9px}.welcome-profile-photo{width:62px;height:62px}}
+@media(max-width:650px){.welcome-with-team .welcome-inner{display:block}.welcome-team,.welcome-profile-modal{display:none}.welcome-with-team .welcome-content{width:100%}}
+@media(prefers-reduced-motion:reduce){.welcome-profile,.welcome-profile-dialog{transition:none;animation:none}}
+
 @media(min-width:1100px){
  main.shell{width:min(1380px,calc(100% - 64px))}
  .home-slider{margin-top:34px}
@@ -232,7 +270,29 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
 @endif
 
 @if($section==='welcome' && $home['welcome'])
-<section class="welcome home-section home-section-welcome welcome-layout-{{ $welcomeLayout }}" data-welcome>
+<section class="welcome home-section home-section-welcome welcome-layout-{{ $welcomeLayout }} {{ $homeManagement->take(2)->isNotEmpty() ? 'welcome-with-team' : '' }}" data-welcome>
+<div class="welcome-inner">
+@if($homeManagement->take(2)->isNotEmpty())
+<div class="welcome-team" aria-label="Featured leadership profiles">
+<div class="welcome-team-label">Leadership voices</div>
+@foreach($homeManagement->take(2) as $member)
+@php
+$profileMessage=trim(strip_tags((string) $member->content));
+$profileShortMessage=\Illuminate\Support\Str::words($profileMessage,20);
+@endphp
+<button type="button" class="welcome-profile" data-welcome-profile="{{ $member->id }}" aria-label="Open profile of {{ $member->title }}">
+<div class="welcome-profile-photo">@if($member->image_path)<img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}" loading="lazy">@else<i class="fa-solid fa-user-tie"></i>@endif</div>
+<div class="welcome-profile-copy">
+<h3 class="welcome-profile-name">{{ $member->title }}</h3>
+<div class="welcome-profile-role">{{ $member->designation ?: $member->excerpt }}</div>
+@if($profileShortMessage !== '')<div class="welcome-profile-message">{{ $profileShortMessage }}</div>@endif
+<div class="welcome-profile-hint">View message <i class="fa-solid fa-arrow-right"></i></div>
+</div>
+</button>
+@endforeach
+</div>
+@endif
+<div class="welcome-content">
 <div class="welcome-heading"><span class="eyebrow">{{ $welcomeEyebrow ?: 'Welcome to '.$siteName }}</span><h1>{{ $welcomeTitle ?: 'Building a stronger energy future.' }}</h1><div class="welcome-rule"></div></div>
 <div class="welcome-copy">
 <div class="welcome-preview">{!! nl2br(e($welcomePreview)) !!}</div>
@@ -241,6 +301,8 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
 <button type="button" class="welcome-more-toggle" aria-expanded="false"><span>Read more</span><i class="fa-solid fa-arrow-down"></i></button>
 @endif
 @if($welcomeSignoff !== '')<div class="welcome-signoff">{{ $welcomeSignoff }}</div>@endif
+</div>
+</div>
 </div>
 </section>
 @endif
@@ -294,9 +356,42 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
 @endif
 @endforeach
 </main>
+
+@if($homeManagement->take(2)->isNotEmpty())
+@foreach($homeManagement->take(2) as $member)
+@php($profileMessage=trim(strip_tags((string) $member->content)))
+<div class="welcome-profile-modal" data-welcome-modal="{{ $member->id }}" aria-hidden="true">
+<div class="welcome-profile-dialog" role="dialog" aria-modal="true" aria-labelledby="welcome-profile-title-{{ $member->id }}">
+<div class="welcome-profile-modal-photo">@if($member->image_path)<img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}">@else<div class="fallback"><i class="fa-solid fa-user-tie"></i></div>@endif</div>
+<div class="welcome-profile-modal-body">
+<div class="welcome-profile-modal-head"><div><div class="welcome-profile-modal-kicker">Management Profile</div><h2 class="welcome-profile-modal-title" id="welcome-profile-title-{{ $member->id }}">{{ $member->title }}</h2><div class="welcome-profile-modal-role">{{ $member->designation ?: $member->excerpt }}</div></div><button type="button" class="welcome-profile-modal-close" data-close-welcome-profile aria-label="Close profile"><i class="fa-solid fa-xmark"></i></button></div>
+<div class="welcome-profile-modal-divider"></div>
+<div class="welcome-profile-modal-scroll"><div class="welcome-profile-modal-label">Message</div>@if($profileMessage !== ''){!! nl2br(e($profileMessage)) !!}@else<p>No additional profile message is available.</p>@endif</div>
+</div>
+</div>
+</div>
+@endforeach
+@endif
+
 <script>
 (() => {
  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+ document.querySelectorAll('[data-welcome-profile]').forEach(button=>{
+  button.addEventListener('click',()=>{
+   if(window.innerWidth<=650)return;
+   const modal=document.querySelector('[data-welcome-modal="'+button.dataset.welcomeProfile+'"]');
+   if(!modal)return;
+   modal.classList.add('is-open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+   modal.querySelector('[data-close-welcome-profile]')?.focus();
+  });
+ });
+ document.querySelectorAll('[data-welcome-modal]').forEach(modal=>{
+  const close=()=>{modal.classList.remove('is-open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';};
+  modal.querySelector('[data-close-welcome-profile]')?.addEventListener('click',close);
+  modal.addEventListener('click',e=>{if(e.target===modal)close();});
+ });
+
  document.querySelectorAll('[data-welcome]').forEach(section => {
   const button=section.querySelector('.welcome-more-toggle'), more=section.querySelector('.welcome-more-content');
   if(button&&more) button.addEventListener('click',()=>{const open=button.getAttribute('aria-expanded')==='true';button.setAttribute('aria-expanded',String(!open));more.hidden=open;button.querySelector('span').textContent=open?'Read more':'Show less';});
