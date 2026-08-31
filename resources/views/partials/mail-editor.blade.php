@@ -85,7 +85,8 @@
  let files=[];
  const initial=@json($initial);
  const cmsMode={{ $editorMode === 'cms' ? 'true' : 'false' }};
- const escapeHtml=(s)=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+ const escapeHtml=(s)=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+ const escapeAttr=(s)=>escapeHtml(s);
  editor.innerHTML=initial||'';
  let savedRange=null;
  const focus=()=>{editor.focus();if(savedRange){const s=getSelection();s.removeAllRanges();s.addRange(savedRange);}};
@@ -155,8 +156,8 @@
    const items=raw.split(',').map(x=>x.split(':')).map(x=>({label:x[0]?.trim(),value:Number(x.slice(1).join(':'))})).filter(x=>x.label&&Number.isFinite(x.value)&&x.value>=0).slice(0,10);
    if(!items.length){alert('Use Label:Value pairs, for example Plant A:40, Plant B:30.');return;}
    const max=Math.max(1,...items.map(x=>x.value)),barW=620/items.length;
-   const bars=items.map((x,i)=>{const h=220*x.value/max,y=285-h,xx=90+i*barW+barW*.16;return '<rect x="'+xx.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+(barW*.68).toFixed(1)+'" height="'+h.toFixed(1)+'" rx="5" fill="currentColor" opacity=".72"/><text x="'+(xx+barW*.34).toFixed(1)+'" y="312" text-anchor="middle" font-size="11" fill="currentColor">'+x.label.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))+'</text><text x="'+(xx+barW*.34).toFixed(1)+'" y="'+Math.max(16,y-6).toFixed(1)+'" text-anchor="middle" font-size="11" fill="currentColor">'+x.value+'</text>';}).join('');
-   const html='<figure class="ff-chart" contenteditable="false" data-chart="bar"><figcaption>'+title.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))+'</figcaption><svg viewBox="0 0 760 340" role="img" aria-label="'+title.replace(/"/g,'&quot;')+'" xmlns="http://www.w3.org/2000/svg"><line x1="75" y1="285" x2="720" y2="285" stroke="currentColor" opacity=".25"/>'+bars+'</svg></figure><p><br></p>';
+   const bars=items.map((x,i)=>{const h=220*x.value/max,y=285-h,xx=90+i*barW+barW*.16;return '<rect x="'+xx.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+(barW*.68).toFixed(1)+'" height="'+h.toFixed(1)+'" rx="5" fill="currentColor" opacity=".72"/><text x="'+(xx+barW*.34).toFixed(1)+'" y="312" text-anchor="middle" font-size="11" fill="currentColor">'+escapeHtml(x.label)+'</text><text x="'+(xx+barW*.34).toFixed(1)+'" y="'+Math.max(16,y-6).toFixed(1)+'" text-anchor="middle" font-size="11" fill="currentColor">'+x.value+'</text>';}).join('');
+   const html='<figure class="ff-chart" contenteditable="false" data-chart="bar"><figcaption>'+escapeHtml(title)+'</figcaption><svg viewBox="0 0 760 340" role="img" aria-label="'+escapeAttr(title)+'" xmlns="http://www.w3.org/2000/svg"><line x1="75" y1="285" x2="720" y2="285" stroke="currentColor" opacity=".25"/>'+bars+'</svg></figure><p><br></p>';
    focus();document.execCommand('insertHTML',false,html);update();
  });
  @endif
