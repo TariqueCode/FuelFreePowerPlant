@@ -27,12 +27,13 @@
                 <input id="email" type="email" name="email" value="{{ old('email', $user->email) }}" required maxlength="255">
             </div>
             <div>
-                <label for="role_id">Role</label>
+                <label for="role_id">Responsibility</label>
                 <select id="role_id" name="role_id" required>
                     @foreach($roles as $role)
                         <option value="{{ $role->id }}" @selected(old('role_id', $user->roles->first()?->id) == $role->id)>{{ $role->name }}</option>
                     @endforeach
                 </select>
+                <div id="capabilityHint" class="capability-hint">Choose a responsibility to see what this account can manage.</div>
             </div>
             <div>
                 <label for="password">New password</label>
