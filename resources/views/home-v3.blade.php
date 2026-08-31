@@ -118,7 +118,7 @@ img{max-width:100%}
 <div class="welcome-more-content" hidden>{!! nl2br(e($welcomeRemaining)) !!}</div>
 <button type="button" class="welcome-more-toggle" aria-expanded="false"><span>Read more</span><i class="fa-solid fa-arrow-down"></i></button>
 @endif
-<div class="welcome-signoff">{{ $siteName }} <span>— Powering a cleaner, smarter future.</span></div>
+@if($welcomeSignoff !== '')<div class="welcome-signoff">{{ $welcomeSignoff }}</div>@endif
 </div>
 </section>
 @endif
