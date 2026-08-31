@@ -23,7 +23,7 @@ class UserController extends Controller
     public function create(): View
     {
         return view('admin.users.create', [
-            'roles' => Role::with('permissions')->orderBy('name')->get(),
+            'roles' => Role::with('permissions')->when(!request()->user()->hasRole('super-admin'), fn ($query) => $query->where('slug', '!=', 'super-admin'))->orderBy('name')->get(),
         ]);
     }
 
@@ -56,7 +56,7 @@ class UserController extends Controller
     {
         return view('admin.users.edit', [
             'user' => $user->load('roles'),
-            'roles' => Role::orderBy('name')->get(),
+            'roles' => Role::with('permissions')->when(!request()->user()->hasRole('super-admin'), fn ($query) => $query->where('slug', '!=', 'super-admin'))->orderBy('name')->get(),
         ]);
     }
 
