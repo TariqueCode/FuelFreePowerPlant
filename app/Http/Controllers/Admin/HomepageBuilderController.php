@@ -42,9 +42,9 @@ class HomepageBuilderController extends Controller
             'section_order.*' => ['required', 'string', 'max:60'],
             'sections' => ['nullable', 'array'],
             'settings' => ['nullable', 'array'],
-            'settings.*.limit' => ['nullable', 'integer', 'min:1', 'max:12'],
+            'settings.*.limit' => ['nullable', 'integer', 'min:1', 'max:100'],
             'settings.*.mode' => ['nullable', 'in:latest,selected'],
-            'settings.*.ids' => ['nullable', 'array', 'max:12'],
+            'settings.*.ids' => ['nullable', 'array', 'max:100'],
             'settings.*.ids.*' => ['integer', 'distinct'],
         ]);
 
@@ -59,7 +59,7 @@ class HomepageBuilderController extends Controller
             $section = HomepageSection::query()->where('key', $key)->first();
             $settings = is_array($section?->settings) ? $section->settings : [];
             if (in_array($key, ['projects','management','news','gallery'], true) && $request->has("settings.{$key}.limit")) {
-                $settings['limit'] = max(1, min(12, (int) $request->input("settings.{$key}.limit")));
+                $settings['limit'] = max(1, min(100, (int) $request->input("settings.{$key}.limit")));
                 $mode = $request->input("settings.{$key}.mode", $settings['mode'] ?? 'latest');
                 $settings['mode'] = $mode;
                 if ($mode === 'selected') {
