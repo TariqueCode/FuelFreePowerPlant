@@ -37,7 +37,7 @@
                     <span><i class="fa-regular fa-clock"></i>{{ $popup->display_seconds ? $popup->display_seconds.' sec auto-close' : 'Visitor closes' }}</span>
                     <span><i class="fa-regular fa-calendar"></i>{{ $popup->starts_at?->format('d M Y, H:i') ?: 'Immediately' }}{{ $popup->ends_at ? ' → '.$popup->ends_at->format('d M Y, H:i') : ' · No expiry' }}</span>
                 </div>
-            </a>
+            </a>@endif
             <div class="highlight-actions">
                 @if(auth()->user()->hasPermission('website.publish'))<form method="POST" action="{{ route('admin.site-popups.update',$popup) }}">
                     @csrf @method('PATCH')
