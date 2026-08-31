@@ -46,6 +46,7 @@ class HomepageWelcomeSettingsTest extends TestCase
             'settings' => [
                 'welcome' => [
                     'eyebrow' => 'FUEL FREE POWER PLANT LIMITED',
+                    'signoff' => 'FUEL FREE POWER PLANT LIMITED — Powering a cleaner, smarter future.',
                     'title' => 'Rethinking the Future of Electricity',
                     'content' => 'Energy Without the Conventional Fuel Dependency. The world is entering a new era of energy.',
                     'preview_words' => 30,
@@ -58,6 +59,7 @@ class HomepageWelcomeSettingsTest extends TestCase
 
         $settings = HomepageSection::where('key', 'welcome')->value('settings');
         $this->assertSame('FUEL FREE POWER PLANT LIMITED', $settings['eyebrow']);
+        $this->assertSame('FUEL FREE POWER PLANT LIMITED — Powering a cleaner, smarter future.', $settings['signoff']);
         $this->assertSame('Rethinking the Future of Electricity', $settings['title']);
         $this->assertSame(30, $settings['preview_words']);
         $this->assertSame(120, $settings['more_words']);
