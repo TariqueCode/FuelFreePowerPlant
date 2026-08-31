@@ -6,6 +6,8 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\SiteContentItem;
+use App\Models\HomepageSection;
+use App\Models\PowerPlant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -106,6 +108,21 @@ class PublishingAuthorityTest extends TestCase
         ])->assertForbidden();
 
         $this->assertDatabaseMissing('site_content_items', ['title' => 'QA Gallery']);
+    }
+
+    public function test_homepage_selected_content_uses_admin_selected_order(): void
+    {
+        $first = PowerPlant::factory()->create(['name' => 'First QA Plant']);
+        $second = PowerPlant::factory()->create(['name' => 'Second QA Plant']);
+        HomepageSection::updateOrCreate(['key' => 'projects'], [
+            'sort_order' => 3, 'is_enabled' => true, 'settings' => [
+                'limit' => 2, 'mode' => 'selected', 'ids' => [$second->id, $first->id],
+            ],
+        ]);
+
+        $response = $this->get(route('home'));
+        $response->assertOk();
+        $response->assertSeeInOrder([$second->name, $first->name]);
     }
 
 }
