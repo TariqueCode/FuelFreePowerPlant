@@ -68,7 +68,7 @@
 .public-menu-dropdown:hover .public-menu-dropdown-panel,.public-menu-dropdown.is-open .public-menu-dropdown-panel{opacity:1;visibility:visible;pointer-events:auto;transform:translate(-50%,0)}
 .public-menu-dropdown-panel a,.public-menu-dropdown-panel a:visited{display:flex;width:100%;min-height:40px;justify-content:flex-start;padding:9px 12px;font-size:13px;box-sizing:border-box}.public-menu-dropdown-panel .public-menu-dropdown{width:100%}.public-menu-dropdown-panel .public-menu-dropdown-toggle{width:100%;justify-content:space-between}.public-menu-dropdown-panel .public-menu-dropdown-panel{top:-8px;left:100%;transform:translate(0,0);margin-left:6px}.public-menu-dropdown-panel .public-menu-dropdown:hover>.public-menu-dropdown-panel,.public-menu-dropdown-panel .public-menu-dropdown.is-open>.public-menu-dropdown-panel{transform:translate(0,0)}
 .public-menu-toggle{display:none;width:42px;height:42px;border:1px solid rgba(86,210,238,.15);border-radius:11px;background:#06141d;color:#fff;align-items:center;justify-content:center;cursor:pointer}
-.mobile-portal-separator,.mobile-menu-portal{display:none}
+.mobile-portal-separator,.mobile-menu-portal{display:none!important}
 @media(max-width:720px){
  .public-shell{width:calc(100% - 20px)}.public-header-top{min-height:58px;border-bottom:0}
  .public-header-socials,.public-header-divider,.public-header-tools .public-portal{display:none!important}
@@ -144,11 +144,6 @@
                     <a href="{{ route('contact') }}">{{ $headerLabels['contact_label'] ?? 'Contact' }}</a>
                     <a href="{{ route('webmail.redirect') }}" target="_blank" rel="noopener noreferrer">{{ $headerLabels['webmail_label'] ?? 'Webmail' }}</a>
                 @endforelse
-                <span class="mobile-portal-separator" aria-hidden="true"></span>
-                <a class="mobile-menu-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer">
-                    <i class="fa-solid {{ $isPortalUser ? 'fa-circle-user' : 'fa-right-to-bracket' }}" aria-hidden="true"></i>
-                    <span>{{ $isPortalUser ? 'Portal' : 'Login' }}</span>
-                </a>
             </nav>
         </div>
     </div>
