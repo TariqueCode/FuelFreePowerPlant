@@ -44,7 +44,8 @@ class SiteContentController extends Controller
                     ->when(!in_array($sort, ['oldest','updated'], true), fn($query) => $query->orderByDesc('published_at')->orderByDesc('created_at'));
             })
             ->when($type === 'company', fn($q) => $q->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')->orderBy('navigation_order')->orderByDesc('created_at'))
-            ->when($type !== '' && $type !== 'company' && $type !== 'news', fn($q) => $q->latest('created_at'))
+            ->when($type === 'resource', fn($q) => $q->orderBy('sort_order')->orderByDesc('published_at')->orderByDesc('created_at'))
+            ->when($type !== '' && !in_array($type, ['company','news','resource'], true), fn($q) => $q->latest('created_at'))
             ->when($type === '', fn($q) => $q->latest('created_at'))
             ->paginate(20)->withQueryString();
 
