@@ -25,7 +25,7 @@ class SiteContentRenderingTest extends TestCase
             ->get(route('admin.site-content.index', ['type' => 'news']))
             ->assertOk()
             ->assertSee('News &amp; Notices CMS', false)
-            ->assertSee('News &amp; Notices');
+            ->assertSee('News &amp; Notices', false);
     }
 
     public function test_portal_uses_one_news_and_notices_navigation_entry(): void
