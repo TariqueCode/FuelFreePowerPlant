@@ -99,6 +99,6 @@ class HomeController
         );
         $stats=['projects'=>PowerPlant::query()->count(),'capacity_mw'=>round((float)PowerPlant::query()->sum('capacity_kw')/1000,2),'operational'=>PowerPlant::query()->whereRaw('LOWER(status)=?', ['operational'])->count()];
 
-        return response(view('home-v3',compact('plants','homePage','stats','content','brand','gallery','sliders','home','homeManagement','welcomeEyebrow','welcomeTitle','welcomeContent','welcomePreviewWords','welcomeMoreWords','welcomeShowFull','welcomeLayout','welcomePreview','welcomeRemaining'))->render());
+        return response(view('home-v3',compact('plants','homePage','stats','content','brand','gallery','sliders','home','homeManagement','welcomeEyebrow','welcomeTitle','welcomeContent','welcomePreviewWords','welcomeMoreWords','welcomeShowFull','welcomeLayout','welcomePreview','welcomeRemaining','welcomeHasMore','sectionSettings'))->render());
     }
 }
