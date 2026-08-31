@@ -37,10 +37,12 @@ class HomepageWelcomeSettingsTest extends TestCase
     public function test_welcome_message_can_be_fully_configured(): void
     {
         $user = $this->manager();
+        $order = HomepageSection::query()->ordered()->pluck('key')->all();
+        $sections = array_fill_keys($order, '1');
 
         $this->actingAs($user)->post(route('admin.homepage-builder.update'), [
-            'section_order' => ['welcome'],
-            'sections' => ['welcome' => '1'],
+            'section_order' => $order,
+            'sections' => $sections,
             'settings' => [
                 'welcome' => [
                     'eyebrow' => 'FUEL FREE POWER PLANT LIMITED',
