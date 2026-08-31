@@ -66,6 +66,7 @@
                 </form>
             </div>
         @endif
+    @endif
 </article>
 @empty<div class="empty"><i class="fa-regular fa-newspaper"></i><strong>No {{ $type==='news' ? 'news or notices' : ($type==='resource' ? 'resources' : 'content') }} yet</strong><span>Use the button above to create the first entry.</span></div>@endforelse
 </div>
