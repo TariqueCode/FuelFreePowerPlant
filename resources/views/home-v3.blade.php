@@ -763,6 +763,16 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
 <div class="welcome-profile-hint">View message <i class="fa-solid fa-arrow-right"></i></div>
 </div>
 </button>
+<div class="welcome-profile-modal" data-welcome-modal="{{ $member->id }}" aria-hidden="true">
+<div class="welcome-profile-dialog" role="dialog" aria-modal="true" aria-labelledby="welcome-profile-title-{{ $member->id }}">
+<div class="welcome-profile-modal-photo"><img src="{{ asset('storage/'.ltrim($member->image_path,'/')) }}" alt="{{ $member->title }}"></div>
+<div class="welcome-profile-modal-body">
+<div class="welcome-profile-modal-head"><div><div class="welcome-profile-modal-kicker">Management Profile</div><h2 class="welcome-profile-modal-title" id="welcome-profile-title-{{ $member->id }}">{{ $member->title }}</h2><div class="welcome-profile-modal-role">{{ $member->designation ?: $member->excerpt }}</div></div><button type="button" class="welcome-profile-modal-close" data-close-welcome-profile aria-label="Close profile"><i class="fa-solid fa-xmark"></i></button></div>
+<div class="welcome-profile-modal-divider"></div>
+<div class="welcome-profile-modal-scroll"><div class="welcome-profile-modal-label">Message</div>{{ trim(strip_tags((string) $member->content)) }}</div>
+</div>
+</div>
+</div>
 @endforeach
 </div>
 @endif
