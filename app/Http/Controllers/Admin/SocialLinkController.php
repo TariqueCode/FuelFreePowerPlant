@@ -95,6 +95,7 @@ class SocialLinkController extends Controller
         return $request->validate([
             'platform' => ['required','string','in:'.implode(',', array_keys(config('fuelfree.social.platforms')))],
             'url' => ['required','url','max:500'],
+            'platform' => ['required','string','in:'.implode(',', array_keys(config('fuelfree.social.platforms'))), function ($attribute, $value, $fail) use ($request) { if (SocialLink::query()->where('platform', $value)->whereKeyNot($request->route('socialLink')?->id)->exists()) $fail('This social platform already has a link. Edit the existing link instead.'); }],
             'is_active' => ['nullable','boolean'],
         ]);
     }
