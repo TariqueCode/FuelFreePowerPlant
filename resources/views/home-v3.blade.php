@@ -685,6 +685,7 @@ $profileShortMessage=\Illuminate\Support\Str::words($profileMessage,20);
  if(!sections.length)return;
  // Lightweight scroll choreography: transform-only, one RAF per frame.
  const motionTargets=[...document.querySelectorAll('.welcome-heading,.welcome-copy,.home-section .head>div,.home-section .head>p')];
+ const welcomeProfiles=[...document.querySelectorAll('.welcome-with-team .welcome-profile')];
  let ticking=false;
  const paintMotion=()=>{
   ticking=false;
@@ -701,6 +702,15 @@ $profileShortMessage=\Illuminate\Support\Str::words($profileMessage,20);
    el.style.setProperty('--motion-x',((amount*maxX*direction)).toFixed(2)+'px');
    el.style.setProperty('--motion-y',((amount*maxY*.35)).toFixed(2)+'px');
   });
+  if (welcomeProfiles.length && window.innerWidth>650) {
+   welcomeProfiles.forEach((el,i)=>{
+    const r=el.getBoundingClientRect();
+    const center=(r.top+r.height/2-vh/2)/vh;
+    const amount=Math.max(-1,Math.min(1,center));
+    const x=(amount*Math.min(9,window.innerWidth*.007)*(i%2===0?1:-1));
+    el.style.setProperty('--profile-motion-x',x.toFixed(2)+'px');
+   });
+  }
  };
  const requestMotion=()=>{if(!ticking){ticking=true;requestAnimationFrame(paintMotion)}};
  window.addEventListener('scroll',requestMotion,{passive:true});
