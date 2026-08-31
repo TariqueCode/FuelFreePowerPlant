@@ -14,7 +14,7 @@ class HomeController
 {
     public function __invoke(): Response
     {
-        $plants=PowerPlant::query()->orderByRaw("CASE WHEN status='operational' THEN 0 ELSE 1 END")->latest()->take(6)->get();
+        $plants=PowerPlant::query()->orderByRaw("CASE WHEN status='operational' THEN 0 ELSE 1 END")->latest()->get();
         $homePage=CmsPage::query()->where('slug','home')->where('is_published',true)->first();
         $content=SiteContentItem::published()->whereIn('type',['news','announcement'])->orderBy('sort_order')->latest('published_at')->get()->groupBy(fn ($item) => in_array($item->type, ['news','announcement'], true) ? 'news' : $item->type);
         $gallery=SiteContentItem::published()->where('type','gallery')->whereNotNull('image_path')->withCount('galleryMedia')->orderBy('sort_order')->latest('published_at')->get();
@@ -42,11 +42,44 @@ class HomeController
         $managementLimit=max(1,min(12,(int)($sectionSettings['management']['limit']??4)));
         $newsLimit=max(1,min(12,(int)($sectionSettings['news']['limit']??3)));
         $galleryLimit=max(1,min(12,(int)($sectionSettings['gallery']['limit']??4)));
-        $content['news']=$content->get('news', collect())->take($newsLimit);
-        $plants=$plants->take($projectsLimit);
-        $gallery=$gallery->take($galleryLimit);
+        $resolveIds = static fn (array $settings): array => array_values(array_unique(array_filter(array_map('intval', $settings['ids'] ?? []))));
+        $applySelection = static function ($query, array $settings, int $limit) use ($resolveIds) {
+            if (($settings['mode'] ?? 'latest') === 'selected') {
+                $ids = $resolveIds($settings);
+                if ($ids) {
+                    return $query->whereIn('id', $ids)->orderByRaw('FIELD(id, '.implode(',', $ids).')')->take($limit)->get();
+                }
+            }
+            return $query->take($limit)->get();
+        };
+
+        $newsSettings = $sectionSettings['news'] ?? [];
+        $projectSettings = $sectionSettings['projects'] ?? [];
+        $managementSettings = $sectionSettings['management'] ?? [];
+        $gallerySettings = $sectionSettings['gallery'] ?? [];
+
+        $content['news'] = $applySelection(
+            SiteContentItem::published()->whereIn('type',['news','announcement'])->orderBy('sort_order')->latest('published_at'),
+            $newsSettings,
+            $newsLimit
+        );
+        $plants = $applySelection(
+            PowerPlant::query()->orderByRaw("CASE WHEN status='operational' THEN 0 ELSE 1 END")->latest(),
+            $projectSettings,
+            $projectsLimit
+        );
+        $homeManagement = $applySelection(
+            SiteContentItem::published()->where('type','management')->orderBy('sort_order')->orderBy('title'),
+            $managementSettings,
+            $managementLimit
+        );
+        $gallery = $applySelection(
+            SiteContentItem::published()->where('type','gallery')->whereNotNull('image_path')->withCount('galleryMedia')->orderBy('sort_order')->latest('published_at'),
+            $gallerySettings,
+            $galleryLimit
+        );
         $stats=['projects'=>PowerPlant::query()->count(),'capacity_mw'=>round((float)PowerPlant::query()->sum('capacity_kw')/1000,2),'operational'=>PowerPlant::query()->whereRaw('LOWER(status)=?', ['operational'])->count()];
 
-        return response(view('home-v3',compact('plants','homePage','stats','content','brand','gallery','sliders','home'))->render());
+        return response(view('home-v3',compact('plants','homePage','stats','content','brand','gallery','sliders','home','homeManagement'))->render());
     }
 }
