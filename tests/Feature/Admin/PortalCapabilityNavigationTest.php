@@ -24,6 +24,26 @@ class PortalCapabilityNavigationTest extends TestCase
         $this->actingAs($user)->get(route('admin.users.index'))->assertOk()->assertSee('Users');
     }
 
+    public function test_user_viewer_cannot_access_user_mutation(): void
+    {
+        $view = Permission::firstOrCreate(['slug'=>'users.view'], ['name'=>'View users']);
+        $manage = Permission::firstOrCreate(['slug'=>'users.manage'], ['name'=>'Manage users']);
+        $role = Role::create(['name'=>'User Viewer Mutation','slug'=>'user-viewer-mutation','is_system'=>false]);
+        $role->permissions()->sync([$view->id]);
+        $user = User::factory()->create();
+        $user->roles()->attach($role);
+        $target = User::factory()->create();
+
+        $this->actingAs($user)->patch(route('admin.users.update', $target), [
+            'name' => 'Should Not Change',
+            'email' => $target->email,
+            'password' => '',
+            'password_confirmation' => '',
+        ])->assertForbidden();
+
+        $this->assertSame($target->name, $target->fresh()->name);
+    }
+
     public function test_user_manager_sees_add_account_navigation(): void
     {
         $view = Permission::firstOrCreate(['slug'=>'users.view'], ['name'=>'View users']);
