@@ -3,7 +3,7 @@ $canDesign=auth()->user()->hasPermission('website.view') || auth()->user()->hasR
 $canMail=auth()->user()->hasPermission('mail.view');
 $canCareer=auth()->user()->hasPermission('career.view');
 $canDocs=auth()->user()->hasPermission('documents.view');
-$brand=\App\Models\SystemSetting::query()->whereIn('key',['company.name','company.logo_path'])->pluck('value','key');
+$brand=collect(['company.name'=>config('fuelfree.company.name'),'company.logo_path'=>config('fuelfree.company.logo_path')]);
 $dashboardName=$brand->get('company.name')?:config('fuelfree.company.name');
 $dashboardLogo=$brand->get('company.logo_path');
 $canWebsite=$canDesign || auth()->user()->hasPermission('cms.view') || auth()->user()->hasPermission('social-media.manage') || auth()->user()->hasPermission('navigation.manage') || auth()->user()->hasPermission('documents.view');
