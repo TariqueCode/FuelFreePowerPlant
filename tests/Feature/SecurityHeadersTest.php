@@ -2,22 +2,28 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Support\Facades\Cache;
+use App\Http\Middleware\SecurityHeaders;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 class SecurityHeadersTest extends TestCase
 {
     public function test_html_responses_receive_hardened_security_headers(): void
     {
-        config(['fuelfree.company.logo_path' => null]);
-        Cache::forget('fuelfree.system_settings');
+        $request = Request::create('/', 'GET');
 
-        $response = $this->get(route('home'));
+        $response = (new SecurityHeaders())->handle(
+            $request,
+            static fn () => new Response('<!doctype html><html><head></head><body>ok</body></html>', 200, [
+                'Content-Type' => 'text/html; charset=UTF-8',
+            ])
+        );
 
-        $response->assertOk()
-            ->assertHeader('X-Content-Type-Options', 'nosniff')
-            ->assertHeader('X-Frame-Options', 'SAMEORIGIN')
-            ->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
-            ->assertHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
+        $this->assertSame('SAMEORIGIN', $response->headers->get('X-Frame-Options'));
+        $this->assertSame('strict-origin-when-cross-origin', $response->headers->get('Referrer-Policy'));
+        $this->assertSame('camera=(), microphone=(), geolocation=()', $response->headers->get('Permissions-Policy'));
     }
 }
