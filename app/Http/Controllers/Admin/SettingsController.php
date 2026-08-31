@@ -9,6 +9,7 @@ use App\Services\WebmailService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Throwable;
@@ -169,6 +170,7 @@ class SettingsController
             $data['company.logo_path']=$request->file('company.logo')->store('site/branding','public');
         }
         foreach($data as $key=>$value) SystemSetting::updateOrCreate(['key'=>$key],['value'=>(string)($value??''),'is_sensitive'=>false]);
+        Cache::forget('fuelfree.system_settings');
         return back()->with('status','System settings saved. Contact and Career mailboxes were verified and connected.');
     }
 }
