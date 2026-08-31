@@ -95,7 +95,7 @@ class NavigationMenuController extends Controller
 
             $item->delete();
         });
-        Cache::forget("public.navigation.{$item->menu}");
+        app(PublicNavigationService::class)->clear($item->menu);
 
         return back()->with('status', 'Menu item deleted.');
     }
