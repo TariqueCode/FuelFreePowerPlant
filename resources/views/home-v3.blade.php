@@ -442,7 +442,7 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
     }
     .welcome-with-team.revealed .welcome-profile{
         opacity:1;
-        transform:none;
+        transform:translate3d(var(--profile-motion-x,0px),0,0);
     }
     .welcome-with-team.revealed .welcome-profile:nth-child(2){transition-delay:.10s}
     .welcome-with-team.revealed .welcome-profile:nth-child(3){transition-delay:.20s}
