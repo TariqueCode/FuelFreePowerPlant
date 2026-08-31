@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\HomepageSection;
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,6 +17,8 @@ class HomepageBuilderTest extends TestCase
     {
         $user = User::factory()->create();
         $role = Role::create(['name' => 'Test Admin', 'slug' => 'test-admin', 'is_system' => false]);
+        $permission = Permission::create(['name' => 'Manage website sections', 'slug' => 'website.manage']);
+        $role->permissions()->attach($permission);
         $user->roles()->attach($role);
         HomepageSection::query()->delete();
         $sections = collect([
