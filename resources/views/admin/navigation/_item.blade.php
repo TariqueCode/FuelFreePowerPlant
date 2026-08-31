@@ -5,7 +5,7 @@
         <em>{{ $item->children->isNotEmpty() ? "Folder" : "Page / Link" }}</em>
         <small>{{ $item->route_name ?: ($item->url ?: 'No destination') }} · {{ $item->is_visible ? 'Visible' : 'Hidden' }}</small>
     </div>
-    <a href="#edit-{{ $item->id }}">Edit</a>
+    <div class="item-actions"><button type="button" class="move-btn move-up" data-id="{{ $item->id }}" title="Move up" aria-label="Move {{ $item->label }} up">↑</button><button type="button" class="move-btn move-down" data-id="{{ $item->id }}" title="Move down" aria-label="Move {{ $item->label }} down">↓</button><a href="#edit-{{ $item->id }}">Edit</a></div>
     @if($item->children->isNotEmpty())
         <div class="children">
             @foreach($item->children as $child)
