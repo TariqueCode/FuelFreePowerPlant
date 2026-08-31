@@ -15,7 +15,7 @@ class UserRoleDelegationTest extends TestCase
     private function role(string $slug, array $permissions): Role
     {
         $role = Role::create(['name' => ucfirst($slug), 'slug' => $slug, 'is_system' => true]);
-        $role->permissions()->sync(collect($permissions)->map(fn ($slug) => Permission::create(['name' => $slug, 'slug' => $slug]))->all());
+        $role->permissions()->sync(collect($permissions)->map(fn ($slug) => Permission::firstOrCreate(['slug' => $slug], ['name' => $slug]))->all());
         return $role;
     }
 
