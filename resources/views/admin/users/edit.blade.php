@@ -6,7 +6,7 @@
 <section class="hero">
     <div class="eyebrow">USER MANAGEMENT</div>
     <h1>Edit user</h1>
-    <p>Update the account profile, access role or password.</p>
+    <p>Update this account using plain-language controls. The selected responsibility determines what this person can manage.</p>
 </section>
 
 @if($errors->any())
@@ -51,3 +51,10 @@
     </form>
 </div>
 @endsection
+
+@push('scripts')<script>
+const roleCapabilities=@json($roles->mapWithKeys(fn($r)=>[$r->id=>$r->permissions->pluck('name')->values()]));
+const roleSelect=document.getElementById('role_id'),hint=document.getElementById('capabilityHint');
+function showCaps(){const caps=roleCapabilities[roleSelect.value]||[];hint.innerHTML=caps.length?'<strong>This account can manage:</strong><ul>'+caps.map(c=>'<li>'+String(c).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))+'</li>').join('')+'</ul>':'Choose a responsibility to see what this account can manage.'}
+roleSelect.addEventListener('change',showCaps);showCaps();
+</script>@endpush
