@@ -21,7 +21,7 @@ class HomepageWelcomeSettingsTest extends TestCase
         $user = User::factory()->create();
         $user->roles()->attach($role);
 
-        HomepageSection::create([
+        HomepageSection::firstOrCreate(['key' => 'welcome'], [
             'key' => 'welcome',
             'label' => 'Company Introduction',
             'description' => 'Welcome content',
