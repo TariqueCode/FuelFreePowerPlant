@@ -63,6 +63,7 @@ class HomeController
         $welcomeEyebrow = trim((string) ($welcomeSettings['eyebrow'] ?? ''));
         $welcomeTitle = trim((string) ($welcomeSettings['title'] ?? ($homePage?->title ?? 'Building a stronger energy future.')));
         $welcomeContent = trim((string) ($welcomeSettings['content'] ?? ''));
+        $welcomeSignoff = trim((string) ($welcomeSettings['signoff'] ?? ''));
         if ($welcomeContent === '') {
             $welcomeContent = trim(strip_tags((string) ($homePage?->content ?? '')));
         }
@@ -99,6 +100,6 @@ class HomeController
         );
         $stats=['projects'=>PowerPlant::query()->count(),'capacity_mw'=>round((float)PowerPlant::query()->sum('capacity_kw')/1000,2),'operational'=>PowerPlant::query()->whereRaw('LOWER(status)=?', ['operational'])->count()];
 
-        return response(view('home-v3',compact('plants','homePage','stats','content','brand','gallery','sliders','home','homeManagement','welcomeEyebrow','welcomeTitle','welcomeContent','welcomePreviewWords','welcomeMoreWords','welcomeShowFull','welcomeLayout','welcomePreview','welcomeRemaining','welcomeHasMore','sectionSettings'))->render());
+        return response(view('home-v3',compact('plants','homePage','stats','content','brand','gallery','sliders','home','homeManagement','welcomeEyebrow','welcomeTitle','welcomeContent','welcomeSignoff','welcomePreviewWords','welcomeMoreWords','welcomeShowFull','welcomeLayout','welcomePreview','welcomeRemaining','welcomeHasMore','sectionSettings'))->render());
     }
 }
