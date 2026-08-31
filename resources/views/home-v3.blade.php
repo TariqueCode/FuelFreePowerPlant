@@ -311,8 +311,10 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
  .energy-atmosphere *{animation:none!important}
  .home-section .head>div,.home-section .head>p,.welcome-heading,.welcome-copy{transform:none!important;will-change:auto}
 }
-\n</style>
-<main class="shell">\n<div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
+
+</style>
+<main class="shell">
+<div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
 @foreach($home['section_order'] as $section)
 @if($section==='hero' && $home['slider'] && $sliders->isNotEmpty())
 <section class="home-slider" aria-label="Company highlights">
