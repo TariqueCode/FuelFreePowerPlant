@@ -211,17 +211,65 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
  .welcome{padding:76px 0 70px}
 }
 
-/* Desktop welcome: message left, selected management profiles right. */
-@media(min-width:1100px){
- .welcome-with-team .welcome-inner{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,360px);align-items:start;gap:52px}
- .welcome-with-team .welcome-content{min-width:0}
- .welcome-with-team .welcome-team{grid-column:2;grid-row:1;align-self:start;padding-top:6px}
+/* Welcome team composition: message left, selected profiles right on larger screens. */
+@media(min-width:651px){
+ .welcome-with-team .welcome-inner{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(280px,360px);
+  align-items:start;
+  gap:42px;
+ }
+ .welcome-with-team .welcome-content{grid-column:1;grid-row:1;min-width:0}
+ .welcome-with-team .welcome-team{
+  grid-column:2;
+  grid-row:1;
+  align-self:start;
+  padding-top:6px;
+ }
  .welcome-with-team .welcome-team-label{text-align:left}
  .welcome-with-team .welcome-profile{grid-template-columns:76px minmax(0,1fr);padding:12px;gap:12px}
  .welcome-with-team .welcome-profile-photo{width:76px;height:76px}
  .welcome-with-team .welcome-profile-copy{min-width:0}
 }
-
+@media(max-width:650px){
+ .welcome-with-team .welcome-inner{display:block}
+ .welcome-with-team .welcome-content{width:100%}
+ .welcome-with-team .welcome-team{
+  display:grid;
+  gap:10px;
+  margin-top:30px;
+  padding-top:22px;
+  border-top:1px solid rgba(72,216,241,.10);
+ }
+ .welcome-with-team .welcome-team-label{margin-bottom:2px}
+ .welcome-with-team .welcome-profile{
+  grid-template-columns:64px minmax(0,1fr);
+  padding:10px;
+  gap:10px;
+  border-radius:14px;
+ }
+ .welcome-with-team .welcome-profile-photo{width:64px;height:64px;border-radius:11px}
+ .welcome-with-team .welcome-profile-message{-webkit-line-clamp:2}
+ .welcome-profile-modal{padding:12px}
+ .welcome-profile-dialog{
+  width:min(100%,520px);
+  max-height:90vh;
+  grid-template-columns:1fr;
+  border-radius:18px;
+ }
+ .welcome-profile-modal-photo{
+  min-height:170px;
+  max-height:220px;
+  padding:16px;
+  border-right:0;
+  border-bottom:1px solid rgba(72,216,241,.12);
+ }
+ .welcome-profile-modal-photo img{max-height:190px}
+ .welcome-profile-modal-head{padding:18px 18px 14px}
+ .welcome-profile-modal-title{font-size:21px}
+ .welcome-profile-modal-divider{margin:0 18px}
+ .welcome-profile-modal-scroll{padding:16px 18px 20px;font-size:11px;line-height:1.8}
+}
 /* Mobile: deliberately different, vertical-first composition */
 @media(max-width:650px){
  main.shell{width:calc(100% - 20px)}
@@ -390,7 +438,7 @@ $profileShortMessage=\Illuminate\Support\Str::words($profileMessage,20);
 
  document.querySelectorAll('[data-welcome-profile]').forEach(button=>{
   button.addEventListener('click',()=>{
-   if(window.innerWidth<=650)return;
+   
    const modal=document.querySelector('[data-welcome-modal="'+button.dataset.welcomeProfile+'"]');
    if(!modal)return;
    modal.classList.add('is-open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
