@@ -47,7 +47,6 @@ $canCommunications=$canMail || $canCareer || auth()->user()->hasPermission('inqu
 @if($canUsers)
 <div class="nav-group"><button type="button" class="nav-parent" aria-expanded="false"><span class="nav-icon"><i class="fa-solid fa-users-gear"></i></span><span>Users &amp; Access</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
 @if(auth()->user()->hasPermission('users.view'))<a class="{{ request()->routeIs('admin.users.*')?'active':'' }}" href="{{ route('admin.users.index') }}"><span>Users</span></a>@endif
-@if($canManageUsers)<a class="{{ request()->routeIs('admin.users.create')?'active':'' }}" href="{{ route('admin.users.create') }}"><span>Add account</span></a>@endif
 @if(auth()->user()->hasPermission('audit.view'))<a class="{{ request()->routeIs('admin.audit')?'active':'' }}" href="{{ route('admin.audit') }}"><span>Audit Log</span></a>@endif
 @if(auth()->user()->hasPermission('health.view'))<a class="{{ request()->routeIs('admin.health')?'active':'' }}" href="{{ route('admin.health') }}"><span>System Health</span></a>@endif
 </div></div>
