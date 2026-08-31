@@ -70,9 +70,10 @@ class HomeController
         $welcomeMoreWords = max(20, min(2000, (int) ($welcomeSettings['more_words'] ?? 900)));
         $welcomeShowFull = (bool) ($welcomeSettings['show_full'] ?? false);
         $welcomeLayout = in_array(($welcomeSettings['layout'] ?? 'left'), ['left','center','right'], true) ? $welcomeSettings['layout'] : 'left';
-        $welcomePreview = $welcomeShowFull ? $welcomeContent : \Illuminate\Support\Str::words($welcomeContent, $welcomePreviewWords, '');
-        $welcomeRemaining = $welcomeShowFull ? '' : trim(\Illuminate\Support\Str::words(substr($welcomeContent, strlen($welcomePreview)), $welcomeMoreWords, ''));
-        $welcomeRemaining = $welcomeRemaining !== '' ? trim($welcomeRemaining) : '';
+        $welcomeWords = preg_split('/\s+/u', trim($welcomeContent), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $welcomePreview = $welcomeShowFull ? $welcomeContent : implode(' ', array_slice($welcomeWords, 0, $welcomePreviewWords));
+        $welcomeRemaining = $welcomeShowFull ? '' : implode(' ', array_slice($welcomeWords, $welcomePreviewWords, $welcomeMoreWords));
+        $welcomeHasMore = $welcomeRemaining !== '';
 
 
         $content['news'] = $applySelection(
