@@ -8,7 +8,7 @@
         <p>Manage the homepage banners visitors see first. Schedule them, set an auto-close timer, or let visitors close them manually.</p>
     </div>
     <div class="highlight-header-actions">
-        <a class="primary" href="{{ route('admin.site-popups.create') }}"><i class="fa-solid fa-plus"></i><span>New highlight</span></a>
+        @if(auth()->user()->hasPermission('website.manage'))<a class="primary" href="{{ route('admin.site-popups.create') }}"><i class="fa-solid fa-plus"></i><span>New highlight</span></a>@endif
         <div class="profile-count"><strong>{{ $publishedCount }}</strong><span>published</span></div>
     </div>
 </section>
@@ -22,10 +22,12 @@
             $stateLabel = ['draft'=>'Draft','scheduled'=>'Scheduled','expired'=>'Expired','live'=>'Live'][$state];
         @endphp
         <article class="highlight-card">
-            <a class="highlight-media" href="{{ route('admin.site-popups.edit',$popup) }}" aria-label="Open {{ $popup->title ?: 'highlight' }}">
+            @if(auth()->user()->hasPermission('website.manage'))<a class="highlight-media" href="{{ route('admin.site-popups.edit',$popup) }}" aria-label="Open {{ $popup->title ?: 'highlight' }}">
                 <img src="{{ asset('storage/'.$popup->image_path) }}" alt="{{ $popup->title ?: 'Highlight banner' }}" loading="lazy">
-            </a>
-            <a class="highlight-content" href="{{ route('admin.site-popups.edit',$popup) }}">
+            </a>@else<a class="highlight-media" href="#" aria-hidden="true">
+                <img src="{{ asset('storage/'.$popup->image_path) }}" alt="{{ $popup->title ?: 'Highlight banner' }}" loading="lazy">
+            </a>@endif
+            @if(auth()->user()->hasPermission('website.manage'))<a class="highlight-content" href="{{ route('admin.site-popups.edit',$popup) }}">
                 <div class="highlight-top">
                     <span class="status {{ $state }}"><i></i>{{ $stateLabel }}</span>
                     @if($popup->link_url)<span class="link-type"><i class="fa-solid fa-link"></i> Linked</span>@endif
@@ -37,17 +39,17 @@
                 </div>
             </a>
             <div class="highlight-actions">
-                <form method="POST" action="{{ route('admin.site-popups.update',$popup) }}">
+                @if(auth()->user()->hasPermission('website.publish'))<form method="POST" action="{{ route('admin.site-popups.update',$popup) }}">
                     @csrf @method('PATCH')
                     <input type="hidden" name="toggle" value="1">
                     <button class="toggle-btn {{ $popup->is_published ? 'active' : 'inactive' }}" type="submit" aria-label="{{ $popup->is_published ? 'Deactivate' : 'Activate' }} highlight" title="{{ $popup->is_published ? 'Deactivate' : 'Activate' }}">
                         <span class="toggle-track"><span class="toggle-knob"></span></span>
                     </button>
-                </form>
-                <form method="POST" action="{{ route('admin.site-popups.destroy',$popup) }}" onsubmit="return confirm('Delete this highlight?')">
+                </form>@endif
+                @if(auth()->user()->hasPermission('website.manage'))<form method="POST" action="{{ route('admin.site-popups.destroy',$popup) }}" onsubmit="return confirm('Delete this highlight?')">
                     @csrf @method('DELETE')
                     <button class="delete-btn" type="submit" aria-label="Delete highlight" title="Delete highlight"><i class="fa-solid fa-trash-can"></i></button>
-                </form>
+                </form>@endif
             </div>
         </article>
     @empty
