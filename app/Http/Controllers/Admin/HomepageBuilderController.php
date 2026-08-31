@@ -54,6 +54,7 @@ class HomepageBuilderController extends Controller
             'settings.welcome.more_words' => ['nullable', 'integer', 'min:20', 'max:2000'],
             'settings.welcome.show_full' => ['nullable', 'boolean'],
             'settings.welcome.layout' => ['nullable', 'in:left,center,right'],
+            'settings.*.layout' => ['nullable', 'in:left,center,right'],
         ]);
 
         $existing = HomepageSection::query()->pluck('key')->all();
@@ -79,6 +80,7 @@ class HomepageBuilderController extends Controller
         foreach ($order as $position => $key) {
             $section = HomepageSection::query()->where('key', $key)->first();
             $settings = is_array($section?->settings) ? $section->settings : [];
+            $settings['layout'] = in_array((string) $request->input("settings.{$key}.layout", $settings['layout'] ?? 'left'), ['left','center','right'], true) ? $request->input("settings.{$key}.layout", $settings['layout'] ?? 'left') : 'left';
             if ($key === 'welcome' && $request->has('settings.welcome')) {
                 $welcome = (array) $request->input('settings.welcome', []);
                 $settings['eyebrow'] = trim((string) ($welcome['eyebrow'] ?? ''));
