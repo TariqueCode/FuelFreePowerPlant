@@ -93,6 +93,9 @@ class SiteContentController extends Controller
     public function destroy(SiteContentItem $item): RedirectResponse
     {
         $type = in_array($item->type, ['news','announcement'], true) ? 'news' : $item->type;
+        foreach ([$item->image_path, $item->attachment_path] as $path) {
+            if ($path) Storage::disk('public')->delete($path);
+        }
         $item->delete();
         return redirect()->route('admin.site-content.index', ['type'=>$type])->with('status','Content deleted successfully.');
     }
