@@ -88,7 +88,7 @@
         @if(auth()->user()->hasPermission('cms.view'))
         <a href="{{route('admin.cms.index')}}"><i class="fa-solid fa-file-lines"></i><span><strong>Page Builder</strong><small>Pages, blocks and publishing</small></span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
         @endif
-        <a href="{{route('admin.mail.index')}}"><i class="fa-solid fa-envelope"></i><span><strong>Mail &amp; Conversations</strong><small>Mailbox accounts and communication settings</small></span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        <a href="{{route('admin.mail')}}"><i class="fa-solid fa-envelope"></i><span><strong>Mail &amp; Conversations</strong><small>Mailbox accounts and communication settings</small></span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
     </div>
 </section>
 
