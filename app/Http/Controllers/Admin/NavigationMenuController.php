@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CmsPage;
 use App\Models\NavigationMenuItem;
+use App\Services\PublicNavigationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class NavigationMenuController extends Controller
@@ -69,7 +69,7 @@ class NavigationMenuController extends Controller
         ) + 1;
 
         NavigationMenuItem::create($data);
-        Cache::forget("public.navigation.{$data['menu']}");
+        app(PublicNavigationService::class)->clear($data['menu']);
 
         return back()->with('status', 'Menu item added.');
     }
@@ -82,7 +82,7 @@ class NavigationMenuController extends Controller
         $data['sort_order'] = $item->sort_order;
 
         $item->update($data);
-        Cache::forget("public.navigation.{$item->menu}");
+        app(PublicNavigationService::class)->clear($item->menu);
 
         return back()->with('status', 'Menu item updated.');
     }
@@ -143,7 +143,7 @@ class NavigationMenuController extends Controller
                 ]);
             }
         });
-        Cache::forget("public.navigation.{$data['menu']}");
+        app(PublicNavigationService::class)->clear($data['menu']);
 
         return response()->json(['ok' => true]);
     }
