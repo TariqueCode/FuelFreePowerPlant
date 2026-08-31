@@ -25,8 +25,8 @@
 <button type="button" data-action="image-settings" title="Image settings"><i class="fa-solid fa-expand"></i></button>
 <button type="button" data-action="table-row" title="Add table row"><i class="fa-solid fa-table-rows"></i></button>
 <button type="button" data-action="table-column" title="Add table column"><i class="fa-solid fa-table-columns"></i></button>
-<button type="button" data-action="table-cell" title="Cell size"><i class="fa-solid fa-ruler-combined"></i></button>
-<button type="button" data-action="chart" title="Insert chart"><i class="fa-solid fa-chart-pie"></i></button>
+<button type="button" data-action="table-cell" title="Cell size"><i class="fa-solid fa-ruler-combined"></i></button><button type="button" data-action="table-delete-row" title="Delete table row"><i class="fa-solid fa-trash-can"></i><span class="ff-tool-label"> Row</span></button><button type="button" data-action="table-delete-column" title="Delete table column"><i class="fa-solid fa-trash-can"></i><span class="ff-tool-label"> Col</span></button>
+<button type="button" data-action="chart" title="Insert chart"><i class="fa-solid fa-chart-pie"></i></button><button type="button" data-action="delete-element" title="Remove selected image or chart"><i class="fa-solid fa-trash"></i></button>
 @endif<button type="button" data-cmd="insertHorizontalRule" title="Horizontal line"><i class="fa-solid fa-minus"></i></button>
         <span class="ff-sep"></span>
         <button type="button" data-cmd="undo" title="Undo"><i class="fa-solid fa-rotate-left"></i></button><button type="button" data-cmd="redo" title="Redo"><i class="fa-solid fa-rotate-right"></i></button><button type="button" data-cmd="removeFormat" title="Clear formatting"><i class="fa-solid fa-eraser"></i></button><button type="button" data-action="source" title="HTML source"><i class="fa-solid fa-code"></i></button><button type="button" data-action="fullscreen" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
@@ -45,7 +45,7 @@
 .ff-editor-toolbar{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:8px;border-bottom:1px solid #d8e2e6;background:#f5f8f9;position:sticky;top:76px;z-index:40;max-width:100%;min-width:0;border-radius:15px 15px 0 0;box-shadow:0 2px 8px rgba(15,55,70,.08)}
 .ff-editor-toolbar button,.ff-editor-toolbar select{height:34px;border:1px solid #d7e1e5;border-radius:7px;background:#fff;color:#334155;cursor:pointer;font-size:12px;padding:0 8px;flex:0 0 auto}
 .ff-editor-toolbar button:hover,.ff-editor-toolbar select:focus{border-color:#22b8d5;background:#eefbfe}
-.ff-editor-toolbar button{min-width:34px}.ff-editor-toolbar select{max-width:130px}.ff-sep{width:1px;height:24px;background:#d5e0e4;margin:0 3px}
+.ff-editor-toolbar button{min-width:34px}.ff-tool-label{display:inline}@media(max-width:760px){.ff-tool-label{display:none}}.ff-editor-toolbar select{max-width:130px}.ff-sep{width:1px;height:24px;background:#d5e0e4;margin:0 3px}
 .ff-color-control{height:34px!important;display:inline-flex;align-items:center;gap:6px;padding:0 8px!important;border:1px solid #d7e1e5;border-radius:7px;background:#fff;color:#536873;cursor:pointer;position:relative}
 .ff-color-control input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .ff-color-swatch{width:17px;height:17px;border-radius:4px;border:1px solid #b9c8ce;background:#1f2937;box-shadow:inset 0 -3px 0 rgba(0,0,0,.14)}
@@ -142,6 +142,21 @@
    const td=cell();if(!td){alert('Place the cursor inside a table cell first.');return;}
    const table=td.closest('table'),index=td.cellIndex;
    [...table.rows].forEach(row=>{const source=row.cells[index],el=document.createElement(source?.tagName||'td');el.innerHTML='&nbsp;';el.style.width=source?.style.width||'';row.insertBefore(el,row.cells[index+1]||null);});update();
+ });
+ root.querySelector('[data-action=table-delete-row]').addEventListener('click',()=>{
+   const td=cell();if(!td){alert('Place the cursor inside a table row first.');return;}
+   const tr=td.parentElement, table=tr.closest('table'); if(table.rows.length<=1){alert('A table must keep at least one row.');return;} tr.remove();update();
+ });
+ root.querySelector('[data-action=table-delete-column]').addEventListener('click',()=>{
+   const td=cell();if(!td){alert('Place the cursor inside a table column first.');return;}
+   const table=td.closest('table'),index=td.cellIndex;
+   const maxCols=Math.max(...[...table.rows].map(row=>row.cells.length));
+   if(maxCols<=1){alert('A table must keep at least one column.');return;}
+   [...table.rows].forEach(row=>{if(row.cells[index])row.deleteCell(index);});update();
+ });
+ root.querySelector('[data-action=delete-element]').addEventListener('click',()=>{
+   const target=selected('img,.ff-chart');if(!target){alert('Select an image or chart first.');return;}
+   target.remove();update();
  });
  root.querySelector('[data-action=table-cell]').addEventListener('click',()=>{
    const td=cell();if(!td){alert('Place the cursor inside a table cell first.');return;}
