@@ -21,9 +21,6 @@ class UserRoleDelegationTest extends TestCase
 
     public function test_user_cannot_assign_a_role_with_permissions_they_do_not_have(): void
     {
-        $manageUsers = Permission::create(['name' => 'Manage users', 'slug' => 'users.manage']);
-        $sensitive = Permission::create(['name' => 'Manage settings', 'slug' => 'settings.manage']);
-
         $administrator = $this->role('administrator', ['users.manage']);
         $super = $this->role('super-admin', ['users.manage', 'settings.manage']);
 
