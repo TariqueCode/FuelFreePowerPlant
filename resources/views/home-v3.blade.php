@@ -95,6 +95,64 @@
 @media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr)}.project-grid{grid-template-columns:repeat(2,1fr)}.management-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.stats-grid,.project-grid,.management-grid{grid-template-columns:1fr 1fr;gap:10px}.stat-card{padding:17px}.stat-card strong{font-size:23px;margin-top:13px}.project-media{height:135px}.project-body{padding:13px}.project-body h3{font-size:14px}.cta-card{display:block;padding:25px}.cta-card .btn{display:inline-flex;margin-top:20px}}
 @media(max-width:380px){.stats-grid,.project-grid,.management-grid{grid-template-columns:1fr}.project-media{height:180px}}
+<style>
+/* Final responsive polish: consistent typography, spacing and touch targets */
+@media(max-width:650px){
+  .shell{width:calc(100% - 24px)}
+  .welcome{padding:44px 0 42px}
+  .welcome-heading{padding-bottom:18px}
+  .welcome .eyebrow{font-size:9px!important;letter-spacing:.15em;line-height:1.4}
+  .welcome h1{font-size:clamp(31px,9.2vw,44px);line-height:1.06;letter-spacing:-.045em;margin:9px 0 0;max-width:100%;overflow-wrap:anywhere}
+  .welcome-rule{width:44px;height:2px;margin-top:13px}
+  .welcome-copy{padding-top:18px}
+  .welcome-copy p{font-size:14px!important;line-height:1.75;text-align:left;margin:0 0 13px}
+  .welcome-signoff{font-size:12px;line-height:1.5;margin-top:17px}
+  .section{padding:42px 0}
+  .head{align-items:flex-start;margin-bottom:15px;gap:10px}
+  .head>div{min-width:0}
+  .head h2{font-size:clamp(23px,7vw,31px);line-height:1.08;letter-spacing:-.035em;margin:5px 0 0}
+  .head p{font-size:10px!important;line-height:1.65!important;margin:8px 0 0}
+  .more{font-size:9px!important;padding-top:7px}
+  .home-slider{margin-top:5px}
+  .slide-media{border-radius:14px}
+  .slide-caption{padding:0 6px}
+  .slide-caption strong{font-size:8px;line-height:1.3}
+  .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .stat-card{padding:14px;border-radius:14px;min-height:104px}
+  .stat-card i{font-size:15px}
+  .stat-card strong{font-size:20px;line-height:1.12;margin-top:10px;overflow-wrap:anywhere}
+  .stat-card span{font-size:8px;line-height:1.35;margin-top:6px}
+  .project-grid,.management-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .project-card,.member-card{border-radius:14px}
+  .project-media{height:125px}
+  .project-body{padding:11px}
+  .project-body h3{font-size:13px;line-height:1.3;margin:8px 0 5px}
+  .project-body p{font-size:8px;line-height:1.45;margin-bottom:9px}
+  .project-body>strong{font-size:10px}
+  .member-card>div:last-child{padding:11px}
+  .member-card h3{font-size:12px;line-height:1.3}
+  .member-card p{font-size:8px;line-height:1.45}
+  .cta-card{padding:21px;border-radius:17px}
+  .cta-card h2{font-size:25px;line-height:1.1}
+  .cta-card p{font-size:10px;line-height:1.65}
+  .cta-card .btn{min-height:42px}
+}
+@media(max-width:380px){
+  .shell{width:calc(100% - 20px)}
+  .welcome{padding-top:38px}
+  .welcome h1{font-size:30px}
+  .welcome-copy p{font-size:13px!important}
+  .stats-grid,.project-grid,.management-grid{grid-template-columns:1fr}
+  .project-media{height:170px}
+  .head h2{font-size:24px}
+}
+@media(min-width:651px) and (max-width:1099px){
+  .welcome h1{font-size:clamp(40px,6vw,64px);line-height:1.02}
+  .head h2{line-height:1.08}
+  .project-grid{gap:13px}
+  .management-grid{gap:13px}
+}
+</style>
 </style>
 <main class="shell">
 @foreach($home['section_order'] as $section)
