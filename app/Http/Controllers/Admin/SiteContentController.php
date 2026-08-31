@@ -100,7 +100,7 @@ class SiteContentController extends Controller
         return redirect()->route('admin.site-content.index', ['type'=>$type])->with('status','Content deleted successfully.');
     }
 
-    public function toggleNews(SiteContentItem $item): RedirectResponse
+    public function toggleNews(Request $request, SiteContentItem $item): RedirectResponse
     {
         abort_unless(in_array($item->type, ['news','announcement'], true), 404);
         abort_unless($request->user()->hasPermission('website.publish'), 403, 'Publishing website content requires publishing permission.');
