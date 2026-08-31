@@ -211,6 +211,17 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
  .welcome{padding:76px 0 70px}
 }
 
+/* Desktop welcome: message left, selected management profiles right. */
+@media(min-width:1100px){
+ .welcome-with-team .welcome-inner{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,360px);align-items:start;gap:52px}
+ .welcome-with-team .welcome-content{min-width:0}
+ .welcome-with-team .welcome-team{grid-column:2;grid-row:1;align-self:start;padding-top:6px}
+ .welcome-with-team .welcome-team-label{text-align:left}
+ .welcome-with-team .welcome-profile{grid-template-columns:76px minmax(0,1fr);padding:12px;gap:12px}
+ .welcome-with-team .welcome-profile-photo{width:76px;height:76px}
+ .welcome-with-team .welcome-profile-copy{min-width:0}
+}
+
 /* Mobile: deliberately different, vertical-first composition */
 @media(max-width:650px){
  main.shell{width:calc(100% - 20px)}
