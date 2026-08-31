@@ -536,6 +536,198 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
     }
 }
 
+
+/* === Final welcome composition correction === */
+@media (min-width:651px){
+    .welcome-with-team{
+        padding:72px 0 82px!important;
+    }
+    .welcome-with-team .welcome-inner{
+        display:grid!important;
+        grid-template-columns:minmax(0,1fr) minmax(300px,360px)!important;
+        gap:clamp(32px,5vw,64px)!important;
+        align-items:center!important;
+    }
+    .welcome-with-team .welcome-content{
+        grid-column:1!important;
+        grid-row:1!important;
+        min-width:0!important;
+        text-align:left!important;
+    }
+    .welcome-with-team .welcome-heading,
+    .welcome-with-team .welcome-copy{
+        max-width:none!important;
+        margin-left:0!important;
+        margin-right:0!important;
+        text-align:left!important;
+    }
+    .welcome-with-team .welcome-heading{
+        padding-bottom:28px!important;
+    }
+    .welcome-with-team .welcome-heading h1{
+        max-width:100%!important;
+        font-size:clamp(44px,5.1vw,72px)!important;
+        line-height:.98!important;
+    }
+    .welcome-with-team .welcome-copy{
+        padding-top:26px!important;
+    }
+    .welcome-with-team .welcome-preview,
+    .welcome-with-team .welcome-more-content{
+        max-width:100%!important;
+        font-size:clamp(13px,1.02vw,15px)!important;
+        line-height:1.82!important;
+    }
+
+    .welcome-with-team .welcome-team{
+        grid-column:2!important;
+        grid-row:1!important;
+        display:grid!important;
+        grid-template-columns:1fr!important;
+        grid-auto-rows:auto!important;
+        gap:12px!important;
+        align-self:center!important;
+        align-content:center!important;
+        min-width:0!important;
+        padding:0!important;
+    }
+    .welcome-with-team .welcome-team-label{
+        grid-column:1!important;
+        margin:0 0 1px 2px!important;
+        text-align:left!important;
+        color:#67d9ec!important;
+        font-size:8px!important;
+        font-weight:850!important;
+        letter-spacing:.2em!important;
+        text-transform:uppercase!important;
+    }
+    .welcome-with-team .welcome-profile{
+        width:100%!important;
+        min-width:0!important;
+        display:grid!important;
+        grid-template-columns:82px minmax(0,1fr)!important;
+        gap:13px!important;
+        align-items:center!important;
+        min-height:100px!important;
+        padding:10px!important;
+        border:1px solid rgba(72,216,241,.16)!important;
+        border-radius:17px!important;
+        background:
+            radial-gradient(180px 120px at 0 0,rgba(72,216,241,.08),transparent 75%),
+            linear-gradient(145deg,rgba(8,37,50,.92),rgba(3,19,27,.97))!important;
+        box-shadow:0 12px 32px rgba(0,0,0,.18)!important;
+        text-align:left!important;
+        cursor:pointer!important;
+    }
+    .welcome-with-team .welcome-profile:hover,
+    .welcome-with-team .welcome-profile:focus-visible{
+        transform:translate3d(-4px,-2px,0)!important;
+        border-color:rgba(72,216,241,.4)!important;
+        box-shadow:0 20px 44px rgba(0,0,0,.25),0 0 30px rgba(72,216,241,.06)!important;
+        outline:none!important;
+    }
+    .welcome-with-team .welcome-profile:nth-of-type(2){
+        animation-delay:.08s;
+    }
+    .welcome-with-team .welcome-profile-photo{
+        width:82px!important;
+        height:82px!important;
+        aspect-ratio:1!important;
+        border-radius:14px!important;
+        overflow:hidden!important;
+    }
+    .welcome-with-team .welcome-profile-copy{
+        min-width:0!important;
+    }
+    .welcome-with-team .welcome-profile-name{
+        font-size:13px!important;
+        line-height:1.25!important;
+        white-space:normal!important;
+    }
+    .welcome-with-team .welcome-profile-role{
+        margin-top:5px!important;
+        font-size:8px!important;
+        line-height:1.35!important;
+    }
+    .welcome-with-team .welcome-profile-message{
+        margin-top:7px!important;
+        font-size:8px!important;
+        line-height:1.48!important;
+        -webkit-line-clamp:2!important;
+    }
+    .welcome-with-team .welcome-profile-hint{
+        margin-top:6px!important;
+        font-size:7px!important;
+    }
+}
+
+@media (min-width:651px) and (max-width:900px){
+    .welcome-with-team .welcome-inner{
+        grid-template-columns:minmax(0,1fr) minmax(245px,290px)!important;
+        gap:24px!important;
+    }
+    .welcome-with-team .welcome-profile{
+        grid-template-columns:64px minmax(0,1fr)!important;
+        min-height:84px!important;
+        gap:10px!important;
+        padding:9px!important;
+    }
+    .welcome-with-team .welcome-profile-photo{
+        width:64px!important;
+        height:64px!important;
+        border-radius:11px!important;
+    }
+    .welcome-with-team .welcome-profile-name{font-size:11px!important}
+    .welcome-with-team .welcome-profile-role{font-size:7px!important}
+    .welcome-with-team .welcome-profile-message{font-size:7px!important}
+    .welcome-with-team .welcome-profile-hint{font-size:6.5px!important}
+}
+
+@media (max-width:650px){
+    .welcome-with-team .welcome-inner{
+        display:block!important;
+    }
+    .welcome-with-team .welcome-content{
+        width:100%!important;
+    }
+    .welcome-with-team .welcome-team{
+        display:grid!important;
+        grid-template-columns:1fr!important;
+        gap:10px!important;
+        margin-top:28px!important;
+        padding-top:20px!important;
+    }
+    .welcome-with-team .welcome-team-label{
+        grid-column:1!important;
+    }
+    .welcome-with-team .welcome-profile{
+        width:100%!important;
+        grid-column:1!important;
+        display:grid!important;
+        grid-template-columns:64px minmax(0,1fr)!important;
+        gap:10px!important;
+        min-height:0!important;
+        padding:10px!important;
+    }
+    .welcome-with-team .welcome-profile-photo{
+        width:64px!important;
+        height:64px!important;
+    }
+    .welcome-with-team .welcome-profile-name{
+        font-size:11px!important;
+        line-height:1.3!important;
+    }
+    .welcome-with-team .welcome-profile-role{
+        font-size:7px!important;
+    }
+    .welcome-with-team .welcome-profile-message{
+        font-size:7px!important;
+        line-height:1.45!important;
+    }
+}
+
+/* Keep the public page free of legacy escaped-newline artefacts. */
+
 </style>
 <main class="shell">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
@@ -642,8 +834,9 @@ $profileShortMessage=\Illuminate\Support\Str::words($profileMessage,20);
 @endforeach
 </main>
 
-@if($homeManagement->take(2)->isNotEmpty())
-@foreach($homeManagement->take(2) as $member)
+@php($welcomeModalManagement = $welcomeManagement->merge($homeManagement)->unique('id')->take(2))
+@if($welcomeModalManagement->isNotEmpty())
+@foreach($welcomeModalManagement as $member)
 @php($profileMessage=trim(strip_tags((string) $member->content)))
 <div class="welcome-profile-modal" data-welcome-modal="{{ $member->id }}" aria-hidden="true">
 <div class="welcome-profile-dialog" role="dialog" aria-modal="true" aria-labelledby="welcome-profile-title-{{ $member->id }}">
