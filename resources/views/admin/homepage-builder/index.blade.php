@@ -13,7 +13,7 @@ $icons=['hero'=>'fa-images','welcome'=>'fa-building','statistics'=>'fa-chart-sim
 $countLabels=['hero'=>'sliders','welcome'=>null,'statistics'=>null,'projects'=>'projects','management'=>'management profiles','news'=>'published news & notices','gallery'=>'published galleries','highlight'=>null,'cta'=>null];
 @endphp
 @foreach($sections as $section)
-@php($sectionLimit = (int)($section->settings['limit'] ?? match($section->key){'projects'=>6,'management'=>4,'news'=>3,'gallery'=>4,default=>0})) @endphp
+@php($sectionLimit = (int)($section->settings['limit'] ?? match($section->key){'projects'=>6,'management'=>4,'news'=>3,'gallery'=>4,default=>0}))
 @php($manageRoutes = ['projects'=>route('admin.plants.index'),'management'=>route('admin.management.index'),'news'=>route('admin.site-content.index',['type'=>'news']),'gallery'=>route('admin.gallery.index'),'hero'=>route('admin.sliders.index'),'highlight'=>route('admin.site-popups.index')])
 <div class="section-row" draggable="true" data-key="{{ $section->key }}">
 <span class="grip" title="Drag to reorder" aria-label="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span>
