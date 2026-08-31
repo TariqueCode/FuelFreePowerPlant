@@ -23,7 +23,7 @@ class UserController extends Controller
     public function create(): View
     {
         return view('admin.users.create', [
-            'roles' => Role::with('permissions')->when(!request()->user()->hasRole('super-admin'), fn ($query) => $query->where('slug', '!=', 'super-admin'))->orderBy('name')->get(),
+            'roles' => Role::with('permissions')->get()->filter(fn (Role $role) => $role->canBeAssignedBy(request()->user()))->sortBy('name')->values(),
         ]);
     }
 
@@ -37,6 +37,7 @@ class UserController extends Controller
         ]);
 
         $selectedRole = Role::findOrFail($data['role_id']);
+        abort_unless($selectedRole->canBeAssignedBy($request->user()), 403, 'You cannot assign a responsibility with more access than your own.');
         abort_if($selectedRole->slug === 'super-admin' && ! $request->user()->hasRole('super-admin'), 403, 'Only a Super Admin can assign the Super Admin role.');
 
         $user = DB::transaction(function () use ($data) {
@@ -70,6 +71,7 @@ class UserController extends Controller
         ]);
 
         $selectedRole = Role::findOrFail($data['role_id']);
+        abort_unless($selectedRole->canBeAssignedBy($request->user()), 403, 'You cannot assign a responsibility with more access than your own.');
         if ($user->hasRole('super-admin') && ! $request->user()->hasRole('super-admin')) {
             abort(403, 'Only a Super Admin can modify a Super Admin account.');
         }
