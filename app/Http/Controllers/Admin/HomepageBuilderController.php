@@ -63,7 +63,7 @@ class HomepageBuilderController extends Controller
                 $mode = $request->input("settings.{$key}.mode", $settings['mode'] ?? 'latest');
                 $settings['mode'] = $mode;
                 if ($mode === 'selected') {
-                    $settings['ids'] = array_values(array_unique(array_slice(array_map('intval', (array) $request->input("settings.{$key}.ids", [])), 0, 12)));
+                    $settings['ids'] = array_values(array_unique(array_slice(array_map('intval', (array) $request->input("settings.{$key}.ids", [])), 0, 100)));
                 } else {
                     unset($settings['ids']);
                 }
