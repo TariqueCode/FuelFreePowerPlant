@@ -3,11 +3,11 @@
 @section('title', 'User Management')
 @section('eyebrow', 'ADMINISTRATION')
 @section('heading', 'User Management')
-@section('description', 'Create and manage secure staff and client accounts.')
+@section('description', 'Create secure accounts and give each person only the responsibility they need.')
 
 @section('content')
 <div class="toolbar"><div class="user-summary"><strong>{{ $users->total() }}</strong><span>total account(s)</span></div>
-    <a class="action" href="{{ route('admin.users.create') }}">+ Create user</a>
+    <a class="action" href="{{ route('admin.users.create') }}">+ Add account</a>
 </div>
 @if(session('status'))
     <div class="notice">{{ session('status') }}</div>
@@ -18,7 +18,7 @@
 <div class="table-card">
     <div class="table-wrap">
         <table>
-            <thead><tr><th>Name</th><th>Email</th><th>Responsibility</th><th>Created</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Person</th><th>Contact</th><th>Responsibility</th><th>Added</th><th>Actions</th></tr></thead>
             <tbody>
             @forelse($users as $user)
                 <tr>
@@ -29,7 +29,7 @@
                     <td class="row-actions">
                         <a href="{{ route('admin.users.edit', $user) }}">Edit</a>
                         @if(!auth()->user()->is($user))
-                            <form method="POST" action="{{ route('admin.users.destroy', $user) }}" onsubmit="return confirm('Delete this user account permanently?')">
+                            <form method="POST" action="{{ route('admin.users.destroy', $user) }}" onsubmit="return confirm('Remove this account permanently?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit">Delete</button>
