@@ -47,6 +47,14 @@ class HomepageBuilderController extends Controller
             'settings.*.mode' => ['nullable', 'in:latest,selected'],
             'settings.*.ids' => ['nullable', 'array', 'max:100'],
             'settings.*.ids.*' => ['integer', 'distinct'],
+            'settings.welcome.eyebrow' => ['nullable', 'string', 'max:120'],
+            'settings.welcome.title' => ['nullable', 'string', 'max:240'],
+            'settings.welcome.content' => ['nullable', 'string', 'max:30000'],
+            'settings.welcome.preview_words' => ['nullable', 'integer', 'min:20', 'max:500'],
+            'settings.welcome.more_words' => ['nullable', 'integer', 'min:20', 'max:2000'],
+            'settings.welcome.show_full' => ['nullable', 'boolean'],
+            'settings.welcome.layout' => ['nullable', 'in:left,center,right'],
+            'settings.*.layout' => ['nullable', 'in:left,center,right'],
         ]);
 
         $existing = HomepageSection::query()->pluck('key')->all();
@@ -72,6 +80,17 @@ class HomepageBuilderController extends Controller
         foreach ($order as $position => $key) {
             $section = HomepageSection::query()->where('key', $key)->first();
             $settings = is_array($section?->settings) ? $section->settings : [];
+            $settings['layout'] = in_array((string) $request->input("settings.{$key}.layout", $settings['layout'] ?? 'left'), ['left','center','right'], true) ? $request->input("settings.{$key}.layout", $settings['layout'] ?? 'left') : 'left';
+            if ($key === 'welcome' && $request->has('settings.welcome')) {
+                $welcome = (array) $request->input('settings.welcome', []);
+                $settings['eyebrow'] = trim((string) ($welcome['eyebrow'] ?? ''));
+                $settings['title'] = trim((string) ($welcome['title'] ?? ''));
+                $settings['content'] = trim((string) ($welcome['content'] ?? ''));
+                $settings['preview_words'] = max(20, min(500, (int) ($welcome['preview_words'] ?? 180)));
+                $settings['more_words'] = max(20, min(2000, (int) ($welcome['more_words'] ?? 900)));
+                $settings['show_full'] = $request->boolean('settings.welcome.show_full');
+                $settings['layout'] = in_array(($welcome['layout'] ?? 'left'), ['left','center','right'], true) ? $welcome['layout'] : 'left';
+            }
             if (in_array($key, ['projects','management','news','gallery'], true) && $request->has("settings.{$key}.limit")) {
                 $settings['limit'] = max(1, min(100, (int) $request->input("settings.{$key}.limit")));
                 $mode = $request->input("settings.{$key}.mode", $settings['mode'] ?? 'latest');

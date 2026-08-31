@@ -59,6 +59,23 @@ class HomeController
         $projectSettings = $sectionSettings['projects'] ?? [];
         $managementSettings = $sectionSettings['management'] ?? [];
         $gallerySettings = $sectionSettings['gallery'] ?? [];
+        $welcomeSettings = $sectionSettings['welcome'] ?? [];
+        $welcomeEyebrow = trim((string) ($welcomeSettings['eyebrow'] ?? ''));
+        $welcomeTitle = trim((string) ($welcomeSettings['title'] ?? ($homePage?->title ?? 'Building a stronger energy future.')));
+        $welcomeContent = trim((string) ($welcomeSettings['content'] ?? ''));
+        if ($welcomeContent === '') {
+            $welcomeContent = trim(strip_tags((string) ($homePage?->content ?? '')));
+        }
+        $welcomePreviewWords = max(20, min(500, (int) ($welcomeSettings['preview_words'] ?? 180)));
+        $welcomeMoreWords = max(20, min(2000, (int) ($welcomeSettings['more_words'] ?? 900)));
+        $welcomeShowFull = (bool) ($welcomeSettings['show_full'] ?? false);
+        $requestedWelcomeLayout = $welcomeSettings['layout'] ?? 'left';
+        $welcomeLayout = in_array($requestedWelcomeLayout, ['left','center','right'], true) ? $requestedWelcomeLayout : 'left';
+        $welcomeWords = preg_split('/\s+/u', trim($welcomeContent), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $welcomePreview = $welcomeShowFull ? $welcomeContent : implode(' ', array_slice($welcomeWords, 0, $welcomePreviewWords));
+        $welcomeRemaining = $welcomeShowFull ? '' : implode(' ', array_slice($welcomeWords, $welcomePreviewWords, $welcomeMoreWords));
+        $welcomeHasMore = $welcomeRemaining !== '';
+
 
         $content['news'] = $applySelection(
             SiteContentItem::published()->whereIn('type',['news','announcement'])->orderBy('sort_order')->latest('published_at'),
@@ -82,6 +99,6 @@ class HomeController
         );
         $stats=['projects'=>PowerPlant::query()->count(),'capacity_mw'=>round((float)PowerPlant::query()->sum('capacity_kw')/1000,2),'operational'=>PowerPlant::query()->whereRaw('LOWER(status)=?', ['operational'])->count()];
 
-        return response(view('home-v3',compact('plants','homePage','stats','content','brand','gallery','sliders','home','homeManagement'))->render());
+        return response(view('home-v3',compact('plants','homePage','stats','content','brand','gallery','sliders','home','homeManagement','welcomeEyebrow','welcomeTitle','welcomeContent','welcomePreviewWords','welcomeMoreWords','welcomeShowFull','welcomeLayout','welcomePreview','welcomeRemaining','welcomeHasMore','sectionSettings'))->render());
     }
 }
