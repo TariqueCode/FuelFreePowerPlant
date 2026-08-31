@@ -9,6 +9,7 @@ use App\Models\SiteContentItem;
 use App\Models\SystemSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class HomepageBuilderController extends Controller
@@ -55,6 +56,19 @@ class HomepageBuilderController extends Controller
             return back()->withErrors(['section_order' => 'The homepage section list is invalid.']);
         }
 
+        $selectedIds = [];
+        foreach (['projects','management','news','gallery'] as $key) {
+            $selectedIds[$key] = array_values(array_unique(array_map('intval', (array) $request->input("settings.{$key}.ids", []))));
+        }
+
+        $validIds = [
+            'projects' => PowerPlant::query()->whereIn('id', $selectedIds['projects'])->pluck('id')->map(fn ($id) => (int) $id)->all(),
+            'management' => SiteContentItem::query()->where('type', 'management')->published()->whereIn('id', $selectedIds['management'])->pluck('id')->map(fn ($id) => (int) $id)->all(),
+            'news' => SiteContentItem::query()->whereIn('type', ['news','announcement'])->published()->whereIn('id', $selectedIds['news'])->pluck('id')->map(fn ($id) => (int) $id)->all(),
+            'gallery' => SiteContentItem::query()->where('type', 'gallery')->published()->whereIn('id', $selectedIds['gallery'])->pluck('id')->map(fn ($id) => (int) $id)->all(),
+        ];
+
+        DB::transaction(function () use ($order, $request, $validIds) {
         foreach ($order as $position => $key) {
             $section = HomepageSection::query()->where('key', $key)->first();
             $settings = is_array($section?->settings) ? $section->settings : [];
@@ -63,7 +77,7 @@ class HomepageBuilderController extends Controller
                 $mode = $request->input("settings.{$key}.mode", $settings['mode'] ?? 'latest');
                 $settings['mode'] = $mode;
                 if ($mode === 'selected') {
-                    $settings['ids'] = array_values(array_unique(array_slice(array_map('intval', (array) $request->input("settings.{$key}.ids", [])), 0, 100)));
+                    $settings['ids'] = array_values(array_slice($validIds[$key] ?? [], 0, 100));
                 } else {
                     unset($settings['ids']);
                 }
@@ -74,6 +88,7 @@ class HomepageBuilderController extends Controller
                 'settings' => $settings,
             ]);
         }
+        });
 
         return back()->with('status', 'Homepage layout saved successfully.');
     }
