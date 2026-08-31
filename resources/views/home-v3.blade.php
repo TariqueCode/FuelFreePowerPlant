@@ -747,33 +747,19 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
 @endif
 
 @if($section==='welcome' && $home['welcome'])
-@php
-$featuredManagement = $welcomeManagement->take(2);
-@endphp
+@php($featuredManagement = $welcomeManagement->take(2))
 <section class="welcome home-section home-section-welcome welcome-layout-{{ $welcomeLayout }} {{ $featuredManagement->isNotEmpty() ? 'welcome-with-team' : '' }}" data-welcome>
 <div class="welcome-inner">
 @if($featuredManagement->isNotEmpty())
 <div class="welcome-team" aria-label="Featured leadership profiles">
 <div class="welcome-team-label">Leadership voices</div>
 @foreach($featuredManagement as $member)
-@php
-$profileMessage = trim(strip_tags((string) $member->content));
-$profileShortMessage = IlluminateSupportStr::words($profileMessage, 20);
-@endphp
 <button type="button" class="welcome-profile" data-welcome-profile="{{ $member->id }}" aria-label="Open profile of {{ $member->title }}">
-<div class="welcome-profile-photo">
-@if($member->image_path)
-<img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}" loading="lazy">
-@else
-<i class="fa-solid fa-user-tie"></i>
-@endif
-</div>
+<div class="welcome-profile-photo"><img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}" loading="lazy"></div>
 <div class="welcome-profile-copy">
 <h3 class="welcome-profile-name">{{ $member->title }}</h3>
 <div class="welcome-profile-role">{{ $member->designation ?: $member->excerpt }}</div>
-@if($profileShortMessage !== '')
-<div class="welcome-profile-message">{{ $profileShortMessage }}</div>
-@endif
+<div class="welcome-profile-message">{{ IlluminateSupportStr::words(trim(strip_tags((string) $member->content)), 20) }}</div>
 <div class="welcome-profile-hint">View message <i class="fa-solid fa-arrow-right"></i></div>
 </div>
 </button>
