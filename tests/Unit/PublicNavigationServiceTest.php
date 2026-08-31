@@ -60,10 +60,12 @@ class PublicNavigationServiceTest extends TestCase
 
     public function test_cache_is_cleared_before_public_tree_is_rebuilt(): void
     {
-        Cache::put('public.navigation.main', collect(['stale']));
+        Cache::put('public.navigation.v2.main', ['stale-v2']);
+        Cache::put('public.navigation.main', ['stale-legacy']);
 
         app(PublicNavigationService::class)->clear('main');
 
+        $this->assertNull(Cache::get('public.navigation.v2.main'));
         $this->assertNull(Cache::get('public.navigation.main'));
     }
 }
