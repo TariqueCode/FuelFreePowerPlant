@@ -766,6 +766,16 @@ $profileShortMessage=\Illuminate\Support\Str::words($profileMessage,20);
 <div class="welcome-profile-hint">View message <i class="fa-solid fa-arrow-right"></i></div>
 </div>
 </button>
+<div class="welcome-profile-modal" data-welcome-modal="{{ $member->id }}" aria-hidden="true">
+<div class="welcome-profile-dialog" role="dialog" aria-modal="true" aria-labelledby="welcome-profile-title-{{ $member->id }}">
+<div class="welcome-profile-modal-photo">@if($member->image_path)<img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}">@else<div class="fallback"><i class="fa-solid fa-user-tie"></i></div>@endif</div>
+<div class="welcome-profile-modal-body">
+<div class="welcome-profile-modal-head"><div><div class="welcome-profile-modal-kicker">Management Profile</div><h2 class="welcome-profile-modal-title" id="welcome-profile-title-{{ $member->id }}">{{ $member->title }}</h2><div class="welcome-profile-modal-role">{{ $member->designation ?: $member->excerpt }}</div></div><button type="button" class="welcome-profile-modal-close" data-close-welcome-profile aria-label="Close profile"><i class="fa-solid fa-xmark"></i></button></div>
+<div class="welcome-profile-modal-divider"></div>
+<div class="welcome-profile-modal-scroll"><div class="welcome-profile-modal-label">Message</div>@if($profileMessage !== ''){!! nl2br(e($profileMessage)) !!}@else<p>No additional profile message is available.</p>@endif</div>
+</div>
+</div>
+</div>
 @endforeach
 </div>
 @endif
@@ -834,24 +844,6 @@ $profileShortMessage=\Illuminate\Support\Str::words($profileMessage,20);
 @endforeach
 </main>
 
-@php
-    $welcomeModalManagement = $welcomeManagement->merge($homeManagement)->unique('id')->take(2);
-@endphp
-@if($welcomeModalManagement->isNotEmpty())
-@foreach($welcomeModalManagement as $member)
-@php($profileMessage=trim(strip_tags((string) $member->content)))
-<div class="welcome-profile-modal" data-welcome-modal="{{ $member->id }}" aria-hidden="true">
-<div class="welcome-profile-dialog" role="dialog" aria-modal="true" aria-labelledby="welcome-profile-title-{{ $member->id }}">
-<div class="welcome-profile-modal-photo">@if($member->image_path)<img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}">@else<div class="fallback"><i class="fa-solid fa-user-tie"></i></div>@endif</div>
-<div class="welcome-profile-modal-body">
-<div class="welcome-profile-modal-head"><div><div class="welcome-profile-modal-kicker">Management Profile</div><h2 class="welcome-profile-modal-title" id="welcome-profile-title-{{ $member->id }}">{{ $member->title }}</h2><div class="welcome-profile-modal-role">{{ $member->designation ?: $member->excerpt }}</div></div><button type="button" class="welcome-profile-modal-close" data-close-welcome-profile aria-label="Close profile"><i class="fa-solid fa-xmark"></i></button></div>
-<div class="welcome-profile-modal-divider"></div>
-<div class="welcome-profile-modal-scroll"><div class="welcome-profile-modal-label">Message</div>@if($profileMessage !== ''){!! nl2br(e($profileMessage)) !!}@else<p>No additional profile message is available.</p>@endif</div>
-</div>
-</div>
-</div>
-@endforeach
-@endif
 
 <script>
 (() => {
