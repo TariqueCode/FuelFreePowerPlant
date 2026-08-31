@@ -9,8 +9,8 @@
 <div class="helper"><i class="fa-solid fa-circle-info"></i><span><b>Simple rule:</b> turn a section off to hide it; do not delete its content. Edit the actual content from its own module.</span></div>
 <div id="section-list">
 @php
-$icons=['hero'=>'fa-images','welcome'=>'fa-building','statistics'=>'fa-chart-simple','projects'=>'fa-industry','management'=>'fa-users','news'=>'fa-newspaper','gallery'=>'fa-images','cta'=>'fa-paper-plane'];
-$countLabels=['hero'=>'sliders','welcome'=>null,'statistics'=>null,'projects'=>'projects','management'=>'management profiles','news'=>'published news & notices','gallery'=>'published galleries','cta'=>null];
+$icons=['hero'=>'fa-images','welcome'=>'fa-building','statistics'=>'fa-chart-simple','projects'=>'fa-industry','management'=>'fa-users','news'=>'fa-newspaper','gallery'=>'fa-images','highlight'=>'fa-bullhorn','cta'=>'fa-paper-plane'];
+$countLabels=['hero'=>'sliders','welcome'=>null,'statistics'=>null,'projects'=>'projects','management'=>'management profiles','news'=>'published news & notices','gallery'=>'published galleries','highlight'=>null,'cta'=>null];
 @endphp
 @foreach($sections as $section)
 @php($sectionLimit = (int)($section->settings['limit'] ?? match($section->key){'projects'=>6,'management'=>4,'news'=>3,'gallery'=>4,default=>0}))
