@@ -312,6 +312,230 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
  .home-section .head>div,.home-section .head>p,.welcome-heading,.welcome-copy{transform:none!important;will-change:auto}
 }
 
+/* === Final responsive welcome + featured leadership composition === */
+@media (min-width:651px){
+    .welcome-with-team{
+        padding-top:72px;
+        padding-bottom:78px;
+    }
+    .welcome-with-team .welcome-inner{
+        display:grid;
+        grid-template-columns:minmax(0,1fr) minmax(300px,390px);
+        gap:clamp(38px,5vw,78px);
+        align-items:center;
+    }
+    .welcome-with-team .welcome-content{
+        grid-column:1;
+        grid-row:1;
+        min-width:0;
+    }
+    .welcome-with-team .welcome-heading{
+        max-width:100%;
+        padding-bottom:30px;
+    }
+    .welcome-with-team .welcome-heading h1{
+        max-width:100%;
+        font-size:clamp(48px,5.6vw,78px);
+        line-height:.98;
+        letter-spacing:-.055em;
+    }
+    .welcome-with-team .welcome-copy{
+        max-width:100%;
+        padding-top:27px;
+    }
+    .welcome-with-team .welcome-preview,
+    .welcome-with-team .welcome-more-content{
+        max-width:920px;
+        font-size:clamp(13px,1.08vw,15px);
+        line-height:1.85;
+    }
+
+    .welcome-with-team .welcome-team{
+        grid-column:2;
+        grid-row:1;
+        display:grid;
+        gap:14px;
+        align-self:center;
+        align-content:center;
+        padding:0;
+        min-width:0;
+    }
+    .welcome-with-team .welcome-team-label{
+        margin:0 0 2px 4px;
+        color:#67d9ec;
+        font-size:9px;
+        font-weight:850;
+        letter-spacing:.20em;
+        text-transform:uppercase;
+    }
+    .welcome-with-team .welcome-profile{
+        width:100%;
+        display:grid;
+        grid-template-columns:92px minmax(0,1fr);
+        gap:15px;
+        align-items:center;
+        min-height:112px;
+        padding:12px;
+        border:1px solid rgba(72,216,241,.14);
+        border-radius:18px;
+        background:
+            radial-gradient(180px 120px at 0 0,rgba(72,216,241,.08),transparent 75%),
+            linear-gradient(145deg,rgba(8,37,50,.90),rgba(3,19,27,.96));
+        box-shadow:0 12px 34px rgba(0,0,0,.16);
+        text-align:left;
+        transform:translate3d(0,0,0);
+        transition:transform .35s cubic-bezier(.2,.7,.2,1),border-color .35s ease,box-shadow .35s ease;
+    }
+    .welcome-with-team .welcome-profile:hover{
+        transform:translate3d(-5px,-2px,0);
+        border-color:rgba(72,216,241,.38);
+        box-shadow:0 20px 44px rgba(0,0,0,.25),0 0 32px rgba(72,216,241,.06);
+    }
+    .welcome-with-team .welcome-profile-photo{
+        width:92px;
+        height:92px;
+        border-radius:14px;
+        border-color:rgba(72,216,241,.20);
+        box-shadow:0 8px 22px rgba(0,0,0,.24);
+    }
+    .welcome-with-team .welcome-profile-name{
+        font-size:13px;
+        line-height:1.28;
+        letter-spacing:-.01em;
+    }
+    .welcome-with-team .welcome-profile-role{
+        margin-top:5px;
+        color:#70dced;
+        font-size:8px;
+        font-weight:800;
+        letter-spacing:.05em;
+        text-transform:uppercase;
+    }
+    .welcome-with-team .welcome-profile-message{
+        margin-top:7px;
+        color:#91aeb8;
+        font-size:8px;
+        line-height:1.5;
+        -webkit-line-clamp:2;
+    }
+    .welcome-with-team .welcome-profile-hint{
+        margin-top:7px;
+        color:#5ed3e9;
+        font-size:7px;
+        letter-spacing:.05em;
+    }
+
+    /* Scroll reveal: content enters from the left, leadership cards from the right. */
+    .welcome-with-team.reveal-ready .welcome-content{
+        opacity:0;
+        transform:translate3d(-34px,14px,0);
+        transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1);
+    }
+    .welcome-with-team.reveal-ready .welcome-profile{
+        opacity:0;
+        transform:translate3d(34px,18px,0);
+        transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1),border-color .35s ease,box-shadow .35s ease;
+    }
+    .welcome-with-team.revealed .welcome-content{
+        opacity:1;
+        transform:none;
+    }
+    .welcome-with-team.revealed .welcome-profile{
+        opacity:1;
+        transform:none;
+    }
+    .welcome-with-team.revealed .welcome-profile:nth-child(2){transition-delay:.10s}
+    .welcome-with-team.revealed .welcome-profile:nth-child(3){transition-delay:.20s}
+
+    /* Avoid the generic alternating text choreography fighting this composition. */
+    .welcome-with-team .welcome-heading,
+    .welcome-with-team .welcome-copy{
+        will-change:transform;
+    }
+}
+
+@media (max-width:650px){
+    /* Mobile remains vertical-first, but uses a cleaner executive treatment. */
+    .welcome-with-team .welcome-team{
+        margin-top:34px;
+        padding-top:24px;
+        gap:11px;
+    }
+    .welcome-with-team .welcome-team-label{
+        color:#67d9ec;
+        font-size:8px;
+        font-weight:850;
+        letter-spacing:.18em;
+        text-transform:uppercase;
+    }
+    .welcome-with-team .welcome-profile{
+        grid-template-columns:70px minmax(0,1fr);
+        min-height:88px;
+        padding:10px;
+        gap:11px;
+        border-radius:15px;
+        background:
+            radial-gradient(160px 100px at 0 0,rgba(72,216,241,.07),transparent 75%),
+            linear-gradient(145deg,rgba(8,37,50,.90),rgba(3,19,27,.96));
+    }
+    .welcome-with-team .welcome-profile-photo{
+        width:70px;
+        height:70px;
+        border-radius:12px;
+    }
+    .welcome-with-team .welcome-profile-name{
+        font-size:11px;
+        line-height:1.3;
+    }
+    .welcome-with-team .welcome-profile-role{
+        margin-top:4px;
+        color:#69d9ec;
+        font-size:7px;
+        line-height:1.35;
+        font-weight:800;
+        letter-spacing:.04em;
+        text-transform:uppercase;
+    }
+    .welcome-with-team .welcome-profile-message{
+        margin-top:6px;
+        font-size:7px;
+        line-height:1.45;
+        -webkit-line-clamp:2;
+    }
+    .welcome-with-team .welcome-profile-hint{
+        margin-top:5px;
+        font-size:6.5px;
+    }
+
+    /* Gentle mobile entrance; no heavy parallax or layout-jank. */
+    .welcome-with-team.reveal-ready .welcome-content{
+        opacity:0;
+        transform:translate3d(-18px,10px,0);
+        transition:opacity .65s ease,transform .65s ease;
+    }
+    .welcome-with-team.reveal-ready .welcome-profile{
+        opacity:0;
+        transform:translate3d(18px,12px,0);
+        transition:opacity .55s ease,transform .55s ease;
+    }
+    .welcome-with-team.revealed .welcome-content,
+    .welcome-with-team.revealed .welcome-profile{
+        opacity:1;
+        transform:none;
+    }
+    .welcome-with-team.revealed .welcome-profile:nth-child(2){transition-delay:.08s}
+    .welcome-with-team.revealed .welcome-profile:nth-child(3){transition-delay:.16s}
+}
+
+@media(prefers-reduced-motion:reduce){
+    .welcome-with-team.reveal-ready .welcome-content,
+    .welcome-with-team.reveal-ready .welcome-profile{
+        opacity:1!important;
+        transform:none!important;
+        transition:none!important;
+    }
+}
+
 </style>
 <main class="shell">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
