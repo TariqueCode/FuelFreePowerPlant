@@ -23,7 +23,7 @@ class UserController extends Controller
     public function create(): View
     {
         return view('admin.users.create', [
-            'roles' => Role::orderBy('name')->get(),
+            'roles' => Role::with('permissions')->orderBy('name')->get(),
         ]);
     }
 
