@@ -107,11 +107,8 @@ class SettingsController
         $validated=$request->validate([
             'company.name'=>['required','string','max:150'],'company.domain'=>['required','string','max:255'],'company.tagline'=>['nullable','string','max:255'],
             'company.timezone'=>['required','timezone'],'storage.quota_gib'=>['required','numeric','min:1','max:1048576'],'uploads.max_mb'=>['required','integer','min:1','max:1048576'],'uploads.career_max_mb'=>['required','integer','min:1','max:1048576'],'uploads.documents_max_mb'=>['required','integer','min:1','max:1048576'],'uploads.gallery_max_mb'=>['required','integer','min:1','max:1048576'],'uploads.sliders_max_mb'=>['required','integer','min:1','max:1048576'],'uploads.popups_max_mb'=>['required','integer','min:1','max:1048576'],'uploads.content_media_max_mb'=>['required','integer','min:1','max:1048576'],
-            'home.news_limit'=>['required','integer','min:1','max:100'],'home.gallery_limit'=>['required','integer','min:1','max:100'],
-            'home.slider_enabled'=>['nullable','boolean'],'home.welcome_enabled'=>['nullable','boolean'],'home.news_enabled'=>['nullable','boolean'],'home.gallery_enabled'=>['nullable','boolean'],'home.hero_enabled'=>['nullable','boolean'],'home.statistics_enabled'=>['nullable','boolean'],'home.projects_enabled'=>['nullable','boolean'],'home.cta_enabled'=>['nullable','boolean'],
             'mail.contact_email'=>['nullable','email:rfc,dns','ends_with:@fuelfreepowerplant.com','max:255'],'mail.contact_password'=>['nullable','string','max:1000'],
             'mail.career_email'=>['nullable','email:rfc,dns','ends_with:@fuelfreepowerplant.com','max:255'],'mail.career_password'=>['nullable','string','max:1000'],
-            'company.logo'=>['nullable','image','mimes:jpg,jpeg,png,webp,svg'],'header.*'=>['required','string','max:100'],
             'footer.tagline'=>['nullable','string','max:255'],'footer.technology'=>['nullable','string','max:255'],'footer.office_heading'=>['required','string','max:100'],
             'footer.address'=>['required','string','max:500'],'footer.contact_heading'=>['required','string','max:100'],'footer.email'=>['required','email','max:255'],
             'footer.phone'=>['required','string','max:50'],'footer.website'=>['required','string','max:255'],'footer.website_url'=>['required','url','max:255'],
@@ -121,17 +118,7 @@ class SettingsController
         $data=[
             'company.name'=>data_get($validated,'company.name'),'company.domain'=>data_get($validated,'company.domain'),'company.tagline'=>data_get($validated,'company.tagline'),
             'company.timezone'=>data_get($validated,'company.timezone'),'storage.quota_gib'=>data_get($validated,'storage.quota_gib'),'uploads.max_mb'=>data_get($validated,'uploads.max_mb'),'uploads.career_max_mb'=>data_get($validated,'uploads.career_max_mb'),'uploads.documents_max_mb'=>data_get($validated,'uploads.documents_max_mb'),'uploads.gallery_max_mb'=>data_get($validated,'uploads.gallery_max_mb'),'uploads.sliders_max_mb'=>data_get($validated,'uploads.sliders_max_mb'),'uploads.popups_max_mb'=>data_get($validated,'uploads.popups_max_mb'),'uploads.content_media_max_mb'=>data_get($validated,'uploads.content_media_max_mb'),
-            'home.news_limit'=>data_get($validated,'home.news_limit'),'home.gallery_limit'=>data_get($validated,'home.gallery_limit'),
-            'home.slider_enabled'=>$request->boolean('home.slider_enabled')?'1':'0','home.welcome_enabled'=>$request->boolean('home.welcome_enabled')?'1':'0',
-            'home.news_enabled'=>$request->boolean('home.news_enabled')?'1':'0','home.gallery_enabled'=>$request->boolean('home.gallery_enabled')?'1':'0','home.hero_enabled'=>$request->boolean('home.hero_enabled')?'1':'0','home.statistics_enabled'=>$request->boolean('home.statistics_enabled')?'1':'0','home.projects_enabled'=>$request->boolean('home.projects_enabled')?'1':'0','home.cta_enabled'=>$request->boolean('home.cta_enabled')?'1':'0',
-            'header.home_label'=>data_get($validated,'header.home_label'),'header.management_label'=>data_get($validated,'header.management_label'),
-            'header.gallery_label'=>data_get($validated,'header.gallery_label'),'header.news_label'=>data_get($validated,'header.news_label'),
-            'header.career_label'=>data_get($validated,'header.career_label'),'header.contact_label'=>data_get($validated,'header.contact_label'),
-            'header.webmail_label'=>data_get($validated,'header.webmail_label'),'header.portal_label'=>data_get($validated,'header.portal_label'),'header.login_label'=>data_get($validated,'header.login_label'),
-            'footer.tagline'=>data_get($validated,'footer.tagline'),'footer.technology'=>data_get($validated,'footer.technology'),'footer.office_heading'=>data_get($validated,'footer.office_heading'),
-            'footer.address'=>data_get($validated,'footer.address'),'footer.contact_heading'=>data_get($validated,'footer.contact_heading'),'footer.email'=>data_get($validated,'footer.email'),
-            'footer.phone'=>data_get($validated,'footer.phone'),'footer.website'=>data_get($validated,'footer.website'),'footer.website_url'=>data_get($validated,'footer.website_url'),
-            'footer.get_in_touch_label'=>data_get($validated,'footer.get_in_touch_label'),'footer.get_in_touch_url'=>data_get($validated,'footer.get_in_touch_url'),'footer.copyright_text'=>data_get($validated,'footer.copyright_text'),
+
         ];
 
         foreach([
