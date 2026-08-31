@@ -37,7 +37,17 @@ class AuthController extends Controller
         $request->session()->regenerate();
         Audit::record($request, 'login', 'authentication');
 
-        return redirect()->intended(route('dashboard'));
+        if ($request->hasSession() && $request->session()->has('url.intended')) {
+            return redirect()->intended(route('dashboard'));
+        }
+
+        $user = $request->user();
+        $destination = $user->hasPermission('dashboard.view') ? route('dashboard')
+            : ($user->hasPermission('mail.view') ? route('admin.mail')
+            : ($user->hasPermission('career.view') ? route('admin.career-applications.index')
+            : route('profile')));
+
+        return redirect()->to($destination);
     }
 
     public function logout(Request $request): RedirectResponse
