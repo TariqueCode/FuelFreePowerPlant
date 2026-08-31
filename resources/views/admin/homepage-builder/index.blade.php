@@ -138,7 +138,7 @@
                     @endif
                     @if(isset($manageRoutes[$section->key]))
                         <a class="source-link" href="{{ $manageRoutes[$section->key] }}" title="Open {{ $sourceLabels[$section->key] }}">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i><span>Manage source</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i><span>Open manager</span>
                         </a>
                     @endif
                     <label class="visibility" title="{{ $section->is_enabled ? 'Hide from homepage' : 'Show on homepage' }}">
@@ -270,6 +270,7 @@
     });
 
     let drag=null;
+    if('ontouchstart' in window){rows().forEach(row=>row.draggable=false);}
     rows().forEach(row=>{
         row.addEventListener('dragstart',()=>{drag=row;row.classList.add('dragging');});
         row.addEventListener('dragover',e=>{if(!drag||drag===row)return;e.preventDefault();row.classList.add('drop-target');});
