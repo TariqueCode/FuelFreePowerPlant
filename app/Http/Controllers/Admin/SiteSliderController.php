@@ -9,7 +9,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-use Throwable;
 
 class SiteSliderController extends Controller
 {
@@ -30,12 +29,7 @@ class SiteSliderController extends Controller
     {
         $slider = new SiteSlider();
 
-        try {
-            $this->save($slider, $request);
-        } catch (Throwable $e) {
-            report($e);
-            return back()->withInput()->with('error', 'The slider could not be saved. Please check the image file and try again.');
-        }
+        $this->save($slider, $request);
 
         return redirect()->route('admin.sliders.index')->with('status', 'Slider image added successfully.');
     }
@@ -56,12 +50,7 @@ class SiteSliderController extends Controller
             );
         }
 
-        try {
-            $this->save($slider, $request);
-        } catch (Throwable $e) {
-            report($e);
-            return back()->withInput()->with('error', 'The slider could not be saved. Please check the image file and try again.');
-        }
+        $this->save($slider, $request);
 
         return redirect()->route('admin.sliders.index')->with('status', 'Slider image updated successfully.');
     }
@@ -95,6 +84,9 @@ class SiteSliderController extends Controller
 
     private function save(SiteSlider $slider, Request $request): void
     {
+        $publishing = $request->boolean('is_published');
+        abort_unless(! $publishing || $request->user()->hasPermission('website.publish'), 403, 'Publishing sliders requires publishing permission.');
+
         $data = $request->validate([
             'title' => ['nullable', 'string', 'max:255'],
             'image' => [$slider->exists ? 'nullable' : 'required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:'.$this->maxUploadKb()],
@@ -132,8 +124,7 @@ class SiteSliderController extends Controller
         }
 
         unset($data['image']);
-        $data['is_published'] = $request->boolean('is_published');
-        abort_unless(! $data['is_published'] || $request->user()->hasPermission('website.publish'), 403, 'Publishing sliders requires publishing permission.');
+        $data['is_published'] = $publishing;
 
         if (!$slider->exists) {
             $data['sort_order'] = ((int) SiteSlider::query()->max('sort_order')) + 1;
