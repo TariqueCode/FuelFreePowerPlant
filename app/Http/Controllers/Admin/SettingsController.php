@@ -107,6 +107,7 @@ class SettingsController
         $validated=$request->validate([
             'company.name'=>['required','string','max:150'],'company.domain'=>['required','string','max:255'],'company.tagline'=>['nullable','string','max:255'],
             'company.timezone'=>['required','timezone'],'storage.quota_gib'=>['required','numeric','min:1','max:1048576'],'uploads.max_mb'=>['required','integer','min:1','max:1048576'],'uploads.career_max_mb'=>['required','integer','min:1','max:1048576'],'uploads.documents_max_mb'=>['required','integer','min:1','max:1048576'],'uploads.gallery_max_mb'=>['required','integer','min:1','max:1048576'],'uploads.sliders_max_mb'=>['required','integer','min:1','max:1048576'],'uploads.popups_max_mb'=>['required','integer','min:1','max:1048576'],'uploads.content_media_max_mb'=>['required','integer','min:1','max:1048576'],
+            'company.logo'=>['nullable','image','mimes:jpg,jpeg,png,webp,svg'],
             'mail.contact_email'=>['nullable','email:rfc,dns','ends_with:@fuelfreepowerplant.com','max:255'],'mail.contact_password'=>['nullable','string','max:1000'],
             'mail.career_email'=>['nullable','email:rfc,dns','ends_with:@fuelfreepowerplant.com','max:255'],'mail.career_password'=>['nullable','string','max:1000'],
             'footer.tagline'=>['nullable','string','max:255'],'footer.technology'=>['nullable','string','max:255'],'footer.office_heading'=>['required','string','max:100'],
