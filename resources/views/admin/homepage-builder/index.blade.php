@@ -96,8 +96,8 @@
                 <small>Selected items are shown in the order chosen here and capped by “Show items”.</small>
             </div>
         @else
-            <div class="settings-heading"><strong>Display settings</strong><small>This section is controlled by its own content module. Use the controls below only for homepage visibility and alignment.</small></div>
-            <label class="alignment-field"><span>Text alignment</span><select name="settings[{{ $section->key }}][layout]"><option value="left" @selected(($sectionSettings['layout'] ?? 'left')==='left')>Left</option><option value="center" @selected(($sectionSettings['layout'] ?? 'left')==='center')>Center</option><option value="right" @selected(($sectionSettings['layout'] ?? 'left')==='right')>Right</option></select></label>
+            <div class="settings-heading"><strong>Module settings</strong><small>This section's content is managed in its dedicated module. Homepage visibility is controlled here; use “Edit content” for the source records.</small></div>
+            <div class="settings-note"><i class="fa-solid fa-circle-check"></i><span>No duplicate content fields are needed here. This keeps Homepage focused on composition while the source module remains the single place for editing.</span></div>
         @endif
         </div>
     </article>
