@@ -162,6 +162,7 @@
                         </div>
                         <div class="field-grid two">
                             <label><span>Eyebrow</span><input name="settings[welcome][eyebrow]" maxlength="120" value="{{ $settings['eyebrow'] ?? 'Welcome to '.config('fuelfree.company.name') }}"></label>
+                            <label><span>Sign-off line</span><input name="settings[welcome][signoff]" maxlength="240" value="{{ $settings['signoff'] ?? config('fuelfree.company.name').' — Powering a cleaner, smarter future.' }}"><small>Shown below the welcome message</small></label>
                             <label><span>Homepage title</span><input name="settings[welcome][title]" maxlength="240" value="{{ $settings['title'] ?? '' }}"></label>
                         </div>
                         <label class="full-field"><span>Complete welcome message</span><textarea name="settings[welcome][content]" rows="10" maxlength="30000" placeholder="Write the complete company introduction here...">{{ $settings['content'] ?? '' }}</textarea></label>
