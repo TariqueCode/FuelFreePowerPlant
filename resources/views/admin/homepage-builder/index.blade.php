@@ -1,11 +1,11 @@
 @extends('layouts.portal')
-@section('title','Homepage Builder')
+@section('title','Homepage')
 @section('content')
-<section class="hero"><div><span class="eyebrow">WEBSITE / HOMEPAGE</span><h1>Homepage Builder</h1><p>Arrange homepage sections, control visibility, and manage the public composition without touching code.</p></div><div class="builder-actions"><a class="preview" href="{{ route('home') }}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Homepage</a><a class="back" href="{{ route('admin.site-content.index') }}"><i class="fa-solid fa-arrow-left"></i> Website Content</a></div></section>
+<section class="hero"><div><span class="eyebrow">WEBSITE / HOMEPAGE</span><h1>Homepage</h1><p>Choose what visitors see, turn sections on or off, and arrange the order. Your content stays safely in its own module.</p></div><div class="builder-actions"><a class="preview" href="{{ route('home') }}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Preview Website</a><a class="back" href="{{ route('admin.site-content.index') }}"><i class="fa-solid fa-arrow-left"></i> Website Content</a></div></section>
 @if(session('status'))<div class="notice">{{session('status')}}</div>@endif @if($errors->any())<div class="errors">{{$errors->first()}}</div>@endif
 <form method="POST" action="{{ route('admin.homepage-builder.update') }}" id="home-builder">@csrf
 <div class="builder-card">
-<div class="builder-head"><div><strong>Homepage Sections</strong><small>Arrange what visitors see. Each section gets its content from its own website module.</small></div><button class="primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Layout</button></div>
+<div class="builder-head"><div><strong>Homepage Sections</strong><small>Turn sections on or off and arrange them in the order visitors should see.</small></div><button class="primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Layout</button></div>
 <div class="helper"><i class="fa-solid fa-circle-info"></i><span><b>Simple rule:</b> turn a section off to hide it; do not delete its content. Edit the actual content from its own module.</span></div>
 <div id="section-list">
 @php
