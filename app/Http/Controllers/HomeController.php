@@ -49,7 +49,8 @@ class HomeController
                 if (!$ids) {
                     return $query->whereRaw('1 = 0')->take($limit)->get();
                 }
-                return $query->whereIn('id', $ids)->orderByRaw('FIELD(id, '.implode(',', $ids).')')->take($limit)->get();
+                $position = array_flip($ids);
+                return $query->whereIn('id', $ids)->get()->sortBy(fn ($item) => $position[(int) $item->id] ?? PHP_INT_MAX)->take($limit)->values();
             }
             return $query->take($limit)->get();
         };
