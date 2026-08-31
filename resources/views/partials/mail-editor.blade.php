@@ -81,9 +81,11 @@
 (function(){
  const root=document.querySelector('[data-editor="{{ $editorId }}"]'); if(!root)return;
  const editor=root.querySelector('.ff-editor-body'),source=root.querySelector('.ff-editor-source'),value=root.querySelector('.ff-editor-value'),form=document.getElementById('{{ $formId }}'),fileInput=root.querySelector('input[type=file]'),fileList=root.querySelector('.ff-file-list'),wordCount=root.querySelector('.ff-word-count');
- const storageKey='ff-webmail-draft:'+location.pathname+'::{{ $editorId }}';
+ const storageKey='ff-editor-draft:'+location.pathname+'::{{ $editorId }}';
  let files=[];
  const initial=@json($initial);
+ const cmsMode={{ $editorMode === 'cms' ? 'true' : 'false' }};
+ const escapeHtml=(s)=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
  editor.innerHTML=initial||'';
  let savedRange=null;
  const focus=()=>{editor.focus();if(savedRange){const s=getSelection();s.removeAllRanges();s.addRange(savedRange);}};
@@ -159,7 +161,10 @@
  });
  @endif
  root.querySelector('[data-action=table]').addEventListener('click',()=>{let rows=parseInt(prompt('Rows','3'),10),cols=parseInt(prompt('Columns','3'),10);if(!rows||!cols||rows>12||cols>12)return;let html='<table><tbody>';for(let r=0;r<rows;r++){html+='<tr>';for(let c=0;c<cols;c++)html+='<td>&nbsp;</td>';html+='</tr>';}html+='</tbody></table><p><br></p>';focus();document.execCommand('insertHTML',false,html);update();});
- root.querySelector('[data-action=source]').addEventListener('click',()=>{if(source.hidden){source.value=editor.innerHTML;editor.hidden=true;source.hidden=false;}else{editor.innerHTML=source.value;source.hidden=true;editor.hidden=false;update();}});
+ root.querySelector('[data-action=source]').addEventListener('click',()=>{
+ if(source.hidden){source.value=editor.innerHTML;editor.hidden=true;source.hidden=false;}
+ else{editor.innerHTML=source.value;source.hidden=true;editor.hidden=false;update();}
+});
  root.querySelector('[data-action=fullscreen]').addEventListener('click',()=>{root.classList.toggle('is-fullscreen');});
  editor.addEventListener('input',()=>{rememberSelection();updateToolbarState();update();});
  editor.addEventListener('keyup',()=>{rememberSelection();updateToolbarState();});
