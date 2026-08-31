@@ -32,6 +32,7 @@ $canCommunications=$canMail || $canCareer || auth()->user()->hasPermission('inqu
 @if(auth()->user()->hasPermission('website.view'))<a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='news'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news']) }}"><span>News &amp; Events</span></a>
 <a class="{{ request()->routeIs('admin.site-content.*') && request('filter')==='announcement'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news','filter'=>'announcement']) }}"><span>Notices</span></a>@endif
 @if(auth()->user()->hasPermission('website.view'))<a class="{{ request()->routeIs('admin.gallery.*')?'active':'' }}" href="{{ route('admin.gallery.index') }}"><span>Gallery</span></a>@endif
+@if(auth()->user()->hasPermission('website.view'))<a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='resource'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'resource']) }}"><span>Resources</span></a>@endif
 
 @if($canCms)<a class="{{ request()->routeIs('admin.cms.*')?'active':'' }}" href="{{ route('admin.cms.index') }}"><span>Content Pages</span></a>@endif
 @if($canSocial)<a class="{{ request()->routeIs('admin.social-links.*')?'active':'' }}" href="{{ route('admin.social-links.index') }}"><span>Social Media</span></a>@endif
