@@ -166,6 +166,27 @@
                             <label><span>Homepage title</span><input name="settings[welcome][title]" maxlength="240" value="{{ $settings['title'] ?? '' }}"></label>
                         </div>
                         <label class="full-field"><span>Complete welcome message</span><textarea name="settings[welcome][content]" rows="10" maxlength="30000" placeholder="Write the complete company introduction here...">{{ $settings['content'] ?? '' }}</textarea></label>
+                        <div class="welcome-featured-management">
+                            <div class="editor-intro">
+                                <div class="editor-icon"><i class="fa-solid fa-users"></i></div>
+                                <div><strong>Featured management profiles</strong><p>Select up to two existing Management Team profiles. Their source content is managed only in the Management Team module.</p></div>
+                            </div>
+                            <div class="field-grid two">
+                                @for($slot = 0; $slot < 2; $slot++)
+                                    @php($selectedManagementId = (int) (($settings['management_ids'] ?? [])[$slot] ?? 0))
+                                    <label>
+                                        <span>Profile {{ $slot + 1 }}</span>
+                                        <select name="settings[welcome][management_ids][]">
+                                            <option value="">None</option>
+                                            @foreach(($choices['management'] ?? []) as $choice)
+                                                <option value="{{ $choice->id }}" @selected($selectedManagementId === (int) $choice->id)>{{ $choice->title }}</option>
+                                            @endforeach
+                                        </select>
+                                    </label>
+                                @endfor
+                            </div>
+                            <small class="management-selection-note">Desktop: message left + profiles right. Mobile: message first + profiles below.</small>
+                        </div>
                         <div class="field-grid four">
                             <label><span>Preview words</span><input type="number" name="settings[welcome][preview_words]" min="20" max="500" value="{{ $settings['preview_words'] ?? 180 }}"><small>Shown first on the homepage</small></label>
                             <label><span>More words</span><input type="number" name="settings[welcome][more_words]" min="20" max="2000" value="{{ $settings['more_words'] ?? 900 }}"><small>Revealed after Read more</small></label>
