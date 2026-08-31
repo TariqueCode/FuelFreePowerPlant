@@ -56,7 +56,7 @@ class HomepageBuilderController extends Controller
             'settings.welcome.show_full' => ['nullable', 'boolean'],
             'settings.welcome.layout' => ['nullable', 'in:left,center,right'],
             'settings.welcome.management_ids' => ['nullable', 'array', 'max:2'],
-            'settings.welcome.management_ids.*' => ['integer', 'distinct'],
+            'settings.welcome.management_ids.*' => ['nullable', 'integer', 'distinct'],
             'settings.*.layout' => ['nullable', 'in:left,center,right'],
         ]);
 
