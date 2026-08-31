@@ -66,13 +66,15 @@ class SitePopupController extends Controller
             'starts_at'=>['nullable','date'],
             'ends_at'=>['nullable','date','after_or_equal:starts_at'],
         ]);
+        $publishing = $request->boolean('is_published');
+        abort_unless(! $publishing || $request->user()->hasPermission('website.publish'), 403, 'Publishing highlights requires publishing permission.');
+
         if ($request->hasFile('image')) {
             if ($popup->image_path) Storage::disk('public')->delete($popup->image_path);
             $data['image_path']=$request->file('image')->store('site-popups','public');
         }
         unset($data['image']);
-        $data['is_published']=$request->boolean('is_published');
-        abort_unless(! $data['is_published'] || $request->user()->hasPermission('website.publish'), 403, 'Publishing highlights requires publishing permission.');
+        $data['is_published']=$publishing;
         $popup->fill($data)->save();
     }
 
