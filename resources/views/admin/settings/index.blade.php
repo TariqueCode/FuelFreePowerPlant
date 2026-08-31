@@ -180,9 +180,8 @@ document.addEventListener('DOMContentLoaded', () => {
 @endsection
 
 @push('styles')
-<style>.builder-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.builder-links a{display:flex;gap:10px;align-items:center;padding:12px;border:1px solid rgba(104,204,235,.1);border-radius:11px;background:rgba(2,15,23,.5);text-decoration:none;color:#dff4f7}.builder-links a>i{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:rgba(67,194,229,.08);color:#62d9ee}.builder-links b,.builder-links small{display:block}.builder-links b{font-size:10px}.builder-links small{font-size:8px;color:#6d8c97;margin-top:3px}@media(max-width:800px){.builder-links{grid-template-columns:1fr 1fr}}@media(max-width:520px){.builder-links{grid-template-columns:1fr}}.upload-policy-panel{margin-top:16px;padding-top:18px;border-top:1px solid var(--line)}.upload-policy-intro{color:var(--muted);font-size:11px;line-height:1.6;margin:8px 0 14px}.upload-policy-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.upload-policy-field{padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.018)}.upload-policy-field label{display:block;font-weight:700}.upload-policy-field label span{color:var(--muted);font-weight:500}.mb-input{display:flex;align-items:center;gap:7px;margin-top:7px}.mb-input input{min-width:0;flex:1}.mb-input span{color:var(--muted);font-size:11px}.upload-policy-field small{display:block;margin-top:7px;color:var(--muted);font-size:9px;line-height:1.5}@media(max-width:800px){.upload-policy-grid{grid-template-columns:1fr}}</style>
 <style>
-.settings-stack{max-width:980px;display:grid;gap:18px}
+.settings-stack{width:100%;max-width:1120px;display:grid;gap:18px}.settings-stack .form-card{min-width:0}
 .chrome-section{padding-top:18px;margin-top:18px;border-top:1px solid rgba(76,205,233,.09)}
 .chrome-section:first-of-type{padding-top:0;margin-top:0;border-top:0}
 .chrome-section-title{display:flex;align-items:center;gap:9px;margin-bottom:14px;color:#dff5f8;font-size:12px;font-weight:800}
@@ -247,7 +246,7 @@ input:not([type=checkbox]):focus,textarea:focus{border-color:rgba(81,216,240,.35
 .locked-value small{margin-left:auto;color:#526f79;font-size:8px}
 .actions{display:flex;justify-content:flex-end}
 .actions button{border:0;border-radius:12px;padding:13px 20px;background:#31afd2;color:#fff;font-weight:700;box-shadow:0 8px 24px rgba(49,175,210,.14)}
-@media(max-width:650px){
+@media(max-width:900px){.mail-routing-grid{grid-template-columns:1fr}.upload-policy-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.builder-links{grid-template-columns:1fr 1fr}}\n@media(max-width:650px){
 .mail-routing-grid{grid-template-columns:1fr}
 
 .form-card{padding:18px}
