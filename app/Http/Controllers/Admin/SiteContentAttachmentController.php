@@ -113,7 +113,7 @@ class SiteContentAttachmentController extends Controller
 
     public function destroy(SiteContentItem $item): JsonResponse
     {
-        abort_unless(in_array($item->type, ['news', 'announcement'], true), 404);
+        abort_unless(in_array($item->type, ['news', 'announcement', 'resource'], true), 404);
         if ($item->attachment_path) Storage::disk('public')->delete($item->attachment_path);
         $item->update([
             'attachment_path' => null,
