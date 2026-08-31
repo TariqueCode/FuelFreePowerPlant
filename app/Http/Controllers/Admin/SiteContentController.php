@@ -13,8 +13,8 @@ use Illuminate\View\View;
 
 class SiteContentController extends Controller
 {
-    private array $types = ['company','news','gallery','announcement'];
-    private array $labels = ['company'=>'Company & About','management'=>'Management','news'=>'News & Notices','gallery'=>'Gallery','announcement'=>'Announcements'];
+    private array $types = ['company','news','gallery','announcement','resource'];
+    private array $labels = ['company'=>'Company & About','management'=>'Management','news'=>'News & Notices','gallery'=>'Gallery','announcement'=>'Announcements','resource'=>'Resources'];
 
     public function index(Request $request): View|RedirectResponse
     {
@@ -138,7 +138,7 @@ class SiteContentController extends Controller
     private function saveItem(SiteContentItem $item, Request $request): SiteContentItem
     {
         $data = $request->validate([
-            'type'=>['required','in:company,news,announcement,gallery'],
+            'type'=>['required','in:company,news,announcement,gallery,resource'],
             'publication_type'=>['nullable','in:news,announcement'],
             'title'=>['required','string','max:255'],
             'slug'=>['nullable','string','max:255'],
