@@ -8,6 +8,7 @@ use App\Models\DocumentFolder;
 use App\Models\SystemSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -193,7 +194,7 @@ class DocumentController extends Controller
     public function destroy(Request $request, Document $document): RedirectResponse { $this->ownDocument($request, $document); Storage::disk($document->disk)->delete($document->path); $document->delete(); return back()->with('success', 'File deleted permanently.'); }
     private function maxUploadBytes(): int
     {
-        $mb = (int) SystemSetting::query()->where('key', 'uploads.documents_max_mb')->value('value');
+        $mb = (int) Cache::remember('fuelfree.documents_max_upload_mb', 600, fn () => (int) SystemSetting::query()->where('key', 'uploads.documents_max_mb')->value('value'));
         if ($mb < 1) $mb = (int) config('fuelfree.upload.max_mb', 50);
         return $mb * 1024 * 1024;
     }
