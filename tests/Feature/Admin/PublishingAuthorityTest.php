@@ -75,4 +75,37 @@ class PublishingAuthorityTest extends TestCase
         $this->assertSame('published', $item->fresh()->status);
     }
 
+    public function test_management_profile_publishing_requires_publish_permission(): void
+    {
+        $manage = Permission::firstOrCreate(['slug' => 'website.manage'], ['name' => 'Manage website']);
+        $publish = Permission::firstOrCreate(['slug' => 'website.publish'], ['name' => 'Publish website']);
+
+        $role = Role::create(['name' => 'Website Manager', 'slug' => 'website-manager-publish-test', 'is_system' => false]);
+        $role->permissions()->sync([$manage->id]);
+        $user = User::factory()->create();
+        $user->roles()->attach($role);
+
+        $this->actingAs($user)->post(route('admin.management.store'), [
+            'title' => 'QA Manager', 'designation' => 'Director', 'phone' => '01700000000',
+            'status' => 'published',
+        ])->assertForbidden();
+
+        $this->assertDatabaseMissing('site_content_items', ['title' => 'QA Manager']);
+    }
+
+    public function test_gallery_publishing_requires_publish_permission(): void
+    {
+        $manage = Permission::firstOrCreate(['slug' => 'website.manage'], ['name' => 'Manage website']);
+        $role = Role::create(['name' => 'Gallery Manager', 'slug' => 'gallery-manager-publish-test', 'is_system' => false]);
+        $role->permissions()->sync([$manage->id]);
+        $user = User::factory()->create();
+        $user->roles()->attach($role);
+
+        $this->actingAs($user)->post(route('admin.gallery.store'), [
+            'title' => 'QA Gallery', 'status' => 'published',
+        ])->assertForbidden();
+
+        $this->assertDatabaseMissing('site_content_items', ['title' => 'QA Gallery']);
+    }
+
 }
