@@ -23,7 +23,7 @@
 @elseif($type==='company')
 <div class="toolbar"><div><strong>{{ $items->total() }}</strong><span> company pages</span></div><span class="hint"><i class="fa-solid fa-circle-info"></i> Public menu order is managed in Navigation Builder</span></div>
 @endif
-<div class="content-list {{ $type==='company' ? 'company-list' : '' }} {{ $type==='news' ? 'news-list' : '' }}">
+<div class="content-list {{ $type==='company' ? 'company-list' : '' }} {{ $type==='news' ? 'news-list' : ($type==='resource' ? 'resource-list' : '') }}">
 @forelse($items as $item)
 <article class="content-card {{ $type==='company' ? 'company-card' : '' }} {{ $type==='news' ? 'news-card' : '' }}" data-edit-url="{{ route('admin.site-content.edit',$item) }}">
     @if($type==='company')
@@ -31,7 +31,7 @@
         <div class="content-icon"><i class="fa-regular fa-file-lines"></i></div>
     @else
         <div class="news-cover">@if($item->image_path)<img src="{{ asset('storage/'.$item->image_path) }}" alt="{{ $item->cover_alt ?: $item->title }}" loading="lazy">@else<i class="fa-regular fa-newspaper"></i>@endif</div>
-        <div class="news-kind {{ $item->type==='announcement'?'notice':'' }}">{{ $item->type==='announcement'?'Notice':'News' }}</div>
+        <div class="news-kind {{ $item->type==='announcement'?'notice':'' }}">{{ $item->type==='announcement'?'Notice':($item->type==='resource'?'Resource':'News') }}</div>
     @endif
     <div class="info">
         <div class="name">{{ $item->title }}</div>
