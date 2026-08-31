@@ -36,6 +36,9 @@ class UserController extends Controller
             'role_id' => ['required', 'integer', 'exists:roles,id'],
         ]);
 
+        $selectedRole = Role::findOrFail($data['role_id']);
+        abort_if($selectedRole->slug === 'super-admin' && ! $request->user()->hasRole('super-admin'), 403, 'Only a Super Admin can assign the Super Admin role.');
+
         $user = DB::transaction(function () use ($data) {
             $user = User::create([
             'name' => $data['name'],
@@ -66,6 +69,14 @@ class UserController extends Controller
             'role_id' => ['required', 'integer', 'exists:roles,id'],
         ]);
 
+        $selectedRole = Role::findOrFail($data['role_id']);
+        if ($user->hasRole('super-admin') && ! $request->user()->hasRole('super-admin')) {
+            abort(403, 'Only a Super Admin can modify a Super Admin account.');
+        }
+        if ($selectedRole->slug === 'super-admin' && ! $request->user()->hasRole('super-admin')) {
+            abort(403, 'Only a Super Admin can assign the Super Admin role.');
+        }
+
         $user->name = $data['name'];
         $user->email = $data['email'];
         if (!empty($data['password'])) {
@@ -81,6 +92,10 @@ class UserController extends Controller
 
     public function destroy(Request $request, User $user): RedirectResponse
     {
+        if ($user->hasRole('super-admin')) {
+            abort_unless($request->user()->hasRole('super-admin'), 403, 'Only a Super Admin can delete a Super Admin account.');
+        }
+
         abort_if($request->user()->is($user), 422, 'You cannot delete your own account.');
 
         if ($user->hasRole('super-admin')) {
