@@ -82,7 +82,15 @@ class CmsController extends Controller
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:1000'],
             'is_published' => ['nullable', 'boolean'],
-        ]) + ['is_published' => $request->boolean('is_published')];
+            'use_global_framework' => ['nullable', 'boolean'],
+            'use_global_header' => ['nullable', 'boolean'],
+            'use_global_footer' => ['nullable', 'boolean'],
+        ]) + [
+            'is_published' => $request->boolean('is_published'),
+            'use_global_framework' => $request->boolean('use_global_framework'),
+            'use_global_header' => $request->boolean('use_global_header'),
+            'use_global_footer' => $request->boolean('use_global_footer'),
+        ];
     }
 
     private function uniqueSlug(string $value, ?int $ignoreId = null): string
