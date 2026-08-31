@@ -1,4 +1,7 @@
 @php
+    $useGlobalFramework = $useGlobalFramework ?? true;
+    $useGlobalHeader = $useGlobalFramework && ($useGlobalHeader ?? true);
+    $useGlobalFooter = $useGlobalFramework && ($useGlobalFooter ?? true);
     $publicBrand = $brand ?? null;
     if (!$publicBrand || (is_countable($publicBrand) && count($publicBrand) === 0)) {
         $publicBrand = \App\Models\SystemSetting::query()->whereIn('key',['company.name','company.logo_path','company.tagline'])->pluck('value','key');
@@ -35,9 +38,9 @@
     @stack('head')
 </head>
 <body>
-    @include('partials.public-header', ['brand' => $publicBrand])
+    @if($useGlobalHeader) @include('partials.public-header', ['brand' => $publicBrand]) @endif
     @yield('content')
-    @include('partials.public-footer', ['brand' => $publicBrand])
+    @if($useGlobalFooter) @include('partials.public-footer', ['brand' => $publicBrand]) @endif
     @stack('scripts')
 </body>
 </html>
