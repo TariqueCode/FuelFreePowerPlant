@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\SiteContentItem;
 use App\Models\SystemSetting;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -32,8 +31,7 @@ class ResourceController extends Controller
         return view('resources.index', ['resources' => $resources, 'brand' => $this->brand()]);
     }
 
-
-    public function download(string $slug): Response
+    public function download(string $slug)
     {
         $resource = SiteContentItem::published()
             ->whereIn('type', ['resource', 'resources'])
