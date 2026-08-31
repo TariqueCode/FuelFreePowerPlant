@@ -76,7 +76,7 @@ Target areas include: Home, Company/About, Vision, Mission, Values, Management, 
 - [x] Dedicated inquiry database and admin management workflow
 - [x] Finish Company/About public presentation
 - [x] Finish Management/Team public presentation foundation
-- [ ] Complete Resources public-safe management
+- [x] Complete Resources public-safe management
 - [ ] Complete Gallery management
 - [ ] Manual import center
 - [ ] Reference-site feature parity audit
