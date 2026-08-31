@@ -104,3 +104,160 @@
 </div>
 
 <div class="form-card builder-links-card"><div class="section-heading"><div><div class="eyebrow">DESIGN &amp; LAYOUT</div><h2>Visual builders</h2><p>Use dedicated builders for homepage composition, navigation and global visual styling.</p></div><i class="fa-solid fa-wand-magic-sparkles"></i></div><div class="builder-links"><a href="{{route('admin.homepage-builder.index')}}"><i class="fa-solid fa-house"></i><span><b>Homepage Builder</b><small>Sections, visibility &amp; ordering</small></span></a><a href="{{route('admin.navigation.index')}}"><i class="fa-solid fa-bars-staggered"></i><span><b>Menu Builder</b><small>Menus, submenus &amp; drag ordering</small></span></a><a href="{{route('admin.cms.index')}}"><i class="fa-solid fa-file-lines"></i><span><b>Page Builder</b><small>Pages, blocks &amp; publishing</small></span></a><a href="{{route('admin.design.index',['area'=>'header'])}}"><i class="fa-solid fa-window-maximize"></i><span><b>Header Builder</b><small>Header components &amp; visibility</small></span></a><a href="{{route('admin.design.index',['area'=>'footer'])}}"><i class="fa-solid fa-table-columns"></i><span><b>Footer Builder</b><small>Footer components &amp; visibility</small></span></a><a href="{{route('admin.theme.index')}}"><i class="fa-solid fa-palette"></i><span><b>Theme Builder</b><small>Colors, typography &amp; layout</small></span></a></div></div>
+
+<div class="actions"><button type="submit"><i class="fa-solid fa-floppy-disk"></i> Save all settings</button></div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-mailbox-verify]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const group = button.dataset.mailboxVerify;
+            const email = document.getElementById('mail-' + group + '-email');
+            const password = document.getElementById('mail-' + group + '-password');
+            const row = button.closest('.mail-verify-row');
+            let status = row?.querySelector('.mail-verify-live');
+
+            if (!email?.value.trim() || !password?.value) {
+                if (!status) {
+                    status = document.createElement('span');
+                    status.className = 'mail-verify-live';
+                    row.appendChild(status);
+                }
+                status.textContent = 'Enter the email and password first.';
+                status.classList.remove('mail-verify-success');
+                return;
+            }
+
+            button.disabled = true;
+            button.classList.add('is-loading');
+            button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+            if (!status) {
+                status = document.createElement('span');
+                status.className = 'mail-verify-live';
+                row.appendChild(status);
+            }
+            status.textContent = 'Connecting to the mailbox...';
+            status.classList.remove('mail-verify-success');
+
+            try {
+                const response = await fetch(@json(route('admin.settings.mail.verify')), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                        'Accept': 'application/json',
+                    },
+                    body: new URLSearchParams({
+                        _token: document.querySelector('input[name="_token"]').value,
+                        group,
+                        email: email.value.trim(),
+                        password: password.value,
+                    }),
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Mailbox login verification failed.');
+
+                status.textContent = data.message;
+                status.classList.add('mail-verify-success');
+                button.innerHTML = '<i class="fa-solid fa-circle-check"></i> Login Verified';
+            } catch (error) {
+                status.textContent = error.message || 'Mailbox login verification failed.';
+                status.classList.remove('mail-verify-success');
+                button.innerHTML = group === 'career'
+                    ? '<i class="fa-solid fa-plug-circle-check"></i> Verify Career Login'
+                    : '<i class="fa-solid fa-plug-circle-check"></i> Verify Contact Login';
+            } finally {
+                button.disabled = false;
+                button.classList.remove('is-loading');
+            }
+        });
+    });
+});
+</script>
+@endsection
+
+@push('styles')
+<style>.builder-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.builder-links a{display:flex;gap:10px;align-items:center;padding:12px;border:1px solid rgba(104,204,235,.1);border-radius:11px;background:rgba(2,15,23,.5);text-decoration:none;color:#dff4f7}.builder-links a>i{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:rgba(67,194,229,.08);color:#62d9ee}.builder-links b,.builder-links small{display:block}.builder-links b{font-size:10px}.builder-links small{font-size:8px;color:#6d8c97;margin-top:3px}@media(max-width:800px){.builder-links{grid-template-columns:1fr 1fr}}@media(max-width:520px){.builder-links{grid-template-columns:1fr}}.upload-policy-panel{margin-top:16px;padding-top:18px;border-top:1px solid var(--line)}.upload-policy-intro{color:var(--muted);font-size:11px;line-height:1.6;margin:8px 0 14px}.upload-policy-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.upload-policy-field{padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.018)}.upload-policy-field label{display:block;font-weight:700}.upload-policy-field label span{color:var(--muted);font-weight:500}.mb-input{display:flex;align-items:center;gap:7px;margin-top:7px}.mb-input input{min-width:0;flex:1}.mb-input span{color:var(--muted);font-size:11px}.upload-policy-field small{display:block;margin-top:7px;color:var(--muted);font-size:9px;line-height:1.5}@media(max-width:800px){.upload-policy-grid{grid-template-columns:1fr}}</style>
+<style>
+.settings-stack{max-width:980px;display:grid;gap:18px}
+.chrome-section{padding-top:18px;margin-top:18px;border-top:1px solid rgba(76,205,233,.09)}
+.chrome-section:first-of-type{padding-top:0;margin-top:0;border-top:0}
+.chrome-section-title{display:flex;align-items:center;gap:9px;margin-bottom:14px;color:#dff5f8;font-size:12px;font-weight:800}
+.chrome-section-title i{color:#51cfe9}
+.chrome-note{display:flex;gap:9px;align-items:flex-start;margin-top:14px;padding:11px 12px;border-radius:11px;background:rgba(72,216,241,.035);border:1px solid rgba(72,216,241,.08);color:#718f9a;font-size:8px;line-height:1.55}
+.chrome-note i{color:#58cfe9;margin-top:1px}
+.mail-routing-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mail-route{padding:15px;border:1px solid rgba(76,205,233,.11);border-radius:15px;background:rgba(76,205,233,.025)}
+.route-title{display:flex;align-items:center;gap:8px;margin-bottom:14px;color:#dff5f8;font-size:12px;font-weight:800}
+.route-title i{color:#51cfe9}
+.mail-route label{font-size:11px;color:#a9c2ca;font-weight:700;margin-top:9px}
+.mail-route input{margin-bottom:3px}
+.mail-route small{display:block;color:#678692;font-size:8px;line-height:1.55;margin-top:8px}
+.mail-route small strong{color:#9bc4ce}
+.mail-routing-note{display:flex;gap:9px;align-items:flex-start;margin-top:14px;padding:12px 13px;border-radius:12px;background:rgba(72,216,241,.035);border:1px solid rgba(72,216,241,.08);color:#718f9a;font-size:9px;line-height:1.55}
+.mail-routing-note i{color:#58cfe9}
+.mail-routing-note strong{color:#9bc4ce}
+.form-card{background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:20px;padding:24px}
+.section-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:20px}
+.section-heading h2{margin:5px 0 5px;color:#eaf8fb;font-size:21px}
+.section-heading p{margin:0;color:#7899a5;font-size:10px;line-height:1.55}
+.section-heading>i{font-size:26px;color:#51cfe9}
+.identity{display:flex;align-items:center;gap:15px;padding:16px;margin-bottom:20px;border:1px solid rgba(76,205,233,.13);border-radius:16px;background:linear-gradient(135deg,rgba(76,205,233,.06),rgba(255,255,255,.015))}
+.logo-preview{width:68px;height:68px;flex:none;border-radius:17px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line);background:#061923;color:#62d4ed;font-size:25px}
+.logo-preview img{width:100%;height:100%;object-fit:contain}
+.identity-copy strong{display:block;color:#e4f5f8;font-size:15px;margin:2px 0 4px}
+.identity-copy>span{display:block;color:#7899a5;font-size:9px}
+.upload{display:inline-flex;align-items:center;gap:7px;margin-top:9px!important;padding:8px 10px;border:1px solid var(--line);border-radius:9px;color:#9ed3df!important;cursor:pointer!important}
+.upload input{display:none!important}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.full{grid-column:1/-1}
+label{display:block;font-size:10px;color:#9eb9c4;margin:0 0 7px}
+input:not([type=checkbox]),textarea{width:100%;box-sizing:border-box;padding:13px;border-radius:11px;border:1px solid var(--line);background:#071c29;color:#e9f7fb;outline:none;font:inherit}
+textarea{resize:vertical;min-height:84px}
+input:not([type=checkbox]):focus,textarea:focus{border-color:rgba(81,216,240,.35);box-shadow:0 0 0 3px rgba(81,216,240,.06)}
+.home-options{display:grid;gap:10px}
+.home-option{border:1px solid rgba(76,205,233,.11);border-radius:16px;background:rgba(76,205,233,.025);overflow:hidden}
+.option-main{display:grid;grid-template-columns:44px minmax(0,1fr) 46px;align-items:center;gap:12px;padding:13px 14px;margin:0;cursor:pointer}
+.option-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:rgba(72,216,241,.08);color:#5fd4ed;font-size:15px}
+.option-copy{min-width:0}
+.option-copy strong{display:block;color:#e7f7fa;font-size:12px}
+.option-copy small{display:block;color:#718f9a;font-size:9px;margin-top:4px;line-height:1.4}
+.switch-wrap{justify-self:end;display:block}
+.switch-input{position:absolute;opacity:0;pointer-events:none}
+.switch{position:relative;display:block;width:42px;height:23px;border-radius:999px;background:#304952;border:1px solid rgba(255,255,255,.08)}
+.switch i{position:absolute;width:17px;height:17px;top:2px;left:2px;border-radius:50%;background:#a9bcc1;transition:.2s}
+.switch-input:checked + .switch{background:#31b985}
+.switch-input:checked + .switch i{left:21px;background:#fff}
+.display-control{display:grid;grid-template-columns:minmax(120px,1fr) 105px minmax(190px,1.8fr);align-items:center;gap:12px;padding:10px 14px 13px;margin:0 14px 12px;border-top:1px solid rgba(76,205,233,.09)}
+.display-control label{margin:11px 0 0;font-size:9px;color:#89a9b4}
+.count-input{position:relative;margin-top:7px}
+.count-input input{padding:9px 45px 9px 11px!important;font-size:11px}
+.count-input span{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#628591;font-size:8px}
+.display-control>small{color:#678692;font-size:8px;line-height:1.4;margin-top:8px}
+.homepage-note{display:flex;gap:9px;align-items:flex-start;margin-top:14px;padding:12px 13px;border-radius:12px;background:rgba(72,216,241,.035);border:1px solid rgba(72,216,241,.08);color:#718f9a;font-size:8px;line-height:1.55}
+.homepage-note i{color:#58cfe9;margin-top:1px}
+.homepage-note strong{color:#9bc4ce}
+.locked-field{grid-column:1/-1}
+.locked-value{min-height:46px;box-sizing:border-box;padding:10px 13px;border-radius:11px;border:1px solid rgba(76,205,233,.08);background:rgba(255,255,255,.018);display:flex;align-items:center;gap:9px;color:#7899a5}
+.locked-value i{color:#587b86;font-size:12px}
+.locked-value strong{color:#9bbcc5;font-weight:700}
+.locked-value small{margin-left:auto;color:#526f79;font-size:8px}
+.actions{display:flex;justify-content:flex-end}
+.actions button{border:0;border-radius:12px;padding:13px 20px;background:#31afd2;color:#fff;font-weight:700;box-shadow:0 8px 24px rgba(49,175,210,.14)}
+@media(max-width:650px){
+.mail-routing-grid{grid-template-columns:1fr}
+
+.form-card{padding:18px}
+.section-heading{margin-bottom:16px}
+.section-heading h2{font-size:19px}
+.identity{align-items:flex-start}
+.fields{grid-template-columns:1fr}
+.full{grid-column:auto}
+.option-main{grid-template-columns:40px minmax(0,1fr) 42px;padding:12px}
+.option-icon{width:40px;height:40px}
+.display-control{grid-template-columns:1fr 100px;margin:0 12px 11px;padding-top:9px}
+.display-control>small{grid-column:1/-1;margin-top:0}
+.actions button{width:100%}
+}
+</style>
+@endpush
