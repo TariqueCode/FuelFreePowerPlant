@@ -1,7 +1,7 @@
 @extends('layouts.portal')
 @section('title','Slider')
 @section('content')
-<section class="hero slider-hero"><div><span class="eyebrow">PUBLIC WEBSITE CONTROL</span><h1>Homepage Slider</h1><p>Drag and drop the cards to set the display order. Published images rotate automatically with a smooth animation.</p></div><div class="slider-header-actions"><a class="primary" href="{{ route('admin.sliders.create') }}"><i class="fa-solid fa-plus"></i> Add slider</a><div class="profile-count"><strong>{{ $publishedCount }}</strong><span>published</span></div></div></section>
+<section class="hero slider-hero"><div><span class="eyebrow">PUBLIC WEBSITE CONTROL</span><h1>Homepage Slider</h1><p>Drag and drop the cards to set the display order. Published images rotate automatically with a smooth animation.</p></div><div class="slider-header-actions">@if(auth()->user()->hasPermission('website.manage'))<a class="primary" href="{{ route('admin.sliders.create') }}"><i class="fa-solid fa-plus"></i> Add slider</a>@endif<div class="profile-count"><strong>{{ $publishedCount }}</strong><span>published</span></div></div></section>
 @if(session('status'))<div class="notice">{{ session('status') }}</div>@endif
 <div id="slider-save-status" class="save-status" aria-live="polite"></div>
 <div class="slider-list" id="slider-list">
@@ -16,8 +16,8 @@
             <div class="meta-row"><span><i class="fa-solid fa-link"></i>{{ $slider->link_url ? 'Linked image' : 'No link' }}</span><span><i class="fa-regular fa-calendar"></i>{{ $slider->starts_at?->format('d M Y, H:i') ?: 'Immediately' }}{{ $slider->ends_at ? ' → '.$slider->ends_at->format('d M Y, H:i') : ' · No expiry' }}</span></div>
         </a>
         <div class="slider-actions">
-            <form method="POST" action="{{ route('admin.sliders.update',$slider) }}">@csrf @method('PATCH')<input type="hidden" name="toggle" value="1"><button class="toggle-btn {{ $slider->is_published?'active':'inactive' }}" type="submit" title="{{ $slider->is_published?'Deactivate':'Activate' }}"><span class="toggle-track"><span class="toggle-knob"></span></span></button></form>
-            <form method="POST" action="{{ route('admin.sliders.destroy',$slider) }}" onsubmit="return confirm('Delete this slider image?')">@csrf @method('DELETE')<button class="delete-btn" type="submit" title="Delete slider"><i class="fa-solid fa-trash-can"></i></button></form>
+            @if(auth()->user()->hasPermission('website.publish'))<form method="POST" action="{{ route('admin.sliders.update',$slider) }}">@csrf @method('PATCH')<input type="hidden" name="toggle" value="1"><button class="toggle-btn {{ $slider->is_published?'active':'inactive' }}" type="submit" title="{{ $slider->is_published?'Deactivate':'Activate' }}"><span class="toggle-track"><span class="toggle-knob"></span></span></button></form>@endif
+            @if(auth()->user()->hasPermission('website.manage'))<form method="POST" action="{{ route('admin.sliders.destroy',$slider) }}" onsubmit="return confirm('Delete this slider image?')">@csrf @method('DELETE')<button class="delete-btn" type="submit" title="Delete slider"><i class="fa-solid fa-trash-can"></i></button></form>@endif
         </div>
     </article>
 @empty
