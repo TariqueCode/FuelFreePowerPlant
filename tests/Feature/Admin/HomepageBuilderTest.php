@@ -35,4 +35,29 @@ class HomepageBuilderTest extends TestCase
         $response->assertSessionHasErrors(['section_order' => 'The homepage section list is invalid.']);
         $this->assertSame([0, 1], HomepageSection::ordered()->pluck('sort_order')->all());
     }
+    public function test_highlight_section_can_be_disabled_without_deleting_the_highlight_module(): void
+    {
+        $user = User::factory()->create();
+        $role = Role::create(['name' => 'Website Manager', 'slug' => 'website-manager', 'is_system' => false]);
+        $permission = Permission::firstOrCreate(['slug' => 'website.manage'], ['name' => 'Manage website sections']);
+        $role->permissions()->attach($permission);
+        $user->roles()->attach($role);
+
+        $section = HomepageSection::create([
+            'key' => 'highlight',
+            'label' => 'Homepage Highlight',
+            'is_enabled' => true,
+            'sort_order' => 0,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('admin.homepage-builder.update'), [
+            'section_order' => ['highlight'],
+            'sections' => [],
+        ]);
+
+        $response->assertRedirect();
+        $this->assertFalse($section->fresh()->is_enabled);
+        $this->assertDatabaseHas('homepage_sections', ['key' => 'highlight']);
+    }
+
 }
