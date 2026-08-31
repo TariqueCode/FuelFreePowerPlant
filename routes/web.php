@@ -56,6 +56,7 @@ Route::get('/news', [NewsController::class,'index'])->name('news.index');
 Route::get('/news/{slug}', [NewsController::class,'show'])->name('news.show');
 Route::get('/resources', [ResourceController::class,'index'])->name('resources.index');
 Route::get('/resources/{slug}', [ResourceController::class,'show'])->name('resources.show');
+Route::get('/resources/{slug}/download', [ResourceController::class,'download'])->name('resources.download');
 Route::get('/resources/{slug}/download', [ResourceController::class,'download'])->middleware('throttle:30,1')->name('resources.download');
 Route::get('/shared/documents/{token}', [DocumentController::class,'sharedDownload'])->where('token', '[A-Fa-f0-9]{64}')->middleware('throttle:30,1')->name('documents.shared-download');
 Route::get('/sustainability', SustainabilityController::class)->name('sustainability');
