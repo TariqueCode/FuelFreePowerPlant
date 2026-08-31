@@ -14,6 +14,7 @@ class HomepageBuilderTest extends TestCase
     public function test_invalid_homepage_order_is_rejected_without_mutating_sections(): void
     {
         $user = User::factory()->create();
+        HomepageSection::query()->delete();
         $sections = collect([
             HomepageSection::create(['key' => 'hero', 'label' => 'Hero', 'is_enabled' => true, 'sort_order' => 0]),
             HomepageSection::create(['key' => 'news', 'label' => 'News', 'is_enabled' => true, 'sort_order' => 1]),
