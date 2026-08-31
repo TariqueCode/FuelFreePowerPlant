@@ -61,7 +61,4 @@ class HomepageBuilderTest extends TestCase
         $this->assertDatabaseHas('homepage_sections', ['key' => 'highlight']);
     }
 
-    public function test_invalid_homepage_order_is_rejected_without_mutating_sections(): void {
-        $this->assertTrue(true);
-    }
 }
