@@ -171,6 +171,7 @@ class SettingsController
         }
         foreach($data as $key=>$value) SystemSetting::updateOrCreate(['key'=>$key],['value'=>(string)($value??''),'is_sensitive'=>false]);
         Cache::forget('fuelfree.system_settings');
+        Cache::forget('fuelfree.documents_max_upload_mb');
         return back()->with('status','System settings saved. Contact and Career mailboxes were verified and connected.');
     }
 }
