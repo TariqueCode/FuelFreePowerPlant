@@ -21,6 +21,6 @@ class CmsPageController extends Controller
             ->whereIn('key', ['company.name', 'company.logo_path', 'company.tagline'])
             ->pluck('value', 'key');
 
-        return view('site.company-page', ['item' => $page, 'brand' => ['name' => $brand->get('company.name') ?: config('fuelfree.company.name'), 'logo_path' => $brand->get('company.logo_path'), 'tagline' => $brand->get('company.tagline') ?: config('fuelfree.company.tagline')], 'backRoute' => route('home'), 'backLabel' => 'Back to Home']);
+        return view('site.company-page', ['item' => $page, 'useGlobalFramework' => $page->use_global_framework, 'useGlobalHeader' => $page->use_global_framework && $page->use_global_header, 'useGlobalFooter' => $page->use_global_framework && $page->use_global_footer, 'brand' => ['name' => $brand->get('company.name') ?: config('fuelfree.company.name'), 'logo_path' => $brand->get('company.logo_path'), 'tagline' => $brand->get('company.tagline') ?: config('fuelfree.company.tagline')], 'backRoute' => route('home'), 'backLabel' => 'Back to Home']);
     }
 }
