@@ -48,6 +48,7 @@ class SiteSliderController extends Controller
     public function update(Request $request, SiteSlider $slider): RedirectResponse
     {
         if ($request->boolean('toggle')) {
+            abort_unless($request->user()->hasPermission('website.publish'), 403, 'Publishing sliders requires publishing permission.');
             $slider->update(['is_published' => !$slider->is_published]);
             return redirect()->route('admin.sliders.index')->with(
                 'status',
@@ -132,6 +133,7 @@ class SiteSliderController extends Controller
 
         unset($data['image']);
         $data['is_published'] = $request->boolean('is_published');
+        abort_unless(! $data['is_published'] || $request->user()->hasPermission('website.publish'), 403, 'Publishing sliders requires publishing permission.');
 
         if (!$slider->exists) {
             $data['sort_order'] = ((int) SiteSlider::query()->max('sort_order')) + 1;
