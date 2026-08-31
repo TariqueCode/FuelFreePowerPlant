@@ -112,8 +112,8 @@ class PublishingAuthorityTest extends TestCase
 
     public function test_homepage_selected_content_uses_admin_selected_order(): void
     {
-        $first = PowerPlant::factory()->create(['name' => 'First QA Plant']);
-        $second = PowerPlant::factory()->create(['name' => 'Second QA Plant']);
+        $first = PowerPlant::create(['name' => 'First QA Plant', 'slug' => 'first-qa-plant', 'status' => 'operational', 'capacity_kw' => 100]);
+        $second = PowerPlant::create(['name' => 'Second QA Plant', 'slug' => 'second-qa-plant', 'status' => 'operational', 'capacity_kw' => 200]);
         HomepageSection::updateOrCreate(['key' => 'projects'], [
             'sort_order' => 3, 'is_enabled' => true, 'settings' => [
                 'limit' => 2, 'mode' => 'selected', 'ids' => [$second->id, $first->id],
