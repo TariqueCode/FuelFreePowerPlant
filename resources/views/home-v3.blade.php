@@ -92,6 +92,35 @@ img{max-width:100%}
 .shell{width:calc(100% - 18px)}.welcome{padding-top:41px}.welcome h1{font-size:29px}.welcome-preview,.welcome-more-content{font-size:13px}.stats-grid,.project-grid,.management-grid{grid-template-columns:1fr}.project-media{aspect-ratio:16/10}.news{grid-template-columns:94px 1fr;min-height:94px}.news-media{width:94px;height:94px}.folders{grid-template-columns:1fr}.head h2{font-size:23px}
 }
 @media(prefers-reduced-motion:reduce){.slide,.welcome:before,.welcome:after,.section,.project-card,.member-card,.folder,.news{animation:none;transition:none}.slide.is-active{transform:none}}
+
+/* Homepage motion + responsive polish */
+.home-slider{isolation:isolate;animation:homeRise .8s cubic-bezier(.2,.7,.2,1) both}
+.home-slider:before{content:"";position:absolute;inset:-18px -10px auto;height:70%;z-index:-1;border-radius:40px;background:radial-gradient(circle at 50% 35%,rgba(72,216,241,.16),transparent 62%);filter:blur(22px);animation:heroGlow 7s ease-in-out infinite}
+.slide-media{box-shadow:0 20px 70px rgba(0,0,0,.28);transition:border-color .35s ease,box-shadow .35s ease,transform .35s ease}
+.slide.is-active .slide-media{border-color:rgba(72,216,241,.34);box-shadow:0 24px 80px rgba(0,0,0,.34),0 0 50px rgba(72,216,241,.08)}
+.slide.is-active .slide-media:after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 25%,rgba(255,255,255,.09) 48%,transparent 58%);transform:translateX(-120%);animation:heroSweep 6s ease-in-out infinite;pointer-events:none}
+.home-section{position:relative;overflow:visible}
+.home-section:not(.cta-section):after{content:"";position:absolute;left:8%;right:8%;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(72,216,241,.11),transparent);pointer-events:none}
+.section{animation:none;opacity:1;transform:none}
+.home-section.reveal-ready{opacity:0;transform:translateY(24px) scale(.992);transition:opacity .75s cubic-bezier(.2,.7,.2,1),transform .75s cubic-bezier(.2,.7,.2,1)}
+.home-section.revealed{opacity:1;transform:none}
+.home-section .head,.welcome-heading,.welcome-copy{position:relative}
+.home-section .head:after{content:"";position:absolute;right:0;bottom:-10px;width:44px;height:1px;background:var(--cyan);opacity:.35;transform-origin:right;transform:scaleX(0);transition:transform .8s ease .15s}
+.home-section.revealed .head:after{transform:scaleX(1)}
+.stat-card,.project-card,.member-card,.news,.folder{position:relative;transform:translateY(0);transition:transform .35s cubic-bezier(.2,.7,.2,1),border-color .35s ease,box-shadow .35s ease,background .35s ease}
+.stat-card:before,.project-card:before,.member-card:before,.news:before,.folder:before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(120deg,rgba(72,216,241,.08),transparent 35%,transparent 70%,rgba(72,216,241,.035));opacity:0;transition:opacity .35s ease;pointer-events:none}
+.stat-card:hover:before,.project-card:hover:before,.member-card:hover:before,.news:hover:before,.folder:hover:before{opacity:1}
+.home-section.revealed .stat-card,.home-section.revealed .project-card,.home-section.revealed .member-card,.home-section.revealed .news,.home-section.revealed .folder{animation:cardIn .6s cubic-bezier(.2,.7,.2,1) both}
+.home-section.revealed .stat-card:nth-child(2),.home-section.revealed .project-card:nth-child(2),.home-section.revealed .member-card:nth-child(2),.home-section.revealed .news:nth-child(2),.home-section.revealed .folder:nth-child(2){animation-delay:.07s}
+.home-section.revealed .stat-card:nth-child(3),.home-section.revealed .project-card:nth-child(3),.home-section.revealed .member-card:nth-child(3),.home-section.revealed .news:nth-child(3),.home-section.revealed .folder:nth-child(3){animation-delay:.14s}
+.home-section.revealed .stat-card:nth-child(4),.home-section.revealed .project-card:nth-child(4),.home-section.revealed .member-card:nth-child(4),.home-section.revealed .news:nth-child(4),.home-section.revealed .folder:nth-child(4){animation-delay:.21s}
+.stat-card i,.project-top i,.folder-meta i{transition:transform .35s ease}.stat-card:hover i,.project-card:hover .project-top i,.folder:hover .folder-meta i{transform:translateY(-2px) scale(1.08)}
+.welcome{overflow:hidden}.welcome-heading:before{content:"";position:absolute;right:2%;top:-10px;width:110px;height:110px;border:1px solid rgba(72,216,241,.08);border-radius:50%;box-shadow:0 0 45px rgba(72,216,241,.06);animation:orbitPulse 5s ease-in-out infinite}.welcome-layout-center .welcome-heading:before{right:12%}.welcome-layout-right .welcome-heading:before{right:auto;left:2%}
+.cta-section{border-top-color:rgba(72,216,241,.14)}.cta-card{position:relative;overflow:hidden}.cta-card:before,.cta-card:after{content:"";position:absolute;border-radius:50%;pointer-events:none}.cta-card:before{width:240px;height:240px;right:-100px;top:-150px;border:1px solid rgba(72,216,241,.16);box-shadow:0 0 55px rgba(72,216,241,.08);animation:ctaFloat 8s ease-in-out infinite}.cta-card:after{width:8px;height:8px;right:26%;top:26%;background:var(--cyan);box-shadow:0 0 24px rgba(72,216,241,.55);animation:dotDrift 5s ease-in-out infinite}
+@keyframes homeRise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}@keyframes heroGlow{0%,100%{opacity:.55;transform:scale(.96)}50%{opacity:1;transform:scale(1.03)}}@keyframes heroSweep{0%,55%{transform:translateX(-120%)}75%,100%{transform:translateX(120%)}}@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}@keyframes orbitPulse{0%,100%{transform:translate3d(0,0,0) scale(1);opacity:.45}50%{transform:translate3d(-8px,10px,0) scale(1.08);opacity:.9}}@keyframes ctaFloat{0%,100%{transform:translate(0,0)}50%{transform:translate(-12px,10px)}}@keyframes dotDrift{0%,100%{transform:translate(0,0);opacity:.45}50%{transform:translate(16px,-12px);opacity:1}}
+@media(max-width:900px){.home-section .head:after{display:none}.home-section:not(.cta-section):after{left:4%;right:4%}.welcome-heading:before{width:80px;height:80px;right:0}.cta-card:before{width:170px;height:170px;right:-80px;top:-100px}}
+@media(max-width:650px){.home-slider:before{inset:-8px 0 auto;height:90%;filter:blur(16px)}.slide.is-active .slide-media{box-shadow:0 16px 42px rgba(0,0,0,.3),0 0 30px rgba(72,216,241,.06)}.home-section.reveal-ready{transform:translateY(16px)}.welcome-heading:before{width:58px;height:58px;top:0}.home-section.revealed .stat-card,.home-section.revealed .project-card,.home-section.revealed .member-card,.home-section.revealed .news,.home-section.revealed .folder{animation-duration:.45s}.cta-card:after{right:18%;top:22%}}
+@media(prefers-reduced-motion:reduce){.home-slider,.home-slider:before,.slide.is-active .slide-media:after,.welcome-heading:before,.cta-card:before,.cta-card:after{animation:none}.home-section.reveal-ready{opacity:1;transform:none;transition:none}.home-section.revealed .stat-card,.home-section.revealed .project-card,.home-section.revealed .member-card,.home-section.revealed .news,.home-section.revealed .folder{animation:none}}
 </style>
 <main class="shell">
 @foreach($home['section_order'] as $section)
@@ -110,7 +139,7 @@ img{max-width:100%}
 @endif
 
 @if($section==='welcome' && $home['welcome'])
-<section class="welcome welcome-layout-{{ $welcomeLayout }}" data-welcome>
+<section class="welcome home-section home-section-welcome welcome-layout-{{ $welcomeLayout }}" data-welcome>
 <div class="welcome-heading"><span class="eyebrow">{{ $welcomeEyebrow ?: 'Welcome to '.$siteName }}</span><h1>{{ $welcomeTitle ?: 'Building a stronger energy future.' }}</h1><div class="welcome-rule"></div></div>
 <div class="welcome-copy">
 <div class="welcome-preview">{!! nl2br(e($welcomePreview)) !!}</div>
@@ -124,7 +153,7 @@ img{max-width:100%}
 @endif
 
 @if($section==='statistics' && $home['statistics'])
-<section class="section section-layout-{{ ($sectionSettings['statistics'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Power at a glance</span><h2>Our footprint.</h2></div><p>Key figures are calculated directly from the power plant records managed in the admin portal.</p></div>
+<section class="section home-section home-section-statistics section-layout-{{ ($sectionSettings['statistics'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Power at a glance</span><h2>Our footprint.</h2></div><p>Key figures are calculated directly from the power plant records managed in the admin portal.</p></div>
 <div class="stats-grid">
 <div class="stat-card"><i class="fa-solid fa-industry"></i><strong>{{ number_format($stats['projects']) }}</strong><span>Projects</span></div>
 <div class="stat-card"><i class="fa-solid fa-bolt"></i><strong>{{ number_format($stats['capacity_mw'],2) }} MW</strong><span>Total capacity</span></div>
@@ -134,7 +163,7 @@ img{max-width:100%}
 @endif
 
 @if($section==='projects' && $home['projects'])
-<section class="section section-layout-{{ ($sectionSettings['projects'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Our power plants</span><h2>Projects &amp; plants.</h2></div><a class="more" href="{{ route('site.plants') }}">View all →</a></div>
+<section class="section home-section home-section-projects section-layout-{{ ($sectionSettings['projects'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Our power plants</span><h2>Projects &amp; plants.</h2></div><a class="more" href="{{ route('site.plants') }}">View all →</a></div>
 <div class="project-grid">
 @if($plants->isNotEmpty())
 @foreach($plants as $plant)
@@ -149,7 +178,7 @@ img{max-width:100%}
 
 @if($section==='management' && $home['management'])
 
-<section class="section section-layout-{{ ($sectionSettings['management'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Leadership</span><h2>Management team.</h2></div><a class="more" href="{{ route('management') }}">Meet the team →</a></div>
+<section class="section home-section home-section-management section-layout-{{ ($sectionSettings['management'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Leadership</span><h2>Management team.</h2></div><a class="more" href="{{ route('management') }}">Meet the team →</a></div>
 <div class="management-grid">
 @if($homeManagement->isNotEmpty())
 @foreach($homeManagement as $member)
@@ -160,25 +189,31 @@ img{max-width:100%}
 @endif
 
 @if($section==='news' && $home['news'])
-<section class="section section-layout-{{ ($sectionSettings['news'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Latest updates</span><h2>News &amp; Notices</h2></div><a class="more" href="{{ route('news.index') }}">View all →</a></div><div class="news-grid">@if(($content['news']??collect())->isNotEmpty())@foreach(($content['news']??collect()) as $item)<a class="news" href="{{ route('news.show',$item->slug) }}"><div class="news-media">@if($item->image_path)<img src="{{ asset('storage/'.$item->image_path) }}" alt="{{ $item->cover_alt ?: $item->title }}" loading="lazy">@else<div class="news-placeholder">▣</div>@endif</div><div class="news-kind {{ $item->type==='announcement'?'notice':'' }}">{{ $item->type==='announcement'?'Notice':'News' }}</div><div class="news-body"><h3>{{ $item->title }}</h3><p>{{ $item->excerpt ?: \Illuminate\Support\Str::limit(strip_tags((string) $item->content), 180) }}</p><div class="news-footer"><span class="date">{{ $item->published_at?->format('d F Y') }}</span><span class="read">Read more →</span></div></div></a>@endforeach @else<div class="empty" style="grid-column:1/-1">No news has been published yet.</div>@endif</div></section>
+<section class="section home-section home-section-news section-layout-{{ ($sectionSettings['news'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Latest updates</span><h2>News &amp; Notices</h2></div><a class="more" href="{{ route('news.index') }}">View all →</a></div><div class="news-grid">@if(($content['news']??collect())->isNotEmpty())@foreach(($content['news']??collect()) as $item)<a class="news" href="{{ route('news.show',$item->slug) }}"><div class="news-media">@if($item->image_path)<img src="{{ asset('storage/'.$item->image_path) }}" alt="{{ $item->cover_alt ?: $item->title }}" loading="lazy">@else<div class="news-placeholder">▣</div>@endif</div><div class="news-kind {{ $item->type==='announcement'?'notice':'' }}">{{ $item->type==='announcement'?'Notice':'News' }}</div><div class="news-body"><h3>{{ $item->title }}</h3><p>{{ $item->excerpt ?: \Illuminate\Support\Str::limit(strip_tags((string) $item->content), 180) }}</p><div class="news-footer"><span class="date">{{ $item->published_at?->format('d F Y') }}</span><span class="read">Read more →</span></div></div></a>@endforeach @else<div class="empty" style="grid-column:1/-1">No news has been published yet.</div>@endif</div></section>
 @endif
 
 @if($section==='gallery' && $home['gallery'])
-<section class="section section-layout-{{ ($sectionSettings['gallery'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Photo collections</span><h2>Gallery</h2></div><a class="more" href="{{ route('site.gallery') }}">View all →</a></div><div class="folders">@if($gallery->isNotEmpty())@foreach($gallery as $item)<a class="folder" href="{{ route('gallery.show',['item'=>$item->slug ?: $item->id]) }}"><div class="folder-media">@if($item->image_path)<img src="{{ asset('storage/'.ltrim($item->image_path,'/')) }}" alt="{{ $item->cover_alt ?: $item->title }}" loading="lazy">@else<div class="folder-placeholder"><i class="fa-regular fa-images"></i></div>@endif</div><div class="folder-body"><h3>{{ $item->title }}</h3><div class="folder-meta"><span class="folder-date"><i class="fa-regular fa-calendar"></i>{{ $item->published_at?->format('d F Y') ?? $item->created_at?->format('d F Y') }}</span><span class="folder-count"><i class="fa-regular fa-images"></i>{{ $item->gallery_media_count }} {{ $item->gallery_media_count === 1 ? 'photo' : 'photos' }}</span></div></div></a>@endforeach @else<div class="empty" style="grid-column:1/-1">No photo galleries have been published yet.</div>@endif</div></section>
+<section class="section home-section home-section-gallery section-layout-{{ ($sectionSettings['gallery'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Photo collections</span><h2>Gallery</h2></div><a class="more" href="{{ route('site.gallery') }}">View all →</a></div><div class="folders">@if($gallery->isNotEmpty())@foreach($gallery as $item)<a class="folder" href="{{ route('gallery.show',['item'=>$item->slug ?: $item->id]) }}"><div class="folder-media">@if($item->image_path)<img src="{{ asset('storage/'.ltrim($item->image_path,'/')) }}" alt="{{ $item->cover_alt ?: $item->title }}" loading="lazy">@else<div class="folder-placeholder"><i class="fa-regular fa-images"></i></div>@endif</div><div class="folder-body"><h3>{{ $item->title }}</h3><div class="folder-meta"><span class="folder-date"><i class="fa-regular fa-calendar"></i>{{ $item->published_at?->format('d F Y') ?? $item->created_at?->format('d F Y') }}</span><span class="folder-count"><i class="fa-regular fa-images"></i>{{ $item->gallery_media_count }} {{ $item->gallery_media_count === 1 ? 'photo' : 'photos' }}</span></div></div></a>@endforeach @else<div class="empty" style="grid-column:1/-1">No photo galleries have been published yet.</div>@endif</div></section>
 @endif
 
 @if($section==='cta' && $home['cta'])
-<section class="section section-layout-{{ ($sectionSettings['cta'] ?? [])['layout'] ?? 'left' }} cta-section"><div class="cta-card"><div><span class="eyebrow">Let's build the future</span><h2>Reliable energy. Responsible growth.</h2><p>{{ $brand['tagline'] }}</p></div><a class="btn" href="{{ route('contact') }}">Contact us <i class="fa-solid fa-arrow-right"></i></a></div></section>
+<section class="section home-section home-section-cta section-layout-{{ ($sectionSettings['cta'] ?? [])['layout'] ?? 'left' }} cta-section"><div class="cta-card"><div><span class="eyebrow">Let's build the future</span><h2>Reliable energy. Responsible growth.</h2><p>{{ $brand['tagline'] }}</p></div><a class="btn" href="{{ route('contact') }}">Contact us <i class="fa-solid fa-arrow-right"></i></a></div></section>
 @endif
 @endforeach
 </main>
 <script>
 (() => {
+ const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  document.querySelectorAll('[data-welcome]').forEach(section => {
   const button=section.querySelector('.welcome-more-toggle'), more=section.querySelector('.welcome-more-content');
-  if(!button||!more)return;
-  button.addEventListener('click',()=>{const open=button.getAttribute('aria-expanded')==='true';button.setAttribute('aria-expanded',String(!open));more.hidden=open;button.querySelector('span').textContent=open?'Read more':'Show less';});
+  if(button&&more) button.addEventListener('click',()=>{const open=button.getAttribute('aria-expanded')==='true';button.setAttribute('aria-expanded',String(!open));more.hidden=open;button.querySelector('span').textContent=open?'Read more':'Show less';});
  });
+ const sections=[...document.querySelectorAll('.home-section')];
+ if(!sections.length)return;
+ sections.forEach(section=>section.classList.add('reveal-ready'));
+ if(reduce){sections.forEach(section=>section.classList.add('revealed'));return;}
+ const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('revealed');observer.unobserve(entry.target);}})},{rootMargin:'0px 0px -8% 0px',threshold:.08});
+ sections.forEach(section=>observer.observe(section));
 })();
 </script>
 @push('scripts')
