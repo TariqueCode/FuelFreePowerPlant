@@ -57,5 +57,6 @@ Controlled publishing: Draft -> Review -> Approved -> Published
 
 ## Batch status
 Completed: architecture baseline recorded.
-Not yet implemented: CMS/navigation redesign and editor enhancements.
-Next major batch: consolidate the existing website-management surface and map each current route/controller/data source into the final Global CMS model before UI replacement.
+Completed: website-management route/data mapping checkpoint and public Resource management integration.
+Not yet implemented: final CMS/navigation redesign and editor enhancements; remaining Gallery/Sustainability/Careers parity audit.
+Next major batch: complete the website-management consolidation checkpoint, with emphasis on Gallery/public-safe media and end-to-end Dashboard → Database → Public Website integrity.
