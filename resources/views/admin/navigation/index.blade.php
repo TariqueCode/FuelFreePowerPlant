@@ -4,15 +4,17 @@
 <section class="hero">
     <div class="eyebrow">WEBSITE / NAVIGATION</div>
     <h1>Menu Builder</h1>
-    <p>Organize pages and links into nested folders. Drag items to reorder or use the parent selector for precise placement.</p>
+    <p>Organize your website menu like folders: add a page or folder, then place it where visitors should find it.</p>
 </section>
 
 @if(session('status'))<div class="notice">{{ session('status') }}</div>@endif
 @if($errors->any())<div class="notice error-notice">{{ $errors->first() }}</div>@endif
 
+<div class="quick-guide"><div><i class="fa-solid fa-folder-tree"></i><strong>Simple menu rule</strong><span>Folder = dropdown. Page / Link = opens a destination. Drag to reorder.</span></div><div><i class="fa-solid fa-eye"></i><strong>Visibility</strong><span>Hide an item without deleting its content.</span></div></div>
+
 <div class="builder-grid">
     <div class="builder-card">
-        <div class="card-head"><strong>Main Menu</strong><span>Nested hierarchy supported</span></div>
+        <div class="card-head"><strong>Menu Structure</strong><span>Folders &amp; pages</span></div>
         <div id="menu-tree">
             @forelse($items as $item)
                 @include('admin.navigation._item', ['item' => $item])
@@ -22,12 +24,12 @@
         </div>
     </div>
 
-    <div class="builder-card">
-        <div class="card-head"><strong>Add Item</strong><span>Page or custom link</span></div>
+    <div class="builder-card add-card">
+        <div class="card-head"><strong>Add to Menu</strong><span>Start with a page or folder</span></div>
         <form method="POST" action="{{ route('admin.navigation.store') }}" class="builder-form">
             @csrf
             <input type="hidden" name="menu" value="{{ $menu }}">
-            <label>Type
+            <label>What do you want to add?
                 <select id="item-kind" name="kind">
                     <option value="link">Page / Link</option>
                     <option value="folder">Folder</option>
@@ -44,7 +46,7 @@
             </label>
             <label id="url-wrap">URL<input id="item-url" name="url" maxlength="500" placeholder="/about-us"></label>
             <label id="route-wrap">Route name<input name="route_name" maxlength="160" placeholder="site.about"></label>
-            <label>Parent
+            <label>Put inside
                 <select name="parent_id">
                     <option value="">Top-level</option>
                     @foreach($all as $p)
@@ -52,9 +54,9 @@
                     @endforeach
                 </select>
             </label>
-            <label>Menu Group<input name="group" maxlength="100" placeholder="Company"></label>
-            <label>Target<select name="target"><option value="_self">Same window</option><option value="_blank">New window</option></select></label>
-            <label>Icon<input name="icon" maxlength="100" placeholder="fa-solid fa-house"></label>
+            
+            <input type="hidden" name="target" value="_self">
+            
             <label class="check"><input type="checkbox" name="is_visible" value="1" checked> Show in menu</label>
             <button class="primary" type="submit"><i class="fa-solid fa-plus"></i> Add menu item</button>
         </form>
@@ -96,7 +98,7 @@
 
 @push('styles')
 <style>
-.builder-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:16px}.builder-card{background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:18px;padding:18px}.full-card{margin-top:16px}.card-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:14px;color:#d9edf2}.card-head span{font-size:10px;color:#6e8d9a}.builder-form,.edit-grid{display:grid;gap:10px}.builder-form label,.edit-box label{font-size:10px;color:#88a6b1}.builder-form input,.builder-form select,.edit-box input,.edit-box select{width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border-radius:9px;border:1px solid var(--line);background:#071b27;color:#e8f6fa}.check{display:flex!important;align-items:center;gap:7px}.check input{width:auto!important;margin:0!important}.primary,.edit-title button,.danger{border:0;border-radius:9px;padding:10px 13px;background:#31afd2;color:#fff;font-weight:700;cursor:pointer}.danger{background:transparent;border:1px solid rgba(255,100,100,.25);color:#ff9a9a;font-size:10px}.edit-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.edit-box{padding:13px;border:1px solid var(--line);border-radius:12px}.edit-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:#dceff3}.edit-title button{padding:7px 10px;font-size:10px}.is-hidden{display:none!important}.notice{padding:12px;border-radius:11px;margin-bottom:14px;background:rgba(67,194,137,.1);color:#a8e5ca}.error-notice{background:rgba(255,100,100,.1);color:#ffb0b0}.empty{text-align:center;color:#708d99;padding:28px}@media(max-width:800px){.builder-grid,.edit-grid{grid-template-columns:1fr}}
+.quick-guide{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 16px}.quick-guide>div{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.02)}.quick-guide i{color:#62d9ee;font-size:16px}.quick-guide strong{display:block;color:#dceff3;font-size:10px}.quick-guide span{color:#718f9a;font-size:9px;margin-left:auto}.builder-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:16px}.builder-card{background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:18px;padding:18px}.full-card{margin-top:16px}.card-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:14px;color:#d9edf2}.card-head span{font-size:10px;color:#6e8d9a}.builder-form,.edit-grid{display:grid;gap:10px}.builder-form label,.edit-box label{font-size:10px;color:#88a6b1}.builder-form input,.builder-form select,.edit-box input,.edit-box select{width:100%;box-sizing:border-box;margin-top:5px;padding:10px;border-radius:9px;border:1px solid var(--line);background:#071b27;color:#e8f6fa}.check{display:flex!important;align-items:center;gap:7px}.check input{width:auto!important;margin:0!important}.primary,.edit-title button,.danger{border:0;border-radius:9px;padding:10px 13px;background:#31afd2;color:#fff;font-weight:700;cursor:pointer}.danger{background:transparent;border:1px solid rgba(255,100,100,.25);color:#ff9a9a;font-size:10px}.edit-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.edit-box{padding:13px;border:1px solid var(--line);border-radius:12px}.edit-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:#dceff3}.edit-title button{padding:7px 10px;font-size:10px}.is-hidden{display:none!important}.notice{padding:12px;border-radius:11px;margin-bottom:14px;background:rgba(67,194,137,.1);color:#a8e5ca}.error-notice{background:rgba(255,100,100,.1);color:#ffb0b0}.empty{text-align:center;color:#708d99;padding:28px}@media(max-width:800px){.quick-guide,.builder-grid,.edit-grid{grid-template-columns:1fr}.quick-guide>div{align-items:flex-start}.quick-guide span{margin-left:0}.builder-card{padding:14px}.card-head{align-items:flex-start;flex-direction:column;gap:4px}}
 </style>
 @endpush
 
