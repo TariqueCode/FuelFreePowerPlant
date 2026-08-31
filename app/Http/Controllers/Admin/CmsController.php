@@ -25,6 +25,7 @@ class CmsController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validatePage($request);
+        $this->guardPublishing($request, $data['is_published'] ?? false);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title']);
         CmsPage::create($data);
         return redirect()->route('admin.cms.index')->with('status', 'CMS page created successfully.');
@@ -38,6 +39,7 @@ class CmsController extends Controller
     public function update(Request $request, CmsPage $page): RedirectResponse
     {
         $data = $this->validatePage($request);
+        $this->guardPublishing($request, $data['is_published'] ?? false);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title'], $page->id);
         $page->update($data);
         return redirect()->route('admin.cms.index')->with('status', 'CMS page updated successfully.');
@@ -91,6 +93,11 @@ class CmsController extends Controller
             'use_global_header' => $request->boolean('use_global_header'),
             'use_global_footer' => $request->boolean('use_global_footer'),
         ];
+    }
+
+    private function guardPublishing(Request $request, bool $publishing): void
+    {
+        abort_unless(! $publishing || $request->user()->hasPermission('cms.publish'), 403, 'Publishing CMS pages requires publishing permission.');
     }
 
     private function uniqueSlug(string $value, ?int $ignoreId = null): string
