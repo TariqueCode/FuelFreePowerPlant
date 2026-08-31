@@ -33,7 +33,7 @@ class SystemSettingsScopeTest extends TestCase
         $response->assertDontSee('Homepage sections');
         $response->assertDontSee('Contact &amp; Career email login');
         $response->assertDontSee('Default upload limit');
-        $response->assertSee('Storage &amp; upload policy');
+        $response->assertSeeText('Storage & upload policy');
     }
 
     public function test_mail_fields_cannot_create_mailbox_settings_from_system_settings(): void
