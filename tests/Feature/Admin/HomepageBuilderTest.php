@@ -17,7 +17,7 @@ class HomepageBuilderTest extends TestCase
     {
         $user = User::factory()->create();
         $role = Role::create(['name' => 'Test Admin', 'slug' => 'test-admin', 'is_system' => false]);
-        $permission = Permission::create(['name' => 'Manage website sections', 'slug' => 'website.manage']);
+        $permission = Permission::firstOrCreate(['slug' => 'website.manage'], ['name' => 'Manage website sections']);
         $role->permissions()->attach($permission);
         $user->roles()->attach($role);
         HomepageSection::query()->delete();
