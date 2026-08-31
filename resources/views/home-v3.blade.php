@@ -39,7 +39,7 @@
 .welcome h1{max-width:900px;font-size:clamp(42px,6vw,72px);margin:13px 0 0}
 .welcome h1 em{color:#a9f5ff;font-style:normal}
 .welcome-rule{width:58px;height:2px;margin-top:20px;background:var(--cyan);opacity:.8}
-.welcome-copy{max-width:900px;padding:30px 0 0}
+.welcome-copy{max-width:900px;padding:30px 0 0;position:relative}.welcome-layout-center .welcome-heading,.welcome-layout-center .welcome-copy{text-align:center;margin-inline:auto}.welcome-layout-right .welcome-heading,.welcome-layout-right .welcome-copy{margin-left:auto;text-align:right}.welcome-more-content{margin-top:16px;color:var(--muted);line-height:1.85}.welcome-more-toggle{display:inline-flex;align-items:center;gap:8px;margin-top:18px;padding:10px 14px;border:1px solid var(--line);border-radius:999px;background:rgba(72,216,241,.05);color:var(--cyan);font-size:11px;font-weight:700;cursor:pointer}.welcome-more-toggle i{transition:transform .2s}.welcome-more-toggle[aria-expanded=true] i{transform:rotate(180deg)}.welcome-preview{color:var(--muted);font-size:15px;line-height:1.85;white-space:normal}
 .welcome-copy p{margin:0 0 18px;color:var(--muted);font-size:15px!important;line-height:1.85;text-align:left}
 .welcome-copy strong{color:var(--text)}
 .welcome-signoff{margin-top:25px;color:var(--text);font-weight:750;font-size:14px}
@@ -171,14 +171,13 @@
 @endif
 
 @if($section==='welcome' && $home['welcome'])
-<section class="welcome">
-<div class="welcome-heading"><span class="eyebrow">Welcome to {{ $siteName }}</span><h1>{{ $homePage?->title ?: 'Building a stronger energy future.' }}</h1><div class="welcome-rule"></div></div>
+<section class="welcome welcome-layout-{{ $welcomeLayout }}" data-welcome>
+<div class="welcome-heading"><span class="eyebrow">{{ $welcomeEyebrow ?: 'Welcome to '.$siteName }}</span><h1>{{ $welcomeTitle ?: 'Building a stronger energy future.' }}</h1><div class="welcome-rule"></div></div>
 <div class="welcome-copy">
-@if($homePage?->content)
-{!! $homePage->content !!}
-@else
-<p><strong>{{ $siteName }}</strong> is a forward-thinking energy company committed to contributing to Bangladesh’s sustainable energy future. Our vision is to develop efficient, reliable, and innovative power solutions that support the country’s growing energy needs and economic development.</p>
-<p>We are dedicated to building a cleaner and smarter energy future through innovation, responsible development, and world-class management practices. We aim to strengthen our capabilities, expand our projects, embrace modern technologies, and deliver dependable energy solutions while maintaining our commitment to quality, sustainability, and excellence.</p>
+<div class="welcome-preview">{!! nl2br(e($welcomePreview)) !!}</div>
+@if($welcomeHasMore)
+<div class="welcome-more-content" hidden>{!! nl2br(e($welcomeRemaining)) !!}</div>
+<button type="button" class="welcome-more-toggle" aria-expanded="false"><span>Read more</span><i class="fa-solid fa-arrow-down"></i></button>
 @endif
 <div class="welcome-signoff">{{ $siteName }} <span>— Powering a cleaner, smarter future.</span></div>
 </div>
@@ -234,6 +233,15 @@
 @endif
 @endforeach
 </main>
+<script>
+(() => {
+ document.querySelectorAll('[data-welcome]').forEach(section => {
+  const button=section.querySelector('.welcome-more-toggle'), more=section.querySelector('.welcome-more-content');
+  if(!button||!more)return;
+  button.addEventListener('click',()=>{const open=button.getAttribute('aria-expanded')==='true';button.setAttribute('aria-expanded',String(!open));more.hidden=open;button.querySelector('span').textContent=open?'Read more':'Show less';});
+ });
+})();
+</script>
 @push('scripts')
 <script>
 (() => {
