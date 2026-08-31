@@ -188,7 +188,7 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
 .welcome-profile-modal-scroll p{margin:0 0 14px}.welcome-profile-modal-scroll p:last-child{margin-bottom:0}
 .welcome-profile-modal-label{margin:0 0 10px;color:#70ddec;font-size:8px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
 @media(max-width:1099px){.welcome-with-team .welcome-inner{grid-template-columns:minmax(200px,245px) minmax(0,1fr);gap:24px}.welcome-profile{grid-template-columns:62px minmax(0,1fr);padding:9px;gap:9px}.welcome-profile-photo{width:62px;height:62px}}
-@media(max-width:650px){.welcome-with-team .welcome-inner{display:block}.welcome-team,.welcome-profile-modal{display:none}.welcome-with-team .welcome-content{width:100%}}
+@media(max-width:650px){.welcome-with-team .welcome-inner{display:block}.welcome-with-team .welcome-content{width:100%}.welcome-with-team .welcome-team{display:grid;margin-top:30px;padding-top:22px;border-top:1px solid rgba(72,216,241,.10);gap:10px}.welcome-with-team .welcome-profile{grid-template-columns:64px minmax(0,1fr);padding:10px;gap:10px}.welcome-with-team .welcome-profile-photo{width:64px;height:64px;border-radius:11px}.welcome-profile-modal{display:none}.welcome-profile-modal.is-open{display:flex}}
 @media(prefers-reduced-motion:reduce){.welcome-profile,.welcome-profile-dialog{transition:none;animation:none}}
 
 @media(min-width:1100px){
@@ -329,12 +329,12 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
 @endif
 
 @if($section==='welcome' && $home['welcome'])
-<section class="welcome home-section home-section-welcome welcome-layout-{{ $welcomeLayout }} {{ $homeManagement->take(2)->isNotEmpty() ? 'welcome-with-team' : '' }}" data-welcome>
+<section class="welcome home-section home-section-welcome welcome-layout-{{ $welcomeLayout }} {{ $welcomeManagement->isNotEmpty() ? 'welcome-with-team' : '' }}" data-welcome>
 <div class="welcome-inner">
-@if($homeManagement->take(2)->isNotEmpty())
+@if($welcomeManagement->isNotEmpty())
 <div class="welcome-team" aria-label="Featured leadership profiles">
 <div class="welcome-team-label">Leadership voices</div>
-@foreach($homeManagement->take(2) as $member)
+@foreach($welcomeManagement as $member)
 @php
 $profileMessage=trim(strip_tags((string) $member->content));
 $profileShortMessage=\Illuminate\Support\Str::words($profileMessage,20);
