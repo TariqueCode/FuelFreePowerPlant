@@ -36,6 +36,9 @@ class GalleryController extends Controller
 
     private function saveGallery(SiteContentItem $gallery,Request $request): void
     {
+        $publishing = $request->input('status') === 'published';
+        abort_unless(! $publishing || $request->user()->hasPermission('website.publish'), 403, 'Publishing galleries requires publishing permission.');
+
         $data=$request->validate(['title'=>['required','string','max:255'],'excerpt'=>['nullable','string','max:500'],'cover_image'=>['nullable','image','mimes:jpg,jpeg,png,webp,gif','max:'.$this->maxUploadKb()],'status'=>['required','in:draft,published'],'sort_order'=>['nullable','integer','min:0'],'published_at'=>['nullable','date'],'media'=>['nullable','array'],'media.*.path'=>['required_with:media','string','max:500'],'media.*.type'=>['required_with:media','in:image,video'],'media.*.name'=>['nullable','string','max:255']]);
         if($request->hasFile('cover_image')){if($gallery->image_path)Storage::disk('public')->delete($gallery->image_path);$data['image_path']=$request->file('cover_image')->store('galleries/covers','public');}
         $baseSlug=Str::slug($data['title']);$slug=$baseSlug?:'gallery';$i=2;while(SiteContentItem::query()->where('slug',$slug)->where($gallery->getKeyName(),'!=',$gallery->getKey())->exists())$slug=$baseSlug.'-'.$i++;
