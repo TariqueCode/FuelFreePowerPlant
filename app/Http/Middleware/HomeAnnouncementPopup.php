@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\HomepageSection;
 use App\Models\SitePopup;
 use Closure;
 use Illuminate\Http\Request;
@@ -12,7 +13,8 @@ class HomeAnnouncementPopup
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
-        if ($request->routeIs('home') && str_contains((string) $response->headers->get('Content-Type'), 'text/html')) {
+        if ($request->routeIs('home') && str_contains((string) $response->headers->get('Content-Type'), 'text/html')
+            && HomepageSection::query()->where('key', 'highlight')->value('is_enabled') !== false) {
             $popup = SitePopup::active()->first();
             if ($popup && $response->getContent()) {
                 $seconds = $popup->display_seconds ? (int) $popup->display_seconds : 0;
