@@ -50,7 +50,7 @@
                 const nodes = [];
                 while (walker.nextNode()) nodes.push(walker.currentNode);
                 nodes.forEach(node => {
-                    if (node.nodeValue && node.nodeValue.trim() === '\\n') node.remove();
+                    if (node.nodeValue && /^(?:\\s*\\\\n\\s*)+$/.test(node.nodeValue)) node.remove();
                 });
             };
             if (document.readyState === 'loading') {
