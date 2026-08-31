@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\HomepageSection;
 use App\Models\PowerPlant;
 use App\Models\SiteContentItem;
+use App\Models\SystemSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -33,6 +34,8 @@ class HomepageBuilderController extends Controller
             'section_order' => ['required', 'array'],
             'section_order.*' => ['required', 'string', 'max:60'],
             'sections' => ['nullable', 'array'],
+            'settings' => ['nullable', 'array'],
+            'settings.*.limit' => ['nullable', 'integer', 'min:1', 'max:12'],
         ]);
 
         $existing = HomepageSection::query()->pluck('key')->all();
@@ -43,9 +46,15 @@ class HomepageBuilderController extends Controller
         }
 
         foreach ($order as $position => $key) {
+            $section = HomepageSection::query()->where('key', $key)->first();
+            $settings = is_array($section?->settings) ? $section->settings : [];
+            if (in_array($key, ['projects','management','news','gallery'], true) && $request->has("settings.{$key}.limit")) {
+                $settings['limit'] = max(1, min(12, (int) $request->input("settings.{$key}.limit")));
+            }
             HomepageSection::query()->where('key', $key)->update([
                 'sort_order' => $position,
                 'is_enabled' => $request->boolean("sections.{$key}"),
+                'settings' => $settings,
             ]);
         }
 
