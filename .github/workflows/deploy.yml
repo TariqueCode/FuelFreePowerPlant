@@ -81,16 +81,11 @@ jobs:
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             "$DEPLOY_USER@$DEPLOY_HOST" 'bash -s' <<'REMOTE'
-          set -Eeuo pipefail
-          trap 'echo "DEPLOY FAILED at remote line $LINENO (exit $?)"' ERR
+          set -euo pipefail
 
-          echo "==> Remote user: $(id -un)"
-          echo "==> Remote home: $HOME"
-          cd "$HOME/public_html"
+          cd /home/fuelfree/public_html
 
           echo "==> Syncing application code"
-          echo "==> Git remote check"
-          git remote -v
           git fetch origin main
           git reset --hard origin/main
 
