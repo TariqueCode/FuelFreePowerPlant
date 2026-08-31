@@ -55,6 +55,8 @@ class HomepageBuilderController extends Controller
             'settings.welcome.more_words' => ['nullable', 'integer', 'min:20', 'max:2000'],
             'settings.welcome.show_full' => ['nullable', 'boolean'],
             'settings.welcome.layout' => ['nullable', 'in:left,center,right'],
+            'settings.welcome.management_ids' => ['nullable', 'array', 'max:2'],
+            'settings.welcome.management_ids.*' => ['integer', 'distinct'],
             'settings.*.layout' => ['nullable', 'in:left,center,right'],
         ]);
 
@@ -92,6 +94,12 @@ class HomepageBuilderController extends Controller
                 $settings['more_words'] = max(20, min(2000, (int) ($welcome['more_words'] ?? 900)));
                 $settings['show_full'] = $request->boolean('settings.welcome.show_full');
                 $settings['layout'] = in_array(($welcome['layout'] ?? 'left'), ['left','center','right'], true) ? $welcome['layout'] : 'left';
+                $requestedManagementIds = array_values(array_unique(array_map('intval', (array) ($welcome['management_ids'] ?? []))));
+                $settings['management_ids'] = array_values(array_slice(
+                    SiteContentItem::query()->where('type','management')->published()->whereIn('id', $requestedManagementIds)->pluck('id')->map(fn ($id) => (int) $id)->all(),
+                    0,
+                    2
+                ));
             }
             if (in_array($key, ['projects','management','news','gallery'], true) && $request->has("settings.{$key}.limit")) {
                 $settings['limit'] = max(1, min(100, (int) $request->input("settings.{$key}.limit")));
