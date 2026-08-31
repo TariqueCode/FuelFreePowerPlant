@@ -25,7 +25,8 @@ class HomepageBuilderTest extends TestCase
             'sections' => ['hero' => '1'],
         ]);
 
-        $response->assertSessionHasErrors('section_order');
+        $response->assertRedirect();
+        $this->assertSame('The homepage section list is invalid.', session('errors')?->first('section_order'));
         $this->assertSame([0, 1], HomepageSection::ordered()->pluck('sort_order')->all());
     }
 }
