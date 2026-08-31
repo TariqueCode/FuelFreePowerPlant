@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\SystemSetting;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +29,7 @@ class SecurityHeaders
         // The logo configured in Admin > Settings is the universal favicon for every HTML page,
         // including the public website, authentication pages and admin dashboard.
         if ($response->headers->get('Content-Type') && str_contains(strtolower($response->headers->get('Content-Type')), 'text/html')) {
-            $logoPath = SystemSetting::query()->where('key', 'company.logo_path')->value('value');
+            $logoPath = config('fuelfree.company.logo_path');
             $content = $response->getContent();
 
             if ($logoPath && is_string($content) && stripos($content, '</head>') !== false) {
