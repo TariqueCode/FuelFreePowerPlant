@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\HomepageSection;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -14,6 +15,8 @@ class HomepageBuilderTest extends TestCase
     public function test_invalid_homepage_order_is_rejected_without_mutating_sections(): void
     {
         $user = User::factory()->create();
+        $role = Role::create(['name' => 'Test Admin', 'slug' => 'test-admin', 'is_system' => false]);
+        $user->roles()->attach($role);
         HomepageSection::query()->delete();
         $sections = collect([
             HomepageSection::create(['key' => 'hero', 'label' => 'Hero', 'is_enabled' => true, 'sort_order' => 0]),
