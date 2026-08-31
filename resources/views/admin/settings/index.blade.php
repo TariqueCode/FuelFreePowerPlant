@@ -135,7 +135,7 @@
             <div class="display-control">
                 <label for="home-{{ $item[3] }}">Display count</label>
                 <div class="count-input">
-                    <input id="home-{{ $item[3] }}" name="home[{{ $item[3] }}]" type="number" min="1" max="12" step="1" value="{{ old('home.'.$item[3],$settings['home.'.$item[3]]) }}" required>
+                    <input id="home-{{ $item[3] }}" name="home[{{ $item[3] }}]" type="number" min="1" max="100" step="1" value="{{ old('home.'.$item[3],$settings['home.'.$item[3]]) }}" required>
                     <span>items</span>
                 </div>
                 <small>{{ $item[3]==='news_limit' ? 'How many News & Notices appear on the homepage.' : 'How many gallery cards appear on the homepage.' }}</small>
