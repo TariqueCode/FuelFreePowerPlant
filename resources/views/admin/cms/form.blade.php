@@ -13,12 +13,13 @@
     $bodyName = 'content';
     $initialBody = old('content', $page->content);
     $allowAttachments = false;
+    $editorMode = 'cms';
 @endphp
-<div class="cms-editor-shell">@include('partials.mail-editor', compact('editorId','formId','bodyName','initialBody','allowAttachments'))</div>
+<div class="cms-editor-shell">@include('partials.mail-editor', compact('editorId','formId','bodyName','initialBody','allowAttachments','editorMode'))</div>
 <small class="cms-editor-note">Professional rich-text editor with Word-style formatting, selection-aware headings/fonts/sizes/colors, responsive toolbar, HTML/source view, fullscreen, links, images, tables, lists, undo/redo and clear formatting.</small></div><div class="full builder-panel" data-panel="seo"><label>SEO Title<input name="meta_title" value="{{ old('meta_title',$page->meta_title ?? '') }}" maxlength="255" placeholder="Search engine title"></label><label>SEO Description<textarea name="meta_description" rows="4" maxlength="1000" placeholder="Search engine description">{{ old('meta_description',$page->meta_description ?? '') }}</textarea></label><label class="check"><input id="published" type="checkbox" name="is_published" value="1" @checked(old('is_published',$page->is_published))><span>Publish this page</span></label></div></div>
 <div class="actions"><a href="{{ route('admin.cms.index') }}">Cancel</a><button type="submit">{{ $mode === 'create' ? 'Create page' : 'Save changes' }}</button></div></form></div>
 @endsection
-@push('scripts')<script>document.querySelectorAll(".builder-tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".builder-tab").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".builder-panel").forEach(p=>p.classList.toggle("active",p.dataset.panel===b.dataset.tab));}));<script>
+@push('scripts')<script>document.querySelectorAll(".builder-tab").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".builder-tab").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".builder-panel").forEach(p=>p.classList.toggle("active",p.dataset.panel===b.dataset.tab));}));
 (()=>{const list=document.getElementById('blocks-list'),hidden=document.getElementById('builder-blocks-json'),add=document.getElementById('add-block');if(!list||!hidden)return;
 let blocks=[];try{blocks=JSON.parse(hidden.value||'[]')}catch(e){blocks=[]}
 const types={hero:'Hero',text:'Text',image:'Image',image_text:'Image + Text',gallery:'Gallery',video:'Video',cta:'CTA',button:'Button',html:'Custom HTML',divider:'Divider'};
