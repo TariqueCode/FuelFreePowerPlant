@@ -23,14 +23,6 @@ class SettingsController
             'company.timezone'=>config('fuelfree.company.timezone'),'company.logo_path'=>'',
             'storage.quota_gib'=>(string)round(config('fuelfree.storage.quota_bytes',53687091200)/1073741824),'uploads.max_mb'=>(string)config('fuelfree.upload.max_mb',50),'uploads.career_max_mb'=>(string)config('fuelfree.upload.career_max_mb',50),'uploads.documents_max_mb'=>(string)config('fuelfree.upload.documents_max_mb',50),'uploads.gallery_max_mb'=>(string)config('fuelfree.upload.gallery_max_mb',50),'uploads.sliders_max_mb'=>(string)config('fuelfree.upload.sliders_max_mb',50),'uploads.popups_max_mb'=>(string)config('fuelfree.upload.popups_max_mb',50),'uploads.content_media_max_mb'=>(string)config('fuelfree.upload.content_media_max_mb',100),'home.news_limit'=>'3','home.gallery_limit'=>'4',
             'mail.contact_account_id'=>'','mail.career_account_id'=>'',
-            'header.home_label'=>'Home','header.management_label'=>'Management Team','header.gallery_label'=>'Gallery','header.news_label'=>'News & Notices',
-            'header.career_label'=>'Career','header.contact_label'=>'Contact','header.webmail_label'=>'Webmail','header.portal_label'=>'Portal','header.login_label'=>'Login',
-            'footer.tagline'=>'Powering a cleaner, smarter future.','footer.technology'=>'Fuel-Free Flywheel-Based Clean Energy Technology',
-            'footer.office_heading'=>'Office','footer.address'=>'House-141, 3rd Floor, Road-22, Mohakhali DOHS, Dhaka-1206, Bangladesh',
-            'footer.contact_heading'=>'Contact','footer.email'=>'info@fuelfreepowerplant.com','footer.phone'=>'+880 1712-251892',
-            'footer.website'=>'www.fuelfreepowerplant.com','footer.website_url'=>'https://www.fuelfreepowerplant.com','footer.get_in_touch_label'=>'Get in touch',
-            'footer.get_in_touch_url'=>'/contact','footer.copyright_text'=>'All rights reserved.',
-            'home.slider_enabled'=>'1','home.welcome_enabled'=>'1','home.news_enabled'=>'1','home.gallery_enabled'=>'1','home.hero_enabled'=>'1','home.statistics_enabled'=>'1','home.projects_enabled'=>'1','home.cta_enabled'=>'1',
         ];
         $saved=SystemSetting::query()->pluck('value','key')->all();
         $settings=array_merge($defaults,$saved);
@@ -110,11 +102,7 @@ class SettingsController
             'company.logo'=>['nullable','image','mimes:jpg,jpeg,png,webp,svg'],
             'mail.contact_email'=>['nullable','email:rfc,dns','ends_with:@fuelfreepowerplant.com','max:255'],'mail.contact_password'=>['nullable','string','max:1000'],
             'mail.career_email'=>['nullable','email:rfc,dns','ends_with:@fuelfreepowerplant.com','max:255'],'mail.career_password'=>['nullable','string','max:1000'],
-            'footer.tagline'=>['nullable','string','max:255'],'footer.technology'=>['nullable','string','max:255'],'footer.office_heading'=>['required','string','max:100'],
-            'footer.address'=>['required','string','max:500'],'footer.contact_heading'=>['required','string','max:100'],'footer.email'=>['required','email','max:255'],
-            'footer.phone'=>['required','string','max:50'],'footer.website'=>['required','string','max:255'],'footer.website_url'=>['required','url','max:255'],
-            'footer.get_in_touch_label'=>['required','string','max:100'],'footer.get_in_touch_url'=>['required','string','max:255'],'footer.copyright_text'=>['required','string','max:150'],
-        ]);
+                    ]);
 
         $data=[
             'company.name'=>data_get($validated,'company.name'),'company.domain'=>data_get($validated,'company.domain'),'company.tagline'=>data_get($validated,'company.tagline'),
