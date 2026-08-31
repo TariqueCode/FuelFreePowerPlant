@@ -196,10 +196,6 @@ class NavigationMenuController extends Controller
             abort(422, 'A menu item cannot be placed inside its own descendant.');
         }
 
-        if ($ignoreId !== null && $this->isDescendantOf($parentId, $ignoreId)) {
-            abort(422, 'A menu item cannot be placed inside its own descendant.');
-        }
-
         // Keep public navigation usable on every device while still allowing
         // genuine folder/sub-folder structures. Five nested levels is enough
         // for the site information architecture and prevents unusable menus.
