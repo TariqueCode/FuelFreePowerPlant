@@ -2,13 +2,13 @@
 @section('title',$item->exists?'Edit '.$labels[$item->type]:'New '.$labels[$lockedType ?? 'company'])
 @section('content')
 @php($contentType=$lockedType ?? $item->type)
-<section class="hero"><div><span class="eyebrow">{{ strtoupper($labels[$contentType] ?? 'CONTENT') }} CMS</span><h1>{{ $item->exists?'Edit content':'Create content' }}</h1>@if($contentType==='news')<p>Create a polished news or notice with a direct cover-photo upload and visual content editor.</p>@endif</div><a class="back" href="{{ route('admin.site-content.index',['type'=>in_array($item->type,['news','announcement'],true)?'news':($item->type ?: $lockedType)]) }}"><i class="fa-solid fa-arrow-left"></i> Back</a></section>
+<section class="hero"><div><span class="eyebrow">{{ strtoupper($labels[$contentType] ?? 'CONTENT') }} CMS</span><h1>{{ $item->exists?'Edit content':'Create content' }}</h1>@if($contentType==='news')<p>Create a polished news or notice with a direct cover-photo upload and visual content editor.</p>@elseif($contentType==='resource')<p>Create a public-safe resource with rich explanatory content and an optional official PDF attachment.</p>@endif</div><a class="back" href="{{ route('admin.site-content.index',['type'=>in_array($item->type,['news','announcement'],true)?'news':($item->type ?: $lockedType)]) }}"><i class="fa-solid fa-arrow-left"></i> Back</a></section>
 @if($errors->any())<div class="errors">{{ $errors->first() }}</div>@endif
 <div class="card"><form id="content-form" method="POST" action="{{ $item->exists?route('admin.site-content.update',$item):route('admin.site-content.store') }}">@csrf @if($item->exists)@method('PATCH')@endif
 <div class="grid">
 <div>@if($lockedType)
 <label>Section</label>
-<div class="locked-type"><i class="fa-solid {{ $contentType==='company'?'fa-building':($contentType==='gallery'?'fa-images':'fa-newspaper') }}"></i>{{ $labels[$contentType] }}</div>
+<div class="locked-type"><i class="fa-solid {{ $contentType==='company'?'fa-building':($contentType==='gallery'?'fa-images':($contentType==='resource'?'fa-file-arrow-down':'fa-newspaper')) }}"></i>{{ $labels[$contentType] }}</div>
 <input type="hidden" name="type" value="{{ $item->exists?$item->type:$lockedType }}">
 @if($contentType==='news')
 <div class="publication-type"><button type="button" class="{{ old('publication_type',$item->type)==='news'?'selected':'' }}" data-publication-type="news"><i class="fa-regular fa-newspaper"></i> News</button><button type="button" class="{{ old('publication_type',$item->type)==='announcement'?'selected':'' }}" data-publication-type="announcement"><i class="fa-solid fa-bullhorn"></i> Notice</button></div>
