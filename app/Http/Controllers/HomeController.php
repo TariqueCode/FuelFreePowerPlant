@@ -38,10 +38,10 @@ class HomeController
             'section_order' => $sectionOrder ?: ['hero','welcome','statistics','projects','management','news','gallery','cta'],
         ];
 
-        $projectsLimit=max(1,min(12,(int)($sectionSettings['projects']['limit']??6)));
-        $managementLimit=max(1,min(12,(int)($sectionSettings['management']['limit']??4)));
-        $newsLimit=max(1,min(12,(int)($sectionSettings['news']['limit']??3)));
-        $galleryLimit=max(1,min(12,(int)($sectionSettings['gallery']['limit']??4)));
+        $projectsLimit=max(1,min(100,(int)($sectionSettings['projects']['limit']??6)));
+        $managementLimit=max(1,min(100,(int)($sectionSettings['management']['limit']??4)));
+        $newsLimit=max(1,min(100,(int)($sectionSettings['news']['limit']??3)));
+        $galleryLimit=max(1,min(100,(int)($sectionSettings['gallery']['limit']??4)));
         $resolveIds = static fn (array $settings): array => array_values(array_unique(array_filter(array_map('intval', $settings['ids'] ?? []))));
         $applySelection = static function ($query, array $settings, int $limit) use ($resolveIds) {
             if (($settings['mode'] ?? 'latest') === 'selected') {
