@@ -23,6 +23,7 @@ class HomeController
         $brand=['name'=>$settings['company.name']??config('fuelfree.company.name'),'domain'=>$settings['company.domain']??config('fuelfree.company.domain'),'tagline'=>$settings['company.tagline']??config('fuelfree.company.tagline'),'logo_path'=>$settings['company.logo_path']??null];
 
         $configuredSections = HomepageSection::query()->ordered()->get();
+        $sectionSettings = $configuredSections->mapWithKeys(fn ($section) => [$section->key => is_array($section->settings) ? $section->settings : []]);
         $sectionOrder = $configuredSections->pluck('key')->all();
         $enabledSections = $configuredSections->where('is_enabled', true)->pluck('key')->flip();
         $home = [
@@ -37,9 +38,12 @@ class HomeController
             'section_order' => $sectionOrder ?: ['hero','welcome','statistics','projects','management','news','gallery','cta'],
         ];
 
-        $newsLimit=max(1,min(12,(int)($settings['home.news_limit']??3)));
-        $galleryLimit=max(1,min(12,(int)($settings['home.gallery_limit']??4)));
+        $projectsLimit=max(1,min(12,(int)($sectionSettings['projects']['limit']??6)));
+        $managementLimit=max(1,min(12,(int)($sectionSettings['management']['limit']??4)));
+        $newsLimit=max(1,min(12,(int)($sectionSettings['news']['limit']??3)));
+        $galleryLimit=max(1,min(12,(int)($sectionSettings['gallery']['limit']??4)));
         $content['news']=$content->get('news', collect())->take($newsLimit);
+        $plants=$plants->take($projectsLimit);
         $gallery=$gallery->take($galleryLimit);
         $stats=['projects'=>PowerPlant::query()->count(),'capacity_mw'=>round((float)PowerPlant::query()->sum('capacity_kw')/1000,2),'operational'=>PowerPlant::query()->whereRaw('LOWER(status)=?', ['operational'])->count()];
 
