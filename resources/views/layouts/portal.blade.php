@@ -11,6 +11,7 @@ $canCms=auth()->user()->hasPermission('cms.view');
 $canSocial=auth()->user()->hasPermission('social-media.manage');
 $canSettings=auth()->user()->hasPermission('settings.manage');
 $canUsers=auth()->user()->hasPermission('users.view') || auth()->user()->hasPermission('audit.view') || auth()->user()->hasPermission('health.view');
+$canManageUsers=auth()->user()->hasPermission('users.manage');
 $canCommunications=$canMail || $canCareer || auth()->user()->hasPermission('inquiries.view');
 @endphp
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><title>@yield('title','Dashboard') — {{ $dashboardName }}</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><style>
@@ -46,6 +47,7 @@ $canCommunications=$canMail || $canCareer || auth()->user()->hasPermission('inqu
 @if($canUsers)
 <div class="nav-group"><button type="button" class="nav-parent" aria-expanded="false"><span class="nav-icon"><i class="fa-solid fa-users-gear"></i></span><span>Users &amp; Access</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
 @if(auth()->user()->hasPermission('users.view'))<a class="{{ request()->routeIs('admin.users.*')?'active':'' }}" href="{{ route('admin.users.index') }}"><span>Users</span></a>@endif
+@if($canManageUsers)<a class="{{ request()->routeIs('admin.users.create')?'active':'' }}" href="{{ route('admin.users.create') }}"><span>Add account</span></a>@endif
 @if(auth()->user()->hasPermission('audit.view'))<a class="{{ request()->routeIs('admin.audit')?'active':'' }}" href="{{ route('admin.audit') }}"><span>Audit Log</span></a>@endif
 @if(auth()->user()->hasPermission('health.view'))<a class="{{ request()->routeIs('admin.health')?'active':'' }}" href="{{ route('admin.health') }}"><span>System Health</span></a>@endif
 </div></div>
