@@ -248,6 +248,43 @@
     });
 
     let drag=null;
+    // Mobile/tablet: long-press the grip, then drag vertically to reorder.
+    rows().forEach(row=>{
+        const handle=row.querySelector('.drag-handle');
+        if(!handle)return;
+        let timer=null, active=false, lastY=0;
+        const clear=()=>{
+            if(timer){clearTimeout(timer);timer=null;}
+            if(active){
+                active=false;
+                row.classList.remove('dragging');
+                rows().forEach(x=>x.classList.remove('drop-target'));
+                sync();
+            }
+        };
+        handle.addEventListener('touchstart',e=>{
+            if(e.touches.length!==1)return;
+            lastY=e.touches[0].clientY;
+            timer=setTimeout(()=>{active=true;row.classList.add('dragging');},260);
+        },{passive:true});
+        handle.addEventListener('touchmove',e=>{
+            if(!active){
+                if(Math.abs(e.touches[0].clientY-lastY)>10)clear();
+                return;
+            }
+            e.preventDefault();
+            const point=e.touches[0];
+            const target=document.elementFromPoint(point.clientX,point.clientY)?.closest('.section-card');
+            rows().forEach(x=>x.classList.remove('drop-target'));
+            if(!target||target===row)return;
+            target.classList.add('drop-target');
+            const rect=target.getBoundingClientRect();
+            list.insertBefore(row,point.clientY<rect.top+rect.height/2?target:target.nextSibling);
+        },{passive:false});
+        handle.addEventListener('touchend',clear,{passive:true});
+        handle.addEventListener('touchcancel',clear,{passive:true});
+    });
+
     rows().forEach(row=>{
         row.addEventListener('dragstart',()=>{drag=row;row.classList.add('dragging');});
         row.addEventListener('dragover',e=>{if(!drag||drag===row)return;e.preventDefault();row.classList.add('drop-target');});
@@ -258,13 +295,13 @@
             const rect=row.getBoundingClientRect();
             list.insertBefore(drag,e.clientY<rect.top+rect.height/2?row:row.nextSibling);
             row.classList.remove('drop-target');
-            sync();refreshMoveButtons();
+            sync();
         });
         row.addEventListener('dragend',()=>{
             row.classList.remove('dragging');
             rows().forEach(x=>x.classList.remove('drop-target'));
             drag=null;
-            sync();refreshMoveButtons();
+            sync();
         });
     });
 
