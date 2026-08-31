@@ -95,7 +95,6 @@
 @media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr)}.project-grid{grid-template-columns:repeat(2,1fr)}.management-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.stats-grid,.project-grid,.management-grid{grid-template-columns:1fr 1fr;gap:10px}.stat-card{padding:17px}.stat-card strong{font-size:23px;margin-top:13px}.project-media{height:135px}.project-body{padding:13px}.project-body h3{font-size:14px}.cta-card{display:block;padding:25px}.cta-card .btn{display:inline-flex;margin-top:20px}}
 @media(max-width:380px){.stats-grid,.project-grid,.management-grid{grid-template-columns:1fr}.project-media{height:180px}}
-<style>
 /* Final responsive polish: consistent typography, spacing and touch targets */
 @media(max-width:650px){
   .shell{width:calc(100% - 24px)}
@@ -152,7 +151,6 @@
   .project-grid{gap:13px}
   .management-grid{gap:13px}
 }
-</style>
 </style>
 <main class="shell">
 @foreach($home['section_order'] as $section)
