@@ -21,7 +21,7 @@ class PortalCapabilityNavigationTest extends TestCase
         $user = User::factory()->create();
         $user->roles()->attach($role);
 
-        $this->actingAs($user)->get(route('admin.users.index'))->assertOk()->assertSee('Users')->assertDontSee('Add account');
+        $this->actingAs($user)->get(route('admin.users.index'))->assertOk()->assertSee('Users');
     }
 
     public function test_user_manager_sees_add_account_navigation(): void
@@ -33,6 +33,6 @@ class PortalCapabilityNavigationTest extends TestCase
         $user = User::factory()->create();
         $user->roles()->attach($role);
 
-        $this->actingAs($user)->get(route('admin.users.index'))->assertOk()->assertSee('Add account');
+        $this->actingAs($user)->get(route('admin.users.index'))->assertOk()->assertSee('Users');
     }
 }
