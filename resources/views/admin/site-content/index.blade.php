@@ -40,10 +40,32 @@
         @if(in_array($type,['news','resource'],true) && $item->excerpt)<div class="excerpt">{{ \Illuminate\Support\Str::limit($item->excerpt,150) }}</div>@endif
         <div class="meta"><span class="status {{ $item->status }}">{{ ucfirst($item->status) }}</span><span class="date">{{ ($item->published_at ?? $item->updated_at)?->format('d M Y') }}</span></div>
     </div>
-    @if($type==='news')<div class="actions news-actions">
-@if(auth()->user()->hasPermission('website.publish'))<form method="POST" action="{{ route('admin.site-content.news.toggle',$item) }}">@csrf @method('PATCH')<button type="submit" class="news-switch {{ $item->status === 'published' ? 'on' : 'off' }}" title="{{ $item->status === 'published' ? 'Deactivate' : 'Activate' }}" aria-label="{{ $item->status === 'published' ? 'Deactivate' : 'Activate' }}"><span class="switch-track"><span class="switch-knob"></span></span></button></form>@endif
-@if(auth()->user()->hasPermission('website.manage'))<form method="POST" action="{{ route('admin.site-content.destroy',$item) }}" onsubmit="return confirm('Delete this publication?')">@csrf @method('DELETE')<button type="submit" class="news-delete" title="Delete" aria-label="Delete"><i class="fa-solid fa-trash-can"></i></button></form>
-</div>@else <div class="actions"><form method="POST" action="{{ route('admin.site-content.destroy',$item) }}" onsubmit="return confirm('Delete this {{ $type==='news' ? 'publication' : 'content' }}?')">@csrf @method('DELETE')<button type="submit" title="Delete" aria-label="Delete"><i class="fa-solid fa-trash"></i></button></form></div> @endif
+    @if($type==='news')
+        <div class="actions news-actions">
+            @if(auth()->user()->hasPermission('website.publish'))
+                <form method="POST" action="{{ route('admin.site-content.news.toggle',$item) }}">
+                    @csrf @method('PATCH')
+                    <button type="submit" class="news-switch {{ $item->status === 'published' ? 'on' : 'off' }}" title="{{ $item->status === 'published' ? 'Deactivate' : 'Activate' }}" aria-label="{{ $item->status === 'published' ? 'Deactivate' : 'Activate' }}">
+                        <span class="switch-track"><span class="switch-knob"></span></span>
+                    </button>
+                </form>
+            @endif
+            @if(auth()->user()->hasPermission('website.manage'))
+                <form method="POST" action="{{ route('admin.site-content.destroy',$item) }}" onsubmit="return confirm('Delete this publication?')">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="news-delete" title="Delete" aria-label="Delete"><i class="fa-solid fa-trash-can"></i></button>
+                </form>
+            @endif
+        </div>
+    @else
+        @if(auth()->user()->hasPermission('website.manage'))
+            <div class="actions">
+                <form method="POST" action="{{ route('admin.site-content.destroy',$item) }}" onsubmit="return confirm('Delete this {{ $type === 'news' ? 'publication' : 'content' }}?')">
+                    @csrf @method('DELETE')
+                    <button type="submit" title="Delete" aria-label="Delete"><i class="fa-solid fa-trash"></i></button>
+                </form>
+            </div>
+        @endif
 </article>
 @empty<div class="empty"><i class="fa-regular fa-newspaper"></i><strong>No {{ $type==='news' ? 'news or notices' : ($type==='resource' ? 'resources' : 'content') }} yet</strong><span>Use the button above to create the first entry.</span></div>@endforelse
 </div>
