@@ -20,13 +20,17 @@ class AppServiceProvider extends ServiceProvider
             return;
         }
 
-        $settings = Cache::rememberForever('fuelfree.system_settings', fn () => SystemSetting::query()->pluck('value', 'key'));
-        if ($settings->has('company.name')) config(['fuelfree.company.name' => $settings['company.name']]);
-        if ($settings->has('company.domain')) config(['fuelfree.company.domain' => $settings['company.domain']]);
-        if ($settings->has('company.tagline')) config(['fuelfree.company.tagline' => $settings['company.tagline']]);
-        if ($settings->has('company.timezone')) config(['fuelfree.company.timezone' => $settings['company.timezone']]);
-        if ($settings->has('company.logo_path')) config(['fuelfree.company.logo_path' => $settings['company.logo_path']]);
-        if ($settings->has('storage.quota_gib')) config(['fuelfree.storage.quota_bytes' => (int) round((float) $settings['storage.quota_gib'] * 1073741824)]);
+        $settings = Cache::rememberForever(
+            'fuelfree.system_settings',
+            fn () => SystemSetting::query()->pluck('value', 'key')->all()
+        );
+
+        if (array_key_exists('company.name', $settings)) config(['fuelfree.company.name' => $settings['company.name']]);
+        if (array_key_exists('company.domain', $settings)) config(['fuelfree.company.domain' => $settings['company.domain']]);
+        if (array_key_exists('company.tagline', $settings)) config(['fuelfree.company.tagline' => $settings['company.tagline']]);
+        if (array_key_exists('company.timezone', $settings)) config(['fuelfree.company.timezone' => $settings['company.timezone']]);
+        if (array_key_exists('company.logo_path', $settings)) config(['fuelfree.company.logo_path' => $settings['company.logo_path']]);
+        if (array_key_exists('storage.quota_gib', $settings)) config(['fuelfree.storage.quota_bytes' => (int) round((float) $settings['storage.quota_gib'] * 1073741824)]);
 
         foreach (['header','footer'] as $section) {
             $prefix = $section . '.';
