@@ -42,6 +42,7 @@ class HomepageBuilderTest extends TestCase
         $permission = Permission::firstOrCreate(['slug' => 'website.manage'], ['name' => 'Manage website sections']);
         $role->permissions()->attach($permission);
         $user->roles()->attach($role);
+        HomepageSection::query()->delete();
 
         $section = HomepageSection::create([
             'key' => 'highlight',
