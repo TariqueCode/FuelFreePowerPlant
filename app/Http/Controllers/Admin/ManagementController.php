@@ -23,6 +23,10 @@ class ManagementController extends Controller
     public function reorder(Request $request): JsonResponse { $data=$request->validate(['order'=>['required','array'],'order.*'=>['integer']]);$members=SiteContentItem::query()->where('type','management')->whereIn('id',$data['order'])->get()->keyBy('id');foreach($data['order'] as $position=>$id){if(isset($members[$id]))$members[$id]->update(['sort_order'=>$position+1]);}return response()->json(['ok'=>true]); }
     private function save(SiteContentItem $member,Request $request): void
     {
+        // Publishing/activation is a separate authority from content editing.
+        if ($request->input('status') === 'published') {
+            abort_unless($request->user()->hasPermission('website.publish'), 403, 'Publishing management profiles requires publishing permission.');
+        }
         $data=$request->validate(['title'=>['required','string','max:255'],'designation'=>['required','string','max:255'],'phone'=>['required','string','max:50'],'email'=>['nullable','email','max:255'],'content'=>['nullable','string'],'status'=>['required','in:draft,published'],'published_at'=>['nullable','date'],'profile_photo'=>['nullable','image','mimes:jpg,jpeg,png,webp','max:5120'],'visiting_card'=>['nullable','file','mimes:jpg,jpeg,png,webp,pdf','max:10240'],'remove_profile_photo'=>['nullable','boolean'],'remove_visiting_card'=>['nullable','boolean']]);
         $member->type='management';$member->title=$data['title'];$member->slug=Str::slug($data['title']);$member->designation=$data['designation'];$member->excerpt=$data['designation'];$member->phone=$data['phone'];$member->email=$data['email']??null;$member->content=$data['content']??null;$member->status=$data['status'];if(!$member->exists)$member->sort_order=(int)(SiteContentItem::query()->where('type','management')->max('sort_order')??0)+1;$member->published_at=$data['published_at']??null;
         if($request->boolean('remove_profile_photo')&&!$request->hasFile('profile_photo')){if($member->image_path)Storage::disk('public')->delete($member->image_path);$member->image_path=null;}
