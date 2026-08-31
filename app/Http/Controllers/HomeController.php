@@ -46,9 +46,10 @@ class HomeController
         $applySelection = static function ($query, array $settings, int $limit) use ($resolveIds) {
             if (($settings['mode'] ?? 'latest') === 'selected') {
                 $ids = $resolveIds($settings);
-                if ($ids) {
-                    return $query->whereIn('id', $ids)->orderByRaw('FIELD(id, '.implode(',', $ids).')')->take($limit)->get();
+                if (!$ids) {
+                    return $query->whereRaw('1 = 0')->take($limit)->get();
                 }
+                return $query->whereIn('id', $ids)->orderByRaw('FIELD(id, '.implode(',', $ids).')')->take($limit)->get();
             }
             return $query->take($limit)->get();
         };
