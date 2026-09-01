@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Models\HomepageSection;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\SiteContentItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -59,6 +60,69 @@ class HomepageBuilderTest extends TestCase
         $response->assertRedirect();
         $this->assertFalse($section->fresh()->is_enabled);
         $this->assertDatabaseHas('homepage_sections', ['key' => 'highlight']);
+    }
+
+
+    public function test_homepage_management_limit_controls_the_number_of_profiles_rendered(): void
+    {
+        HomepageSection::query()->where('key', 'management')->update([
+            'is_enabled' => true,
+            'settings' => ['limit' => 2, 'mode' => 'latest', 'layout' => 'left'],
+        ]);
+
+        foreach (['Chairman', 'Managing Director', 'Director', 'Advisor'] as $index => $designation) {
+            SiteContentItem::create([
+                'type' => 'management',
+                'title' => "Management {$index}",
+                'slug' => "management-{$index}",
+                'designation' => $designation,
+                'phone' => '+8801700000000',
+                'email' => "management{$index}@example.com",
+                'content' => 'Leadership message.',
+                'status' => 'published',
+                'sort_order' => $index + 1,
+                'published_at' => now()->subMinutes($index),
+            ]);
+        }
+
+        $response = $this->get(route('home'));
+
+        $response->assertOk();
+        $response->assertSee('Management 0');
+        $response->assertSee('Management 1');
+        $response->assertDontSee('Management 2');
+        $response->assertDontSee('Management 3');
+    }
+
+    public function test_homepage_management_selected_mode_respects_selected_profiles_and_limit(): void
+    {
+        $first = SiteContentItem::create([
+            'type' => 'management', 'title' => 'Selected First', 'slug' => 'selected-first',
+            'designation' => 'Chairman', 'phone' => '+8801700000001', 'status' => 'published',
+            'sort_order' => 1, 'published_at' => now(),
+        ]);
+        $second = SiteContentItem::create([
+            'type' => 'management', 'title' => 'Selected Second', 'slug' => 'selected-second',
+            'designation' => 'Director', 'phone' => '+8801700000002', 'status' => 'published',
+            'sort_order' => 2, 'published_at' => now(),
+        ]);
+        SiteContentItem::create([
+            'type' => 'management', 'title' => 'Unselected Profile', 'slug' => 'unselected-profile',
+            'designation' => 'Advisor', 'phone' => '+8801700000003', 'status' => 'published',
+            'sort_order' => 3, 'published_at' => now(),
+        ]);
+
+        HomepageSection::query()->where('key', 'management')->update([
+            'is_enabled' => true,
+            'settings' => ['limit' => 1, 'mode' => 'selected', 'ids' => [$second->id, $first->id], 'layout' => 'left'],
+        ]);
+
+        $response = $this->get(route('home'));
+
+        $response->assertOk();
+        $response->assertSee('Selected Second');
+        $response->assertDontSee('Selected First');
+        $response->assertDontSee('Unselected Profile');
     }
 
 }
