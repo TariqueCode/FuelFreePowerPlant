@@ -130,6 +130,179 @@ img{max-width:100%}
     }
 }
 
+/* Management showcase — reference design: four compact cards on desktop. */
+.home-section-management{
+    padding-top:64px;
+    padding-bottom:70px;
+}
+.home-section-management .head{
+    justify-content:flex-end;
+    align-items:flex-end;
+    margin-bottom:30px;
+}
+.home-section-management .head>div{
+    text-align:right;
+}
+.home-section-management .head .eyebrow{
+    display:block;
+}
+.home-section-management .management-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:18px;
+    width:100%;
+}
+.home-section-management .member-card{
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+    height:100%;
+    border-radius:18px;
+    background:linear-gradient(145deg,rgba(8,37,50,.96),rgba(3,19,27,.98));
+}
+.home-section-management .member-photo{
+    aspect-ratio:4/3;
+    flex:0 0 auto;
+    background:#061923;
+}
+.home-section-management .member-body{
+    display:flex;
+    flex:1;
+    min-width:0;
+    flex-direction:column;
+    padding:16px;
+}
+.home-section-management .member-body h3{
+    font-size:15px;
+    line-height:1.25;
+    overflow-wrap:anywhere;
+}
+.home-section-management .member-role{
+    margin-top:5px;
+    color:var(--cyan);
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.11em;
+    text-transform:uppercase;
+}
+.home-section-management .member-contacts{
+    display:grid;
+    gap:5px;
+    margin-top:12px;
+    padding-top:11px;
+    border-top:1px solid rgba(83,218,240,.13);
+}
+.home-section-management .member-contact{
+    display:flex;
+    min-width:0;
+    align-items:center;
+    gap:7px;
+    color:#8faeb8;
+    font-size:8px;
+    line-height:1.35;
+}
+.home-section-management .member-contact i{
+    width:12px;
+    flex:0 0 12px;
+    color:var(--cyan);
+    text-align:center;
+}
+.home-section-management .member-contact span{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.home-section-management .member-message{
+    margin-top:12px!important;
+    padding-top:11px;
+    border-top:1px solid rgba(83,218,240,.13);
+    color:var(--muted);
+    font-size:9px!important;
+    line-height:1.55!important;
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:3;
+    overflow:hidden;
+}
+.home-section-management .member-message:before{
+    content:"\f075";
+    margin-right:7px;
+    color:var(--cyan);
+    font-family:"Font Awesome 6 Free";
+    font-weight:900;
+}
+.home-section-management .member-more{
+    width:100%;
+    min-height:38px;
+    margin-top:auto;
+    padding:9px 12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    border:1px solid rgba(72,216,241,.22);
+    border-radius:11px;
+    background:rgba(72,216,241,.035);
+    color:var(--cyan);
+    font-size:9px;
+    font-weight:800;
+    cursor:pointer;
+    transition:background .2s ease,border-color .2s ease,transform .2s ease;
+}
+.home-section-management .member-more:hover{
+    border-color:rgba(72,216,241,.48);
+    background:rgba(72,216,241,.08);
+    transform:translateY(-1px);
+}
+@media(min-width:1100px){
+    .home-section-management .management-grid{
+        grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    }
+}
+@media(min-width:651px) and (max-width:1099px){
+    .home-section-management .management-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    }
+}
+@media(max-width:650px){
+    .home-section-management{
+        padding-top:44px;
+        padding-bottom:48px;
+    }
+    .home-section-management .head{
+        align-items:flex-end;
+        margin-bottom:18px;
+    }
+    .home-section-management .head>div{
+        text-align:right;
+    }
+    .home-section-management .head h2{
+        font-size:clamp(27px,8.5vw,38px);
+    }
+    .home-section-management .management-grid{
+        grid-template-columns:1fr !important;
+        gap:12px;
+    }
+    .home-section-management .member-photo{
+        aspect-ratio:4/3;
+    }
+    .home-section-management .member-body{
+        padding:13px;
+    }
+    .home-section-management .member-body h3{
+        font-size:14px;
+    }
+    .home-section-management .member-role{
+        font-size:8px;
+    }
+    .home-section-management .member-contact{
+        font-size:8px;
+    }
+    .home-section-management .member-message{
+        font-size:8px!important;
+    }
+}
 /* Homepage motion + responsive polish */
 .home-slider{isolation:isolate;animation:homeRise .8s cubic-bezier(.2,.7,.2,1) both}
 .home-slider:before{content:"";position:absolute;inset:-18px -10px auto;height:70%;z-index:-1;border-radius:40px;background:radial-gradient(circle at 50% 35%,rgba(72,216,241,.16),transparent 62%);filter:blur(22px);animation:heroGlow 7s ease-in-out infinite}
