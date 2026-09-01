@@ -877,6 +877,38 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
 
 /* Keep the public page free of legacy escaped-newline artefacts. */
 
+
+/* === Final homepage first-viewport + leadership composition hardening === */
+.home-slider{animation:none!important;transform:none!important}
+.home-slider:before{animation:none!important;opacity:.72;transform:none!important}
+.welcome-with-team .welcome-inner{grid-template-columns:minmax(0,1fr) minmax(300px,380px)!important;gap:clamp(34px,4vw,64px)!important;align-items:center!important}
+.welcome-with-team .welcome-content{grid-column:1!important;grid-row:1!important;min-width:0}
+.welcome-with-team .welcome-team{grid-column:2!important;grid-row:1!important;align-self:center!important;align-content:center!important;gap:14px!important}
+.welcome-with-team .welcome-profile{width:100%;min-height:112px;grid-template-columns:88px minmax(0,1fr)!important;padding:13px!important;gap:14px!important;transform:translate3d(var(--profile-motion-x,0px),0,0)}
+.welcome-with-team .welcome-profile-photo{width:88px!important;height:88px!important;border-radius:14px!important}
+.welcome-with-team .welcome-profile-name{font-size:13px!important}
+.welcome-with-team .welcome-profile-role{font-size:9px!important}
+.welcome-with-team .welcome-profile-message{font-size:9px!important;line-height:1.55!important}
+.welcome-with-team .welcome-profile-hint{font-size:8px!important}
+.welcome-profile-modal{overscroll-behavior:contain}
+.welcome-profile-dialog{max-height:min(760px,88svh)}
+@media(max-width:1099px) and (min-width:651px){
+ .welcome-with-team .welcome-inner{grid-template-columns:minmax(0,1fr) minmax(250px,310px)!important;gap:26px!important}
+ .welcome-with-team .welcome-profile{grid-template-columns:66px minmax(0,1fr)!important;min-height:92px;padding:10px!important}
+ .welcome-with-team .welcome-profile-photo{width:66px!important;height:66px!important}
+}
+@media(max-width:650px){
+ .home-slider,.home-slider:before{animation:none!important}
+ .welcome-with-team .welcome-inner{display:block!important}
+ .welcome-with-team .welcome-team{display:grid!important;margin-top:30px!important}
+ .welcome-with-team .welcome-profile{transform:none!important;min-height:0;grid-template-columns:64px minmax(0,1fr)!important}
+ .welcome-with-team .welcome-profile-photo{width:64px!important;height:64px!important}
+}
+@media(pointer:coarse){
+ .energy-atmosphere .energy-grid,.energy-atmosphere .energy-core,.energy-atmosphere .energy-orbit,.energy-atmosphere .energy-pulse{animation:none!important}
+}
+@media(prefers-reduced-motion:reduce){.welcome-with-team .welcome-profile{transform:none!important}}
+
 </style>
 <main class="shell">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
@@ -997,6 +1029,11 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
 <script>
 (() => {
  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+ // Do not let browser scroll restoration reopen the homepage partway down.
+ if ('scrollRestoration' in history) history.scrollRestoration='manual';
+ const resetInitialViewport=()=>{if(window.scrollY>0 && !sessionStorage.getItem('ffp_home_viewport_ready')){window.scrollTo(0,0);sessionStorage.setItem('ffp_home_viewport_ready','1');}};
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',resetInitialViewport,{once:true}); else resetInitialViewport();
 
  document.querySelectorAll('[data-welcome-profile]').forEach(button=>{
   button.addEventListener('click',()=>{
