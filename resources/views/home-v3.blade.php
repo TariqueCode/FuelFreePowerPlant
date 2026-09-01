@@ -998,8 +998,17 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     }
 
     .home-section-management .management-grid {
+        width:min(100%,1080px);
+        margin-inline:auto;
         grid-template-columns:repeat(4,minmax(0,1fr)) !important;
         gap:18px;
+    }
+    /* With exactly two published profiles, preserve the four-card width and center them. */
+    .home-section-management .management-grid:has(> .member-card:nth-child(2):last-child) > .member-card:first-child{
+        grid-column:2;
+    }
+    .home-section-management .management-grid:has(> .member-card:nth-child(2):last-child) > .member-card:nth-child(2){
+        grid-column:3;
     }
 
     .home-section-management .member-card {
@@ -1395,6 +1404,150 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     .home-profile-footer{padding:11px 18px calc(14px + env(safe-area-inset-bottom))}
     .home-profile-links{grid-template-columns:1fr 1fr;gap:7px}
     .home-profile-link{min-height:40px;padding:7px 8px;font-size:9px}
+}
+/* Mobile-only management card + profile popup polish. Desktop modal remains unchanged. */
+@media(max-width:650px){
+    .home-section-management .management-grid{
+        grid-template-columns:1fr !important;
+        gap:10px;
+    }
+    .home-section-management .member-card{
+        display:grid;
+        grid-template-columns:92px minmax(0,1fr);
+        grid-template-rows:auto auto auto;
+        column-gap:12px;
+        border-radius:15px;
+        padding:10px;
+        align-items:center;
+    }
+    .home-section-management .member-photo{
+        grid-column:1;
+        grid-row:1;
+        width:92px;
+        height:115px;
+        aspect-ratio:4 / 5 !important;
+        border-radius:10px;
+    }
+    .home-section-management .member-body{
+        display:contents;
+    }
+    .home-section-management .member-body h3{
+        grid-column:2;
+        grid-row:1;
+        align-self:center;
+        margin:0;
+        padding-right:4px;
+        font-size:12px;
+        line-height:1.3;
+    }
+    .home-section-management .member-role{
+        grid-column:2;
+        grid-row:1;
+        align-self:center;
+        margin:32px 0 0;
+        font-size:7px;
+        line-height:1.4;
+    }
+    .home-section-management .member-message{
+        grid-column:1 / -1;
+        grid-row:2;
+        width:100%;
+        min-height:58px;
+        max-height:76px;
+        margin:10px 0 0;
+        padding:9px 10px;
+        border:1px solid rgba(72,216,241,.12);
+        border-radius:9px;
+        background:rgba(1,12,18,.42);
+        color:#91adb6;
+        font-size:8px;
+        line-height:1.55;
+        overflow-y:auto;
+        display:block;
+        -webkit-line-clamp:unset;
+        -webkit-box-orient:unset;
+        scrollbar-width:thin;
+        overscroll-behavior:contain;
+    }
+    .home-section-management .member-message::-webkit-scrollbar{width:4px}
+    .home-section-management .member-message::-webkit-scrollbar-thumb{background:rgba(72,216,241,.24);border-radius:99px}
+    .home-section-management .member-more{
+        grid-column:1 / -1;
+        grid-row:3;
+        min-height:34px;
+        margin:8px 0 0;
+        font-size:8px;
+    }
+
+    /* A dedicated mobile presentation for the profile popup. */
+    .home-profile-modal{
+        padding:0;
+        align-items:flex-end;
+        justify-content:center;
+        background:rgba(0,4,8,.78);
+        backdrop-filter:blur(14px);
+    }
+    .home-profile-panel{
+        width:100%;
+        max-width:720px;
+        height:min(93vh,780px);
+        min-height:0;
+        display:flex;
+        flex-direction:column;
+        border-radius:22px 22px 0 0;
+        border-bottom:0;
+        animation:homeProfileMobileIn .25s cubic-bezier(.2,.7,.2,1);
+    }
+    @keyframes homeProfileMobileIn{
+        from{opacity:0;transform:translateY(34px)}
+        to{opacity:1;transform:translateY(0)}
+    }
+    .home-profile-photo{
+        flex:0 0 auto;
+        height:205px;
+        min-height:0;
+        padding:14px 18px 10px;
+        border-right:0;
+        border-bottom:1px solid rgba(67,209,240,.10);
+    }
+    .home-profile-photo img{
+        width:auto;
+        height:100%;
+        max-width:100%;
+        max-height:100%;
+        aspect-ratio:4 / 5;
+        object-fit:cover;
+        border-radius:11px;
+    }
+    .home-profile-head{
+        flex:0 0 auto;
+        padding:15px 18px 12px;
+        gap:12px;
+    }
+    .home-profile-title{font-size:22px;line-height:1.15}
+    .home-profile-role{font-size:9px;margin-top:5px}
+    .home-profile-close{width:38px;height:38px;flex-basis:38px;border-radius:10px}
+    .home-profile-divider{margin:0 18px}
+    .home-profile-scroll{
+        flex:1 1 auto;
+        min-height:0;
+        padding:15px 18px 13px;
+        overflow-y:auto;
+    }
+    .home-profile-section-title{font-size:8px;margin-bottom:8px}
+    .home-profile-message{
+        color:#a9c1c9;
+        font-size:11px;
+        line-height:1.78;
+    }
+    .home-profile-message p{margin:0 0 11px}
+    .home-profile-footer{
+        flex:0 0 auto;
+        padding:10px 18px calc(13px + env(safe-area-inset-bottom));
+        background:linear-gradient(180deg,rgba(2,14,21,.28),rgba(2,14,21,.82));
+    }
+    .home-profile-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+    .home-profile-link{min-height:39px;border-radius:9px;font-size:8px}
 }
 @media(max-width:420px){
     .home-section-management .management-grid{gap:8px}
