@@ -1459,8 +1459,8 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     /* Mobile-only profile popup:
        top = 4:5 portrait + identity/contact; bottom = independently scrollable message. */
     .home-profile-modal{
-        padding:0;
-        align-items:flex-end;
+        padding:12px;
+        align-items:center;
         justify-content:center;
         background:rgba(0,4,8,.80);
         backdrop-filter:blur(14px);
@@ -1468,14 +1468,15 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     .home-profile-panel{
         width:100%;
         max-width:720px;
-        height:min(94vh,820px);
+        height:min(90svh,720px);
+        max-height:calc(100svh - 24px);
         min-height:0;
         display:grid;
         grid-template-columns:minmax(112px,32%) minmax(0,68%);
         grid-template-rows:auto minmax(0,1fr) auto;
         overflow:hidden;
-        border-radius:22px 22px 0 0;
-        border-bottom:0;
+        border-radius:22px;
+        border-bottom:1px solid rgba(91,214,239,.24);
         animation:homeProfileMobileIn .25s cubic-bezier(.2,.7,.2,1);
     }
     .home-profile-photo{
