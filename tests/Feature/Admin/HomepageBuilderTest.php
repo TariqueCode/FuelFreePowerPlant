@@ -87,6 +87,10 @@ class HomepageBuilderTest extends TestCase
 
         $response = $this->get(route('home'));
 
+        $debugSection = HomepageSection::query()->where('key', 'management')->first();
+        $debugProfiles = SiteContentItem::published()->where('type', 'management')->orderBy('sort_order')->orderBy('title')->get(['id','title','published_at','status']);
+        fwrite(STDERR, "\nDEBUG management settings=".json_encode($debugSection?->settings)." raw=".json_encode($debugSection?->getRawOriginal('settings'))." profiles=".$debugProfiles->toJson()."\n");
+
         $response->assertOk();
         $response->assertSee('Management 0');
         $response->assertSee('Management 1');
