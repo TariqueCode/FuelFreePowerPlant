@@ -110,7 +110,7 @@ class HomeController
         $welcomeManagement = $welcomeManagement
             ->concat($homeManagement)
             ->unique('id')
-            ->take(2)
+            ->take($managementLimit)
             ->values();
 
         $gallery = $applySelection(
