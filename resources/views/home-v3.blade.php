@@ -110,48 +110,7 @@ img{max-width:100%}
 }
 @media(prefers-reduced-motion:reduce){.slide,.welcome:before,.welcome:after,.section,.project-card,.member-card,.folder,.news{animation:none;transition:none}.slide.is-active{transform:none}}
 
-/* Desktop management grid: always reserve the compact four-card footprint. */
-@media (min-width:851px){
-    .home-section-management .management-grid{
-        grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-        gap:18px !important;
-        align-items:stretch;
-    }
-    .home-section-management .member-card{
-        width:auto !important;
-        min-width:0 !important;
-    }
-    /* With two profiles, keep both cards centered while retaining four-card sizing. */
-    .home-section-management .management-grid:has(> .member-card:nth-child(2):last-child) > .member-card:first-child{
-        grid-column:2 !important;
-    }
-    .home-section-management .management-grid:has(> .member-card:nth-child(2):last-child) > .member-card:nth-child(2){
-        grid-column:3 !important;
-    }
-}
-
-/* Management showcase — reference design: four compact cards on desktop. */
-.home-section-management{
-    padding-top:64px;
-    padding-bottom:70px;
-}
-.home-section-management .head{
-    justify-content:flex-end;
-    align-items:flex-end;
-    margin-bottom:30px;
-}
-.home-section-management .head>div{
-    text-align:right;
-}
-.home-section-management .head .eyebrow{
-    display:block;
-}
-.home-section-management .management-grid{
-    display:grid;
-    grid-template-columns:repeat(4,minmax(0,1fr));
-    gap:18px;
-    width:100%;
-}
+/* Management cards — shared homepage visual system. */
 .home-section-management .member-card{
     display:flex;
     flex-direction:column;
@@ -201,18 +160,8 @@ img{max-width:100%}
     font-size:8px;
     line-height:1.35;
 }
-.home-section-management .member-contact i{
-    width:12px;
-    flex:0 0 12px;
-    color:var(--cyan);
-    text-align:center;
-}
-.home-section-management .member-contact span{
-    min-width:0;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-}
+.home-section-management .member-contact i{width:12px;flex:0 0 12px;color:var(--cyan);text-align:center}
+.home-section-management .member-contact span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .home-section-management .member-message{
     margin-top:12px!important;
     padding-top:11px;
@@ -225,13 +174,7 @@ img{max-width:100%}
     -webkit-line-clamp:3;
     overflow:hidden;
 }
-.home-section-management .member-message:before{
-    content:"\f075";
-    margin-right:7px;
-    color:var(--cyan);
-    font-family:"Font Awesome 6 Free";
-    font-weight:900;
-}
+.home-section-management .member-message:before{content:"\\f075";margin-right:7px;color:var(--cyan);font-family:"Font Awesome 6 Free";font-weight:900}
 .home-section-management .member-more{
     width:100%;
     min-height:38px;
@@ -250,58 +193,14 @@ img{max-width:100%}
     cursor:pointer;
     transition:background .2s ease,border-color .2s ease,transform .2s ease;
 }
-.home-section-management .member-more:hover{
-    border-color:rgba(72,216,241,.48);
-    background:rgba(72,216,241,.08);
-    transform:translateY(-1px);
-}
-@media(min-width:1100px){
-    .home-section-management .management-grid{
-        grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-    }
-}
-@media(min-width:651px) and (max-width:1099px){
-    .home-section-management .management-grid{
-        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    }
-}
+.home-section-management .member-more:hover{border-color:rgba(72,216,241,.48);background:rgba(72,216,241,.08);transform:translateY(-1px)}
 @media(max-width:650px){
-    .home-section-management{
-        padding-top:44px;
-        padding-bottom:48px;
-    }
-    .home-section-management .head{
-        align-items:flex-end;
-        margin-bottom:18px;
-    }
-    .home-section-management .head>div{
-        text-align:right;
-    }
-    .home-section-management .head h2{
-        font-size:clamp(27px,8.5vw,38px);
-    }
-    .home-section-management .management-grid{
-        grid-template-columns:1fr !important;
-        gap:12px;
-    }
-    .home-section-management .member-photo{
-        aspect-ratio:4/3;
-    }
-    .home-section-management .member-body{
-        padding:13px;
-    }
-    .home-section-management .member-body h3{
-        font-size:14px;
-    }
-    .home-section-management .member-role{
-        font-size:8px;
-    }
-    .home-section-management .member-contact{
-        font-size:8px;
-    }
-    .home-section-management .member-message{
-        font-size:8px!important;
-    }
+    .home-section-management .member-photo{aspect-ratio:4/3}
+    .home-section-management .member-body{padding:13px}
+    .home-section-management .member-body h3{font-size:14px}
+    .home-section-management .member-role{font-size:8px}
+    .home-section-management .member-contact{font-size:8px}
+    .home-section-management .member-message{font-size:8px!important}
 }
 /* Homepage motion + responsive polish */
 .home-slider{isolation:isolate;animation:homeRise .8s cubic-bezier(.2,.7,.2,1) both}
