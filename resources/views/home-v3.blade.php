@@ -1639,6 +1639,24 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
 }
 @media(prefers-reduced-motion:reduce){.home-profile-panel{animation:none}}
 
+
+/* Mobile popup final layout correction: keep portrait fully above the message box. */
+@media(max-width:650px){
+    .home-profile-panel{height:min(88vh,760px);grid-template-columns:minmax(118px,31%) minmax(0,69%);grid-template-rows:auto minmax(0,1fr) auto;align-content:stretch}
+    .home-profile-photo{grid-column:1;grid-row:1;height:auto;min-height:0;padding:14px 0 14px 14px;align-items:flex-start}
+    .home-profile-photo img{width:100%;height:auto;aspect-ratio:4 / 5;max-height:none;object-fit:cover;display:block}
+    .home-profile-info{display:contents}
+    .home-profile-head{grid-column:2;grid-row:1;min-height:0;height:100%;padding:24px 14px 14px 13px;display:flex;flex-direction:column;justify-content:center;align-self:stretch}
+    .home-profile-kicker{margin-bottom:5px}.home-profile-title{font-size:18px;line-height:1.16}.home-profile-role{margin-top:4px}.home-profile-contact-mobile{margin-top:9px;gap:5px}.home-profile-divider{display:none}
+    .home-profile-scroll{grid-column:1 / -1;grid-row:2;min-height:0;height:auto;margin:10px 14px 10px;padding:11px 12px 14px;overflow-y:auto;border-radius:12px}
+    .home-profile-section-title{margin-bottom:7px}.home-profile-message{font-size:10px;line-height:1.7}.home-profile-message p{margin:0 0 9px}
+    .home-profile-footer{grid-column:1 / -1;grid-row:3;padding:0 14px calc(10px + env(safe-area-inset-bottom))}
+}
+@media(max-width:420px){
+    .home-profile-panel{height:min(88vh,700px);grid-template-columns:minmax(104px,31%) minmax(0,69%)}
+    .home-profile-photo{padding:12px 0 12px 12px}.home-profile-head{padding:21px 12px 12px 11px}.home-profile-title{font-size:17px}.home-profile-contact-mobile a{font-size:7px}
+    .home-profile-scroll{margin:9px 12px 9px;padding:10px 11px 12px}.home-profile-footer{padding-left:12px;padding-right:12px}
+}
 </style>
 <main class="shell">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
