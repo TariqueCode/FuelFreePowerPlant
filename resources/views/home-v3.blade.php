@@ -839,6 +839,23 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     .welcome-copy{transform:none!important;will-change:auto}
 }
 
+/* Desktop stability: never hide the initial viewport while the observer is warming up. */
+@media (min-width:651px){
+    .home-section.reveal-ready.home-section-welcome,
+    .home-section.reveal-ready.home-section-welcome .welcome-content,
+    .home-section.reveal-ready.home-section-welcome .welcome-profile{
+        opacity:1!important;
+        transform:none!important;
+        transition:none!important;
+    }
+    /* Keep the atmosphere decorative, not a layout/performance dependency. */
+    .energy-atmosphere{pointer-events:none!important;contain:strict!important;}
+    .energy-atmosphere .energy-grid,
+    .energy-atmosphere .energy-core,
+    .energy-atmosphere .energy-orbit,
+    .energy-atmosphere .energy-pulse{will-change:transform;}
+}
+
 /* Keep the public page free of legacy escaped-newline artefacts. */
 
 </style>
@@ -1032,7 +1049,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
  window.addEventListener('scroll',requestMotion,{passive:true});
  window.addEventListener('resize',requestMotion,{passive:true});
  requestMotion();
- sections.forEach(section=>section.classList.add('reveal-ready'));
+ sections.forEach(section=>section.classList.add('reveal-ready')); sections.slice(0,2).forEach(section=>section.classList.add('revealed'));
  if(reduce){sections.forEach(section=>section.classList.add('revealed'));return;}
  const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('revealed');observer.unobserve(entry.target);}})},{rootMargin:'0px 0px -8% 0px',threshold:.08});
  sections.forEach(section=>observer.observe(section));
