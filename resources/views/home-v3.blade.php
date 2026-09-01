@@ -1909,6 +1909,108 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
         grid-template-columns:repeat(4,minmax(0,1fr)) !important;
     }
 }
+
+/* === Management heading alignment: match message-title pattern on every device === */
+.home-section-management .head{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:end;
+    justify-content:initial;
+    gap:20px;
+    margin-bottom:30px;
+    text-align:left !important;
+}
+.home-section-management .head>div{
+    min-width:0;
+    margin:0 !important;
+    text-align:left !important;
+}
+.home-section-management .head .eyebrow{
+    display:block;
+    width:max-content;
+    max-width:100%;
+    margin:0;
+    text-align:left;
+}
+.home-section-management .head .eyebrow:before{
+    display:none;
+}
+.home-section-management .head h2{
+    margin:6px 0 0 !important;
+    text-align:left !important;
+    font-size:clamp(32px,4vw,48px) !important;
+    line-height:1.04;
+    letter-spacing:-.045em;
+}
+.home-section-management .head>div:after{
+    content:"";
+    display:block;
+    width:44px;
+    height:2px;
+    margin-top:11px;
+    border-radius:99px;
+    background:var(--cyan);
+    box-shadow:0 0 10px rgba(72,216,241,.28);
+}
+.home-section-management .head .more{
+    align-self:end;
+    justify-self:end;
+    margin:0 0 4px;
+    padding:0;
+    min-height:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    color:var(--cyan);
+    font-size:10px !important;
+    line-height:1.2;
+    font-weight:750;
+    white-space:nowrap;
+}
+.home-section-management .head .more:hover{
+    border:0;
+    background:transparent;
+    transform:none;
+    color:#b9f6ff;
+}
+@media(max-width:850px){
+    .home-section-management .head{
+        grid-template-columns:minmax(0,1fr) auto;
+        gap:12px;
+        margin-bottom:20px;
+    }
+    .home-section-management .head h2{
+        font-size:clamp(28px,7.5vw,40px) !important;
+    }
+    .home-section-management .head .eyebrow{
+        font-size:8px !important;
+        letter-spacing:.18em;
+    }
+    .home-section-management .head .more{
+        margin-bottom:3px;
+        font-size:8px !important;
+    }
+}
+@media(max-width:420px){
+    .home-section-management .head{
+        gap:8px;
+    }
+    .home-section-management .head h2{
+        font-size:clamp(24px,7.8vw,32px) !important;
+        letter-spacing:-.04em;
+    }
+    .home-section-management .head .more{
+        font-size:7px !important;
+    }
+    .home-section-management .head>div:after{
+        width:38px;
+        height:2px;
+        margin-top:9px;
+    }
+}
+@media(prefers-reduced-motion:reduce){
+    .home-section-management .head .more{transition:none !important}
+}
 </style>
 <main class="shell">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
