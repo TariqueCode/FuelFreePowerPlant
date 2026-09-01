@@ -97,6 +97,14 @@ class HomeController
             $managementSettings,
             $managementLimit
         );
+
+        // Explicit welcome selections take priority; the homepage management list fills any gap.
+        $welcomeManagement = $welcomeManagement
+            ->concat($homeManagement)
+            ->unique('id')
+            ->take(2)
+            ->values();
+
         $gallery = $applySelection(
             SiteContentItem::published()->where('type','gallery')->whereNotNull('image_path')->withCount('galleryMedia')->orderBy('sort_order')->latest('published_at'),
             $gallerySettings,
