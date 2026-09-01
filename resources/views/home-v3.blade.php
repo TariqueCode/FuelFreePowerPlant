@@ -1107,6 +1107,309 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     }
 }
 
+/* === Homepage Management Team: responsive 4:5 executive cards === */
+.home-section-management .management-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:18px;
+    align-items:stretch;
+}
+.home-section-management .member-card{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+    height:100%;
+    border-radius:20px;
+    overflow:hidden;
+    background:linear-gradient(145deg,rgba(8,37,50,.96),rgba(3,19,27,.98));
+}
+.home-section-management .member-photo{
+    position:relative;
+    width:100%;
+    aspect-ratio:4 / 5 !important;
+    flex:0 0 auto;
+    overflow:hidden;
+    background:#061923;
+}
+.home-section-management .member-photo img{
+    width:100%;
+    height:100%;
+    display:block;
+    object-fit:cover;
+    object-position:center;
+}
+.home-section-management .member-photo:after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:linear-gradient(180deg,transparent 58%,rgba(1,10,15,.36));
+}
+.home-section-management .member-body{
+    display:flex;
+    flex:1 1 auto;
+    min-height:0;
+    flex-direction:column;
+    padding:15px 16px 16px;
+}
+.home-section-management .member-body h3{
+    margin:0;
+    color:var(--text);
+    font-size:15px;
+    line-height:1.3;
+    letter-spacing:-.015em;
+}
+.home-section-management .member-role{
+    margin:5px 0 0;
+    color:#73def3;
+    font-size:8px;
+    font-weight:800;
+    line-height:1.45;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+.home-section-management .member-message{
+    display:-webkit-box;
+    margin:11px 0 0;
+    min-height:43px;
+    color:var(--muted);
+    font-size:10px;
+    line-height:1.55;
+    -webkit-line-clamp:3;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+}
+.home-section-management .member-message.is-empty{
+    color:#5f7f89;
+    font-style:italic;
+}
+.home-section-management .member-more{
+    display:inline-flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    width:100%;
+    min-height:37px;
+    margin-top:13px;
+    padding:8px 11px;
+    border:1px solid rgba(72,216,241,.15);
+    border-radius:10px;
+    background:rgba(72,216,241,.045);
+    color:var(--cyan);
+    font:800 9px/1 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+    letter-spacing:.04em;
+    cursor:pointer;
+    transition:background .2s ease,border-color .2s ease,transform .2s ease;
+}
+.home-section-management .member-more i{font-size:8px;transition:transform .2s ease}
+.home-section-management .member-more:hover{
+    background:rgba(72,216,241,.09);
+    border-color:rgba(72,216,241,.32);
+    transform:translateY(-1px);
+}
+.home-section-management .member-more:hover i{transform:translateX(3px)}
+.home-profile-modal{
+    position:fixed;
+    inset:0;
+    z-index:9998;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:rgba(0,5,9,.84);
+    backdrop-filter:blur(18px) saturate(120%);
+}
+.home-profile-modal.open{display:flex}
+.home-profile-panel{
+    width:min(1120px,94vw);
+    height:min(760px,88vh);
+    display:grid;
+    grid-template-columns:minmax(360px,42%) minmax(0,58%);
+    overflow:hidden;
+    border:1px solid rgba(91,214,239,.24);
+    border-radius:26px;
+    background:radial-gradient(650px 500px at 0 0,rgba(67,209,240,.105),transparent 68%),linear-gradient(145deg,#082633 0%,#041923 52%,#021119 100%);
+    box-shadow:0 45px 130px rgba(0,0,0,.72),0 0 90px rgba(23,137,164,.09);
+}
+.home-profile-photo{
+    min-width:0;
+    display:grid;
+    place-items:center;
+    padding:28px;
+    overflow:hidden;
+    background:linear-gradient(145deg,#061923 0%,#04131d 58%,#020d14 100%);
+    border-right:1px solid rgba(67,209,240,.16);
+}
+.home-profile-photo img{
+    width:auto;
+    height:auto;
+    max-width:100%;
+    max-height:100%;
+    aspect-ratio:4 / 5;
+    object-fit:cover;
+    border:1px solid rgba(67,209,240,.58);
+    border-radius:14px;
+    box-shadow:0 0 0 3px rgba(67,209,240,.045),0 18px 45px rgba(0,0,0,.35);
+}
+.home-profile-info{
+    min-width:0;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+}
+.home-profile-head{
+    flex:0 0 auto;
+    display:flex;
+    justify-content:space-between;
+    gap:18px;
+    padding:30px 32px 22px;
+}
+.home-profile-kicker{
+    margin-bottom:7px;
+    color:#72dced;
+    font-size:9px;
+    line-height:1.4;
+    letter-spacing:.20em;
+    text-transform:uppercase;
+}
+.home-profile-title{
+    margin:0;
+    color:var(--text);
+    font-size:31px;
+    line-height:1.15;
+    letter-spacing:-.035em;
+}
+.home-profile-role{
+    margin-top:9px;
+    color:#86dce9;
+    font-size:11px;
+    line-height:1.5;
+}
+.home-profile-close{
+    flex:0 0 42px;
+    width:42px;
+    height:42px;
+    border:1px solid rgba(72,216,241,.16);
+    border-radius:12px;
+    background:rgba(72,216,241,.045);
+    color:#9edce7;
+    cursor:pointer;
+}
+.home-profile-divider{height:1px;margin:0 32px;background:rgba(83,218,240,.13)}
+.home-profile-scroll{
+    min-height:0;
+    flex:1 1 auto;
+    overflow:auto;
+    padding:25px 32px 20px;
+    scrollbar-width:thin;
+    overscroll-behavior:contain;
+}
+.home-profile-scroll::-webkit-scrollbar{width:6px}
+.home-profile-scroll::-webkit-scrollbar-thumb{background:rgba(67,209,240,.24);border-radius:99px}
+.home-profile-section-title{
+    margin-bottom:12px;
+    color:#72dced;
+    font-size:9px;
+    line-height:1.4;
+    font-weight:800;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+}
+.home-profile-message{
+    max-width:760px;
+    color:#a9c1c9;
+    font-size:13px;
+    line-height:1.95;
+}
+.home-profile-message p{margin:0 0 16px}
+.home-profile-message p:last-child{margin-bottom:0}
+.home-profile-footer{
+    flex:0 0 auto;
+    padding:17px 32px 24px;
+    background:linear-gradient(180deg,rgba(2,14,21,.18),rgba(2,14,21,.62));
+    box-shadow:0 -12px 30px rgba(0,0,0,.10);
+}
+.home-profile-links{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+}
+.home-profile-link{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    min-height:42px;
+    padding:8px 10px;
+    border:1px solid rgba(72,216,241,.12);
+    border-radius:11px;
+    background:rgba(1,12,18,.40);
+    color:#a7d8e0;
+    font-size:10px;
+    font-weight:750;
+}
+.home-profile-link.primary{background:rgba(72,216,241,.08);color:#78e0ef;border-color:rgba(72,216,241,.24)}
+@media(max-width:1099px){
+    .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:16px}
+    .home-profile-panel{width:min(980px,96vw);height:min(720px,90vh);grid-template-columns:minmax(300px,40%) minmax(0,60%)}
+    .home-profile-photo{padding:20px}
+    .home-profile-head{padding:23px 25px 18px}
+    .home-profile-title{font-size:26px}
+    .home-profile-divider{margin:0 25px}
+    .home-profile-scroll{padding:19px 25px 15px}
+    .home-profile-footer{padding:13px 25px 18px}
+}
+@media(max-width:650px){
+    .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:10px}
+    .home-section-management .member-card{border-radius:14px}
+    .home-section-management .member-body{padding:10px 10px 11px}
+    .home-section-management .member-body h3{font-size:10px}
+    .home-section-management .member-role{font-size:7px}
+    .home-section-management .member-message{margin-top:8px;min-height:38px;font-size:8px;line-height:1.5;-webkit-line-clamp:3}
+    .home-section-management .member-more{min-height:35px;margin-top:10px;padding:7px 9px;font-size:8px}
+    .home-profile-modal{padding:0;align-items:flex-end}
+    .home-profile-panel{
+        width:100%;
+        max-width:720px;
+        height:min(92vh,760px);
+        min-height:0;
+        display:flex;
+        flex-direction:column;
+        border-radius:24px 24px 0 0;
+        border-bottom:0;
+        animation:homeProfileSheetIn .24s cubic-bezier(.2,.7,.2,1);
+    }
+    @keyframes homeProfileSheetIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+    .home-profile-photo{height:min(34vh,250px);min-height:180px;padding:16px 18px 10px;border-right:0;border-bottom:1px solid rgba(67,209,240,.10)}
+    .home-profile-photo img{max-height:100%;border-radius:12px}
+    .home-profile-head{padding:17px 18px 13px;gap:12px}
+    .home-profile-kicker{margin-bottom:5px;font-size:8px;letter-spacing:.18em}
+    .home-profile-title{font-size:23px}
+    .home-profile-role{margin-top:6px;font-size:10px}
+    .home-profile-close{width:38px;height:38px;flex-basis:38px;border-radius:10px}
+    .home-profile-divider{margin:0 18px}
+    .home-profile-scroll{padding:17px 18px 14px}
+    .home-profile-section-title{margin-bottom:9px;font-size:8px;letter-spacing:.16em}
+    .home-profile-message{font-size:12px;line-height:1.8}
+    .home-profile-message p{margin-bottom:12px}
+    .home-profile-footer{padding:11px 18px calc(14px + env(safe-area-inset-bottom))}
+    .home-profile-links{grid-template-columns:1fr 1fr;gap:7px}
+    .home-profile-link{min-height:40px;padding:7px 8px;font-size:9px}
+}
+@media(max-width:420px){
+    .home-section-management .management-grid{gap:8px}
+    .home-profile-panel{height:min(94vh,740px);border-radius:20px 20px 0 0}
+    .home-profile-photo{height:190px;min-height:160px}
+    .home-profile-head{padding:14px}
+    .home-profile-divider{margin:0 14px}
+    .home-profile-scroll{padding:14px}
+    .home-profile-footer{padding:10px 14px calc(12px + env(safe-area-inset-bottom))}
+    .home-profile-title{font-size:20px}
+    .home-profile-message{font-size:11px;line-height:1.75}
+    .home-profile-links{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){.home-profile-panel{animation:none}}
+
 </style>
 <main class="shell">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
@@ -1172,7 +1475,16 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
 <div class="management-grid">
 @if($homeManagement->isNotEmpty())
 @foreach($homeManagement as $member)
-<a class="member-card" href="{{ route('management') }}#member-{{ $member->id }}"><div class="member-photo">@if($member->image_path)<img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}" loading="lazy">@else<i class="fa-solid fa-user"></i>@endif</div><div><h3>{{ $member->title }}</h3><p>{{ $member->designation ?: $member->excerpt }}</p></div></a>
+<article class="member-card" data-home-profile="{{ $member->id }}">
+<div class="member-photo">@if($member->image_path)<img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}" loading="lazy">@else<i class="fa-solid fa-user"></i>@endif</div>
+<div class="member-body">
+<h3>{{ $member->title }}</h3>
+<p class="member-role">{{ $member->designation ?: $member->excerpt }}</p>
+@if($member->content)<p class="member-message">{{ \Illuminate\Support\Str::limit(trim(strip_tags((string) $member->content)), 125) }}</p>@else<p class="member-message is-empty">Leadership profile</p>@endif
+<button class="member-more" type="button" data-profile="{{ $member->id }}"><span>More</span><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+<div class="home-profile-data" hidden data-name="{{ $member->title }}" data-role="{{ $member->designation ?: $member->excerpt }}" data-message="{{ $member->content }}" data-image="{{ $member->image_path ? asset('storage/'.$member->image_path) : '' }}" data-phone="{{ $member->phone }}" data-email="{{ $member->email }}" data-vcard="{{ route('management.vcard',$member) }}" data-card="{{ $member->visiting_card_path ? asset('storage/'.$member->visiting_card_path) : '' }}"></div>
+</article>
 @endforeach
 @else<div class="empty" style="grid-column:1/-1">Management profiles will appear here when published.</div>@endif
 </div></section>
@@ -1192,6 +1504,71 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
 @endforeach
 </main>
 
+<div class="home-profile-modal" id="homeProfileModal" aria-hidden="true">
+    <div class="home-profile-panel" role="dialog" aria-modal="true" aria-labelledby="homeProfileTitle">
+        <div class="home-profile-photo" id="homeProfilePhoto"></div>
+        <div class="home-profile-info">
+            <div class="home-profile-head">
+                <div>
+                    <div class="home-profile-kicker">Leadership message</div>
+                    <h2 class="home-profile-title" id="homeProfileTitle"></h2>
+                    <div class="home-profile-role" id="homeProfileRole"></div>
+                </div>
+                <button class="home-profile-close" id="homeProfileClose" type="button" aria-label="Close profile"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="home-profile-divider"></div>
+            <div class="home-profile-scroll">
+                <div class="home-profile-section-title">Message from leadership</div>
+                <div class="home-profile-message" id="homeProfileMessage"></div>
+            </div>
+            <div class="home-profile-footer">
+                <div class="home-profile-section-title">Contact &amp; Actions</div>
+                <div class="home-profile-links" id="homeProfileLinks"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(() => {
+ const modal=document.getElementById('homeProfileModal');
+ if(!modal)return;
+ const title=document.getElementById('homeProfileTitle'),role=document.getElementById('homeProfileRole');
+ const photo=document.getElementById('homeProfilePhoto'),message=document.getElementById('homeProfileMessage');
+ const links=document.getElementById('homeProfileLinks'),close=document.getElementById('homeProfileClose');
+ const buttons=[...document.querySelectorAll('.home-section-management .member-more')];
+ let lastTrigger=null;
+ const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+ const renderMessage=raw=>{
+   const clean=String(raw??'').trim();
+   if(!clean)return '<p>No additional profile information is available.</p>';
+   return clean.split(/\n\s*\n/).filter(Boolean).map(p=>'<p>'+esc(p).replace(/\n/g,'<br>')+'</p>').join('');
+ };
+ const closeModal=()=>{
+   modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.style.overflow='';
+   if(lastTrigger)lastTrigger.focus();
+ };
+ const openModal=btn=>{
+   const data=btn.closest('.member-card')?.querySelector('.home-profile-data'); if(!data)return;
+   lastTrigger=btn;
+   title.textContent=data.dataset.name||'';
+   role.textContent=data.dataset.role||'';
+   message.innerHTML=renderMessage(data.dataset.message||'');
+   photo.innerHTML=data.dataset.image?'<img src="'+esc(data.dataset.image)+'" alt="'+esc(data.dataset.name||'')+'">':'<i class="fa-solid fa-user-tie" style="font-size:48px;color:#48d8f1"></i>';
+   const out=[];
+   if(data.dataset.phone)out.push('<a class="home-profile-link" href="tel:'+esc(data.dataset.phone.replace(/[^0-9+]/g,''))+'"><i class="fa-solid fa-phone"></i> Call</a>');
+   if(data.dataset.email)out.push('<a class="home-profile-link" href="mailto:'+esc(data.dataset.email)+'"><i class="fa-solid fa-envelope"></i> Email</a>');
+   if(data.dataset.vcard)out.push('<a class="home-profile-link primary" href="'+esc(data.dataset.vcard)+'"><i class="fa-solid fa-user-plus"></i> Add to Contacts</a>');
+   if(data.dataset.card)out.push('<a class="home-profile-link" href="'+esc(data.dataset.card)+'" target="_blank" rel="noopener"><i class="fa-regular fa-address-card"></i> Visiting Card</a>');
+   links.innerHTML=out.join('');
+   modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; close.focus();
+ };
+ buttons.forEach(btn=>btn.addEventListener('click',()=>openModal(btn)));
+ close.addEventListener('click',closeModal);
+ modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))closeModal()});
+})();
+</script>
 
 <script>
 (() => {
