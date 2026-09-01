@@ -2363,6 +2363,48 @@ main.shell{
         animation-duration:0.01ms !important;
     }
 }
+
+/* === Unified homepage section-heading system === */
+.home-v3 .home-section > .head,
+.home-v3 .home-section > .head > div{ text-align:left !important; }
+.home-v3 .home-section > .head{
+ display:flex; align-items:flex-end; justify-content:space-between; gap:24px;
+ width:100%; margin-bottom:30px;
+}
+.home-v3 .home-section > .head > div{flex:1 1 auto; min-width:0; margin:0 !important;}
+.home-v3 .home-section > .head .eyebrow{
+ display:block; width:max-content; max-width:100%; margin:0 !important;
+ font-size:10px; line-height:1.2; letter-spacing:.2em; text-transform:uppercase;
+}
+.home-v3 .home-section > .head h2{
+ margin:7px 0 0 !important; font-size:clamp(30px,3.3vw,46px) !important;
+ line-height:1.04; letter-spacing:-.045em; text-align:left !important;
+}
+.home-v3 .home-section > .head > div::after{
+ content:""; display:block; width:42px; height:2px; margin-top:11px;
+ border-radius:999px; background:var(--cyan,#49d7ef);
+}
+.home-v3 .home-section > .head > p{
+ flex:0 1 420px; margin:0 0 3px !important; text-align:right;
+}
+.home-v3 .home-section > .head > .more{
+ flex:0 0 auto; align-self:flex-end; margin:0 0 4px !important;
+ padding:0 !important; border:0 !important; background:transparent !important;
+ white-space:nowrap; text-align:right;
+}
+@media(max-width:850px){
+ .home-v3 .home-section > .head{gap:14px;margin-bottom:20px;}
+ .home-v3 .home-section > .head h2{font-size:clamp(27px,6.5vw,38px) !important;}
+ .home-v3 .home-section > .head > p{display:none;}
+ .home-v3 .home-section > .head > .more{margin-bottom:3px !important;}
+}
+@media(max-width:420px){
+ .home-v3 .home-section > .head{gap:9px;margin-bottom:16px;}
+ .home-v3 .home-section > .head h2{font-size:clamp(24px,7.5vw,31px) !important;}
+ .home-v3 .home-section > .head .eyebrow{font-size:8px;letter-spacing:.18em;}
+ .home-v3 .home-section > .head > .more{font-size:8px !important;}
+ .home-v3 .home-section > .head > div::after{width:36px;margin-top:9px;}
+}
 </style>
 <main class="shell">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
