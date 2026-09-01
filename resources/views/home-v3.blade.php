@@ -909,6 +909,204 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
 }
 @media(prefers-reduced-motion:reduce){.welcome-with-team .welcome-profile{transform:none!important}}
 
+
+/* === Homepage requested composition: remove duplicate welcome items and refine desktop leadership === */
+.welcome-team,
+.welcome-signoff {
+    display:none !important;
+}
+
+.home-section-management .management-grid {
+    align-items:stretch;
+}
+
+@media (min-width:1100px) {
+    main.shell {
+        width:min(1320px,calc(100% - 56px));
+    }
+
+    /* Welcome becomes a clean full-width editorial block once the duplicate
+       leadership cards are removed from this area. */
+    .welcome .welcome-inner {
+        display:block !important;
+    }
+
+    .welcome .welcome-content {
+        width:min(100%,1080px);
+        margin-inline:auto;
+    }
+
+    .welcome .welcome-heading {
+        max-width:1080px;
+        margin-inline:auto;
+    }
+
+    .welcome .welcome-copy {
+        max-width:980px;
+        margin-inline:auto;
+    }
+
+    /* Management is the single leadership showcase on desktop. */
+    .home-section-management {
+        padding:92px 0 104px;
+    }
+
+    .home-section-management .head {
+        display:grid;
+        grid-template-columns:minmax(0,1fr) auto;
+        align-items:end;
+        gap:32px;
+        margin-bottom:34px;
+        padding-bottom:22px;
+        border-bottom:1px solid rgba(83,218,240,.13);
+        text-align:left !important;
+    }
+
+    .home-section-management .head > div {
+        max-width:720px;
+        margin-left:0 !important;
+        margin-right:0 !important;
+    }
+
+    .home-section-management .head h2 {
+        margin-top:7px;
+        font-size:clamp(36px,4vw,52px);
+        letter-spacing:-.045em;
+    }
+
+    .home-section-management .head .eyebrow {
+        font-size:10px !important;
+        letter-spacing:.24em;
+    }
+
+    .home-section-management .more {
+        align-self:center;
+        min-height:38px;
+        display:inline-flex;
+        align-items:center;
+        padding:0 14px;
+        border:1px solid rgba(72,216,241,.16);
+        border-radius:999px;
+        background:rgba(72,216,241,.04);
+        transition:background .25s ease,border-color .25s ease,transform .25s ease;
+    }
+
+    .home-section-management .more:hover {
+        border-color:rgba(72,216,241,.34);
+        background:rgba(72,216,241,.08);
+        transform:translateY(-1px);
+    }
+
+    .home-section-management .management-grid {
+        grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+        gap:18px;
+    }
+
+    .home-section-management .member-card {
+        display:flex;
+        min-width:0;
+        flex-direction:column;
+        border-radius:20px;
+        overflow:hidden;
+        background:linear-gradient(145deg,rgba(8,37,50,.96),rgba(3,19,27,.98));
+        border-color:rgba(83,218,240,.16);
+        transform:translateY(0);
+        transition:transform .3s cubic-bezier(.2,.7,.2,1),border-color .3s ease,box-shadow .3s ease;
+    }
+
+    .home-section-management .member-card:hover {
+        transform:translateY(-6px);
+        border-color:rgba(72,216,241,.34);
+        box-shadow:0 22px 55px rgba(0,0,0,.25);
+    }
+
+    .home-section-management .member-photo {
+        position:relative;
+        aspect-ratio:4 / 4.35;
+        overflow:hidden;
+        background:#061923;
+    }
+
+    .home-section-management .member-photo::after {
+        content:"";
+        position:absolute;
+        inset:0;
+        pointer-events:none;
+        background:linear-gradient(180deg,transparent 56%,rgba(1,10,15,.34));
+    }
+
+    .home-section-management .member-card > div:last-child {
+        min-height:92px;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        padding:16px 17px 18px;
+        background:linear-gradient(180deg,rgba(5,26,36,.30),rgba(3,18,26,.72));
+    }
+
+    .home-section-management .member-card h3 {
+        font-size:15px;
+        letter-spacing:-.015em;
+    }
+
+    .home-section-management .member-card p {
+        margin-top:6px;
+        color:#73def3;
+        font-size:9px;
+        font-weight:750;
+        line-height:1.45;
+        letter-spacing:.03em;
+        text-transform:uppercase;
+    }
+
+    .home-section-statistics,
+    .home-section-projects,
+    .home-section-news,
+    .home-section-gallery {
+        padding-top:76px;
+        padding-bottom:76px;
+    }
+
+    .home-section-statistics .head,
+    .home-section-projects .head,
+    .home-section-news .head,
+    .home-section-gallery .head {
+        margin-bottom:30px;
+    }
+
+    .stats-grid,
+    .project-grid,
+    .news-grid,
+    .folders {
+        gap:18px;
+    }
+}
+
+@media (min-width:851px) and (max-width:1099px) {
+    .home-section-management .head {
+        margin-bottom:26px;
+    }
+
+    .home-section-management .management-grid {
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:16px;
+    }
+
+    .home-section-management .member-photo {
+        aspect-ratio:16 / 11;
+    }
+}
+
+@media (max-width:850px) {
+    .home-section-management .management-grid {
+        gap:12px;
+    }
+
+    .home-section-management .head {
+        margin-bottom:18px;
+    }
+}
+
 </style>
 <main class="shell">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
@@ -928,38 +1126,8 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
 @endif
 
 @if($section==='welcome' && $home['welcome'])
-@php($featuredManagement = $welcomeManagement->take(2))
-<section class="welcome home-section home-section-welcome welcome-layout-{{ $welcomeLayout }} {{ $featuredManagement->isNotEmpty() ? 'welcome-with-team' : '' }}" data-welcome>
+<section class="welcome home-section home-section-welcome welcome-layout-{{ $welcomeLayout }}" data-welcome>
 <div class="welcome-inner">
-@if($featuredManagement->isNotEmpty())
-<div class="welcome-team" aria-label="Featured leadership profiles">
-@foreach($featuredManagement as $member)
-<button type="button" class="welcome-profile welcome-profile-{{ $loop->iteration }}" data-welcome-profile="{{ $member->id }}" aria-label="Open profile of {{ $member->title }}">
-<div class="welcome-profile-photo"><img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}" loading="lazy"></div>
-<div class="welcome-profile-copy">
-<h3 class="welcome-profile-name">{{ $member->title }}</h3>
-<div class="welcome-profile-role">{{ $member->designation ?: $member->excerpt }}</div>
-<div class="welcome-profile-message">{{ \Illuminate\Support\Str::words(trim(strip_tags((string) $member->content)), 20) }}</div>
-<div class="welcome-profile-hint">View message <i class="fa-solid fa-arrow-right"></i></div>
-</div>
-</button>
-<div class="welcome-profile-mobile-panel" data-welcome-mobile-panel="{{ $member->id }}" hidden>
-<div class="welcome-profile-mobile-head"><div><strong>{{ $member->title }}</strong><span>{{ $member->designation ?: $member->excerpt }}</span></div><button type="button" class="welcome-profile-mobile-close" data-close-welcome-mobile aria-label="Close message"><i class="fa-solid fa-xmark"></i></button></div>
-<div class="welcome-profile-mobile-message">{!! nl2br(e(trim(strip_tags((string) $member->content)))) !!}</div>
-</div>
-<div class="welcome-profile-modal" data-welcome-modal="{{ $member->id }}" aria-hidden="true">
-<div class="welcome-profile-dialog" role="dialog" aria-modal="true" aria-labelledby="welcome-profile-title-{{ $member->id }}">
-<div class="welcome-profile-modal-photo"><img src="{{ asset('storage/'.ltrim($member->image_path,'/')) }}" alt="{{ $member->title }}"></div>
-<div class="welcome-profile-modal-body">
-<div class="welcome-profile-modal-head"><div><h2 class="welcome-profile-modal-title" id="welcome-profile-title-{{ $member->id }}">{{ $member->title }}</h2><div class="welcome-profile-modal-role">{{ $member->designation ?: $member->excerpt }}</div></div><button type="button" class="welcome-profile-modal-close" data-close-welcome-profile aria-label="Close profile"><i class="fa-solid fa-xmark"></i></button></div>
-<div class="welcome-profile-modal-divider"></div>
-<div class="welcome-profile-modal-scroll"><div class="welcome-profile-modal-label">Message</div>{{ trim(strip_tags((string) $member->content)) }}</div>
-</div>
-</div>
-</div>
-@endforeach
-</div>
-@endif
 <div class="welcome-content">
 <div class="welcome-heading"><span class="eyebrow">{{ $welcomeEyebrow ?: 'Welcome to '.$siteName }}</span><h1>{{ $welcomeTitle ?: 'Building a stronger energy future.' }}</h1><div class="welcome-rule"></div></div>
 <div class="welcome-copy">
@@ -968,7 +1136,6 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
 <div class="welcome-more-content" hidden>{!! nl2br(e($welcomeRemaining)) !!}</div>
 <button type="button" class="welcome-more-toggle" aria-expanded="false"><span>Read more</span><i class="fa-solid fa-arrow-down"></i></button>
 @endif
-@if($welcomeSignoff !== '')<div class="welcome-signoff">{{ $welcomeSignoff }}</div>@endif
 </div>
 </div>
 </div>
