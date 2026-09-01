@@ -51,7 +51,7 @@
                 while (walker.nextNode()) nodes.push(walker.currentNode);
                 nodes.forEach(node => {
                     if (!node.nodeValue) return;
-                    const cleaned = node.nodeValue.replace(/\\\\n/g, '').trim();
+                    const cleaned = node.nodeValue.replaceAll('\\n', '').trim();
                     if (cleaned === '') {
                         node.remove();
                     } else if (cleaned !== node.nodeValue.trim()) {
