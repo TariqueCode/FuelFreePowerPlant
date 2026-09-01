@@ -39,7 +39,7 @@ class HomeController
         ];
 
         $projectsLimit=max(1,min(100,(int)($sectionSettings['projects']['limit']??6)));
-        $managementLimit=max(4,min(100,(int)($sectionSettings['management']['limit']??4)));
+        $managementLimit=max(1,min(100,(int)($sectionSettings['management']['limit']??4)));
         $newsLimit=max(1,min(100,(int)($sectionSettings['news']['limit']??3)));
         $galleryLimit=max(1,min(100,(int)($sectionSettings['gallery']['limit']??4)));
         $resolveIds = static fn (array $settings): array => array_values(array_unique(array_filter(array_map('intval', $settings['ids'] ?? []))));
@@ -97,13 +97,14 @@ class HomeController
             ->orderBy('sort_order')
             ->orderBy('title');
 
-        // The homepage management showcase mirrors the public Management Team:
-        // always render up to four published leadership profiles, independent of a
-        // stale homepage selection setting. This guarantees the four-card layout
-        // receives the same source records as the management page.
-        $homeManagement = $managementQuery
-            ->take($managementLimit)
-            ->get();
+        // The homepage management showcase is controlled by the admin Homepage
+        // Builder just like the other content sections: the configured limit is
+        // respected, and explicit selections keep their configured order.
+        $homeManagement = $applySelection(
+            $managementQuery,
+            $managementSettings,
+            $managementLimit
+        );
 
         // Explicit welcome selections take priority; the homepage management list fills any gap.
         $welcomeManagement = $welcomeManagement
