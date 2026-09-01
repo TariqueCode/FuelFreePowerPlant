@@ -2501,6 +2501,57 @@ main.shell{
     }
 }
 
+
+/* === Final management card height/content balance fix === */
+/* Prevent the grid row from stretching cards into an oversized empty panel. */
+.home-v3 .home-section-management .management-grid{
+    align-items:start !important;
+}
+.home-v3 .home-section-management .member-card{
+    height:auto !important;
+    min-height:0 !important;
+    align-self:start !important;
+}
+.home-v3 .home-section-management .member-body{
+    flex:0 0 auto !important;
+    min-height:0 !important;
+    height:auto !important;
+}
+.home-v3 .home-section-management .member-card > div:last-child{
+    min-height:0 !important;
+    height:auto !important;
+}
+.home-v3 .home-section-management .member-message{
+    min-height:0 !important;
+    max-height:4.5em;
+}
+.home-v3 .home-section-management .member-more{
+    margin-top:12px !important;
+}
+@media (max-width:650px){
+    .home-v3 .home-section-management .member-body{
+        padding:11px 10px 11px !important;
+    }
+    .home-v3 .home-section-management .member-body h3{
+        font-size:11.5px !important;
+        line-height:1.3 !important;
+    }
+    .home-v3 .home-section-management .member-role{
+        font-size:7.5px !important;
+    }
+    .home-v3 .home-section-management .member-contact{
+        font-size:7.5px !important;
+    }
+    .home-v3 .home-section-management .member-message{
+        font-size:8px !important;
+    }
+    .home-v3 .home-section-management .member-more{
+        min-height:34px !important;
+        margin-top:9px !important;
+        font-size:8px !important;
+    }
+}
+
 </style>
 <main class="shell home-v3">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
