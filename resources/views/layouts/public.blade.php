@@ -35,6 +35,28 @@
         button,input,select,textarea{font:inherit}
         @media(max-width:600px){body{font-size:1rem}}
     </style>
+    @if(request()->routeIs('home'))
+        <style>
+            /* Homepage: mobile leadership popup keeps only the full-width Contacts action. */
+            @media (max-width: 650px) {
+                .home-profile-modal .home-profile-links > .home-profile-link:not(.primary) {
+                    display: none !important;
+                }
+                .home-profile-modal .home-profile-links {
+                    grid-template-columns: 1fr !important;
+                    width: 100%;
+                    max-width: 100%;
+                    margin-inline: auto;
+                }
+                .home-profile-modal .home-profile-links > .home-profile-link.primary {
+                    grid-column: 1 / -1 !important;
+                    width: 100%;
+                    min-height: 44px;
+                    margin-inline: auto;
+                }
+            }
+        </style>
+    @endif
     @stack('head')
 </head>
 <body>
