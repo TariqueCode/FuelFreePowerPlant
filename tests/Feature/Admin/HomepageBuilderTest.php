@@ -65,6 +65,10 @@ class HomepageBuilderTest extends TestCase
 
     public function test_homepage_management_limit_controls_the_number_of_profiles_rendered(): void
     {
+        // The database is seeded with real published leadership profiles. Remove
+        // those fixtures so this test isolates the configured "latest" limit.
+        SiteContentItem::query()->where('type', 'management')->delete();
+
         HomepageSection::query()->where('key', 'management')->update([
             'is_enabled' => true,
             'settings' => ['limit' => 2, 'mode' => 'latest', 'layout' => 'left'],
@@ -86,10 +90,6 @@ class HomepageBuilderTest extends TestCase
         }
 
         $response = $this->get(route('home'));
-
-        $debugSection = HomepageSection::query()->where('key', 'management')->first();
-        $debugProfiles = SiteContentItem::published()->where('type', 'management')->orderBy('sort_order')->orderBy('title')->get(['id','title','published_at','status']);
-        fwrite(STDERR, "\nDEBUG management settings=".json_encode($debugSection?->settings)." raw=".json_encode($debugSection?->getRawOriginal('settings'))." profiles=".$debugProfiles->toJson()."\n");
 
         $response->assertOk();
         $response->assertSee('Management 0');
