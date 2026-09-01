@@ -1062,12 +1062,15 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     }
 
     .home-section-management .member-card > div:last-child {
-        min-height:92px;
+        min-height:170px;
         display:flex;
         flex-direction:column;
-        justify-content:center;
-        padding:16px 17px 18px;
+        justify-content:flex-start;
+        padding:15px 17px 17px;
         background:linear-gradient(180deg,rgba(5,26,36,.30),rgba(3,18,26,.72));
+    }
+    .home-section-management .member-body .member-more{
+        margin-top:auto;
     }
 
     .home-section-management .member-card h3 {
@@ -1130,6 +1133,17 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
 
     .home-section-management .head {
         margin-bottom:18px;
+    }
+
+    .home-section-management .member-contacts{
+        gap:3px;
+        margin-top:7px;
+    }
+    .home-section-management .member-contact{
+        font-size:7px;
+    }
+    .home-section-management .member-contact i{
+        font-size:7px;
     }
 }
 
@@ -1194,13 +1208,40 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     letter-spacing:.08em;
     text-transform:uppercase;
 }
+.home-section-management .member-contacts{
+    display:grid;
+    gap:4px;
+    margin-top:9px;
+}
+.home-section-management .member-contact{
+    min-width:0;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    color:#8faeb8;
+    font-size:8px;
+    line-height:1.35;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.home-section-management .member-contact i{
+    flex:0 0 12px;
+    width:12px;
+    color:#55d4ed;
+    font-size:8px;
+    text-align:center;
+}
+.home-section-management .member-contact:hover{
+    color:#eaf8fb;
+}
 .home-section-management .member-message{
     display:-webkit-box;
-    margin:11px 0 0;
-    min-height:43px;
+    margin:9px 0 0;
+    min-height:42px;
     color:var(--muted);
-    font-size:10px;
-    line-height:1.55;
+    font-size:9px;
+    line-height:1.5;
     -webkit-line-clamp:3;
     -webkit-box-orient:vertical;
     overflow:hidden;
@@ -1722,6 +1763,10 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
 <div class="member-body">
 <h3>{{ $member->title }}</h3>
 <p class="member-role">{{ $member->designation ?: $member->excerpt }}</p>
+<div class="member-contacts" aria-label="Contact details">
+@if($member->email)<a class="member-contact" href="mailto:{{ $member->email }}"><i class="fa-solid fa-envelope"></i><span>{{ $member->email }}</span></a>@endif
+@if($member->phone)<a class="member-contact" href="tel:{{ preg_replace('/[^0-9+]/','',$member->phone) }}"><i class="fa-solid fa-phone"></i><span>{{ $member->phone }}</span></a>@endif
+</div>
 @if($member->content)<p class="member-message">{{ \Illuminate\Support\Str::limit(trim(strip_tags((string) $member->content)), 125) }}</p>@else<p class="member-message is-empty">Leadership profile</p>@endif
 <button class="member-more" type="button" data-profile="{{ $member->id }}"><span>More</span><i class="fa-solid fa-arrow-right"></i></button>
 </div>
@@ -1752,7 +1797,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
         <div class="home-profile-info">
             <div class="home-profile-head">
                 <div>
-                    <div class="home-profile-kicker">Leadership message</div>
+                    <div class="home-profile-kicker">Management Profile</div>
                     <h2 class="home-profile-title" id="homeProfileTitle"></h2>
                     <div class="home-profile-role" id="homeProfileRole"></div>
                     <div class="home-profile-contact-mobile" id="homeProfileContactMobile"></div>
