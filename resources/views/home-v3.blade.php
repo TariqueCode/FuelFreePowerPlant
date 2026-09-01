@@ -2502,6 +2502,44 @@ main.shell{
 }
 
 
+
+
+/* === Management message/card stability polish === */
+.home-v3 .home-section-management .member-body{
+    flex:0 0 auto !important;
+    min-height:0 !important;
+}
+.home-v3 .home-section-management .member-message{
+    flex:0 0 auto !important;
+    min-height:0 !important;
+    height:auto !important;
+    margin:12px 0 0 !important;
+    padding-top:10px !important;
+    font-size:10px !important;
+    line-height:1.5 !important;
+    -webkit-line-clamp:2 !important;
+    overflow:hidden !important;
+    overflow-wrap:anywhere;
+}
+.home-v3 .home-section-management .member-message.is-empty{
+    color:#789aa5;
+}
+.home-v3 .home-section-management .member-more{
+    flex:0 0 auto !important;
+    margin-top:12px !important;
+}
+@media(max-width:650px){
+    .home-v3 .home-section-management .member-message{
+        margin-top:9px !important;
+        padding-top:8px !important;
+        font-size:8px !important;
+        line-height:1.5 !important;
+        -webkit-line-clamp:2 !important;
+    }
+    .home-v3 .home-section-management .member-more{
+        margin-top:9px !important;
+    }
+}
 /* === Final management card height/content balance fix === */
 /* Prevent the grid row from stretching cards into an oversized empty panel. */
 .home-v3 .home-section-management .management-grid{
