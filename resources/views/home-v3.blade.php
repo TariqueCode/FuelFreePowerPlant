@@ -110,6 +110,26 @@ img{max-width:100%}
 }
 @media(prefers-reduced-motion:reduce){.slide,.welcome:before,.welcome:after,.section,.project-card,.member-card,.folder,.news{animation:none;transition:none}.slide.is-active{transform:none}}
 
+/* Desktop management grid: always reserve the compact four-card footprint. */
+@media (min-width:851px){
+    .home-section-management .management-grid{
+        grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+        gap:18px !important;
+        align-items:stretch;
+    }
+    .home-section-management .member-card{
+        width:auto !important;
+        min-width:0 !important;
+    }
+    /* With two profiles, keep both cards centered while retaining four-card sizing. */
+    .home-section-management .management-grid:has(> .member-card:nth-child(2):last-child) > .member-card:first-child{
+        grid-column:2 !important;
+    }
+    .home-section-management .management-grid:has(> .member-card:nth-child(2):last-child) > .member-card:nth-child(2){
+        grid-column:3 !important;
+    }
+}
+
 /* Homepage motion + responsive polish */
 .home-slider{isolation:isolate;animation:homeRise .8s cubic-bezier(.2,.7,.2,1) both}
 .home-slider:before{content:"";position:absolute;inset:-18px -10px auto;height:70%;z-index:-1;border-radius:40px;background:radial-gradient(circle at 50% 35%,rgba(72,216,241,.16),transparent 62%);filter:blur(22px);animation:heroGlow 7s ease-in-out infinite}
