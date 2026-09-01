@@ -23,7 +23,19 @@ class HomeController
         $brand=['name'=>$settings['company.name']??config('fuelfree.company.name'),'domain'=>$settings['company.domain']??config('fuelfree.company.domain'),'tagline'=>$settings['company.tagline']??config('fuelfree.company.tagline'),'logo_path'=>$settings['company.logo_path']??null];
 
         $configuredSections = HomepageSection::query()->ordered()->get();
-        $sectionSettings = $configuredSections->mapWithKeys(fn ($section) => [$section->key => is_array($section->settings) ? $section->settings : []]);
+        $normalizeSectionSettings = static function ($value): array {
+            if (is_array($value)) {
+                return $value;
+            }
+            if (is_string($value) && trim($value) !== '') {
+                $decoded = json_decode($value, true);
+                return is_array($decoded) ? $decoded : [];
+            }
+            return [];
+        };
+        $sectionSettings = $configuredSections->mapWithKeys(
+            fn ($section) => [$section->key => $normalizeSectionSettings($section->settings)]
+        );
         $sectionOrder = $configuredSections->pluck('key')->all();
         $enabledSections = $configuredSections->where('is_enabled', true)->pluck('key')->flip();
         $home = [
@@ -39,7 +51,7 @@ class HomeController
         ];
 
         $projectsLimit=max(1,min(100,(int)($sectionSettings['projects']['limit']??6)));
-        $managementLimit=max(1,min(100,(int)($sectionSettings['management']['limit']??4)));
+        $managementLimit = max(1, min(100, (int) data_get($sectionSettings->get('management', []), 'limit', 4)));
         $newsLimit=max(1,min(100,(int)($sectionSettings['news']['limit']??3)));
         $galleryLimit=max(1,min(100,(int)($sectionSettings['gallery']['limit']??4)));
         $resolveIds = static fn (array $settings): array => array_values(array_unique(array_filter(array_map('intval', $settings['ids'] ?? []))));
@@ -100,9 +112,21 @@ class HomeController
         // The homepage management showcase is controlled by the admin Homepage
         // Builder just like the other content sections: the configured limit is
         // respected, and explicit selections keep their configured order.
-        $homeManagement = ($managementSettings['mode'] ?? 'latest') === 'selected'
-            ? $applySelection($managementQuery, $managementSettings, $managementLimit)
-            : (clone $managementQuery)->limit($managementLimit)->get();
+        if (($managementSettings['mode'] ?? 'latest') === 'selected') {
+            $homeManagement = $applySelection($managementQuery, $managementSettings, $managementLimit);
+        } else {
+            // Fetch from a fresh builder and trim the collection explicitly. This
+            // keeps the admin-selected limit authoritative even if another query
+            // layer has mutated a reusable builder.
+            $homeManagement = SiteContentItem::published()
+                ->where('type', 'management')
+                ->orderBy('sort_order')
+                ->orderBy('title')
+                ->limit(100)
+                ->get()
+                ->take($managementLimit)
+                ->values();
+        }
 
         // Explicit welcome selections take priority; the homepage management list fills any gap.
         $welcomeManagement = $welcomeManagement
