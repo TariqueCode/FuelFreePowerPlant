@@ -2288,8 +2288,221 @@ main.shell{
  .home-v3 .home-section > .head > .more{font-size:8px !important;}
  .home-v3 .home-section > .head > div::after{width:36px;margin-top:9px;}
 }
+
+/* === FINAL HOMEPAGE CONSISTENCY PASS ===
+   One heading language, one responsive rhythm, no clipped section actions.
+   Gallery is the reference pattern for every homepage section. */
+.home-v3{
+    --home-gutter:clamp(11px,2.5vw,32px);
+    min-width:0;
+    width:100%;
+}
+.home-v3 > .home-section,
+.home-v3 > .welcome,
+.home-v3 > .home-slider{
+    min-width:0;
+    width:100%;
+}
+
+/* Unified section title: eyebrow + title + blue rule on the left,
+   action on the same title row at the right. */
+.home-v3 .home-section > .head{
+    display:flex !important;
+    align-items:flex-end !important;
+    justify-content:space-between !important;
+    gap:clamp(12px,2.2vw,28px) !important;
+    width:100% !important;
+    min-width:0 !important;
+    margin:0 0 clamp(18px,2.5vw,30px) !important;
+    text-align:left !important;
+}
+.home-v3 .home-section > .head > div{
+    flex:1 1 auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+    margin:0 !important;
+    text-align:left !important;
+}
+.home-v3 .home-section > .head .eyebrow{
+    display:block !important;
+    width:max-content !important;
+    max-width:100% !important;
+    margin:0 !important;
+    color:var(--cyan) !important;
+    font-size:clamp(8px,0.7vw,11px) !important;
+    line-height:1.25 !important;
+    letter-spacing:.2em !important;
+    text-transform:uppercase !important;
+    white-space:nowrap !important;
+}
+.home-v3 .home-section > .head h2{
+    margin:7px 0 0 !important;
+    max-width:100% !important;
+    color:var(--text) !important;
+    font-size:clamp(27px,3.4vw,46px) !important;
+    line-height:1.04 !important;
+    letter-spacing:-.045em !important;
+    text-align:left !important;
+    overflow-wrap:anywhere !important;
+}
+.home-v3 .home-section > .head > div::after{
+    content:"" !important;
+    display:block !important;
+    width:42px !important;
+    height:2px !important;
+    margin-top:11px !important;
+    border-radius:999px !important;
+    background:var(--cyan) !important;
+}
+.home-v3 .home-section > .head > .more{
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:flex-end !important;
+    flex:0 0 auto !important;
+    width:auto !important;
+    max-width:none !important;
+    min-width:max-content !important;
+    margin:0 0 4px !important;
+    padding:0 !important;
+    border:0 !important;
+    background:transparent !important;
+    color:var(--cyan) !important;
+    font-size:clamp(8px,.8vw,11px) !important;
+    line-height:1.3 !important;
+    font-weight:700 !important;
+    white-space:nowrap !important;
+    text-align:right !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+}
+
+/* Never allow a section's content to create horizontal page overflow. */
+.home-v3 .home-section,
+.home-v3 .home-section > .head,
+.home-v3 .stats-grid,
+.home-v3 .project-grid,
+.home-v3 .management-grid,
+.home-v3 .news-grid,
+.home-v3 .folders,
+.home-v3 .cta-card{
+    box-sizing:border-box;
+}
+.home-v3 .stats-grid > *,
+.home-v3 .project-grid > *,
+.home-v3 .management-grid > *,
+.home-v3 .news-grid > *,
+.home-v3 .folders > *{
+    min-width:0;
+    max-width:100%;
+}
+
+/* Keep the management showcase aligned with the same card language. */
+.home-v3 .management-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    align-items:stretch;
+}
+.home-v3 .management-grid .member-card{
+    min-width:0;
+    max-width:100%;
+    height:100%;
+}
+
+/* Stable content widths and comfortable section rhythm. */
+.home-v3 .section{
+    padding-top:clamp(42px,5vw,68px);
+    padding-bottom:clamp(42px,5vw,68px);
+}
+.home-v3 .welcome{
+    padding-top:clamp(48px,6vw,78px);
+    padding-bottom:clamp(46px,6vw,72px);
+}
+
+/* Tablet */
+@media (max-width:1099px){
+    .home-v3 .home-section > .head{
+        gap:18px !important;
+    }
+    .home-v3 .home-section > .head h2{
+        font-size:clamp(27px,4.2vw,40px) !important;
+    }
+    .home-v3 .home-section > .head > .more{
+        max-width:none !important;
+        font-size:10px !important;
+    }
+    .home-v3 .management-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    }
+}
+
+/* Phones: preserve the same two-column title/action composition,
+   but give the action a guaranteed intrinsic width. */
+@media (max-width:650px){
+    .home-v3 .home-section > .head{
+        align-items:flex-end !important;
+        gap:9px !important;
+        margin-bottom:18px !important;
+    }
+    .home-v3 .home-section > .head > div{
+        flex:1 1 auto !important;
+        min-width:0 !important;
+    }
+    .home-v3 .home-section > .head .eyebrow{
+        font-size:8px !important;
+        letter-spacing:.18em !important;
+    }
+    .home-v3 .home-section > .head h2{
+        font-size:clamp(24px,7.2vw,32px) !important;
+        line-height:1.06 !important;
+        margin-top:6px !important;
+    }
+    .home-v3 .home-section > .head > div::after{
+        width:36px !important;
+        height:2px !important;
+        margin-top:9px !important;
+    }
+    .home-v3 .home-section > .head > .more{
+        flex:0 0 auto !important;
+        width:auto !important;
+        max-width:none !important;
+        min-width:max-content !important;
+        margin:0 0 3px !important;
+        padding:0 !important;
+        font-size:8px !important;
+        line-height:1.2 !important;
+        overflow:visible !important;
+    }
+    .home-v3 .management-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:9px !important;
+    }
+}
+
+/* Narrow phones: still side-by-side where physically possible;
+   reduce only typography, never clip the action link. */
+@media (max-width:420px){
+    .home-v3 .home-section > .head{
+        gap:7px !important;
+        margin-bottom:15px !important;
+    }
+    .home-v3 .home-section > .head h2{
+        font-size:clamp(22px,7.4vw,28px) !important;
+    }
+    .home-v3 .home-section > .head > .more{
+        font-size:7px !important;
+    }
+}
+
+/* Very narrow devices: avoid card text collisions while retaining
+   the established mobile two-column pattern until the existing 380px
+   breakpoint intentionally switches cards to one column. */
+@media (max-width:380px){
+    .home-v3 .home-section > .head > .more{
+        font-size:7px !important;
+    }
+}
+
 </style>
-<main class="shell">
+<main class="shell home-v3">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
 @foreach($home['section_order'] as $section)
 @if($section==='hero' && $home['slider'] && $sliders->isNotEmpty())
@@ -2580,47 +2793,3 @@ main.shell{
 </script>
 @endpush
 @endsection
-
-
-/* === Management heading overflow fix: keep the action link fully inside the
-   responsive section header at every viewport width. === */
-.home-section-management .head{
-    grid-template-columns:minmax(0,1fr) minmax(0,clamp(82px,10vw,110px));
-    width:100%;
-    max-width:100%;
-    box-sizing:border-box;
-}
-.home-section-management .head>div{
-    min-width:0;
-    max-width:100%;
-    overflow-wrap:anywhere;
-}
-.home-section-management .head .more{
-    min-width:0;
-    max-width:100%;
-    width:100%;
-    box-sizing:border-box;
-    justify-self:stretch;
-    text-align:right;
-    overflow-wrap:normal;
-    overflow:visible;
-}
-@media(max-width:650px){
-    .home-section-management .head{
-        grid-template-columns:minmax(0,1fr) minmax(82px,92px);
-        gap:10px;
-    }
-    .home-section-management .head .more{
-        font-size:8px !important;
-        letter-spacing:0;
-    }
-}
-@media(max-width:420px){
-    .home-section-management .head{
-        grid-template-columns:minmax(0,1fr) minmax(78px,86px);
-        gap:8px;
-    }
-    .home-section-management .head .more{
-        font-size:7px !important;
-    }
-}
