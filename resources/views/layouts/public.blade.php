@@ -43,20 +43,26 @@
     @if($useGlobalFooter) @include('partials.public-footer', ['brand' => $publicBrand]) @endif
     @stack('scripts')
     <script>
-        // Defensive cleanup for stray escaped newline text emitted by legacy/cached partials.
+        // Remove only the legacy escaped-newline artefact that can appear as a visible "\\n" text node.
         (() => {
-            const removeStrayEscapedNewlines = () => {
+            const cleanEscapedNewlines = () => {
                 const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
                 const nodes = [];
                 while (walker.nextNode()) nodes.push(walker.currentNode);
                 nodes.forEach(node => {
-                    if (node.nodeValue && /^(?:\\s*\\\\n\\s*)+$/.test(node.nodeValue)) node.remove();
+                    if (!node.nodeValue) return;
+                    const cleaned = node.nodeValue.replace(/\\\\n/g, '').trim();
+                    if (cleaned === '') {
+                        node.remove();
+                    } else if (cleaned !== node.nodeValue.trim()) {
+                        node.nodeValue = cleaned;
+                    }
                 });
             };
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', removeStrayEscapedNewlines, { once: true });
+                document.addEventListener('DOMContentLoaded', cleanEscapedNewlines, { once: true });
             } else {
-                removeStrayEscapedNewlines();
+                cleanEscapedNewlines();
             }
         })();
     </script>
