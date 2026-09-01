@@ -81,22 +81,6 @@ img{max-width:100%}
 .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.project-grid,.news-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.management-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.folders{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 
-/* Management desktop footprint: two published profiles must occupy the same card width as a four-profile row. */
-@media(min-width:651px){
-    .home-section-management .management-grid{
-        grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-        gap:18px !important;
-    }
-    .home-section-management .member-card{
-        min-width:0 !important;
-    }
-    .home-section-management .management-grid:has(> .member-card:nth-child(2):last-child) > .member-card:first-child{
-        grid-column:2 !important;
-    }
-    .home-section-management .management-grid:has(> .member-card:nth-child(2):last-child) > .member-card:nth-child(2){
-        grid-column:3 !important;
-    }
-}
 @media(max-width:650px){
 .shell{width:calc(100% - 22px)}
 .home-slider{margin-top:7px}.slider-track{aspect-ratio:2.35/1}.slide-media{border-radius:14px}.slide-caption{top:calc(100% + 5px);padding:0 5px}.slide-caption strong{font-size:7px}
