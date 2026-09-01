@@ -486,10 +486,10 @@ main{padding:72px 0 88px}
     .bio-modal-head{padding:25px 27px 18px}.bio-modal-divider{margin:0 27px}.bio-modal-scroll{padding:20px 27px 14px}.bio-modal-footer{padding:13px 27px 18px}
     .bio-modal-title{font-size:26px}.bio-modal-body{font-size:12px;line-height:1.8}
 }
-/* Desktop: use a consistent executive-card layout. Biography never changes card height. */
-.desktop-profile-button{display:none}
+/* Responsive profile entry: the card stays concise; the leadership message opens in the profile experience. */
+.profile-button{
 @media(min-width:851px){
-    .desktop-profile-button{
+    .profile-button{
         display:inline-flex;
         align-items:center;
         justify-content:center;
@@ -507,7 +507,7 @@ main{padding:72px 0 88px}
         cursor:pointer;
         transition:.2s ease;
     }
-    .desktop-profile-button:hover{
+    .profile-button:hover{
         background:rgba(67,209,240,.10);
         border-color:rgba(67,209,240,.30);
         color:#fff;
@@ -522,7 +522,7 @@ main{padding:72px 0 88px}
 </style>
 <main class="shell">
     <section class="hero"><span class="eyebrow">Leadership &amp; Management</span><h1>Management Team</h1><p>Meet the people responsible for guiding {{ $name }}.</p></section>
-    <section class="grid">@forelse($members as $member)<article class="card"><div class="photo" @if($member->image_path) data-image="{{ asset('storage/'.$member->image_path) }}" data-name="{{ $member->title }}" role="button" tabindex="0" @endif>@if($member->image_path)<img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}" loading="lazy">@else<i class="fa-solid fa-user-tie"></i>@endif</div><div class="body"><h2>{{ $member->title }}</h2><div class="role">{{ $member->designation ?: $member->excerpt }}</div><button class="desktop-profile-button" type="button" data-profile="{{ $member->id }}"><i class="fa-regular fa-id-card"></i> View Profile</button>@if($member->content)<div class="bio bio-preview" id="bio-preview-{{ $member->id }}">{!! nl2br(e($member->content)) !!}</div><div class="bio-full" id="bio-full-{{ $member->id }}">{!! nl2br(e($member->content)) !!}</div><button class="bio-more" type="button" data-more="{{ $member->id }}"><span>More</span><i class="fa-solid fa-chevron-down"></i></button>@endif<div class="contact-list">@if($member->phone)<a class="contact" href="tel:{{ preg_replace('/[^0-9+]/','',$member->phone) }}"><i class="fa-solid fa-phone"></i>{{ $member->phone }}</a>@endif @if($member->email)<a class="contact" href="mailto:{{ $member->email }}"><i class="fa-solid fa-envelope"></i>{{ $member->email }}</a>@endif</div><div class="actions"><a class="action primary" href="{{ route('management.vcard',$member) }}"><i class="fa-solid fa-user-plus"></i> Add to Contacts</a>@if($member->visiting_card_path)<a class="action" href="{{ asset('storage/'.$member->visiting_card_path) }}" target="_blank"><i class="fa-regular fa-address-card"></i> Visiting Card</a>@else<a class="action" href="tel:{{ preg_replace('/[^0-9+]/','',$member->phone) }}"><i class="fa-solid fa-phone"></i> Call</a>@endif</div></div></article>@empty<div class="empty"><i class="fa-solid fa-people-group"></i></div>@endforelse</section>
+    <section class="grid">@forelse($members as $member)<article class="card"><div class="photo" @if($member->image_path) data-image="{{ asset('storage/'.$member->image_path) }}" data-name="{{ $member->title }}" role="button" tabindex="0" @endif>@if($member->image_path)<img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}" loading="lazy">@else<i class="fa-solid fa-user-tie"></i>@endif</div><div class="body"><h2>{{ $member->title }}</h2><div class="role">{{ $member->designation ?: $member->excerpt }}</div><button class="profile-button" type="button" data-profile="{{ $member->id }}"><i class="fa-regular fa-id-card"></i> View Profile</button>@if($member->content)<div class="bio bio-preview" id="bio-preview-{{ $member->id }}">{!! nl2br(e($member->content)) !!}</div><div class="bio-full" id="bio-full-{{ $member->id }}">{!! nl2br(e($member->content)) !!}</div><button class="bio-more" type="button" data-more="{{ $member->id }}"><span>More</span><i class="fa-solid fa-chevron-down"></i></button>@endif<div class="contact-list">@if($member->phone)<a class="contact" href="tel:{{ preg_replace('/[^0-9+]/','',$member->phone) }}"><i class="fa-solid fa-phone"></i>{{ $member->phone }}</a>@endif @if($member->email)<a class="contact" href="mailto:{{ $member->email }}"><i class="fa-solid fa-envelope"></i>{{ $member->email }}</a>@endif</div><div class="actions"><a class="action primary" href="{{ route('management.vcard',$member) }}"><i class="fa-solid fa-user-plus"></i> Add to Contacts</a>@if($member->visiting_card_path)<a class="action" href="{{ asset('storage/'.$member->visiting_card_path) }}" target="_blank"><i class="fa-regular fa-address-card"></i> Visiting Card</a>@else<a class="action" href="tel:{{ preg_replace('/[^0-9+]/','',$member->phone) }}"><i class="fa-solid fa-phone"></i> Call</a>@endif</div></div></article>@empty<div class="empty"><i class="fa-solid fa-people-group"></i></div>@endforelse</section>
 </main>
 
 <div class="bio-modal" id="bioModal" aria-hidden="true">
@@ -531,7 +531,7 @@ main{padding:72px 0 88px}
         <div class="bio-modal-info">
             <div class="bio-modal-head">
                 <div>
-                    <div class="bio-modal-kicker">Management Profile</div>
+                    <div class="bio-modal-kicker">Leadership message</div>
                     <h2 class="bio-modal-title" id="bioModalTitle"></h2>
                     <div class="bio-modal-role" id="bioModalRole"></div>
                 </div>
@@ -539,7 +539,7 @@ main{padding:72px 0 88px}
             </div>
             <div class="bio-modal-divider"></div>
             <div class="bio-modal-scroll">
-                <div class="bio-modal-section-title">Profile</div>
+                <div class="bio-modal-section-title">Message from leadership</div>
                 <div class="bio-modal-body" id="bioModalBody"></div>
             </div>
             <div class="bio-modal-footer">
@@ -551,7 +551,7 @@ main{padding:72px 0 88px}
     </div>
 </div>
 <div class="lightbox" id="photoLightbox"><button class="lightbox-close" id="lightboxClose" type="button"><i class="fa-solid fa-xmark"></i></button><div class="lightbox-content"><img id="lightboxImage" src="" alt=""></div><div class="zoom-controls"><button id="zoomOut" type="button"><i class="fa-solid fa-minus"></i></button><span class="zoom-level" id="zoomLevel">100%</span><button id="zoomIn" type="button"><i class="fa-solid fa-plus"></i></button><button id="zoomReset" type="button"><i class="fa-solid fa-rotate-left"></i></button></div></div>
-<script>(function(){const buttons=[...document.querySelectorAll('.bio-more')];function closeOther(except){buttons.forEach(btn=>{if(btn===except)return;const id=btn.dataset.more,full=document.getElementById('bio-full-'+id),preview=document.getElementById('bio-preview-'+id);if(full&&full.classList.contains('open')){full.classList.remove('open');preview.style.display='';btn.querySelector('span').textContent='More';btn.querySelector('i').className='fa-solid fa-chevron-down'}})}const bioModal=document.getElementById('bioModal'),bioModalTitle=document.getElementById('bioModalTitle'),bioModalRole=document.getElementById('bioModalRole'),bioModalBody=document.getElementById('bioModalBody'),bioModalPhoto=document.getElementById('bioModalPhoto'),bioModalContacts=document.getElementById('bioModalContacts'),bioModalActions=document.getElementById('bioModalActions'),bioModalClose=document.getElementById('bioModalClose');const desktopProfiles=[...document.querySelectorAll('.desktop-profile-button')];function shutBioModal(){if(!bioModal)return;bioModal.classList.remove('open');bioModal.setAttribute('aria-hidden','true');document.body.style.overflow=''}function openBioModal(btn){const card=btn.closest('.card'),body=card.querySelector('.body'),title=body.querySelector('h2'),role=body.querySelector('.role'),full=body.querySelector('.bio-full'),photo=card.querySelector('.photo img'),contacts=[...body.querySelectorAll('.contact')],actions=[...body.querySelectorAll('.actions .action')];bioModalTitle.textContent=title?title.textContent:'';bioModalRole.textContent=role?role.textContent:'';bioModalBody.innerHTML=full?full.innerHTML:'<p>No additional profile information is available.</p>';bioModalPhoto.innerHTML=photo?'<img src="'+photo.src.replace(/"/g,'&quot;')+'" alt="'+(title?title.textContent.replace(/"/g,'&quot;'):'')+'">':'<div class="bio-modal-photo-fallback"><i class="fa-solid fa-user-tie"></i></div>';bioModalContacts.innerHTML=contacts.map(a=>'<a class="bio-modal-contact" href="'+a.getAttribute('href')+'">'+a.innerHTML+'</a>').join('');bioModalActions.innerHTML=actions.map(a=>'<a class="bio-modal-action '+(a.classList.contains('primary')?'primary':'')+'" href="'+a.getAttribute('href')+'" '+(a.target?'target="'+a.target+'"':'')+'>'+a.innerHTML+'</a>').join('');bioModal.classList.add('open');bioModal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';bioModalClose.focus()}desktopProfiles.forEach(btn=>btn.addEventListener('click',()=>openBioModal(btn)));buttons.forEach(btn=>btn.addEventListener('click',()=>{if(window.matchMedia('(min-width:851px)').matches){openBioModal(btn);return}const id=btn.dataset.more,full=document.getElementById('bio-full-'+id),preview=document.getElementById('bio-preview-'+id),open=!full.classList.contains('open');if(open)closeOther(btn);full.classList.toggle('open',open);preview.style.display=open?'none':'';btn.querySelector('span').textContent=open?'Less':'More';btn.querySelector('i').className=open?'fa-solid fa-chevron-up':'fa-solid fa-chevron-down'}));if(bioModal){bioModalClose.addEventListener('click',shutBioModal);bioModal.addEventListener('click',e=>{if(e.target===bioModal)shutBioModal})}const box=document.getElementById('photoLightbox'),img=document.getElementById('lightboxImage'),close=document.getElementById('lightboxClose'),level=document.getElementById('zoomLevel');let zoom=1;function render(){zoom=Math.min(4,Math.max(1,zoom));img.style.transform='scale('+zoom+')';level.textContent=Math.round(zoom*100)+'%'}function open(p){img.src=p.dataset.image;img.alt=p.dataset.name||'';zoom=1;render();box.classList.add('open');document.body.style.overflow='hidden'}function shut(){box.classList.remove('open');img.src='';document.body.style.overflow=''}document.querySelectorAll('.photo[data-image]').forEach(p=>{p.onclick=()=>{if(window.matchMedia('(min-width:851px)').matches){const profile=p.closest('.card')?.querySelector('.desktop-profile-button');if(profile){openBioModal(profile);return}}open(p)};p.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();if(window.matchMedia('(min-width:851px)').matches){const profile=p.closest('.card')?.querySelector('.desktop-profile-button');if(profile){openBioModal(profile);return}}open(p)}}});document.getElementById('zoomIn').onclick=()=>{zoom+=.25;render()};document.getElementById('zoomOut').onclick=()=>{zoom-=.25;render()};document.getElementById('zoomReset').onclick=()=>{zoom=1;render()};close.onclick=shut;box.onclick=e=>{if(e.target===box)shut()};document.addEventListener('keydown',e=>{if(e.key==='Escape'){shut();shutBioModal()}})})();</script>
+<script>(function(){const buttons=[...document.querySelectorAll('.bio-more')];function closeOther(except){buttons.forEach(btn=>{if(btn===except)return;const id=btn.dataset.more,full=document.getElementById('bio-full-'+id),preview=document.getElementById('bio-preview-'+id);if(full&&full.classList.contains('open')){full.classList.remove('open');preview.style.display='';btn.querySelector('span').textContent='More';btn.querySelector('i').className='fa-solid fa-chevron-down'}})}const bioModal=document.getElementById('bioModal'),bioModalTitle=document.getElementById('bioModalTitle'),bioModalRole=document.getElementById('bioModalRole'),bioModalBody=document.getElementById('bioModalBody'),bioModalPhoto=document.getElementById('bioModalPhoto'),bioModalContacts=document.getElementById('bioModalContacts'),bioModalActions=document.getElementById('bioModalActions'),bioModalClose=document.getElementById('bioModalClose');const desktopProfiles=[...document.querySelectorAll('.profile-button')];function shutBioModal(){if(!bioModal)return;bioModal.classList.remove('open');bioModal.setAttribute('aria-hidden','true');document.body.style.overflow=''}function openBioModal(btn){const card=btn.closest('.card'),body=card.querySelector('.body'),title=body.querySelector('h2'),role=body.querySelector('.role'),full=body.querySelector('.bio-full'),photo=card.querySelector('.photo img'),contacts=[...body.querySelectorAll('.contact')],actions=[...body.querySelectorAll('.actions .action')];bioModalTitle.textContent=title?title.textContent:'';bioModalRole.textContent=role?role.textContent:'';bioModalBody.innerHTML=full?full.innerHTML:'<p>No additional profile information is available.</p>';bioModalPhoto.innerHTML=photo?'<img src="'+photo.src.replace(/"/g,'&quot;')+'" alt="'+(title?title.textContent.replace(/"/g,'&quot;'):'')+'">':'<div class="bio-modal-photo-fallback"><i class="fa-solid fa-user-tie"></i></div>';bioModalContacts.innerHTML=contacts.map(a=>'<a class="bio-modal-contact" href="'+a.getAttribute('href')+'">'+a.innerHTML+'</a>').join('');bioModalActions.innerHTML=actions.map(a=>'<a class="bio-modal-action '+(a.classList.contains('primary')?'primary':'')+'" href="'+a.getAttribute('href')+'" '+(a.target?'target="'+a.target+'"':'')+'>'+a.innerHTML+'</a>').join('');bioModal.classList.add('open');bioModal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';bioModalClose.focus()}desktopProfiles.forEach(btn=>btn.addEventListener('click',()=>openBioModal(btn)));buttons.forEach(btn=>btn.addEventListener('click',()=>{openBioModal(btn);returnconst id=btn.dataset.more,full=document.getElementById('bio-full-'+id),preview=document.getElementById('bio-preview-'+id),open=!full.classList.contains('open');if(open)closeOther(btn);full.classList.toggle('open',open);preview.style.display=open?'none':'';btn.querySelector('span').textContent=open?'Less':'More';btn.querySelector('i').className=open?'fa-solid fa-chevron-up':'fa-solid fa-chevron-down'}));if(bioModal){bioModalClose.addEventListener('click',shutBioModal);bioModal.addEventListener('click',e=>{if(e.target===bioModal)shutBioModal})}const box=document.getElementById('photoLightbox'),img=document.getElementById('lightboxImage'),close=document.getElementById('lightboxClose'),level=document.getElementById('zoomLevel');let zoom=1;function render(){zoom=Math.min(4,Math.max(1,zoom));img.style.transform='scale('+zoom+')';level.textContent=Math.round(zoom*100)+'%'}function open(p){img.src=p.dataset.image;img.alt=p.dataset.name||'';zoom=1;render();box.classList.add('open');document.body.style.overflow='hidden'}function shut(){box.classList.remove('open');img.src='';document.body.style.overflow=''}document.querySelectorAll('.photo[data-image]').forEach(p=>{p.onclick=()=>{if(window.matchMedia('(min-width:851px)').matches){const profile=p.closest('.card')?.querySelector('.profile-button');if(profile){openBioModal(profile);return}}open(p)};p.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();if(window.matchMedia('(min-width:851px)').matches){const profile=p.closest('.card')?.querySelector('.profile-button');if(profile){openBioModal(profile);return}}open(p)}}});document.getElementById('zoomIn').onclick=()=>{zoom+=.25;render()};document.getElementById('zoomOut').onclick=()=>{zoom-=.25;render()};document.getElementById('zoomReset').onclick=()=>{zoom=1;render()};close.onclick=shut;box.onclick=e=>{if(e.target===box)shut()};document.addEventListener('keydown',e=>{if(e.key==='Escape'){shut();shutBioModal()}})})();</script>
 
 
 <!-- Final desktop-only executive profile refinement.
@@ -568,7 +568,7 @@ main{padding:72px 0 88px}
     .card .body{
         min-height:250px;
     }
-    .desktop-profile-button{
+    .profile-button{
         margin-top:15px;
     }
 
@@ -777,6 +777,47 @@ main{padding:72px 0 88px}
     .bio-modal-photo-fallback{
         color:#48cde9;
     }
+}
+@media (max-width:850px){
+    .profile-button{display:flex;width:100%;margin:13px 0 0;min-height:42px}
+    .body .bio-preview,.body .bio-full,.body .bio-more{display:none!important}
+    .bio-modal{padding:0;align-items:flex-end;justify-content:center;background:rgba(0,5,9,.72);backdrop-filter:blur(12px)}
+    .bio-modal.open{display:flex}
+    .bio-modal-panel{width:100%;max-width:720px;height:min(92vh,760px);min-height:0;display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(67,209,240,.20);border-bottom:0;border-radius:24px 24px 0 0;background:radial-gradient(500px 260px at 50% 0,rgba(67,209,240,.10),transparent 70%),linear-gradient(180deg,#082633 0%,#041923 55%,#021119 100%);box-shadow:0 -25px 80px rgba(0,0,0,.52);animation:profileSheetIn .24s cubic-bezier(.2,.7,.2,1)}
+    @keyframes profileSheetIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+    .bio-modal-photo{flex:0 0 auto;height:min(34vh,250px);min-height:180px;padding:16px 18px 10px;background:linear-gradient(180deg,rgba(4,25,35,.82),rgba(4,18,27,.96));border-right:0;border-bottom:1px solid rgba(67,209,240,.10)}
+    .bio-modal-photo:before{inset:10px 18px;border-radius:16px}
+    .bio-modal-photo:after{inset:16px 18px;border-radius:14px}
+    .bio-modal-photo img{width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain;border-radius:12px;border:1px solid rgba(67,209,240,.42);box-shadow:0 12px 32px rgba(0,0,0,.28)}
+    .bio-modal-info{min-height:0;flex:1 1 auto;overflow:hidden}
+    .bio-modal-head{padding:17px 18px 13px;gap:12px}
+    .bio-modal-kicker{margin-bottom:5px;font-size:8px;letter-spacing:.18em}
+    .bio-modal-title{font-size:23px;line-height:1.16}
+    .bio-modal-role{margin-top:6px;font-size:10px;line-height:1.45}
+    .bio-modal-close{width:38px;height:38px;flex-basis:38px;border-radius:10px}
+    .bio-modal-divider{margin:0 18px}
+    .bio-modal-scroll{padding:17px 18px 14px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+    .bio-modal-section-title{margin-bottom:9px;color:#72dced;font-size:8px;letter-spacing:.16em}
+    .bio-modal-body{color:#a9c1c9;font-size:12px;line-height:1.8}
+    .bio-modal-body p{margin-bottom:12px}
+    .bio-modal-footer{flex:0 0 auto;padding:11px 18px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(2,14,21,.30),rgba(2,14,21,.72))}
+    .bio-modal-footer .bio-modal-section-title{margin-bottom:7px}
+    .bio-modal-contacts,.bio-modal-actions{grid-template-columns:1fr 1fr;gap:7px}
+    .bio-modal-actions{margin-top:7px}
+    .bio-modal-contact{min-height:40px;padding:7px 8px;border-radius:9px;font-size:9px}
+    .bio-modal-contact i{width:24px;height:24px;flex-basis:24px}
+    .bio-modal-action{min-height:40px;padding:8px;border-radius:9px;font-size:9px}
+}
+@media(max-width:420px){
+    .bio-modal-panel{height:min(94vh,740px);border-radius:20px 20px 0 0}
+    .bio-modal-photo{height:190px;min-height:160px}
+    .bio-modal-head{padding:14px 14px 11px}
+    .bio-modal-divider{margin:0 14px}
+    .bio-modal-scroll{padding:14px 14px 12px}
+    .bio-modal-footer{padding-left:14px;padding-right:14px}
+    .bio-modal-title{font-size:20px}
+    .bio-modal-body{font-size:11px;line-height:1.75}
+    .bio-modal-contacts,.bio-modal-actions{grid-template-columns:1fr}
 }
 @media (min-width:851px) and (max-width:1100px){
     .bio-modal-photo{
