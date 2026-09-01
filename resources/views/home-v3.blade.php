@@ -2580,3 +2580,47 @@ main.shell{
 </script>
 @endpush
 @endsection
+
+
+/* === Management heading overflow fix: keep the action link fully inside the
+   responsive section header at every viewport width. === */
+.home-section-management .head{
+    grid-template-columns:minmax(0,1fr) minmax(0,clamp(82px,10vw,110px));
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
+}
+.home-section-management .head>div{
+    min-width:0;
+    max-width:100%;
+    overflow-wrap:anywhere;
+}
+.home-section-management .head .more{
+    min-width:0;
+    max-width:100%;
+    width:100%;
+    box-sizing:border-box;
+    justify-self:stretch;
+    text-align:right;
+    overflow-wrap:normal;
+    overflow:visible;
+}
+@media(max-width:650px){
+    .home-section-management .head{
+        grid-template-columns:minmax(0,1fr) minmax(82px,92px);
+        gap:10px;
+    }
+    .home-section-management .head .more{
+        font-size:8px !important;
+        letter-spacing:0;
+    }
+}
+@media(max-width:420px){
+    .home-section-management .head{
+        grid-template-columns:minmax(0,1fr) minmax(78px,86px);
+        gap:8px;
+    }
+    .home-section-management .head .more{
+        font-size:7px !important;
+    }
+}
