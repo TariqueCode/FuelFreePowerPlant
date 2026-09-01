@@ -362,14 +362,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
         padding:0;
         min-width:0;
     }
-    .welcome-with-team .welcome-team-label{
-        margin:0 0 2px 4px;
-        color:#67d9ec;
-        font-size:9px;
-        font-weight:850;
-        letter-spacing:.20em;
-        text-transform:uppercase;
-    }
+
     .welcome-with-team .welcome-profile{
         width:100%;
         display:grid;
@@ -463,13 +456,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
         padding-top:24px;
         gap:11px;
     }
-    .welcome-with-team .welcome-team-label{
-        color:#67d9ec;
-        font-size:8px;
-        font-weight:850;
-        letter-spacing:.18em;
-        text-transform:uppercase;
-    }
+
     .welcome-with-team .welcome-profile{
         grid-template-columns:70px minmax(0,1fr);
         min-height:88px;
@@ -593,16 +580,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
         min-width:0!important;
         padding:0!important;
     }
-    .welcome-with-team .welcome-team-label{
-        grid-column:1!important;
-        margin:0 0 1px 2px!important;
-        text-align:left!important;
-        color:#67d9ec!important;
-        font-size:8px!important;
-        font-weight:850!important;
-        letter-spacing:.2em!important;
-        text-transform:uppercase!important;
-    }
+
     .welcome-with-team .welcome-profile{
         width:100%!important;
         min-width:0!important;
@@ -699,9 +677,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
         margin-top:28px!important;
         padding-top:20px!important;
     }
-    .welcome-with-team .welcome-team-label{
-        grid-column:1!important;
-    }
+
     .welcome-with-team .welcome-profile{
         width:100%!important;
         grid-column:1!important;
@@ -751,12 +727,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
         min-width:0!important;
         padding:0!important;
     }
-    .welcome-with-team .welcome-team-label{
-        margin:0 0 2px 3px!important;
-        text-align:left!important;
-        font-size:8px!important;
-        letter-spacing:.2em!important;
-    }
+
     .welcome-with-team .welcome-profile{
         min-width:0!important;
         min-height:104px!important;
@@ -885,7 +856,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
 <div class="welcome-profile-dialog" role="dialog" aria-modal="true" aria-labelledby="welcome-profile-title-{{ $member->id }}">
 <div class="welcome-profile-modal-photo"><img src="{{ asset('storage/'.ltrim($member->image_path,'/')) }}" alt="{{ $member->title }}"></div>
 <div class="welcome-profile-modal-body">
-<div class="welcome-profile-modal-head"><div><div class="welcome-profile-modal-kicker">Management Profile</div><h2 class="welcome-profile-modal-title" id="welcome-profile-title-{{ $member->id }}">{{ $member->title }}</h2><div class="welcome-profile-modal-role">{{ $member->designation ?: $member->excerpt }}</div></div><button type="button" class="welcome-profile-modal-close" data-close-welcome-profile aria-label="Close profile"><i class="fa-solid fa-xmark"></i></button></div>
+<div class="welcome-profile-modal-head"><div><h2 class="welcome-profile-modal-title" id="welcome-profile-title-{{ $member->id }}">{{ $member->title }}</h2><div class="welcome-profile-modal-role">{{ $member->designation ?: $member->excerpt }}</div></div><button type="button" class="welcome-profile-modal-close" data-close-welcome-profile aria-label="Close profile"><i class="fa-solid fa-xmark"></i></button></div>
 <div class="welcome-profile-modal-divider"></div>
 <div class="welcome-profile-modal-scroll"><div class="welcome-profile-modal-label">Message</div>{{ trim(strip_tags((string) $member->content)) }}</div>
 </div>
