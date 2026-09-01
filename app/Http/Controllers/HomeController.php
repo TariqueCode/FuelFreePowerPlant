@@ -100,11 +100,9 @@ class HomeController
         // The homepage management showcase is controlled by the admin Homepage
         // Builder just like the other content sections: the configured limit is
         // respected, and explicit selections keep their configured order.
-        $homeManagement = $applySelection(
-            $managementQuery,
-            $managementSettings,
-            $managementLimit
-        );
+        $homeManagement = ($managementSettings['mode'] ?? 'latest') === 'selected'
+            ? $applySelection($managementQuery, $managementSettings, $managementLimit)
+            : (clone $managementQuery)->limit($managementLimit)->get();
 
         // Explicit welcome selections take priority; the homepage management list fills any gap.
         $welcomeManagement = $welcomeManagement
