@@ -2540,6 +2540,72 @@ main.shell{
         margin-top:9px !important;
     }
 }
+/* === Final responsive frame + alignment lock ===
+   Keep the homepage shell centered on every viewport and prevent the
+   decorative scroll choreography from moving real content horizontally. */
+.home-v3.shell{
+    width:min(1280px,calc(100% - 32px)) !important;
+    max-width:1280px !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+    padding-left:0 !important;
+    padding-right:0 !important;
+}
+.home-v3 .home-section,
+.home-v3 .welcome,
+.home-v3 .home-slider{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+}
+.home-v3 .home-section > .head > div,
+.home-v3 .home-section > .head > p,
+.home-v3 .welcome-heading,
+.home-v3 .welcome-copy{
+    transform:none !important;
+    translate:none !important;
+}
+.home-v3 .home-section > .head{
+    width:100% !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+}
+.home-v3 .home-section > .head > div{
+    overflow:visible !important;
+}
+.home-v3 .home-section > .head > .more{
+    flex:0 0 auto !important;
+    max-width:none !important;
+    min-width:max-content !important;
+    overflow:visible !important;
+}
+@media (min-width:1100px){
+    .home-v3.shell{
+        width:min(1280px,calc(100% - 64px)) !important;
+    }
+}
+@media (max-width:650px){
+    .home-v3.shell{
+        width:calc(100% - 22px) !important;
+        max-width:none !important;
+    }
+    .home-v3 .home-section > .head{
+        align-items:flex-end !important;
+        gap:10px !important;
+    }
+    .home-v3 .home-section > .head > div{
+        flex:1 1 auto !important;
+        min-width:0 !important;
+    }
+    .home-v3 .home-section > .head > .more{
+        flex:0 0 auto !important;
+        min-width:max-content !important;
+        white-space:nowrap !important;
+    }
+}
+
 /* === Final management card height/content balance fix === */
 /* Prevent the grid row from stretching cards into an oversized empty panel. */
 .home-v3 .home-section-management .management-grid{
