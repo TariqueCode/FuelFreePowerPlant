@@ -812,6 +812,33 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     }
 }
 
+/* Touch-performance guardrail: keep mobile interaction and first paint stable. */
+@media (pointer:coarse) and (max-width:900px){
+    .energy-atmosphere .energy-grid,
+    .energy-atmosphere .energy-core,
+    .energy-atmosphere .energy-orbit,
+    .energy-atmosphere .energy-pulse,
+    .home-slider:before,
+    .welcome-heading:before,
+    .cta-card:before,
+    .cta-card:after{animation:none!important}
+    .energy-atmosphere .energy-grid{opacity:.045!important}
+    .energy-atmosphere .energy-core{opacity:.20!important}
+    .energy-atmosphere .energy-orbit{opacity:.16!important}
+    .home-slider{animation:none!important}
+    .home-section.reveal-ready,
+    .welcome-with-team.reveal-ready .welcome-content,
+    .welcome-with-team.reveal-ready .welcome-profile{
+        opacity:1!important;
+        transform:none!important;
+        transition:none!important;
+    }
+    .home-section .head>div,
+    .home-section .head>p,
+    .welcome-heading,
+    .welcome-copy{transform:none!important;will-change:auto}
+}
+
 /* Keep the public page free of legacy escaped-newline artefacts. */
 
 </style>
