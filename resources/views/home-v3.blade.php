@@ -1288,6 +1288,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     line-height:1.15;
     letter-spacing:-.035em;
 }
+.home-profile-contact-mobile{display:none}
 .home-profile-role{
     margin-top:9px;
     color:#86dce9;
@@ -1405,150 +1406,225 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     .home-profile-links{grid-template-columns:1fr 1fr;gap:7px}
     .home-profile-link{min-height:40px;padding:7px 8px;font-size:9px}
 }
-/* Mobile-only management card + profile popup polish. Desktop modal remains unchanged. */
+/* Mobile-only management card + profile popup polish. */
 @media(max-width:650px){
+    /* Keep the homepage cards compact: two profiles stay side-by-side. */
     .home-section-management .management-grid{
-        grid-template-columns:1fr !important;
-        gap:10px;
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:9px;
     }
     .home-section-management .member-card{
-        display:grid;
-        grid-template-columns:92px minmax(0,1fr);
-        grid-template-rows:auto auto auto;
-        column-gap:12px;
-        border-radius:15px;
-        padding:10px;
-        align-items:center;
+        display:block;
+        border-radius:14px;
+        overflow:hidden;
     }
     .home-section-management .member-photo{
-        grid-column:1;
-        grid-row:1;
-        width:92px;
-        height:115px;
-        aspect-ratio:4 / 5 !important;
-        border-radius:10px;
+        width:100%;
+        height:auto;
+        aspect-ratio:1 / 1 !important;
+        border-radius:0;
     }
     .home-section-management .member-body{
-        display:contents;
+        display:block;
+        padding:9px 9px 10px;
     }
     .home-section-management .member-body h3{
-        grid-column:2;
-        grid-row:1;
-        align-self:center;
         margin:0;
-        padding-right:4px;
-        font-size:12px;
+        font-size:10px;
         line-height:1.3;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
     }
     .home-section-management .member-role{
-        grid-column:2;
-        grid-row:1;
-        align-self:center;
-        margin:32px 0 0;
+        margin:4px 0 0;
         font-size:7px;
-        line-height:1.4;
+        line-height:1.35;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
     }
     .home-section-management .member-message{
-        grid-column:1 / -1;
-        grid-row:2;
-        width:100%;
-        min-height:58px;
-        max-height:76px;
-        margin:10px 0 0;
-        padding:9px 10px;
-        border:1px solid rgba(72,216,241,.12);
-        border-radius:9px;
-        background:rgba(1,12,18,.42);
-        color:#91adb6;
-        font-size:8px;
-        line-height:1.55;
-        overflow-y:auto;
-        display:block;
-        -webkit-line-clamp:unset;
-        -webkit-box-orient:unset;
-        scrollbar-width:thin;
-        overscroll-behavior:contain;
+        display:none !important;
     }
-    .home-section-management .member-message::-webkit-scrollbar{width:4px}
-    .home-section-management .member-message::-webkit-scrollbar-thumb{background:rgba(72,216,241,.24);border-radius:99px}
     .home-section-management .member-more{
-        grid-column:1 / -1;
-        grid-row:3;
-        min-height:34px;
-        margin:8px 0 0;
+        width:100%;
+        min-height:33px;
+        margin-top:8px;
+        padding:7px 8px;
+        border-radius:9px;
         font-size:8px;
     }
 
-    /* A dedicated mobile presentation for the profile popup. */
+    /* Mobile-only profile popup:
+       top = 4:5 portrait + identity/contact; bottom = independently scrollable message. */
     .home-profile-modal{
         padding:0;
         align-items:flex-end;
         justify-content:center;
-        background:rgba(0,4,8,.78);
+        background:rgba(0,4,8,.80);
         backdrop-filter:blur(14px);
     }
     .home-profile-panel{
         width:100%;
         max-width:720px;
-        height:min(93vh,780px);
+        height:min(94vh,820px);
         min-height:0;
-        display:flex;
-        flex-direction:column;
+        display:grid;
+        grid-template-columns:minmax(112px,32%) minmax(0,68%);
+        grid-template-rows:auto minmax(0,1fr) auto;
+        overflow:hidden;
         border-radius:22px 22px 0 0;
         border-bottom:0;
         animation:homeProfileMobileIn .25s cubic-bezier(.2,.7,.2,1);
+    }
+    .home-profile-photo{
+        grid-column:1;
+        grid-row:1;
+        min-width:0;
+        height:auto;
+        padding:14px 0 14px 16px;
+        display:flex;
+        align-items:flex-start;
+        justify-content:flex-start;
+        border-right:0;
+        border-bottom:0;
+        background:transparent;
+    }
+    .home-profile-photo img{
+        width:100%;
+        height:auto;
+        max-width:none;
+        aspect-ratio:4 / 5;
+        object-fit:cover;
+        border-radius:11px;
+    }
+    .home-profile-info{
+        grid-column:1 / -1;
+        grid-row:1 / 4;
+        display:grid;
+        grid-template-columns:minmax(112px,32%) minmax(0,68%);
+        grid-template-rows:auto auto auto;
+        min-height:0;
+        pointer-events:none;
+    }
+    .home-profile-head{
+        grid-column:2;
+        grid-row:1;
+        min-width:0;
+        display:block;
+        padding:25px 16px 12px 14px;
+        pointer-events:auto;
+    }
+    .home-profile-kicker{
+        margin-bottom:6px;
+        font-size:7px;
+        letter-spacing:.16em;
+    }
+    .home-profile-title{
+        font-size:19px;
+        line-height:1.16;
+        overflow-wrap:anywhere;
+    }
+    .home-profile-role{
+        margin-top:5px;
+        font-size:8px;
+        line-height:1.4;
+    }
+    .home-profile-contact-mobile{
+        display:flex;
+        flex-direction:column;
+        gap:6px;
+        margin-top:12px;
+    }
+    .home-profile-contact-mobile a{
+        min-width:0;
+        display:flex;
+        align-items:flex-start;
+        gap:6px;
+        color:#9ec9d2;
+        font-size:7px;
+        line-height:1.45;
+        text-decoration:none;
+        overflow-wrap:anywhere;
+    }
+    .home-profile-contact-mobile i{
+        flex:0 0 10px;
+        margin-top:1px;
+        color:#72dced;
+    }
+    .home-profile-close{
+        position:absolute;
+        top:13px;
+        right:14px;
+        z-index:4;
+        width:36px;
+        height:36px;
+        flex-basis:36px;
+        border-radius:10px;
+        pointer-events:auto;
+    }
+    .home-profile-divider{
+        grid-column:1 / -1;
+        grid-row:2;
+        width:auto;
+        height:1px;
+        margin:0 16px;
+        align-self:start;
+    }
+    .home-profile-scroll{
+        grid-column:1 / -1;
+        grid-row:2;
+        min-height:0;
+        margin:14px 16px 12px;
+        padding:13px 13px 18px;
+        overflow-y:auto;
+        border:1px solid rgba(72,216,241,.14);
+        border-radius:13px;
+        background:rgba(1,12,18,.52);
+        box-shadow:inset 0 0 24px rgba(72,216,241,.025);
+        pointer-events:auto;
+        scrollbar-width:thin;
+        overscroll-behavior:contain;
+    }
+    .home-profile-section-title{
+        margin-bottom:9px;
+        font-size:7px;
+        letter-spacing:.16em;
+    }
+    .home-profile-message{
+        max-width:none;
+        color:#a9c1c9;
+        font-size:10px;
+        line-height:1.75;
+    }
+    .home-profile-message p{margin:0 0 11px}
+    .home-profile-footer{
+        grid-column:1 / -1;
+        grid-row:3;
+        min-height:0;
+        padding:0 16px calc(12px + env(safe-area-inset-bottom));
+        background:linear-gradient(180deg,rgba(2,14,21,.18),rgba(2,14,21,.88));
+        pointer-events:auto;
+    }
+    .home-profile-footer .home-profile-section-title{
+        margin-bottom:7px;
+    }
+    .home-profile-links{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:7px;
+    }
+    .home-profile-link{
+        min-height:36px;
+        border-radius:9px;
+        font-size:8px;
     }
     @keyframes homeProfileMobileIn{
         from{opacity:0;transform:translateY(34px)}
         to{opacity:1;transform:translateY(0)}
     }
-    .home-profile-photo{
-        flex:0 0 auto;
-        height:205px;
-        min-height:0;
-        padding:14px 18px 10px;
-        border-right:0;
-        border-bottom:1px solid rgba(67,209,240,.10);
-    }
-    .home-profile-photo img{
-        width:auto;
-        height:100%;
-        max-width:100%;
-        max-height:100%;
-        aspect-ratio:4 / 5;
-        object-fit:cover;
-        border-radius:11px;
-    }
-    .home-profile-head{
-        flex:0 0 auto;
-        padding:15px 18px 12px;
-        gap:12px;
-    }
-    .home-profile-title{font-size:22px;line-height:1.15}
-    .home-profile-role{font-size:9px;margin-top:5px}
-    .home-profile-close{width:38px;height:38px;flex-basis:38px;border-radius:10px}
-    .home-profile-divider{margin:0 18px}
-    .home-profile-scroll{
-        flex:1 1 auto;
-        min-height:0;
-        padding:15px 18px 13px;
-        overflow-y:auto;
-    }
-    .home-profile-section-title{font-size:8px;margin-bottom:8px}
-    .home-profile-message{
-        color:#a9c1c9;
-        font-size:11px;
-        line-height:1.78;
-    }
-    .home-profile-message p{margin:0 0 11px}
-    .home-profile-footer{
-        flex:0 0 auto;
-        padding:10px 18px calc(13px + env(safe-area-inset-bottom));
-        background:linear-gradient(180deg,rgba(2,14,21,.28),rgba(2,14,21,.82));
-    }
-    .home-profile-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
-    .home-profile-link{min-height:39px;border-radius:9px;font-size:8px}
 }
+
 @media(max-width:420px){
     .home-section-management .management-grid{gap:8px}
     .home-profile-panel{height:min(94vh,740px);border-radius:20px 20px 0 0}
@@ -1666,6 +1742,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
                     <div class="home-profile-kicker">Leadership message</div>
                     <h2 class="home-profile-title" id="homeProfileTitle"></h2>
                     <div class="home-profile-role" id="homeProfileRole"></div>
+                    <div class="home-profile-contact-mobile" id="homeProfileContactMobile"></div>
                 </div>
                 <button class="home-profile-close" id="homeProfileClose" type="button" aria-label="Close profile"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -1688,7 +1765,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
  if(!modal)return;
  const title=document.getElementById('homeProfileTitle'),role=document.getElementById('homeProfileRole');
  const photo=document.getElementById('homeProfilePhoto'),message=document.getElementById('homeProfileMessage');
- const links=document.getElementById('homeProfileLinks'),close=document.getElementById('homeProfileClose');
+ const links=document.getElementById('homeProfileLinks'),close=document.getElementById('homeProfileClose'),contactMobile=document.getElementById('homeProfileContactMobile');
  const buttons=[...document.querySelectorAll('.home-section-management .member-more')];
  let lastTrigger=null;
  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -1714,6 +1791,12 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
    if(data.dataset.vcard)out.push('<a class="home-profile-link primary" href="'+esc(data.dataset.vcard)+'"><i class="fa-solid fa-user-plus"></i> Add to Contacts</a>');
    if(data.dataset.card)out.push('<a class="home-profile-link" href="'+esc(data.dataset.card)+'" target="_blank" rel="noopener"><i class="fa-regular fa-address-card"></i> Visiting Card</a>');
    links.innerHTML=out.join('');
+   if(contactMobile){
+     const contact=[];
+     if(data.dataset.phone)contact.push('<a href="tel:'+esc(data.dataset.phone.replace(/[^0-9+]/g,''))+'"><i class="fa-solid fa-phone"></i><span>'+esc(data.dataset.phone)+'</span></a>');
+     if(data.dataset.email)contact.push('<a href="mailto:'+esc(data.dataset.email)+'"><i class="fa-solid fa-envelope"></i><span>'+esc(data.dataset.email)+'</span></a>');
+     contactMobile.innerHTML=contact.join('');
+   }
    modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; close.focus();
  };
  buttons.forEach(btn=>btn.addEventListener('click',()=>openModal(btn)));
