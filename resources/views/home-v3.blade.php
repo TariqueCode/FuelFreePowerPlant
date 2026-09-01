@@ -1501,20 +1501,14 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
         border-radius:11px;
     }
     .home-profile-info{
-        grid-column:1 / -1;
-        grid-row:1 / 4;
-        display:grid;
-        grid-template-columns:minmax(112px,32%) minmax(0,68%);
-        grid-template-rows:auto auto auto;
-        min-height:0;
-        pointer-events:none;
+        display:contents;
     }
     .home-profile-head{
         grid-column:2;
         grid-row:1;
         min-width:0;
         display:block;
-        padding:25px 16px 12px 14px;
+        padding:25px 58px 12px 14px;
         pointer-events:auto;
     }
     .home-profile-kicker{
@@ -1556,8 +1550,8 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     }
     .home-profile-close{
         position:absolute;
-        top:13px;
-        right:14px;
+        top:10px;
+        right:10px;
         z-index:4;
         width:36px;
         height:36px;
@@ -1749,7 +1743,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
             </div>
             <div class="home-profile-divider"></div>
             <div class="home-profile-scroll">
-                <div class="home-profile-section-title">Message from leadership</div>
+                <div class="home-profile-section-title" id="homeProfileMessageTitle">Message from leadership</div>
                 <div class="home-profile-message" id="homeProfileMessage"></div>
             </div>
             <div class="home-profile-footer">
@@ -1765,6 +1759,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
  const modal=document.getElementById('homeProfileModal');
  if(!modal)return;
  const title=document.getElementById('homeProfileTitle'),role=document.getElementById('homeProfileRole');
+ const messageTitle=document.getElementById('homeProfileMessageTitle');
  const photo=document.getElementById('homeProfilePhoto'),message=document.getElementById('homeProfileMessage');
  const links=document.getElementById('homeProfileLinks'),close=document.getElementById('homeProfileClose'),contactMobile=document.getElementById('homeProfileContactMobile');
  const buttons=[...document.querySelectorAll('.home-section-management .member-more')];
@@ -1783,7 +1778,9 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
    const data=btn.closest('.member-card')?.querySelector('.home-profile-data'); if(!data)return;
    lastTrigger=btn;
    title.textContent=data.dataset.name||'';
-   role.textContent=data.dataset.role||'';
+   const profileRole=String(data.dataset.role||'').trim();
+   role.textContent=profileRole;
+   if(messageTitle) messageTitle.textContent='Message from '+(profileRole||'Leadership');
    message.innerHTML=renderMessage(data.dataset.message||'');
    photo.innerHTML=data.dataset.image?'<img src="'+esc(data.dataset.image)+'" alt="'+esc(data.dataset.name||'')+'">':'<i class="fa-solid fa-user-tie" style="font-size:48px;color:#48d8f1"></i>';
    const out=[];
