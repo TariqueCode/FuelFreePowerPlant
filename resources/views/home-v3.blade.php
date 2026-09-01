@@ -80,6 +80,17 @@ img{max-width:100%}
 .welcome{padding:62px 0 64px}.welcome h1{font-size:clamp(38px,6.5vw,62px)}
 .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.project-grid,.news-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.management-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.folders{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
+
+/* Desktop-mode management cards: keep the exact four-profile card footprint even when only two profiles are published. */
+@media(min-width:851px) and (max-width:1099px){
+    .home-section-management .management-grid{
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+    }
+    .home-section-management .member-card{
+        min-width:0;
+    }
+}
 @media(max-width:650px){
 .shell{width:calc(100% - 22px)}
 .home-slider{margin-top:7px}.slider-track{aspect-ratio:2.35/1}.slide-media{border-radius:14px}.slide-caption{top:calc(100% + 5px);padding:0 5px}.slide-caption strong{font-size:7px}
