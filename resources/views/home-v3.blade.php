@@ -1886,6 +1886,29 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
 }
 @media(prefers-reduced-motion:reduce){.home-profile-panel{animation:none}}
 
+
+/* === Final desktop management grid: 1 row x 4 columns ===
+   Desktop must reserve the same compact card footprint whether 2, 3, or 4
+   profiles are published. Mobile/tablet layouts remain unchanged. */
+@media (min-width:851px){
+    .home-section-management .management-grid{
+        grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+        gap:18px !important;
+        align-items:stretch;
+    }
+    .home-section-management .member-card{
+        width:auto !important;
+        min-width:0 !important;
+    }
+    .home-section-management .member-photo{
+        aspect-ratio:4 / 5 !important;
+    }
+}
+@media (min-width:851px) and (max-width:1099px){
+    .home-section-management .management-grid{
+        grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    }
+}
 </style>
 <main class="shell">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
