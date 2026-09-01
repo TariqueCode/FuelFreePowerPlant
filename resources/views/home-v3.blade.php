@@ -856,6 +856,25 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     .energy-atmosphere .energy-pulse{will-change:transform;}
 }
 
+/* Final first-viewport stability: the welcome composition must never enter from an offset. */
+.home-section.home-section-welcome,
+.home-section.home-section-welcome.reveal-ready,
+.home-section.home-section-welcome.revealed,
+.home-section.home-section-welcome .welcome-content,
+.home-section.home-section-welcome .welcome-heading,
+.home-section.home-section-welcome .welcome-copy,
+.home-section.home-section-welcome .welcome-team,
+.home-section.home-section-welcome .welcome-profile{
+    opacity:1!important;
+    transform:none!important;
+    animation:none!important;
+}
+.home-section.home-section-welcome .welcome-heading,
+.home-section.home-section-welcome .welcome-copy{will-change:auto!important}
+@media(min-width:651px){
+    .home-section.home-section-welcome .welcome-profile{transition:border-color .25s ease,box-shadow .25s ease,background .25s ease!important}
+}
+
 /* Keep the public page free of legacy escaped-newline artefacts. */
 
 </style>
