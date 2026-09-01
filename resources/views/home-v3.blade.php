@@ -1379,6 +1379,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     .home-section-management .member-more{min-height:35px;margin-top:10px;padding:7px 9px;font-size:8px}
     .home-profile-modal{padding:0;align-items:flex-end}
     .home-profile-panel{
+        position:relative;
         width:100%;
         max-width:720px;
         height:min(92vh,760px);
@@ -1552,7 +1553,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
         position:absolute;
         top:10px;
         right:10px;
-        z-index:4;
+        z-index:20;
         width:36px;
         height:36px;
         flex-basis:36px;
@@ -1747,7 +1748,6 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
                 <div class="home-profile-message" id="homeProfileMessage"></div>
             </div>
             <div class="home-profile-footer">
-                <div class="home-profile-section-title">Contact &amp; Actions</div>
                 <div class="home-profile-links" id="homeProfileLinks"></div>
             </div>
         </div>
