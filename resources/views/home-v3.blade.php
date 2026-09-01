@@ -2011,6 +2011,358 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
 @media(prefers-reduced-motion:reduce){
     .home-section-management .head .more{transition:none !important}
 }
+
+/* === Master homepage responsive polish ===
+   One consistent section rhythm, predictable grids, safe typography, and
+   touch-friendly controls across desktop/tablet/mobile. */
+.home-v3 main,
+.home-v3 .shell,
+main.shell{
+    min-width:0;
+}
+.home-section{
+    width:100%;
+    min-width:0;
+    box-sizing:border-box;
+}
+.home-section .head{
+    min-width:0;
+    box-sizing:border-box;
+}
+.home-section .head > div{
+    min-width:0;
+}
+.home-section .head h2{
+    overflow-wrap:anywhere;
+}
+.home-section .more{
+    flex:0 0 auto;
+    white-space:nowrap;
+}
+
+/* Hero / slider */
+.home-slider{
+    width:100%;
+    min-width:0;
+    overflow:hidden;
+}
+.home-slider img,
+.home-slider video{
+    display:block;
+    max-width:100%;
+}
+.home-slider .slider-track{
+    min-width:0;
+}
+
+/* Welcome */
+.welcome,
+.welcome-inner,
+.welcome-content,
+.welcome-copy{
+    min-width:0;
+    box-sizing:border-box;
+}
+.welcome-inner{
+    width:min(100%,var(--shell,1200px));
+    margin-inline:auto;
+}
+.welcome-copy{
+    overflow-wrap:anywhere;
+}
+.welcome-more-content{
+    max-width:100%;
+    overflow-wrap:anywhere;
+}
+.welcome-more-toggle{
+    min-height:40px;
+    touch-action:manipulation;
+}
+
+/* Shared grids */
+.stats-grid,
+.project-grid,
+.management-grid,
+.news-grid,
+.folders{
+    width:100%;
+    min-width:0;
+    box-sizing:border-box;
+}
+.stats-grid > *,
+.project-grid > *,
+.management-grid > *,
+.news-grid > *,
+.folders > *{
+    min-width:0;
+    box-sizing:border-box;
+}
+
+/* Statistics */
+.stats-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:18px;
+}
+.stat-card{
+    min-width:0;
+    overflow:hidden;
+}
+.stat-card strong,
+.stat-card span{
+    overflow-wrap:anywhere;
+}
+
+/* Projects */
+.project-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:18px;
+}
+.project-card{
+    min-width:0;
+    overflow:hidden;
+}
+.project-media{
+    aspect-ratio:16 / 10;
+    overflow:hidden;
+}
+.project-media img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+.project-body{
+    min-width:0;
+}
+.project-body h3,
+.project-body p{
+    overflow-wrap:anywhere;
+}
+
+/* Management */
+.management-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+}
+.member-card{
+    min-width:0;
+    overflow:hidden;
+}
+.member-photo{
+    aspect-ratio:4 / 5;
+    overflow:hidden;
+}
+.member-photo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+/* News */
+.news-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:18px;
+}
+.news{
+    min-width:0;
+    overflow:hidden;
+}
+.news-media{
+    aspect-ratio:16 / 10;
+    overflow:hidden;
+}
+.news-media img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+.news-body,
+.news-body h3,
+.news-body p{
+    min-width:0;
+}
+.news-body h3,
+.news-body p{
+    overflow-wrap:anywhere;
+}
+
+/* Gallery */
+.folders{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:18px;
+}
+.folder{
+    min-width:0;
+    overflow:hidden;
+}
+.folder-media{
+    aspect-ratio:4 / 3;
+    overflow:hidden;
+}
+.folder-media img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+.folder-body{
+    min-width:0;
+}
+.folder-body h3{
+    overflow-wrap:anywhere;
+}
+
+/* CTA */
+.cta-card{
+    width:100%;
+    min-width:0;
+    box-sizing:border-box;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:28px;
+}
+.cta-card > div{
+    min-width:0;
+}
+.cta-card h2,
+.cta-card p{
+    overflow-wrap:anywhere;
+}
+.cta-card .btn{
+    flex:0 0 auto;
+    white-space:nowrap;
+    min-height:44px;
+    touch-action:manipulation;
+}
+
+/* Tablet */
+@media (max-width:1099px){
+    .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .project-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .news-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .folders{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .cta-card{gap:20px}
+}
+
+/* Small tablet / large phone */
+@media (max-width:850px){
+    .home-section{
+        overflow:clip;
+    }
+    .home-section .head{
+        width:100%;
+        gap:12px;
+    }
+    .home-section .head h2{
+        max-width:100%;
+    }
+    .home-section .head .more{
+        max-width:42%;
+        overflow:hidden;
+        text-overflow:ellipsis;
+    }
+    .stats-grid{gap:10px}
+    .project-grid,
+    .news-grid{gap:12px}
+    .folders{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .cta-card{
+        align-items:flex-start;
+        flex-direction:column;
+        gap:16px;
+    }
+    .cta-card .btn{
+        width:100%;
+        justify-content:center;
+    }
+}
+
+/* Mobile */
+@media (max-width:650px){
+    .home-section{
+        width:100%;
+    }
+    .home-section .head{
+        align-items:flex-end;
+        margin-bottom:18px;
+    }
+    .home-section .head > div{
+        flex:1 1 auto;
+        min-width:0;
+    }
+    .home-section .head .more{
+        flex:0 0 auto;
+        max-width:46%;
+        font-size:8px !important;
+    }
+    .stats-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:8px;
+    }
+    .stat-card{
+        min-height:110px;
+        padding:14px 11px;
+    }
+    .project-grid{
+        grid-template-columns:1fr;
+        gap:10px;
+    }
+    .project-media{
+        aspect-ratio:16 / 9;
+    }
+    .news-grid{
+        grid-template-columns:1fr;
+        gap:10px;
+    }
+    .news-media{
+        aspect-ratio:16 / 9;
+    }
+    .folders{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:9px;
+    }
+    .folder-media{
+        aspect-ratio:4 / 3;
+    }
+    .cta-card{
+        padding:18px !important;
+        border-radius:16px;
+    }
+}
+
+/* Narrow phones */
+@media (max-width:420px){
+    .home-section .head{
+        gap:8px;
+        margin-bottom:15px;
+    }
+    .home-section .head .more{
+        max-width:48%;
+        font-size:7px !important;
+    }
+    .stats-grid{gap:7px}
+    .stat-card{
+        min-height:98px;
+        padding:11px 9px;
+    }
+    .project-grid,
+    .news-grid{gap:9px}
+    .folders{gap:8px}
+    .cta-card{
+        padding:15px !important;
+    }
+}
+
+/* Accessibility / stability */
+@media (prefers-reduced-motion:reduce){
+    .home-section *,
+    .home-slider *{
+        scroll-behavior:auto !important;
+        transition-duration:0.01ms !important;
+        animation-duration:0.01ms !important;
+    }
+}
 </style>
 <main class="shell">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
