@@ -97,27 +97,13 @@ class HomeController
             ->orderBy('sort_order')
             ->orderBy('title');
 
-        $homeManagement = $applySelection($managementQuery, $managementSettings, $managementLimit);
-
-        // A homepage card grid is designed for four profiles. If an admin has selected
-        // fewer than four profiles, fill the remaining slots with the latest published
-        // management profiles rather than leaving the homepage with a single card.
-        if ($homeManagement->count() < $managementLimit) {
-            $selectedIds = $homeManagement->pluck('id')->all();
-            $fallbackManagement = SiteContentItem::published()
-                ->where('type','management')
-                ->when($selectedIds, fn ($query) => $query->whereNotIn('id', $selectedIds))
-                ->orderBy('sort_order')
-                ->orderBy('title')
-                ->take($managementLimit - $homeManagement->count())
-                ->get();
-
-            $homeManagement = $homeManagement
-                ->concat($fallbackManagement)
-                ->unique('id')
-                ->take($managementLimit)
-                ->values();
-        }
+        // The homepage management showcase mirrors the public Management Team:
+        // always render up to four published leadership profiles, independent of a
+        // stale homepage selection setting. This guarantees the four-card layout
+        // receives the same source records as the management page.
+        $homeManagement = $managementQuery
+            ->take($managementLimit)
+            ->get();
 
         // Explicit welcome selections take priority; the homepage management list fills any gap.
         $welcomeManagement = $welcomeManagement
