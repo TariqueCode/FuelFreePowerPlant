@@ -39,7 +39,8 @@
         <style>
             /* Homepage: mobile leadership popup keeps only the full-width Contacts action. */
             @media (max-width: 650px) {
-                .home-profile-modal .home-profile-links > .home-profile-link:not(.primary) {
+                .home-profile-modal .home-profile-links > .home-profile-link[href^="tel:"],
+                .home-profile-modal .home-profile-links > .home-profile-link[href^="mailto:"] {
                     display: none !important;
                 }
                 .home-profile-modal .home-profile-links {
