@@ -16,7 +16,7 @@ a{text-decoration:none;color:inherit}
 img{max-width:100%}
 .shell{width:min(var(--max),calc(100% - 32px));margin-inline:auto}
 .eyebrow{display:block;color:var(--cyan);font-size:11px!important;line-height:1.4;letter-spacing:.2em;text-transform:uppercase}
-.home-slider{position:relative;width:100%;margin:30px 0 0;overflow:visible}
+ .home-slider{position:relative;width:100%;margin:30px 0 0;overflow:visible}
 .slider-track{position:relative;width:100%;aspect-ratio:2.35/1}
 .slide{position:absolute;inset:0;display:block;opacity:0;visibility:hidden;transform:scale(1.008);transition:opacity .8s ease,transform 6s ease,visibility .8s}
 .slide.is-active{opacity:1;visibility:visible;transform:scale(1)}
@@ -124,7 +124,7 @@ img{max-width:100%}
 
 /* === FFP modern motion architecture: GPU-light, responsive, content-safe === */
 main.shell{position:relative;isolation:isolate}
-main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:none;overflow:hidden;contain:strict;background:
+main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-events:none;overflow:hidden;contain:strict;background:
  radial-gradient(circle at 18% 18%,rgba(43,203,232,.08),transparent 28%),
  radial-gradient(circle at 82% 46%,rgba(36,157,191,.06),transparent 25%),
  linear-gradient(180deg,rgba(2,11,17,.15),rgba(1,8,13,.32))}
@@ -152,11 +152,15 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
 @keyframes orbitFloat{0%,100%{transform:translate(-50%,-50%) rotate(-14deg) scale(1)}50%{transform:translate(-50%,-50%) rotate(-8deg) scale(1.04)}}
 @keyframes pulseTravel{0%,100%{opacity:.25;transform:scaleX(.92)}50%{opacity:.75;transform:scaleX(1)}}
 
+
+.welcome-profile-mobile-panel{display:none}
+.welcome-profile-mobile-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:12px 14px 10px;border-bottom:1px solid rgba(72,216,241,.10)}
+.welcome-profile-mobile-head strong{display:block;color:#eaf8fb;font-size:11px;line-height:1.3}.welcome-profile-mobile-head span{display:block;margin-top:4px;color:#63d4e9;font-size:8px;line-height:1.35}.welcome-profile-mobile-close{width:30px;height:30px;flex:0 0 30px;display:grid;place-items:center;border:1px solid rgba(72,216,241,.14);border-radius:9px;background:rgba(72,216,241,.05);color:#b9d8df;cursor:pointer}.welcome-profile-mobile-message{padding:12px 14px 14px;color:#9bb6bf;font-size:10px;line-height:1.75;overflow-wrap:anywhere}
+
 /* Desktop: editorial wide composition */
 /* Desktop welcome composition: selected leadership profiles beside the introduction. */
 .welcome-with-team .welcome-inner{display:grid;grid-template-columns:minmax(235px,285px) minmax(0,1fr);gap:42px;align-items:center}
 .welcome-team{display:grid;gap:14px;align-self:stretch;align-content:center}
-.welcome-team-label{color:#69d9ec;font-size:8px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
 .welcome-profile{position:relative;display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:center;min-width:0;padding:11px;border:1px solid rgba(72,216,241,.13);border-radius:16px;background:linear-gradient(145deg,rgba(8,37,50,.88),rgba(3,19,27,.92));color:inherit;cursor:pointer;text-align:left;transition:transform .28s cubic-bezier(.2,.7,.2,1),border-color .28s ease,box-shadow .28s ease}
 .welcome-profile:before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(120deg,rgba(72,216,241,.08),transparent 45%);opacity:0;transition:opacity .28s ease;pointer-events:none}
 .welcome-profile:hover{transform:translateX(5px);border-color:rgba(72,216,241,.34);box-shadow:0 14px 34px rgba(0,0,0,.22),0 0 28px rgba(72,216,241,.045)}
@@ -166,7 +170,7 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
 .welcome-profile-copy{min-width:0}
 .welcome-profile-name{margin:0;color:#eaf8fb;font-size:12px;line-height:1.3;font-weight:800;overflow-wrap:anywhere}
 .welcome-profile-role{margin-top:4px;color:#63d4e9;font-size:8px;line-height:1.4;font-weight:750}
-.welcome-profile-message{margin-top:7px;color:#7f9ea8;font-size:8px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.welcome-profile-message{margin-top:7px;color:#7f9ea8;font-size:8px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.welcome-profile-mobile-panel{display:none}
 .welcome-profile-hint{margin-top:6px;color:#5bcde4;font-size:7px;font-weight:800;letter-spacing:.04em}
 .welcome-with-team .welcome-content{min-width:0}
 .welcome-profile-modal{position:fixed;inset:0;z-index:160;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,5,9,.78);backdrop-filter:blur(16px) saturate(120%)}
@@ -226,8 +230,7 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
   align-self:start;
   padding-top:6px;
  }
- .welcome-with-team .welcome-team-label{text-align:left}
- .welcome-with-team .welcome-profile{grid-template-columns:76px minmax(0,1fr);padding:12px;gap:12px}
+ .welcome-with-team  .welcome-with-team .welcome-profile{grid-template-columns:76px minmax(0,1fr);padding:12px;gap:12px}
  .welcome-with-team .welcome-profile-photo{width:76px;height:76px}
  .welcome-with-team .welcome-profile-copy{min-width:0}
 }
@@ -241,8 +244,7 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
   padding-top:22px;
   border-top:1px solid rgba(72,216,241,.10);
  }
- .welcome-with-team .welcome-team-label{margin-bottom:2px}
- .welcome-with-team .welcome-profile{
+  .welcome-with-team .welcome-profile{
   grid-template-columns:64px minmax(0,1fr);
   padding:10px;
   gap:10px;
@@ -865,7 +867,6 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
 <div class="welcome-inner">
 @if($featuredManagement->isNotEmpty())
 <div class="welcome-team" aria-label="Featured leadership profiles">
-<div class="welcome-team-label">Leadership voices</div>
 @foreach($featuredManagement as $member)
 <button type="button" class="welcome-profile welcome-profile-{{ $loop->iteration }}" data-welcome-profile="{{ $member->id }}" aria-label="Open profile of {{ $member->title }}">
 <div class="welcome-profile-photo"><img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}" loading="lazy"></div>
@@ -876,6 +877,10 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
 <div class="welcome-profile-hint">View message <i class="fa-solid fa-arrow-right"></i></div>
 </div>
 </button>
+<div class="welcome-profile-mobile-panel" data-welcome-mobile-panel="{{ $member->id }}" hidden>
+<div class="welcome-profile-mobile-head"><div><strong>{{ $member->title }}</strong><span>{{ $member->designation ?: $member->excerpt }}</span></div><button type="button" class="welcome-profile-mobile-close" data-close-welcome-mobile aria-label="Close message"><i class="fa-solid fa-xmark"></i></button></div>
+<div class="welcome-profile-mobile-message">{!! nl2br(e(trim(strip_tags((string) $member->content)))) !!}</div>
+</div>
 <div class="welcome-profile-modal" data-welcome-modal="{{ $member->id }}" aria-hidden="true">
 <div class="welcome-profile-dialog" role="dialog" aria-modal="true" aria-labelledby="welcome-profile-title-{{ $member->id }}">
 <div class="welcome-profile-modal-photo"><img src="{{ asset('storage/'.ltrim($member->image_path,'/')) }}" alt="{{ $member->title }}"></div>
@@ -961,11 +966,27 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
 
  document.querySelectorAll('[data-welcome-profile]').forEach(button=>{
   button.addEventListener('click',()=>{
-   
-   const modal=document.querySelector('[data-welcome-modal="'+button.dataset.welcomeProfile+'"]');
+   const id=button.dataset.welcomeProfile;
+   if(window.innerWidth<=650){
+    const panel=document.querySelector('[data-welcome-mobile-panel="'+id+'"]');
+    if(!panel)return;
+    const open=panel.classList.contains('is-open');
+    document.querySelectorAll('[data-welcome-mobile-panel]').forEach(p=>{p.classList.remove('is-open');p.hidden=true;});
+    document.querySelectorAll('[data-welcome-profile]').forEach(b=>b.classList.remove('is-expanded'));
+    if(!open){panel.hidden=false;panel.classList.add('is-open');button.classList.add('is-expanded');}
+    return;
+   }
+   const modal=document.querySelector('[data-welcome-modal="'+id+'"]');
    if(!modal)return;
    modal.classList.add('is-open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
    modal.querySelector('[data-close-welcome-profile]')?.focus();
+  });
+ });
+ document.querySelectorAll('[data-welcome-mobile-panel]').forEach(panel=>{
+  panel.querySelector('[data-close-welcome-mobile]')?.addEventListener('click',e=>{
+   e.stopPropagation();
+   panel.classList.remove('is-open');panel.hidden=true;
+   document.querySelector('[data-welcome-profile="'+panel.dataset.welcomeMobilePanel+'"]')?.classList.remove('is-expanded');
   });
  });
  document.querySelectorAll('[data-welcome-modal]').forEach(modal=>{
@@ -1009,7 +1030,7 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
    });
   }
  };
- const requestMotion=()=>{if(!ticking){ticking=true;requestAnimationFrame(paintMotion)}};
+ const requestMotion=()=>{if(window.matchMedia('(pointer:coarse)').matches || window.innerWidth<=650)return;if(!ticking){ticking=true;requestAnimationFrame(paintMotion)}};
  window.addEventListener('scroll',requestMotion,{passive:true});
  window.addEventListener('resize',requestMotion,{passive:true});
  requestMotion();
