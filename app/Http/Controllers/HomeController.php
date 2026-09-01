@@ -39,7 +39,7 @@ class HomeController
         ];
 
         $projectsLimit=max(1,min(100,(int)($sectionSettings['projects']['limit']??6)));
-        $managementLimit=max(1,min(100,(int)($sectionSettings['management']['limit']??4)));
+        $managementLimit=max(4,min(100,(int)($sectionSettings['management']['limit']??4)));
         $newsLimit=max(1,min(100,(int)($sectionSettings['news']['limit']??3)));
         $galleryLimit=max(1,min(100,(int)($sectionSettings['gallery']['limit']??4)));
         $resolveIds = static fn (array $settings): array => array_values(array_unique(array_filter(array_map('intval', $settings['ids'] ?? []))));
@@ -92,11 +92,32 @@ class HomeController
             $projectSettings,
             $projectsLimit
         );
-        $homeManagement = $applySelection(
-            SiteContentItem::published()->where('type','management')->orderBy('sort_order')->orderBy('title'),
-            $managementSettings,
-            $managementLimit
-        );
+        $managementQuery = SiteContentItem::published()
+            ->where('type','management')
+            ->orderBy('sort_order')
+            ->orderBy('title');
+
+        $homeManagement = $applySelection($managementQuery, $managementSettings, $managementLimit);
+
+        // A homepage card grid is designed for four profiles. If an admin has selected
+        // fewer than four profiles, fill the remaining slots with the latest published
+        // management profiles rather than leaving the homepage with a single card.
+        if ($homeManagement->count() < $managementLimit) {
+            $selectedIds = $homeManagement->pluck('id')->all();
+            $fallbackManagement = SiteContentItem::published()
+                ->where('type','management')
+                ->when($selectedIds, fn ($query) => $query->whereNotIn('id', $selectedIds))
+                ->orderBy('sort_order')
+                ->orderBy('title')
+                ->take($managementLimit - $homeManagement->count())
+                ->get();
+
+            $homeManagement = $homeManagement
+                ->concat($fallbackManagement)
+                ->unique('id')
+                ->take($managementLimit)
+                ->values();
+        }
 
         // Explicit welcome selections take priority; the homepage management list fills any gap.
         $welcomeManagement = $welcomeManagement
