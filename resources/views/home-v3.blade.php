@@ -726,6 +726,119 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
     }
 }
 
+
+/* === Master welcome / leadership polish === */
+@media (min-width:651px){
+    .welcome-with-team .welcome-inner{
+        grid-template-columns:minmax(0,1fr) minmax(300px,360px)!important;
+        gap:clamp(34px,4.8vw,68px)!important;
+        align-items:center!important;
+    }
+    .welcome-with-team .welcome-content{
+        grid-column:1!important;
+        grid-row:1!important;
+        min-width:0!important;
+    }
+    .welcome-with-team .welcome-team{
+        grid-column:2!important;
+        grid-row:1!important;
+        align-self:center!important;
+        display:grid!important;
+        grid-template-columns:1fr!important;
+        gap:13px!important;
+        min-width:0!important;
+        padding:0!important;
+    }
+    .welcome-with-team .welcome-team-label{
+        margin:0 0 2px 3px!important;
+        text-align:left!important;
+        font-size:8px!important;
+        letter-spacing:.2em!important;
+    }
+    .welcome-with-team .welcome-profile{
+        min-width:0!important;
+        min-height:104px!important;
+        grid-template-columns:82px minmax(0,1fr)!important;
+        gap:13px!important;
+        padding:10px!important;
+        border-radius:17px!important;
+        transform:translate3d(var(--profile-motion-x,0px),0,0);
+    }
+    .welcome-with-team .welcome-profile-1{transition-delay:0s!important}
+    .welcome-with-team .welcome-profile-2{transition-delay:.10s!important}
+    .welcome-with-team .welcome-profile-photo{
+        width:82px!important;
+        height:82px!important;
+        border-radius:13px!important;
+    }
+    .welcome-with-team .welcome-profile-name{
+        font-size:13px!important;
+        font-weight:850!important;
+    }
+    .welcome-with-team .welcome-profile-role{
+        font-size:8px!important;
+        margin-top:5px!important;
+    }
+    .welcome-with-team .welcome-profile-message{
+        font-size:8px!important;
+        line-height:1.5!important;
+        margin-top:7px!important;
+    }
+    .welcome-with-team .welcome-profile-hint{
+        font-size:7px!important;
+        margin-top:6px!important;
+    }
+
+    /* The welcome copy subtly travels left/right with scroll, while remaining GPU-friendly. */
+    .welcome-with-team.revealed .welcome-heading{
+        transform:translate3d(var(--motion-x,0px),var(--motion-y,0px),0);
+        will-change:transform;
+    }
+    .welcome-with-team.revealed .welcome-copy{
+        transform:translate3d(calc(var(--motion-x,0px) * -0.72),var(--motion-y,0px),0);
+        will-change:transform;
+    }
+    .welcome-with-team.revealed .welcome-profile{
+        will-change:transform;
+    }
+}
+@media (max-width:650px){
+    .welcome-with-team .welcome-team{
+        margin-top:30px!important;
+        padding-top:22px!important;
+        gap:11px!important;
+    }
+    .welcome-with-team .welcome-profile{
+        min-height:88px!important;
+        grid-template-columns:64px minmax(0,1fr)!important;
+        gap:10px!important;
+        padding:10px!important;
+        border-radius:15px!important;
+    }
+    .welcome-with-team .welcome-profile-photo{
+        width:64px!important;
+        height:64px!important;
+        border-radius:11px!important;
+    }
+    .welcome-with-team .welcome-profile-name{
+        font-size:11px!important;
+        font-weight:850!important;
+    }
+    .welcome-with-team .welcome-profile-role{
+        font-size:7px!important;
+        line-height:1.4!important;
+        letter-spacing:.04em!important;
+    }
+    .welcome-with-team .welcome-profile-message{
+        font-size:7px!important;
+        line-height:1.45!important;
+        -webkit-line-clamp:2!important;
+    }
+    .welcome-with-team .welcome-profile-hint{
+        font-size:6.5px!important;
+    }
+}
+
 /* Keep the public page free of legacy escaped-newline artefacts. */
 
 </style>
@@ -754,12 +867,12 @@ main.shell>.energy-atmosphere{position:fixed;inset:0;z-index:-2;pointer-events:n
 <div class="welcome-team" aria-label="Featured leadership profiles">
 <div class="welcome-team-label">Leadership voices</div>
 @foreach($featuredManagement as $member)
-<button type="button" class="welcome-profile" data-welcome-profile="{{ $member->id }}" aria-label="Open profile of {{ $member->title }}">
+<button type="button" class="welcome-profile welcome-profile-{{ $loop->iteration }}" data-welcome-profile="{{ $member->id }}" aria-label="Open profile of {{ $member->title }}">
 <div class="welcome-profile-photo"><img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}" loading="lazy"></div>
 <div class="welcome-profile-copy">
 <h3 class="welcome-profile-name">{{ $member->title }}</h3>
 <div class="welcome-profile-role">{{ $member->designation ?: $member->excerpt }}</div>
-<div class="welcome-profile-message">{{ IlluminateSupportStr::words(trim(strip_tags((string) $member->content)), 20) }}</div>
+<div class="welcome-profile-message">{{ \Illuminate\Support\Str::words(trim(strip_tags((string) $member->content)), 20) }}</div>
 <div class="welcome-profile-hint">View message <i class="fa-solid fa-arrow-right"></i></div>
 </div>
 </button>
