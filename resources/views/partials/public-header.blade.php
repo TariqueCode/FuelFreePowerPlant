@@ -144,6 +144,11 @@
                     <a href="{{ route('contact') }}">{{ $headerLabels['contact_label'] ?? 'Contact' }}</a>
                     <a href="{{ route('webmail.redirect') }}" target="_blank" rel="noopener noreferrer">{{ $headerLabels['webmail_label'] ?? 'Webmail' }}</a>
                 @endforelse
+                <span class="mobile-portal-separator" aria-hidden="true"></span>
+                <a class="mobile-menu-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer">
+                    <i class="fa-solid {{ $isPortalUser ? 'fa-circle-user' : 'fa-right-to-bracket' }}" aria-hidden="true"></i>
+                    <span>{{ $isPortalUser ? ($headerLabels['portal_label'] ?? 'Portal') : ($headerLabels['login_label'] ?? 'Login') }}</span>
+                </a>
             </nav>
         </div>
     </div>
