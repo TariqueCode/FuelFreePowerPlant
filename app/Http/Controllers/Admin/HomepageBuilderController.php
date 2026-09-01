@@ -111,11 +111,12 @@ class HomepageBuilderController extends Controller
                     unset($settings['ids']);
                 }
             }
-            HomepageSection::query()->where('key', $key)->update([
-                'sort_order' => $position,
-                'is_enabled' => $request->boolean("sections.{$key}"),
-                'settings' => $settings,
-            ]);
+            if ($section) {
+                $section->sort_order = $position;
+                $section->is_enabled = $request->boolean("sections.{$key}");
+                $section->settings = $settings;
+                $section->save();
+            }
         }
         });
 
