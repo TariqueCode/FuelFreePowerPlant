@@ -10,7 +10,7 @@ return [
 
     'header' => [
         'home_label' => 'Home',
-        'management_label' => 'Management Team',
+        'management_label' => 'Board of Directors',
         'gallery_label' => 'Gallery',
         'news_label' => 'News & Notices',
         'career_label' => 'Career',
