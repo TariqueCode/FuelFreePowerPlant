@@ -46,7 +46,7 @@
     @if($section === 'solutions' || $section === 'plants' || $section === 'future-project')
         <section class="site-section-grid">
             @if($items->isEmpty())
-                <div class="site-section-empty">No {{ $section === 'plants' ? 'plant information' : ($section === 'future-project' ? 'future project information' : 'solutions') }} have been published yet.</div>
+                <div class="site-section-empty">No {{ $section === 'plants' ? 'project information' : ($section === 'future-project' ? 'future project information' : 'solutions') }} have been published yet.</div>
             @else
                 @foreach($items as $item)
                     <article class="site-section-card">
