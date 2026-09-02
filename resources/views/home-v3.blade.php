@@ -47,6 +47,35 @@ img{max-width:100%}
 @keyframes sectionReveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .section-layout-center .head{text-align:center}.section-layout-center .head>div{margin-inline:auto}
 .section-layout-right .head{text-align:right}.section-layout-right .head>div{margin-left:auto}
+
+/* Homepage section alignment must control the content grid as well as its heading. */
+.section-layout-left .management-grid,
+.section-layout-left .project-grid,
+.section-layout-left .news-grid,
+.section-layout-left .folders{
+    justify-content:start;
+}
+.section-layout-center .management-grid,
+.section-layout-center .project-grid,
+.section-layout-center .news-grid,
+.section-layout-center .folders{
+    justify-content:center;
+}
+.section-layout-right .management-grid,
+.section-layout-right .project-grid,
+.section-layout-right .news-grid,
+.section-layout-right .folders{
+    justify-content:end;
+}
+
+/* Centered executive cards should form a compact, balanced row instead of
+   occupying empty grid tracks from the left edge. */
+@media(min-width:651px){
+    .section-layout-center .management-grid{
+        grid-template-columns:repeat(auto-fit,minmax(240px,280px));
+    }
+}
+
 .head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:24px}
 .head>div{min-width:0}.head h2{font-size:clamp(27px,4vw,44px);line-height:1.05;letter-spacing:-.04em;margin:5px 0 0}
 .head p{max-width:560px;margin:7px 0 0;color:var(--muted);font-size:11px!important;line-height:1.6!important}
