@@ -190,7 +190,7 @@ img{max-width:100%}
     margin-top:12px!important;
     padding-top:11px;
     border-top:1px solid rgba(83,218,240,.13);
-    color:var(--muted);
+    color:#9ab7bf !important;
     font-size:9px!important;
     line-height:1.55!important;
     display:-webkit-box;
