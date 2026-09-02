@@ -6,6 +6,7 @@
     $publicFooterName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
     $publicFooterTagline = $footerSettings['tagline'] ?? (is_object($publicBrand) ? ($publicBrand->get('tagline') ?: $publicBrand->get('company.tagline') ?: config('fuelfree.company.tagline')) : ($publicBrand['tagline'] ?? $publicBrand['company.tagline'] ?? config('fuelfree.company.tagline')));
     $publicFooterLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
+    $publicFooterName = preg_replace('/^FUEL\\s*FREE\\s*POWER\\s*PLANT$/i', 'FUELFREE POWERPLANT', trim((string) $publicFooterName));
     $publicFooterNameParts = preg_split('/\s+/', trim((string) $publicFooterName), 2);
     $publicFooterNameFirst = $publicFooterNameParts[0] ?? '';
     $publicFooterNameRest = $publicFooterNameParts[1] ?? '';
