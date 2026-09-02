@@ -3311,9 +3311,70 @@ main.shell{
 })();
 </script>
 
+<style>
+/* === FINAL STATIC HOMEPAGE MODE ===
+   Professional visual design stays intact; motion is disabled for reliable
+   touch interaction and predictable rendering on every device. */
+.home-v3,
+.home-v3 *,
+.home-v3 *::before,
+.home-v3 *::after{
+    animation:none !important;
+    transition:none !important;
+    scroll-behavior:auto !important;
+}
+.home-v3 .slide,
+.home-v3 .slide.is-active{
+    transform:none !important;
+}
+.home-v3 .home-section,
+.home-v3 .home-section.reveal-ready,
+.home-v3 .home-section.revealed,
+.home-v3 .welcome-with-team .welcome-content,
+.home-v3 .welcome-with-team .welcome-profile,
+.home-v3 .welcome-heading,
+.home-v3 .welcome-copy,
+.home-v3 .home-section .head>div,
+.home-v3 .home-section .head>p{
+    opacity:1 !important;
+    transform:none !important;
+    translate:none !important;
+    will-change:auto !important;
+}
+.home-v3 .stat-card:hover,
+.home-v3 .project-card:hover,
+.home-v3 .member-card:hover,
+.home-v3 .news:hover,
+.home-v3 .folder:hover,
+.home-v3 .welcome-profile:hover,
+.home-v3 .member-more:hover{
+    transform:none !important;
+}
+.home-v3 .slide.is-active .slide-media:after,
+.home-v3 .welcome-heading:before,
+.home-v3 .cta-card:before,
+.home-v3 .cta-card:after,
+.home-v3 .home-slider:before{
+    animation:none !important;
+}
+@media (pointer:coarse){
+    .home-v3 .home-slider,
+    .home-v3 .home-section,
+    .home-v3 .member-card,
+    .home-v3 .stat-card,
+    .home-v3 .project-card,
+    .home-v3 .news,
+    .home-v3 .folder,
+    .home-v3 button,
+    .home-v3 a{
+        -webkit-tap-highlight-color:transparent;
+    }
+}
+</style>
+
 <script>
 (() => {
- const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const reduce=true;
 
  // Do not let browser scroll restoration reopen the homepage partway down.
  if ('scrollRestoration' in history) history.scrollRestoration='manual';
@@ -3404,28 +3465,8 @@ main.shell{
     const slides = [...root.querySelectorAll('.slide')];
     if (slides.length < 2) return;
 
-    let index = 0;
-    let timer;
-
-    const show = (nextIndex) => {
-        index = (nextIndex + slides.length) % slides.length;
-        slides.forEach((slide, i) => slide.classList.toggle('is-active', i === index));
-    };
-
-    const start = () => {
-        clearInterval(timer);
-        timer = setInterval(() => show(index + 1), 5000);
-    };
-
-    const pause = () => clearInterval(timer);
-
-    root.addEventListener('mouseenter', pause);
-    root.addEventListener('mouseleave', start);
-    root.addEventListener('touchstart', pause, {passive:true});
-    root.addEventListener('touchend', start, {passive:true});
-    root.addEventListener('touchcancel', start, {passive:true});
-
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) start();
+    // Static homepage mode: keep the first slide visible.
+    // No autoplay, swipe choreography, or timed transitions.
 })();
 </script>
 @endpush
