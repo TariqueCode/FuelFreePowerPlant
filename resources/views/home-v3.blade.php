@@ -1084,52 +1084,6 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
         padding:92px 0 104px;
     }
 
-    .home-section-management .head {
-        display:grid;
-        grid-template-columns:minmax(0,1fr) auto;
-        align-items:end;
-        gap:32px;
-        margin-bottom:34px;
-        padding-bottom:22px;
-        border-bottom:1px solid rgba(83,218,240,.13);
-        text-align:left !important;
-    }
-
-    .home-section-management .head > div {
-        max-width:720px;
-        margin-left:0 !important;
-        margin-right:0 !important;
-    }
-
-    .home-section-management .head h2 {
-        margin-top:7px;
-        font-size:clamp(36px,4vw,52px);
-        letter-spacing:-.045em;
-    }
-
-    .home-section-management .head .eyebrow {
-        font-size:10px !important;
-        letter-spacing:.24em;
-    }
-
-    .home-section-management .more {
-        align-self:center;
-        min-height:38px;
-        display:inline-flex;
-        align-items:center;
-        padding:0 14px;
-        border:1px solid rgba(72,216,241,.16);
-        border-radius:999px;
-        background:rgba(72,216,241,.04);
-        transition:background .25s ease,border-color .25s ease,transform .25s ease;
-    }
-
-    .home-section-management .more:hover {
-        border-color:rgba(72,216,241,.34);
-        background:rgba(72,216,241,.08);
-        transform:translateY(-1px);
-    }
-
     .home-section-management .management-grid { gap:18px; }
     .home-section-management .member-card {
         display:flex;
