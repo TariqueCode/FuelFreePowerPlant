@@ -167,4 +167,37 @@ class PublishingAuthorityTest extends TestCase
         $response->assertSeeInOrder([$second->name, $first->name]);
     }
 
+    public function test_cms_page_activation_and_deactivation_requires_publish_permission(): void
+    {
+        $manage = Permission::firstOrCreate(['slug' => 'cms.manage'], ['name' => 'Manage CMS']);
+        $publish = Permission::firstOrCreate(['slug' => 'cms.publish'], ['name' => 'Publish CMS pages']);
+
+        $managerRole = Role::create(['name' => 'CMS Manager', 'slug' => 'cms-manager-toggle-test', 'is_system' => false]);
+        $managerRole->permissions()->sync([$manage->id]);
+        $manager = User::factory()->create();
+        $manager->roles()->attach($managerRole);
+
+        $publisherRole = Role::create(['name' => 'CMS Publisher', 'slug' => 'cms-publisher-toggle-test', 'is_system' => false]);
+        $publisherRole->permissions()->sync([$manage->id, $publish->id]);
+        $publisher = User::factory()->create();
+        $publisher->roles()->attach($publisherRole);
+
+        $page = AppModelsCmsPage::create([
+            'title' => 'QA Content Page',
+            'slug' => 'qa-content-page',
+            'content' => 'QA',
+            'is_published' => false,
+        ]);
+
+        $this->actingAs($manager)->patch(route('admin.cms.toggle', $page))->assertForbidden();
+        $this->assertFalse($page->fresh()->is_published);
+
+        $this->actingAs($publisher)->patch(route('admin.cms.toggle', $page))->assertRedirect();
+        $this->assertTrue($page->fresh()->is_published);
+
+        $this->actingAs($publisher)->patch(route('admin.cms.toggle', $page))->assertRedirect();
+        $this->assertFalse($page->fresh()->is_published);
+    }
+
+
 }
