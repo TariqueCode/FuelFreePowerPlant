@@ -3174,7 +3174,7 @@ main.shell{
 @endif
 
 @if($section==='statistics' && $home['statistics'])
-<section class="section home-section home-section-statistics section-layout-{{ ($sectionSettings['statistics'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Power at a glance</span><h2>Our footprint.</h2></div><p>Key figures are calculated directly from the power plant records managed in the admin portal.</p></div>
+<section class="section home-section home-section-statistics section-layout-{{ ($sectionSettings['statistics'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Power at a glance</span><h2>Our footprint</h2></div><p>Key figures are calculated directly from the power plant records managed in the admin portal.</p></div>
 <div class="stats-grid">
 <div class="stat-card"><i class="fa-solid fa-industry"></i><strong>{{ number_format($stats['projects']) }}</strong><span>Projects</span></div>
 <div class="stat-card"><i class="fa-solid fa-bolt"></i><strong>{{ number_format($stats['capacity_mw'],2) }} MW</strong><span>Total capacity</span></div>
@@ -3184,7 +3184,7 @@ main.shell{
 @endif
 
 @if($section==='projects' && $home['projects'])
-<section class="section home-section home-section-projects section-layout-{{ ($sectionSettings['projects'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Our power plants</span><h2>Projects &amp; plants.</h2></div><a class="more" href="{{ route('site.plants') }}">View all →</a></div>
+<section class="section home-section home-section-projects section-layout-{{ ($sectionSettings['projects'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Our power plants</span><h2>Projects &amp; plants</h2></div><a class="more" href="{{ route('site.plants') }}">View all →</a></div>
 <div class="project-grid">
 @if($plants->isNotEmpty())
 @foreach($plants as $plant)
