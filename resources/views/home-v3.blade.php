@@ -3131,7 +3131,7 @@ main.shell{
 
 @if($section==='management' && $home['management'])
 
-<section class="section home-section home-section-management section-layout-{{ ($sectionSettings['management'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Leadership</span><h2>Board of Directors.</h2></div><a class="more" href="{{ route('management') }}">Meet the team →</a></div>
+<section class="section home-section home-section-management section-layout-{{ ($sectionSettings['management'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Leadership</span><h2>Board of Directors</h2></div><a class="more" href="{{ route('management') }}">Meet the team →</a></div>
 <div class="management-grid">
 @if($homeManagement->isNotEmpty())
 @foreach($homeManagement as $member)
@@ -3364,3 +3364,11 @@ main.shell{
 
 
 @endsection
+/* === Final mobile Board of Directors: always two profiles per row === */
+@media (max-width:650px){
+ .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:10px !important;}
+ .home-section-management .member-card{min-width:0;width:100%;}
+}
+@media (max-width:380px){
+ .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:8px !important;}
+}
