@@ -3,7 +3,7 @@
 @section('content')
 <section class="overview-hero"><div><div class="eyebrow">ENERGY OPERATIONS CONTROL CENTER</div><h1>Powering the future, <span>{{ auth()->user()->name }}</span>.</h1><p>A focused overview of plants, verified performance and core operations.</p></div></section>
 <section class="metric-grid" aria-label="Key metrics">
-@foreach([['⚡','POWER PLANTS',$plantStats['total'],$plantStats['operational'].' operational'],['◈','TOTAL CAPACITY',number_format($plantStats['capacity_kw'],1).' kW','Registered plant capacity'],['◉','VERIFIED OUTPUT',$performanceSummary['output_kw']!==null?number_format((float)$performanceSummary['output_kw'],1).' kW':'—',$latestPerformance?'Verified / real-time':'Awaiting verified data'],['↗','EFFICIENCY',$performanceSummary['efficiency']!==null?number_format((float)$performanceSummary['efficiency'],1).'%':'—','Latest verified reading']] as $m)
+@foreach([['⚡','PROJECTS',$plantStats['total'],$plantStats['operational'].' operational'],['◈','TOTAL CAPACITY',number_format($plantStats['capacity_kw'],1).' kW','Registered project capacity'],['◉','VERIFIED OUTPUT',$performanceSummary['output_kw']!==null?number_format((float)$performanceSummary['output_kw'],1).' kW':'—',$latestPerformance?'Verified / real-time':'Awaiting verified data'],['↗','EFFICIENCY',$performanceSummary['efficiency']!==null?number_format((float)$performanceSummary['efficiency'],1).'%':'—','Latest verified reading']] as $m)
 <article class="metric-card"><div class="metric-icon">{{ $m[0] }}</div><div><small>{{ $m[1] }}</small><strong>{{ $m[2] }}</strong><span>{{ $m[3] }}</span></div></article>
 @endforeach
 </section>
