@@ -3184,7 +3184,7 @@ main.shell{
 @endif
 
 @if($section==='projects' && $home['projects'])
-<section class="section home-section home-section-projects section-layout-{{ ($sectionSettings['projects'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Our power plants</span><h2>Projects &amp; plants</h2></div><a class="more" href="{{ route('site.plants') }}">View all →</a></div>
+<section class="section home-section home-section-projects section-layout-{{ ($sectionSettings['projects'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">{{ config('fuelfree.projects.eyebrow','Our project portfolio') }}</span><h2>{{ config('fuelfree.projects.label','Projects &amp; Our Plans') }}</h2></div><a class="more" href="{{ route('site.plants') }}">View all →</a></div>
 <div class="project-grid">
 @if($plants->isNotEmpty())
 @foreach($plants as $plant)
@@ -3193,7 +3193,7 @@ main.shell{
 <div class="project-body"><div class="project-top"><span>{{ ucfirst(str_replace('_',' ',$plant->status)) }}</span><i class="fa-solid fa-arrow-up-right-from-square"></i></div><h3>{{ $plant->name }}</h3><p>{{ $plant->location ?: $plant->technology ?: 'Power generation project' }}</p><strong>{{ number_format((float)$plant->capacity_kw/1000,2) }} MW</strong></div>
 </a>
 @endforeach
-@else<div class="empty" style="grid-column:1/-1">No power plant projects have been published yet.</div>@endif
+@else<div class="empty" style="grid-column:1/-1">No projects have been published yet.</div>@endif
 </div></section>
 @endif
 
