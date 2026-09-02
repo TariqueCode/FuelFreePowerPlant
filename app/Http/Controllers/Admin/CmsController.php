@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CmsPage;
+use App\Models\SiteContentItem;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -12,9 +14,45 @@ use Illuminate\View\View;
 
 class CmsController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        return view('admin.cms.index', ['pages' => CmsPage::latest()->paginate(15)]);
+        $pageBuilder = CmsPage::query()->get()->map(function (CmsPage $page) {
+            $page->content_source = 'Page Builder';
+            $page->edit_url = route('admin.cms.edit', $page);
+            $page->toggle_url = route('admin.cms.toggle', $page);
+            $page->delete_url = route('admin.cms.destroy', $page);
+            $page->duplicate_url = route('admin.cms.duplicate', $page);
+            return $page;
+        });
+
+        $websitePages = SiteContentItem::query()
+            ->whereIn('type', ['company', 'plants', 'future-project', 'solution'])
+            ->get()
+            ->map(function (SiteContentItem $page) {
+                $page->content_source = 'Website Content';
+                $page->edit_url = route('admin.site-content.edit', $page);
+                $page->toggle_url = route('admin.site-content.page.toggle', $page);
+                $page->delete_url = route('admin.site-content.destroy', $page);
+                $page->duplicate_url = null;
+                return $page;
+            });
+
+        $allPages = $pageBuilder
+            ->concat($websitePages)
+            ->sortByDesc(fn ($page) => $page->updated_at?->timestamp ?? 0)
+            ->values();
+
+        $perPage = 15;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $pages = new LengthAwarePaginator(
+            $allPages->forPage($currentPage, $perPage)->values(),
+            $allPages->count(),
+            $perPage,
+            $currentPage,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return view('admin.cms.index', ['pages' => $pages]);
     }
 
     public function create(): View
