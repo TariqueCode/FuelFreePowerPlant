@@ -2952,6 +2952,57 @@ main.shell{
   .home-slider:before,.slide.is-active .slide-media:after,.welcome:before,.welcome:after{animation:none!important}
 }
 
+
+/* FFP final responsive + motion polish */
+/* Keep the existing visual language; tune only layout resilience and motion load. */
+@media (min-width:1100px){
+  .home-section .head{align-items:flex-end}
+  .home-section .head>div{min-width:0}
+  .management-grid,.project-grid,.news-grid,.stats-grid,.folders{max-width:100%}
+  .home-section-management .member-card,.home-section-projects .project-card,.home-section-news .news,.home-section-gallery .folder{min-width:0}
+}
+@media (min-width:651px) and (max-width:900px){
+  .home-section .head{gap:16px}
+  .home-section .head>div{max-width:68%}
+  .home-section .more{flex-shrink:0}
+  .management-grid,.project-grid,.news-grid,.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .folders{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .project-media{aspect-ratio:16/10;height:auto}
+}
+@media (max-width:650px){
+  .home-section .head{width:100%;align-items:flex-start}
+  .home-section .head>div{max-width:calc(100% - 82px)}
+  .home-section .head h2,.home-section .head p{overflow-wrap:anywhere}
+  .home-section .more{max-width:82px;text-align:right;white-space:normal;line-height:1.35!important}
+  .management-grid,.project-grid,.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .news-grid{grid-template-columns:1fr}
+  .folders{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .home-section .member-card,.home-section .project-card,.home-section .news,.home-section .folder,.home-section .stat-card{min-width:0;max-width:100%}
+  .home-section-management .member-message{overflow-wrap:anywhere}
+  .home-section-management .member-contact span{min-width:0}
+  /* Decorative motion remains, but never becomes a layout dependency on touch devices. */
+  .home-slider:before,.welcome:before,.welcome:after,.welcome-heading:before,.cta-card:before,.cta-card:after{animation-duration:16s}
+}
+@media (max-width:480px){
+  .shell{width:calc(100% - 18px)}
+  .section{padding:36px 0}
+  .home-section .head{margin-bottom:13px}
+  .home-section .head>div{max-width:calc(100% - 70px)}
+  .home-section .head h2{font-size:clamp(21px,7vw,28px)}
+  .home-section .more{max-width:70px;font-size:7.5px!important}
+  .stats-grid,.project-grid,.management-grid{gap:8px}
+  .stat-card{padding:12px}
+  .home-section-management .member-body{padding:11px}
+  .home-section-management .member-more{min-height:36px;padding:8px 10px;font-size:8px}
+}
+@media (max-width:380px){
+  .stats-grid,.project-grid,.management-grid,.folders{grid-template-columns:1fr}
+  .home-section .head>div{max-width:100%}
+  .home-section .more{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .home-slider,.home-slider:before,.slide.is-active .slide-media:after,.welcome:before,.welcome:after,.welcome-heading:before,.cta-card:before,.cta-card:after,.home-section.reveal-ready,.home-section.revealed .stat-card,.home-section.revealed .project-card,.home-section.revealed .member-card,.home-section.revealed .news,.home-section.revealed .folder{animation:none!important;transition:none!important}
+}
 </style>
 <main class="shell home-v3">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
