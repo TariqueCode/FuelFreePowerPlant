@@ -1,11 +1,11 @@
 @extends('layouts.public')
 
-@section('title', $resource->title.' · '.($brand['name'] ?? config('fuelfree.company.name')))
+@section('title', ($resource->meta_title ?: $resource->title).' · '.($brand['name'] ?? config('fuelfree.company.name')))
 
 @section('content')
 @push('head')
 @if($resource->meta_description)<meta name="description" content="{{ $resource->meta_description }}">@endif
-@if($resource->meta_title)<meta property="og:title" content="{{ $resource->meta_title }}">@endif
+<meta property="og:title" content="{{ $resource->meta_title ?: $resource->title }}">
 @if($resource->meta_description)<meta property="og:description" content="{{ $resource->meta_description }}">@endif
 <meta property="og:type" content="article">
 @endpush
