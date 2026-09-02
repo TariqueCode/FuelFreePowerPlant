@@ -36,6 +36,18 @@ class HomeController
         $sectionSettings = $configuredSections->mapWithKeys(
             fn ($section) => [$section->key => $normalizeSectionSettings($section->settings)]
         );
+
+        // Keep every homepage section layout constrained to the three layouts
+        // exposed by the Admin Homepage Builder. Invalid/stale values must never
+        // become CSS class names on the public site.
+        $sectionSettings = $sectionSettings->map(function (array $settings): array {
+            $layout = $settings['layout'] ?? 'left';
+            $settings['layout'] = in_array($layout, ['left', 'center', 'right'], true)
+                ? $layout
+                : 'left';
+
+            return $settings;
+        });
         $sectionOrder = $configuredSections->pluck('key')->all();
         $enabledSections = $configuredSections->where('is_enabled', true)->pluck('key')->flip();
         $home = [
