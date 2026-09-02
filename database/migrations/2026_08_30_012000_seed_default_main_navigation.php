@@ -10,7 +10,7 @@ return new class extends Migration
         $topLevel = [
             ['label' => 'Home', 'route_name' => 'home', 'sort_order' => 0],
             ['label' => 'Company', 'group' => 'Company', 'sort_order' => 1],
-            ['label' => 'Management Team', 'route_name' => 'management', 'sort_order' => 2],
+            ['label' => 'Board of Directors', 'route_name' => 'management', 'sort_order' => 2],
             ['label' => 'Gallery', 'route_name' => 'site.gallery', 'sort_order' => 3],
             ['label' => 'News & Notices', 'route_name' => 'news.index', 'sort_order' => 4],
             ['label' => 'Career', 'route_name' => 'site.career', 'sort_order' => 5],
