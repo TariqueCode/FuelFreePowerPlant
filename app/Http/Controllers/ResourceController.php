@@ -64,6 +64,13 @@ class ResourceController extends Controller
             ->limit(4)
             ->get();
 
-        return view('resources.show', ['resource' => $resource, 'related' => $related, 'brand' => $this->brand()]);
+        return view('resources.show', [
+            'resource' => $resource,
+            'related' => $related,
+            'brand' => $this->brand(),
+            'useGlobalFramework' => (bool) ($resource->use_global_framework ?? true),
+            'useGlobalHeader' => (bool) ($resource->use_global_header ?? true),
+            'useGlobalFooter' => (bool) ($resource->use_global_footer ?? true),
+        ]);
     }
 }
