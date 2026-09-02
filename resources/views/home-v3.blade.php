@@ -248,7 +248,7 @@ img{max-width:100%}
 .home-section.revealed .stat-card:nth-child(3),.home-section.revealed .project-card:nth-child(3),.home-section.revealed .member-card:nth-child(3),.home-section.revealed .news:nth-child(3),.home-section.revealed .folder:nth-child(3){animation-delay:.14s}
 .home-section.revealed .stat-card:nth-child(4),.home-section.revealed .project-card:nth-child(4),.home-section.revealed .member-card:nth-child(4),.home-section.revealed .news:nth-child(4),.home-section.revealed .folder:nth-child(4){animation-delay:.21s}
 .stat-card i,.project-top i,.folder-meta i{transition:transform .35s ease}.stat-card:hover i,.project-card:hover .project-top i,.folder:hover .folder-meta i{transform:translateY(-2px) scale(1.08)}
-.welcome{overflow:hidden}.welcome-heading:before{content:"";position:absolute;right:2%;top:-10px;width:110px;height:110px;border:1px solid rgba(72,216,241,.08);border-radius:50%;box-shadow:0 0 45px rgba(72,216,241,.06);animation:orbitPulse 5s ease-in-out infinite}.welcome-layout-center .welcome-heading:before{right:12%}.welcome-layout-right .welcome-heading:before{right:auto;left:2%}
+.welcome{overflow:hidden}.welcome-heading:before{content:"";position:absolute;right:2%;top:-10px;width:110px;height:110px;border:1px solid rgba(72,216,241,.08);border-radius:50%;box-shadow:0 0 45px rgba(72,216,241,.06);animation:orbitPulse 5s ease-in-out infinite}.section-layout-center .welcome-heading:before{right:12%}.section-layout-right .welcome-heading:before{right:auto;left:2%}
 .cta-section{border-top-color:rgba(72,216,241,.14)}.cta-card{position:relative;overflow:hidden}.cta-card:before,.cta-card:after{content:"";position:absolute;border-radius:50%;pointer-events:none}.cta-card:before{width:240px;height:240px;right:-100px;top:-150px;border:1px solid rgba(72,216,241,.16);box-shadow:0 0 55px rgba(72,216,241,.08);animation:ctaFloat 8s ease-in-out infinite}.cta-card:after{width:8px;height:8px;right:26%;top:26%;background:var(--cyan);box-shadow:0 0 24px rgba(72,216,241,.55);animation:dotDrift 5s ease-in-out infinite}
 @keyframes homeRise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}@keyframes heroGlow{0%,100%{opacity:.55;transform:scale(.96)}50%{opacity:1;transform:scale(1.03)}}@keyframes heroSweep{0%,55%{transform:translateX(-120%)}75%,100%{transform:translateX(120%)}}@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}@keyframes orbitPulse{0%,100%{transform:translate3d(0,0,0) scale(1);opacity:.45}50%{transform:translate3d(-8px,10px,0) scale(1.08);opacity:.9}}@keyframes ctaFloat{0%,100%{transform:translate(0,0)}50%{transform:translate(-12px,10px)}}@keyframes dotDrift{0%,100%{transform:translate(0,0);opacity:.45}50%{transform:translate(16px,-12px);opacity:1}}
 @media(max-width:900px){.home-section .head:after{display:none}.home-section:not(.cta-section):after{left:4%;right:4%}.welcome-heading:before{width:80px;height:80px;right:0}.cta-card:before{width:170px;height:170px;right:-80px;top:-100px}}
@@ -1130,12 +1130,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
         transform:translateY(-1px);
     }
 
-    .home-section-management .management-grid {
-        width:min(100%,1080px);
-        margin-inline:auto;
-        grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-        gap:18px;
-    }
+    .home-section-management .management-grid { gap:18px; }
     .home-section-management .member-card {
         display:flex;
         min-width:0;
@@ -1802,11 +1797,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
    Desktop must reserve the same compact card footprint whether 2, 3, or 4
    profiles are published. Mobile/tablet layouts remain unchanged. */
 @media (min-width:851px){
-    .home-section-management .management-grid{
-        grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-        gap:18px !important;
-        align-items:stretch;
-    }
+    .home-section-management .management-grid{gap:18px;align-items:stretch}
     .home-section-management .member-card{
         width:auto !important;
         min-width:0 !important;
@@ -1816,9 +1807,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     }
 }
 @media (min-width:851px) and (max-width:1099px){
-    .home-section-management .management-grid{
-        grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-    }
+    .home-section-management .management-grid{}
 }
 
 /* === Management heading alignment: match message-title pattern on every device === */
