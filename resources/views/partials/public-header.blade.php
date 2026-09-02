@@ -135,7 +135,7 @@
                         </button>
                         <div class="public-menu-dropdown-panel">
                             <a href="{{ route('site.about') }}">{{ $headerLabels['about_label'] ?? 'About Us' }}</a>
-                            <a href="{{ route('site.plants') }}">{{ $headerLabels['plants_label'] ?? 'Our Plants' }}</a>
+                            <a href="{{ route('site.plants') }}">{{ config('fuelfree.projects.label','Projects & Our Plans') }}</a>
                             <a href="{{ route('site.future-project') }}">{{ $headerLabels['future_project_label'] ?? 'Future Project' }}</a>
                             <a href="{{ route('site.solutions') }}">{{ $headerLabels['solutions_label'] ?? 'Solutions' }}</a>
                         </div>
