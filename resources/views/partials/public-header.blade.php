@@ -137,7 +137,7 @@
                             <a href="{{ route('site.solutions') }}">{{ $headerLabels['solutions_label'] ?? 'Solutions' }}</a>
                         </div>
                     </div>
-                    <a href="{{ route('management') }}">{{ $headerLabels['management_label'] ?? 'Management Team' }}</a>
+                    <a href="{{ route('management') }}">{{ $headerLabels['management_label'] ?? 'Board of Directors' }}</a>
                     <a href="{{ route('site.gallery') }}">{{ $headerLabels['gallery_label'] ?? 'Gallery' }}</a>
                     <a href="{{ route('news.index') }}">{{ $headerLabels['news_label'] ?? 'News & Notices' }}</a>
                     <a href="{{ route('site.career') }}">{{ $headerLabels['career_label'] ?? 'Career' }}</a>
