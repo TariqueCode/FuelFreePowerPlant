@@ -158,7 +158,7 @@ img{max-width:100%}
     -webkit-line-clamp:3;
     overflow:hidden;
 }
-.home-section-management .member-message:before{content:"\\f075";margin-right:7px;color:var(--cyan);font-family:"Font Awesome 6 Free";font-weight:900}
+.home-section-management .member-message:before{content:"\f075";margin-right:7px;color:var(--cyan);font-family:"Font Awesome 6 Free";font-weight:900}
 .home-section-management .member-more{
     width:100%;
     min-height:38px;
