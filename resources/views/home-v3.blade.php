@@ -1764,20 +1764,16 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     .home-section-management .management-grid{}
 }
 
-/* === Management heading alignment: match message-title pattern on every device === */
+/* === Management heading structure === */
 .home-section-management .head{
     display:grid;
     grid-template-columns:minmax(0,1fr) auto;
     align-items:end;
-    justify-content:initial;
     gap:20px;
     margin-bottom:30px;
-    text-align:left !important;
 }
 .home-section-management .head>div{
     min-width:0;
-    margin:0 !important;
-    text-align:left !important;
 }
 .home-section-management .head .eyebrow{
     display:block;
@@ -1865,6 +1861,89 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
 @media(prefers-reduced-motion:reduce){
     .home-section-management .head .more{transition:none !important}
 }
+
+/* === Admin-controlled homepage alignment: final authority === */
+.home-section{
+    --section-align: start;
+}
+.section-layout-left{ --section-align:start; }
+.section-layout-center{ --section-align:center; }
+.section-layout-right{ --section-align:end; }
+
+.section-layout-left .head{ text-align:left; }
+.section-layout-center .head{ text-align:center; }
+.section-layout-right .head{ text-align:right; }
+
+.section-layout-left .head>div{ margin-left:0 !important; margin-right:0 !important; text-align:left !important; }
+.section-layout-center .head>div{ margin-left:auto !important; margin-right:auto !important; text-align:center !important; }
+.section-layout-right .head>div{ margin-left:auto !important; margin-right:0 !important; text-align:right !important; }
+
+.section-layout-center .head .eyebrow,
+.section-layout-right .head .eyebrow{
+    margin-left:auto;
+    margin-right:0;
+}
+.section-layout-center .head .eyebrow{ margin-left:auto; margin-right:auto; }
+
+.section-layout-left .management-grid,
+.section-layout-left .project-grid,
+.section-layout-left .news-grid,
+.section-layout-left .folders,
+.section-layout-left .stats-grid{
+    width:100%;
+    margin-left:0;
+    margin-right:0;
+}
+.section-layout-center .management-grid,
+.section-layout-center .project-grid,
+.section-layout-center .news-grid,
+.section-layout-center .folders,
+.section-layout-center .stats-grid{
+    width:fit-content;
+    max-width:100%;
+    margin-left:auto;
+    margin-right:auto;
+}
+.section-layout-right .management-grid,
+.section-layout-right .project-grid,
+.section-layout-right .news-grid,
+.section-layout-right .folders,
+.section-layout-right .stats-grid{
+    width:fit-content;
+    max-width:100%;
+    margin-left:auto;
+    margin-right:0;
+}
+
+/* Management has custom heading markup; never let its component CSS override
+   the alignment selected in Homepage Builder. */
+.home-section-management .head,
+.home-section-management .head>div,
+.home-section-management .head h2,
+.home-section-management .head .eyebrow{
+    text-align:inherit;
+}
+.section-layout-left.home-section-management .head,
+.section-layout-left.home-section-management .head>div,
+.section-layout-left.home-section-management .head h2,
+.section-layout-left.home-section-management .head .eyebrow{
+    text-align:left !important;
+}
+.section-layout-center.home-section-management .head,
+.section-layout-center.home-section-management .head>div,
+.section-layout-center.home-section-management .head h2,
+.section-layout-center.home-section-management .head .eyebrow{
+    text-align:center !important;
+}
+.section-layout-right.home-section-management .head,
+.section-layout-right.home-section-management .head>div,
+.section-layout-right.home-section-management .head h2,
+.section-layout-right.home-section-management .head .eyebrow{
+    text-align:right !important;
+}
+.section-layout-left.home-section-management .head>div{ margin-left:0 !important; margin-right:0 !important; }
+.section-layout-center.home-section-management .head>div{ margin-left:auto !important; margin-right:auto !important; }
+.section-layout-right.home-section-management .head>div{ margin-left:auto !important; margin-right:0 !important; }
 
 /* === Master homepage responsive polish ===
    One consistent section rhythm, predictable grids, safe typography, and
