@@ -3003,6 +3003,73 @@ main.shell{
 @media (prefers-reduced-motion:reduce){
   .home-slider,.home-slider:before,.slide.is-active .slide-media:after,.welcome:before,.welcome:after,.welcome-heading:before,.cta-card:before,.cta-card:after,.home-section.reveal-ready,.home-section.revealed .stat-card,.home-section.revealed .project-card,.home-section.revealed .member-card,.home-section.revealed .news,.home-section.revealed .folder{animation:none!important;transition:none!important}
 }
+
+/* === Deep responsive QA hardening === */
+
+@media (min-width:1100px){
+ .home-section-management .management-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
+ .home-section-statistics .stats-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
+ .home-section-projects .project-grid,.home-section-news .news-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
+ .home-section-gallery .folders{grid-template-columns:repeat(4,minmax(0,1fr));}
+}
+@media (min-width:651px) and (max-width:1099px){
+ .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+ .home-section-statistics .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+ .home-section-projects .project-grid,.home-section-news .news-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+ .home-section-gallery .folders{grid-template-columns:repeat(3,minmax(0,1fr));}
+}
+@media (max-width:650px){
+ .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+ .home-section-statistics .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+ .home-section-projects .project-grid{grid-template-columns:1fr;}
+ .home-section-news .news-grid{grid-template-columns:1fr;}
+ .home-section-gallery .folders{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media (max-width:380px){
+ .home-section-management .management-grid,.home-section-statistics .stats-grid,
+ .home-section-projects .project-grid,.home-section-news .news-grid,.home-section-gallery .folders{
+   grid-template-columns:1fr;
+ }
+}
+.home-section-management .member-card,
+.home-section-statistics .stat-card,
+.home-section-projects .project-card,
+.home-section-news .news,
+.home-section-gallery .folder{
+ min-width:0;
+ max-width:100%;
+}
+.home-section-management .member-body,
+.home-section-projects .project-body,
+.home-section-news .news-body,
+.home-section-gallery .folder-body{
+ min-width:0;
+ overflow-wrap:anywhere;
+}
+.home-section-management .member-more,
+.home-section .more{
+ max-width:100%;
+}
+.home-section-management .member-contact span{
+ min-width:0;
+ max-width:100%;
+ overflow:hidden;
+ text-overflow:ellipsis;
+ white-space:nowrap;
+}
+@media (pointer:coarse) and (max-width:900px){
+ .stat-card:hover,.project-card:hover,.member-card:hover,.news:hover,.folder:hover{
+   transform:none;
+ }
+ .home-section-management .member-more:hover{
+   transform:none;
+ }
+}
+@media (prefers-reduced-motion:reduce){
+ .stat-card,.project-card,.member-card,.news,.folder,.member-more{
+   transform:none!important;
+ }
+}
 </style>
 <main class="shell home-v3">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
