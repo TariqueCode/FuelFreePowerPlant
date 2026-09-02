@@ -8,7 +8,7 @@
 <div class="public-menu-dropdown" data-menu-id="{{ $menuItem->id }}">
     <button class="public-menu-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
         @if($menuItem->icon)<i class="{{ $menuItem->icon }}" aria-hidden="true"></i>@endif
-        <span>{{ $menuItem->label }}</span><span class="public-menu-dropdown-chevron" aria-hidden="true"></span>
+        <span>{{ $menuItem->displayLabel() }}</span><span class="public-menu-dropdown-chevron" aria-hidden="true"></span>
     </button>
     <div class="public-menu-dropdown-panel">
         @foreach($children as $child)
