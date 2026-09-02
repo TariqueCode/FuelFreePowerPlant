@@ -2886,6 +2886,72 @@ main.shell{
         font-size:8px !important;
     }
 }
+/* Premium responsive pass — preserves the existing homepage design system. */
+@media (min-width:1100px){
+  .home-section .head{min-height:54px}
+  .home-section .head>div{max-width:72%}
+  .home-section .head p{max-width:520px}
+  .stats-grid,.project-grid,.management-grid,.news-grid,.folders{width:100%;max-width:100%}
+}
+@media (min-width:651px) and (max-width:1099px){
+  .head{align-items:flex-end}
+  .head>div{max-width:70%}
+  .more{padding-bottom:2px}
+  .stats-grid,.project-grid,.management-grid,.news-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .folders{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .project-media{height:auto;aspect-ratio:16/10}
+  .home-section-management .member-card{height:100%}
+  .home-section-management .member-body{padding:15px}
+  .home-section-management .member-message{max-height:4.65em}
+  .cta-card{padding:26px}
+}
+@media (max-width:650px){
+  html,body{width:100%;max-width:100%;overflow-x:hidden}
+  .shell{max-width:100%}
+  .home-section .head{width:100%}
+  .home-section .head>div{max-width:calc(100% - 92px)}
+  .home-section .head h2{overflow-wrap:anywhere}
+  .home-section .head p{max-width:100%;overflow-wrap:anywhere}
+  .home-section .head:after{right:0}
+  .home-slider{width:100%;overflow:visible}
+  .slider-track{width:100%;min-width:0}
+  .slide-media{width:100%;max-width:100%}
+  .home-section-management .management-grid,
+  .home-section-projects .project-grid,
+  .home-section-statistics .stats-grid{align-items:stretch}
+  .home-section-management .member-card,
+  .home-section-projects .project-card,
+  .home-section-statistics .stat-card{height:100%}
+  .home-section-management .member-message{max-height:4.65em}
+  .home-section-management .member-more{margin-top:12px}
+  .home-section:not(.cta-section):after{left:4%;right:4%}
+  .welcome:before,.welcome:after{animation-duration:14s}
+  .home-slider:before{animation-duration:11s}
+  .slide.is-active .slide-media:after{animation-duration:9s}
+}
+@media (max-width:480px){
+  .shell{width:calc(100% - 18px)}
+  .section{padding:36px 0}
+  .head{gap:8px;margin-bottom:13px}
+  .head>div{max-width:calc(100% - 76px)}
+  .head h2{font-size:clamp(21px,7vw,28px)}
+  .more{font-size:7.5px!important}
+  .stats-grid,.project-grid,.management-grid{gap:8px}
+  .stat-card{padding:12px}
+  .home-section-management .member-body{padding:11px}
+  .home-section-management .member-body h3{font-size:12px}
+  .home-section-management .member-role{font-size:7px}
+  .home-section-management .member-contact{font-size:7px}
+  .home-section-management .member-message{font-size:7.5px!important}
+  .home-section-management .member-more{min-height:36px;padding:8px 10px;font-size:8px}
+  .news{grid-template-columns:96px 1fr;min-height:96px}
+  .news-media{width:96px;height:96px}
+  .cta-card{padding:18px}
+}
+@media (prefers-reduced-motion:reduce){
+  .home-slider:before,.slide.is-active .slide-media:after,.welcome:before,.welcome:after{animation:none!important}
+}
+
 </style>
 <main class="shell home-v3">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
