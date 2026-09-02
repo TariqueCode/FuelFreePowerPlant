@@ -20,7 +20,7 @@ class RolePermissionSeeder extends Seeder
         ];
         $permissions = [
             'dashboard.view'=>'View dashboard','plants.view'=>'View power plants','plants.manage'=>'Manage power plants',
-            'cms.view'=>'View CMS','cms.manage'=>'Manage CMS','website.view'=>'View website sections','website.manage'=>'Manage website sections','website.publish'=>'Publish website content',
+            'cms.view'=>'View CMS','cms.manage'=>'Manage CMS','cms.publish'=>'Publish CMS pages','website.view'=>'View website sections','website.manage'=>'Manage website sections','website.publish'=>'Publish website content',
             'users.view'=>'View users','users.manage'=>'Manage users','documents.view'=>'View documents','documents.manage'=>'Manage documents',
             'notifications.view'=>'View notifications','settings.manage'=>'Manage system settings','audit.view'=>'View audit log','health.view'=>'View system health',
             'inquiries.view'=>'View website inquiries','inquiries.manage'=>'Manage website inquiries',
