@@ -27,7 +27,7 @@ return new class extends Migration
             ['welcome', 'Company Introduction', 'Your editable company welcome and vision.', 'cms_page'],
             ['statistics', 'Power Plant Statistics', 'Live figures calculated from plant records.', 'power_plants'],
             ['projects', 'Power Plant Projects', 'Published and operational projects from the plant register.', 'power_plants'],
-            ['management', 'Management Team', 'Selected published leadership profiles.', 'management'],
+            ['management', 'Board of Directors', 'Selected published leadership profiles.', 'management'],
             ['news', 'News & Notices', 'Published news and notices.', 'site_content'],
             ['gallery', 'Gallery', 'Published photo collections.', 'gallery'],
             ['cta', 'Contact & Call to Action', 'A clear next step for visitors.', 'system'],
