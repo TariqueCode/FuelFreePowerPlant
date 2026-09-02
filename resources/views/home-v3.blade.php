@@ -3070,6 +3070,15 @@ main.shell{
    transform:none!important;
  }
 }
+
+/* === Final mobile Board of Directors: always two profiles per row === */
+@media (max-width:650px){
+ .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:10px !important;}
+ .home-section-management .member-card{min-width:0;width:100%;}
+}
+@media (max-width:380px){
+ .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:8px !important;}
+}
 </style>
 <main class="shell home-v3">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
@@ -3364,11 +3373,3 @@ main.shell{
 
 
 @endsection
-/* === Final mobile Board of Directors: always two profiles per row === */
-@media (max-width:650px){
- .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:10px !important;}
- .home-section-management .member-card{min-width:0;width:100%;}
-}
-@media (max-width:380px){
- .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:8px !important;}
-}
