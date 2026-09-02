@@ -1,7 +1,7 @@
 @extends('layouts.portal')
-@section('title','Management Team')
+@section('title','Board of Directors')
 @section('content')
-<section class="hero"><div><span class="eyebrow">WEBSITE SECTIONS · MANAGEMENT</span><h1>Management Team</h1><p>Manage leadership profiles, contact details, photos and visiting cards. Drag profiles to set the public order.</p></div></section>
+<section class="hero"><div><span class="eyebrow">WEBSITE SECTIONS · MANAGEMENT</span><h1>Board of Directors</h1><p>Manage leadership profiles, contact details, photos and visiting cards. Drag profiles to set the public order.</p></div></section>
 @if(session('status'))<div class="notice">{{ session('status') }}</div>@endif
 <div class="management-actions">
     <a class="primary" href="{{ route('admin.management.create') }}"><i class="fa-solid fa-plus"></i> Add member</a>
