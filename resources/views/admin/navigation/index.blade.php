@@ -36,13 +36,13 @@
                     <option value="folder">Folder / Dropdown</option>
                 </select>
             </label>
-            <label>Name<input name="label" required maxlength="160" placeholder="Management Team"></label>
+            <label>Name<input name="label" required maxlength="160" placeholder="Board of Directors"></label>
             <label id="page-link-wrap">Where should it open?
                 <select id="page-link">
                     <option value="">Choose a website page</option>
                     <option value="{{ route('home') }}">Home</option>
                     <option value="{{ route('site.about') }}">About Us</option>
-                    <option value="{{ route('management') }}">Management Team</option>
+                    <option value="{{ route('management') }}">Board of Directors</option>
                     <option value="{{ route('site.plants') }}">Power Plants</option>
                     <option value="{{ route('site.future-project') }}">Future Projects</option>
                     <option value="{{ route('news.index') }}">News &amp; Events</option>
