@@ -34,7 +34,7 @@ class PublicSiteController
         elseif($section==='future-project'){$items=SiteContentItem::published()->where('type','future-project')->orderBy('sort_order')->orderBy('title')->get();}
         elseif($section==='career'){$items=SiteContentItem::published()->whereIn('type',['career','careers','job'])->orderBy('sort_order')->orderBy('title')->get();}
         elseif($section==='solutions'){$items=SiteContentItem::published()->where('type','solution')->orderBy('sort_order')->orderBy('title')->get();}
-        $titles=['plants'=>'Plants','future-project'=>'Future Project','career'=>'Career','solutions'=>'Solutions'];
+        $titles=['plants'=>config('fuelfree.projects.label','Projects & Our Plans'),'future-project'=>'Future Project','career'=>'Career','solutions'=>'Solutions'];
         return view('site.section',compact('section','titles','brand','items'));
     }
 
