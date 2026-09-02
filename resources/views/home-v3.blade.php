@@ -442,6 +442,59 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
  .project-card{display:block}.project-media{min-height:0;aspect-ratio:16/9}
  .energy-atmosphere .energy-core{width:115vw}
 }
+/* Desktop-only polish: keep the existing Board of Directors visual language,
+   but give the message cards a cleaner executive reading rhythm. */
+@media(min-width:651px){
+ .home-section-management .management-grid{
+   align-items:stretch;
+ }
+ .home-section-management .member-card{
+   min-height:0;
+ }
+ .home-section-management .member-body{
+   padding:18px 18px 16px;
+ }
+ .home-section-management .member-body h3{
+   letter-spacing:-.015em;
+ }
+ .home-section-management .member-message{
+   max-height:4.65em;
+   padding-top:12px;
+   margin-top:13px!important;
+   font-size:9.5px!important;
+   line-height:1.55!important;
+ }
+ .home-section-management .member-more{
+   margin-top:14px;
+   border-color:rgba(72,216,241,.20);
+   background:rgba(72,216,241,.025);
+ }
+}
+/* Full-page motion layer: preserve the same atmosphere, but prevent it from
+   appearing as a small/isolated animated region behind only part of the page. */
+@media(min-width:651px){
+ main.shell>.energy-atmosphere{
+   position:fixed;
+   inset:0;
+   width:100vw;
+   height:100vh;
+   z-index:-2;
+   pointer-events:none;
+ }
+ main.shell>.energy-atmosphere .energy-grid{
+   inset:-10%;
+ }
+ main.shell>.energy-atmosphere .energy-core{
+   top:50%;
+ }
+ main.shell>.energy-atmosphere .energy-orbit{
+   top:52%;
+ }
+ main.shell>.energy-atmosphere .energy-pulse{
+   top:60%;
+ }
+}
+
 @media(prefers-reduced-motion:reduce){
  .energy-atmosphere *{animation:none!important}
  .home-section .head>div,.home-section .head>p,.welcome-heading,.welcome-copy{transform:none!important;will-change:auto}
