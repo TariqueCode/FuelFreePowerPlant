@@ -132,6 +132,39 @@ img{max-width:100%}
 @media(max-width:380px){
 .shell{width:calc(100% - 18px)}.welcome{padding-top:41px}.welcome h1{font-size:29px}.welcome-preview,.welcome-more-content{font-size:13px}.stats-grid,.project-grid,.management-grid{grid-template-columns:1fr}.project-media{aspect-ratio:16/10}.news{grid-template-columns:94px 1fr;min-height:94px}.news-media{width:94px;height:94px}.folders{grid-template-columns:1fr}.head h2{font-size:23px}
 }
+
+/* FINAL: Board of Directors stays two-up on every mobile viewport. */
+@media(max-width:650px){
+    .home-section-management .management-grid{
+        display:grid !important;
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:10px !important;
+        width:100% !important;
+        max-width:none !important;
+    }
+    .home-section-management .member-card{
+        width:100% !important;
+        min-width:0 !important;
+        max-width:none !important;
+    }
+    .home-section-management .member-photo{
+        width:100%;
+        aspect-ratio:4/3;
+    }
+}
+@media(max-width:380px){
+    .home-section-management .management-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:8px !important;
+    }
+    .home-section-management .member-body{padding:9px !important}
+    .home-section-management .member-body h3{font-size:11px !important}
+    .home-section-management .member-role,
+    .home-section-management .member-contact{font-size:7px !important}
+    .home-section-management .member-message{font-size:7px !important}
+    .home-section-management .member-more{font-size:7px !important;padding:8px !important}
+}
+
 @media(prefers-reduced-motion:reduce){.slide,.welcome:before,.welcome:after,.section,.project-card,.member-card,.folder,.news{animation:none;transition:none}.slide.is-active{transform:none}}
 
 /* Management cards — shared homepage visual system. */
