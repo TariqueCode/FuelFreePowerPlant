@@ -12,7 +12,10 @@
         $publicLogo = \App\Models\SystemSetting::query()->where('key', 'company.logo_path')->value('value');
     }
 
-    $publicNameParts = preg_split('/\s+/', trim((string) $publicName), 2);
+    // Keep the registered brand spelling intact, but separate the two words
+    // in the public header when the stored value is the concatenated form.
+    $publicDisplayName = preg_replace('/^FUELFREEPOWERPLANT$/i', 'FUELFREE POWERPLANT', trim((string) $publicName));
+    $publicNameParts = preg_split('/\\s+/', $publicDisplayName, 2);
     $publicNameFirst = $publicNameParts[0] ?? '';
     $publicNameRest = $publicNameParts[1] ?? '';
 
@@ -86,9 +89,9 @@
 <header class="public-header">
     <div class="public-shell">
         <div class="public-header-top">
-            <a class="public-brand" href="{{ route('home') }}" aria-label="{{ $publicName }}">
+            <a class="public-brand" href="{{ route('home') }}" aria-label="{{ $publicDisplayName }}">
                 @if($publicLogo)
-                    <img src="{{ asset('storage/'.ltrim($publicLogo,'/')) }}" alt="{{ $publicName }}">
+                    <img src="{{ asset('storage/'.ltrim($publicLogo,'/')) }}" alt="{{ $publicDisplayName }}">
                 @else
                     <span class="public-brand-fallback" aria-hidden="true">⚡</span>
                 @endif
