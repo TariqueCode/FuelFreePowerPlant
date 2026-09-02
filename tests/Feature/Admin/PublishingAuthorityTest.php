@@ -6,6 +6,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\SiteContentItem;
+use App\Models\CmsPage;
 use App\Models\HomepageSection;
 use App\Models\PowerPlant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -182,7 +183,7 @@ class PublishingAuthorityTest extends TestCase
         $publisher = User::factory()->create();
         $publisher->roles()->attach($publisherRole);
 
-        $page = AppModelsCmsPage::create([
+        $page = CmsPage::create([
             'title' => 'QA Content Page',
             'slug' => 'qa-content-page',
             'content' => 'QA',
