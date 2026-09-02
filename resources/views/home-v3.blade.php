@@ -34,8 +34,6 @@ img{max-width:100%}
 .welcome h1 em{font-style:normal;color:#a9f5ff}
 .welcome-rule{width:58px;height:2px;margin-top:18px;background:var(--cyan);opacity:.8}
 .welcome-copy{max-width:960px;padding-top:28px}
-.welcome-layout-center .welcome-heading,.welcome-layout-center .welcome-copy{text-align:center;margin-inline:auto}
-.welcome-layout-right .welcome-heading,.welcome-layout-right .welcome-copy{margin-left:auto;text-align:right}
 .welcome-preview,.welcome-more-content{color:var(--muted);font-size:15px;line-height:1.85;overflow-wrap:anywhere}
 .welcome-more-content{margin-top:16px}
 .welcome-more-toggle{display:inline-flex;align-items:center;gap:8px;margin-top:17px;padding:10px 14px;border:1px solid var(--line);border-radius:999px;background:rgba(72,216,241,.05);color:var(--cyan);font-size:11px;font-weight:750;cursor:pointer}
@@ -47,32 +45,44 @@ img{max-width:100%}
 @keyframes sectionReveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .section-layout-center .head{text-align:center}.section-layout-center .head>div{margin-inline:auto}
 .section-layout-right .head{text-align:right}.section-layout-right .head>div{margin-left:auto}
+.section-layout-center .welcome-heading,.section-layout-center .welcome-copy{text-align:center;margin-inline:auto}.section-layout-right .welcome-heading,.section-layout-right .welcome-copy{margin-left:auto;text-align:right}
+.section-layout-center .cta-card{margin-inline:auto}.section-layout-right .cta-card{margin-left:auto}
 
 /* Homepage section alignment must control the content grid as well as its heading. */
 .section-layout-left .management-grid,
 .section-layout-left .project-grid,
 .section-layout-left .news-grid,
-.section-layout-left .folders{
+.section-layout-left .folders,
+.section-layout-left .stats-grid,
+.section-layout-left .cta-card{
     justify-content:start;
 }
 .section-layout-center .management-grid,
 .section-layout-center .project-grid,
 .section-layout-center .news-grid,
-.section-layout-center .folders{
+.section-layout-center .folders,
+.section-layout-center .stats-grid,
+.section-layout-center .cta-card{
     justify-content:center;
 }
 .section-layout-right .management-grid,
 .section-layout-right .project-grid,
 .section-layout-right .news-grid,
-.section-layout-right .folders{
+.section-layout-right .folders,
+.section-layout-right .stats-grid,
+.section-layout-right .cta-card{
     justify-content:end;
 }
 
 /* Centered executive cards should form a compact, balanced row instead of
    occupying empty grid tracks from the left edge. */
 @media(min-width:651px){
-    .section-layout-center .management-grid{
-        grid-template-columns:repeat(auto-fit,minmax(240px,280px));
+    .section-layout-center .management-grid,
+    .section-layout-center .project-grid,
+    .section-layout-center .news-grid,
+    .section-layout-center .folders{
+        width:fit-content;
+        max-width:100%;
     }
 }
 
@@ -1125,14 +1135,6 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
         grid-template-columns:repeat(4,minmax(0,1fr)) !important;
         gap:18px;
     }
-    /* With exactly two published profiles, preserve the four-card width and center them. */
-    .home-section-management .management-grid:has(> .member-card:nth-child(2):last-child) > .member-card:first-child{
-        grid-column:2;
-    }
-    .home-section-management .management-grid:has(> .member-card:nth-child(2):last-child) > .member-card:nth-child(2){
-        grid-column:3;
-    }
-
     .home-section-management .member-card {
         display:flex;
         min-width:0;
@@ -1252,12 +1254,8 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     }
 }
 
-/* === Homepage Board of Directors: responsive 4:5 executive cards === */
-.home-section-management .management-grid{
-    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-    gap:18px;
-    align-items:stretch;
-}
+/* === Homepage Board of Directors: shared layout, executive card styling === */
+.home-section-management .management-grid{gap:18px;align-items:stretch}
 .home-section-management .member-card{
     position:relative;
     display:flex;
@@ -2704,7 +2702,7 @@ main.shell{
 @endif
 
 @if($section==='welcome' && $home['welcome'])
-<section class="welcome home-section home-section-welcome welcome-layout-{{ $welcomeLayout }}" data-welcome>
+<section class="welcome home-section home-section-welcome section-layout-{{ $welcomeLayout }}" data-welcome>
 <div class="welcome-inner">
 <div class="welcome-content">
 <div class="welcome-heading"><span class="eyebrow">{{ $welcomeEyebrow ?: 'Welcome to '.$siteName }}</span><h1>{{ $welcomeTitle ?: 'Building a stronger energy future.' }}</h1><div class="welcome-rule"></div></div>
@@ -2977,31 +2975,5 @@ main.shell{
 </script>
 @endpush
 
-<style>
-/* === FINAL DESKTOP MANAGEMENT 1x4 + 1:1 OVERRIDE === */
-@media (min-width:851px){
-    .home-v3 .home-section-management .management-grid{
-        display:grid !important;
-        grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-        gap:18px !important;
-        width:100% !important;
-        max-width:none !important;
-        margin-inline:0 !important;
-        align-items:start !important;
-    }
-    .home-v3 .home-section-management .management-grid > .member-card{
-        grid-column:auto !important;
-        width:100% !important;
-        max-width:none !important;
-        min-width:0 !important;
-        align-self:start !important;
-    }
-    .home-v3 .home-section-management .member-photo{
-        width:100% !important;
-        height:auto !important;
-        aspect-ratio:1 / 1 !important;
-    }
-}
-</style>
 
 @endsection
