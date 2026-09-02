@@ -65,6 +65,51 @@ class ResourceManagementTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_resource_supports_page_builder_seo_framework_and_safe_duplicate(): void
+    {
+        $user = $this->publisher();
+
+        $this->actingAs($user)->post(route('admin.site-content.store'), [
+            'type' => 'resource',
+            'title' => 'Unified Resource',
+            'slug' => 'unified-resource',
+            'excerpt' => 'Builder-enabled resource.',
+            'content' => '<p>Rich editor content.</p>',
+            'builder_blocks' => [
+                ['type' => 'hero', 'title' => 'Hero section', 'content' => '<p>Hero body.</p>', 'visible' => true],
+                ['type' => 'cta', 'title' => 'Learn more', 'url' => '/contact', 'visible' => true],
+            ],
+            'template' => 'article',
+            'meta_title' => 'Unified Resource SEO',
+            'meta_description' => 'A professional resource description.',
+            'use_global_framework' => '1',
+            'use_global_header' => '1',
+            'use_global_footer' => '1',
+            'status' => 'published',
+        ])->assertRedirect(route('admin.site-content.index', ['type' => 'resource']));
+
+        $resource = SiteContentItem::where('slug', 'unified-resource')->firstOrFail();
+        $this->assertSame('article', $resource->template);
+        $this->assertIsArray($resource->builder_blocks);
+        $this->assertCount(2, $resource->builder_blocks);
+        $this->assertTrue($resource->use_global_framework);
+
+        $this->get(route('resources.show', $resource->slug))
+            ->assertOk()
+            ->assertSee('Hero section')
+            ->assertSee('Hero body.')
+            ->assertSee('Unified Resource SEO', false);
+
+        $this->actingAs($user)->post(route('admin.site-content.resource.duplicate', $resource))
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('site_content_items', [
+            'type' => 'resource',
+            'title' => 'Unified Resource Copy',
+            'status' => 'draft',
+        ]);
+    }
+
     public function test_resource_download_is_available_only_for_published_resources_with_existing_attachment(): void
     {
         Storage::fake('public');
