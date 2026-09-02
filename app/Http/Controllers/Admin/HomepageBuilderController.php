@@ -57,7 +57,7 @@ class HomepageBuilderController extends Controller
             'settings.welcome.layout' => ['nullable', 'in:left,center,right'],
             'settings.welcome.management_ids' => ['nullable', 'array', 'max:2'],
             'settings.welcome.management_ids.*' => ['nullable', 'integer', 'distinct'],
-            'settings.*.layout' => ['nullable', 'in:left,center,right'],
+            'settings.*.layout' => ['required', 'in:left,center,right'],
         ]);
 
         $existing = HomepageSection::query()->pluck('key')->all();
