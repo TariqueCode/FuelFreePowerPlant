@@ -43,7 +43,7 @@ $canCommunications=$canMail || $canCareer || auth()->user()->hasPermission('inqu
 @endif
 @if(auth()->user()->hasPermission('plants.view'))
 <div class="nav-group"><button type="button" class="nav-parent" aria-expanded="false"><span class="nav-icon"><i class="fa-solid fa-server"></i></span><span>Operations</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
-<a class="{{ request()->routeIs('admin.plants.*')?'active':'' }}" href="{{ route('admin.plants.index') }}"><span>Power Plants</span></a>
+<a class="{{ request()->routeIs('admin.plants.*')?'active':'' }}" href="{{ route('admin.plants.index') }}"><span>{{ config('fuelfree.projects.label','Projects & Our Plans') }}</span></a>
 </div></div>
 @endif
 @if($canUsers)
