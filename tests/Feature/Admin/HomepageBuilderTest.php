@@ -129,4 +129,41 @@ class HomepageBuilderTest extends TestCase
         $response->assertDontSee('Unselected Profile');
     }
 
+    public function test_homepage_section_alignment_is_persisted_and_rendered(): void
+    {
+        $user = User::factory()->create();
+        $role = Role::create(['name' => 'Layout Admin', 'slug' => 'layout-admin', 'is_system' => false]);
+        $permission = Permission::firstOrCreate(['slug' => 'website.manage'], ['name' => 'Manage website sections']);
+        $role->permissions()->attach($permission);
+        $user->roles()->attach($role);
+
+        HomepageSection::query()->delete();
+        HomepageSection::create([
+            'key' => 'management',
+            'label' => 'Board of Directors',
+            'is_enabled' => true,
+            'sort_order' => 0,
+            'settings' => ['limit' => 2, 'mode' => 'latest', 'layout' => 'right'],
+        ]);
+
+        $response = $this->actingAs($user)->post(route('admin.homepage-builder.update'), [
+            'section_order' => ['management'],
+            'sections' => ['management' => '1'],
+            'settings' => ['management' => [
+                'limit' => 2,
+                'mode' => 'latest',
+                'layout' => 'left',
+            ]],
+        ]);
+
+        $response->assertRedirect();
+        $this->assertSame('left', HomepageSection::query()->where('key', 'management')->value('settings')['layout']);
+
+        $home = $this->get(route('home'));
+        $home->assertOk();
+        $home->assertSee('home-section-management section-layout-left', false);
+        $home->assertDontSee('home-section-management section-layout-right', false);
+    }
+
+
 }
