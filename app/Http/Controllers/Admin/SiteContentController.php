@@ -13,8 +13,8 @@ use Illuminate\View\View;
 
 class SiteContentController extends Controller
 {
-    private array $types = ['company','news','gallery','announcement','resource'];
-    private array $labels = ['company'=>'Company & About','management'=>'Management','news'=>'News & Notices','gallery'=>'Gallery','announcement'=>'Announcements','resource'=>'Resources'];
+    private array $types = ['company','plants','future-project','solution','news','gallery','announcement','resource'];
+    private array $labels = ['company'=>'Company & About','plants'=>'Our Plants','future-project'=>'Future Projects','solution'=>'Solutions','news'=>'News & Notices','gallery'=>'Gallery','announcement'=>'Announcements','resource'=>'Resources'];
 
     public function index(Request $request): View|RedirectResponse
     {
@@ -99,6 +99,20 @@ class SiteContentController extends Controller
         }
         $item->delete();
         return redirect()->route('admin.site-content.index', ['type'=>$type])->with('status','Content deleted successfully.');
+    }
+
+    public function togglePage(Request $request, SiteContentItem $item): RedirectResponse
+    {
+        abort_unless(in_array($item->type, ['company', 'plants', 'future-project', 'solution'], true), 404);
+        abort_unless($request->user()->hasPermission('website.publish'), 403, 'Publishing website content requires publishing permission.');
+
+        $item->status = $item->status === 'published' ? 'draft' : 'published';
+        if ($item->status === 'published' && empty($item->published_at)) {
+            $item->published_at = now();
+        }
+        $item->save();
+
+        return redirect()->route('admin.cms.index')->with('status', $item->status === 'published' ? 'Page activated successfully.' : 'Page deactivated successfully.');
     }
 
     public function toggleNews(Request $request, SiteContentItem $item): RedirectResponse
