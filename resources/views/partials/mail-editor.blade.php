@@ -42,7 +42,7 @@
 @push('styles')
 <style>
 .ff-mail-editor{border:1px solid var(--line);border-radius:15px;overflow:visible;background:#fff;color:#1f2937;box-shadow:0 8px 30px rgba(0,0,0,.12);width:100%;max-width:100%;min-width:0}
-.ff-editor-toolbar{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:8px;border-bottom:1px solid #d8e2e6;background:#f5f8f9;position:sticky;top:76px;z-index:40;max-width:100%;min-width:0;border-radius:15px 15px 0 0;box-shadow:0 2px 8px rgba(15,55,70,.08)}
+.ff-editor-toolbar{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:8px;border-bottom:1px solid #d8e2e6;background:#f5f8f9;position:sticky;top:70px;z-index:900;max-width:100%;min-width:0;border-radius:15px 15px 0 0;box-shadow:0 2px 8px rgba(15,55,70,.08)}
 .ff-editor-toolbar button,.ff-editor-toolbar select{height:34px;border:1px solid #d7e1e5;border-radius:7px;background:#fff;color:#334155;cursor:pointer;font-size:12px;padding:0 8px;flex:0 0 auto}
 .ff-editor-toolbar button:hover,.ff-editor-toolbar select:focus{border-color:#22b8d5;background:#eefbfe}
 .ff-editor-toolbar button{min-width:34px}.ff-tool-label{display:inline}@media(max-width:760px){.ff-tool-label{display:none}}.ff-editor-toolbar select{max-width:130px}.ff-sep{width:1px;height:24px;background:#d5e0e4;margin:0 3px}
@@ -54,7 +54,7 @@
 .ff-editor-status{display:flex;justify-content:space-between;gap:10px;padding:7px 12px;border-top:1px solid #dbe5e8;color:#718790;background:#fbfdfe;font-size:10px}.ff-editor-status i{color:#1db58b}
 .ff-mail-editor.is-fullscreen{position:fixed;inset:12px;z-index:9999;display:flex;flex-direction:column;box-shadow:0 30px 100px rgba(0,0,0,.55)}.ff-mail-editor.is-fullscreen .ff-editor-body,.ff-mail-editor.is-fullscreen .ff-editor-source{flex:1;min-height:0}
 @media(max-width:760px){
- .ff-editor-toolbar{top:64px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;align-content:center;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x;padding:7px}
+ .ff-editor-toolbar{top:70px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;align-content:center;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x;padding:7px}
  .ff-editor-toolbar::-webkit-scrollbar{display:none}
  .ff-editor-toolbar select{max-width:112px}
  .ff-editor-body{min-height:280px;padding:14px;font-size:14px;overflow:auto;overflow-wrap:break-word;word-break:normal}
