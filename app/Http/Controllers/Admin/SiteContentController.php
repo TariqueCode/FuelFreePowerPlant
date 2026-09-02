@@ -117,6 +117,31 @@ class SiteContentController extends Controller
         return redirect()->route('admin.site-content.index', ['type'=>$type])->with('status','Content deleted successfully.');
     }
 
+    public function duplicateResource(Request $request, SiteContentItem $item): RedirectResponse
+    {
+        abort_unless(in_array($item->type, ['resource', 'resources'], true), 404);
+        abort_unless($request->user()->hasPermission('website.manage'), 403);
+
+        $copy = $item->replicate();
+        $copy->title = Str::limit($item->title.' Copy', 245, '');
+        $copy->slug = $this->uniqueSlug($item->slug.'-copy', $copy->title, null, 'resource');
+        $copy->status = 'draft';
+        $copy->published_at = null;
+        $copy->is_featured = false;
+        $copy->sort_order = ((int) SiteContentItem::query()->whereIn('type', ['resource','resources'])->max('sort_order')) + 1;
+
+        if ($item->attachment_path && Storage::disk('public')->exists($item->attachment_path)) {
+            $extension = pathinfo($item->attachment_path, PATHINFO_EXTENSION);
+            $newPath = 'site-content/attachments/'.Str::random(32).($extension ? '.'.$extension : '');
+            Storage::disk('public')->copy($item->attachment_path, $newPath);
+            $copy->attachment_path = $newPath;
+        }
+
+        $copy->save();
+
+        return redirect()->route('admin.site-content.edit', $copy)->with('status', 'Resource draft copy created.');
+    }
+
     public function togglePage(Request $request, SiteContentItem $item): RedirectResponse
     {
         abort_unless(in_array($item->type, ['company', 'plants', 'future-project', 'solution', 'resource', 'resources'], true), 404);
