@@ -1223,7 +1223,7 @@ main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-event
     }
 }
 
-/* === Homepage Management Team: responsive 4:5 executive cards === */
+/* === Homepage Board of Directors: responsive 4:5 executive cards === */
 .home-section-management .management-grid{
     grid-template-columns:repeat(4,minmax(0,1fr)) !important;
     gap:18px;
@@ -2717,7 +2717,7 @@ main.shell{
 
 @if($section==='management' && $home['management'])
 
-<section class="section home-section home-section-management section-layout-{{ ($sectionSettings['management'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Leadership</span><h2>Management team.</h2></div><a class="more" href="{{ route('management') }}">Meet the team →</a></div>
+<section class="section home-section home-section-management section-layout-{{ ($sectionSettings['management'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Leadership</span><h2>Board of Directors.</h2></div><a class="more" href="{{ route('management') }}">Meet the team →</a></div>
 <div class="management-grid">
 @if($homeManagement->isNotEmpty())
 @foreach($homeManagement as $member)
