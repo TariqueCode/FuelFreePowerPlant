@@ -52,7 +52,7 @@
 .public-brand img,.public-brand-fallback{width:42px;height:42px;flex:0 0 42px}.public-brand img{object-fit:contain;border-radius:8px}
 .public-brand-fallback{display:grid;place-items:center;border-radius:8px;color:#43d1f0;border:1px solid rgba(86,210,238,.15)}
 .public-brand-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px;line-height:1.2;font-weight:800}
-.public-brand-name-first{color:#51d8f0}.public-brand-name-rest{color:#effcff}
+.public-brand-name-first{color:#51d8f0}.public-brand-name-rest{color:#effcff;margin-left:.3em}
 .public-header-tools{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0;flex:0 0 auto}
 .public-header-socials{display:flex;align-items:center;gap:5px}.public-header-social{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;color:#8faeb8!important;background:rgba(67,209,240,.035);border:1px solid rgba(86,210,238,.11);text-decoration:none!important}
 .public-header-social:hover{color:var(--social-color)!important;background:color-mix(in srgb,var(--social-color) 10%,transparent)}
