@@ -61,7 +61,7 @@
                 <select name="parent_id">
                     <option value="">Top-level</option>
                     @foreach($all as $p)
-                        <option value="{{ $p->id }}">{{ str_repeat('↳ ', min(5,$p->depth ?? 0)) }}{{ $p->label }}</option>
+                        <option value="{{ $p->id }}">{{ str_repeat('↳ ', min(5,$p->depth ?? 0)) }}{{ $p->displayLabel() }}</option>
                     @endforeach
                 </select>
             </label>
@@ -77,12 +77,12 @@
     <div class="edit-grid">
         @foreach($all as $item)
             <details class="edit-details" id="edit-{{ $item->id }}">
-                <summary><span><strong>{{ $item->label }}</strong><small>{{ $item->is_visible ? 'Visible' : 'Hidden' }} · {{ ($item->url || $item->route_name) ? 'Page' : 'Folder' }}</small></span><i class="fa-solid fa-chevron-down"></i></summary>
+                <summary><span><strong>{{ $item->displayLabel() }}</strong><small>{{ $item->is_visible ? 'Visible' : 'Hidden' }} · {{ ($item->url || $item->route_name) ? 'Page' : 'Folder' }}</small></span><i class="fa-solid fa-chevron-down"></i></summary>
                 <div class="edit-content">
                     <form method="POST" action="{{ route('admin.navigation.update',$item) }}" class="edit-box">
                         @csrf @method('PATCH')
                         <input type="hidden" name="kind" value="{{ ($item->url || $item->route_name) ? 'link' : 'folder' }}">
-                        <label>Name<input name="label" value="{{ $item->label }}" required maxlength="160"></label>
+                        <label>Name<input name="label" value="{{ $item->displayLabel() }}" required maxlength="160"></label>
                         <label>Page URL<input name="url" value="{{ $item->url }}" maxlength="500" placeholder="/page"></label>
                         <input type="hidden" name="route_name" value="{{ $item->route_name }}">
                         <label>Put inside
@@ -90,7 +90,7 @@
                                 <option value="">Top-level</option>
                                 @foreach($all as $p)
                                     @if($p->id !== $item->id)
-                                        <option value="{{ $p->id }}" @selected($item->parent_id === $p->id)>{{ str_repeat('↳ ', min(5,$p->depth ?? 0)) }}{{ $p->label }}</option>
+                                        <option value="{{ $p->id }}" @selected($item->parent_id === $p->id)>{{ str_repeat('↳ ', min(5,$p->depth ?? 0)) }}{{ $p->displayLabel() }}</option>
                                     @endif
                                 @endforeach
                             </select>
