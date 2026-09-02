@@ -1,9 +1,93 @@
 @extends('layouts.portal')
 @section('title','Content Pages')
 @section('content')
-<section class="hero"><div class="eyebrow">CONTENT MANAGEMENT</div><h1>Content Pages</h1><p>Manage all pages created with Page Builder from one list. Edit, activate, deactivate, duplicate or delete pages without leaving this section.</p></section>
+<section class="hero content-pages-intro"><div class="eyebrow">CONTENT MANAGEMENT</div><h1>Content Pages</h1><p>Manage all website pages from one list. Tap a card to open and manage its content; use the controls here only for publishing status or deletion.</p></section>
 @if(session('status'))<div class="notice">{{ session('status') }}</div>@endif
-<div class="builder-links"><a href="{{ route('admin.navigation.index') }}"><i class="fa-solid fa-bars-staggered"></i> Menu Builder</a><a href="{{ route('admin.cms.create') }}"><i class="fa-solid fa-layer-group"></i> Create Page</a></div><div class="toolbar"><div><strong style="color:#dff7fb;font-size:12px">All Content Pages</strong><span style="display:block;color:#6f909d;font-size:9px;margin-top:3px">This is the single management list for pages created in Page Builder.</span></div><a class="action" href="{{ route('admin.cms.create') }}"><i class="fa-solid fa-plus"></i> New page</a></div>
-<div class="table-card"><div class="table-wrap"><table><thead><tr><th>Title</th><th>Type</th><th>Slug</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead><tbody>@forelse($pages as $page)<tr><td><strong>{{ $page->title }}</strong></td><td><span class="source-badge">{{ $page->content_source }}</span></td><td>{{ $page->content_source === 'Page Builder' ? '/pages/'.$page->slug : '/'.$page->slug }}</td><td><span class="badge {{ $page->is_published || $page->status === 'published' ? 'published':'draft' }}">{{ $page->is_published || $page->status === 'published' ? 'Active':'Inactive' }}</span></td><td>{{ $page->updated_at->format('M d, Y H:i') }}</td><td><a class="link" href="{{ $page->edit_url }}"><i class="fa-solid fa-pen-to-square"></i> Edit</a> @if(($page->content_source === 'Page Builder' && auth()->user()->hasPermission('cms.publish')) || ($page->content_source === 'Website Content' && auth()->user()->hasPermission('website.publish'))) <form class="inline" method="POST" action="{{ $page->toggle_url }}">@csrf @method('PATCH')<button class="toggle {{ ($page->is_published || $page->status === 'published')?'deactivate':'activate' }}"><i class="fa-solid {{ ($page->is_published || $page->status === 'published')?'fa-toggle-off':'fa-toggle-on' }}"></i> {{ ($page->is_published || $page->status === 'published')?'Deactivate':'Activate' }}</button></form> @endif @if($page->duplicate_url) <form class="inline" method="POST" action="{{ $page->duplicate_url }}">@csrf<button class="copy"><i class="fa-regular fa-copy"></i> Duplicate</button></form> @endif <form class="inline" method="POST" action="{{ $page->delete_url }}" onsubmit="return confirm('Delete this page?')">@csrf @method('DELETE')<button><i class="fa-solid fa-trash-can"></i> Delete</button></form></td></tr>@empty<tr><td colspan="6" class="empty">No content pages found.</td></tr>@endforelse</tbody></table></div><div class="pagination">{{ $pages->links() }}</div></div>
+<div class="content-pages-toolbar"><div class="content-pages-count"><strong>{{ $pages->total() }}</strong> content pages</div><a class="new-page" href="{{ route('admin.cms.create') }}"><i class="fa-solid fa-plus"></i> New page</a></div>
+<div class="content-pages-list">
+@forelse($pages as $page)
+<article class="content-page-card">
+    <a class="content-page-link" href="{{ $page->edit_url }}" aria-label="Manage {{ $page->title }}">
+        <span class="content-page-icon"><i class="fa-regular fa-file-lines"></i></span>
+        <span class="content-page-info">
+            <span class="content-page-title">{{ $page->title }}</span>
+            <span class="content-page-meta">
+                <span class="content-page-source">{{ $page->content_source }}</span>
+                <span class="content-page-dot"></span>
+                <span class="content-page-slug">{{ $page->content_source === 'Page Builder' ? '/pages/'.$page->slug : '/'.$page->slug }}</span>
+            </span>
+        </span>
+    </a>
+    <div class="content-page-actions">
+        @if(($page->content_source === 'Page Builder' && auth()->user()->hasPermission('cms.publish')) || ($page->content_source === 'Website Content' && auth()->user()->hasPermission('website.publish')))
+            <form method="POST" action="{{ $page->toggle_url }}">
+                @csrf @method('PATCH')
+                <button type="submit" class="page-switch {{ ($page->is_published || $page->status === 'published') ? 'on' : 'off' }}" title="{{ ($page->is_published || $page->status === 'published') ? 'Deactivate' : 'Activate' }}" aria-label="{{ ($page->is_published || $page->status === 'published') ? 'Deactivate' : 'Activate' }}">
+                    <span class="switch-knob"></span>
+                </button>
+            </form>
+        @endif
+        @if(($page->content_source === 'Page Builder' && auth()->user()->hasPermission('cms.manage')) || ($page->content_source === 'Website Content' && auth()->user()->hasPermission('website.manage')))
+            <form method="POST" action="{{ $page->delete_url }}" onsubmit="return confirm('Delete this page?')">
+                @csrf @method('DELETE')
+                <button type="submit" class="page-delete" title="Delete" aria-label="Delete"><i class="fa-solid fa-trash-can"></i></button>
+            </form>
+        @endif
+    </div>
+</article>
+@empty
+<div class="empty"><i class="fa-regular fa-file-lines"></i><strong>No content pages found.</strong><span>Create a page to begin managing website content.</span></div>
+@endforelse
+</div>
+@if($pages->hasPages())<div class="pagination">{{ $pages->links() }}</div>@endif
 @endsection
-@push('styles')<style>.builder-links{display:flex;gap:8px;margin-bottom:12px}.builder-links a{padding:9px 11px;border:1px solid var(--line);border-radius:9px;color:#9ec1cc;text-decoration:none;font-size:10px}.builder-links a:hover{color:#fff;background:rgba(49,175,210,.08)}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.filters{display:flex;gap:6px;overflow:auto;max-width:75%;padding-bottom:3px}.filter{padding:8px 10px;border:1px solid var(--line);border-radius:9px;color:#8faab5;text-decoration:none;font-size:10px;white-space:nowrap}.filter:hover,.filter.active{color:#e7f7fb;background:rgba(69,200,232,.08);border-color:rgba(69,200,232,.3)}.action{padding:11px 15px;border-radius:11px;background:#31afd2;color:#fff;text-decoration:none;font-weight:700;font-size:12px;white-space:nowrap}.notice{padding:12px 14px;border-radius:12px;margin-bottom:14px;background:rgba(67,194,137,.1);border:1px solid rgba(67,194,137,.2);color:#a8e5ca}.table-card{background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:18px;overflow:hidden}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:760px}th,td{text-align:left;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06);font-size:12px}.source-badge{display:inline-block;padding:5px 8px;border-radius:99px;font-size:9px;color:#9dddec;background:rgba(67,194,229,.08);border:1px solid rgba(104,204,235,.12)}th{color:#74cce9;font-size:10px;text-transform:uppercase;letter-spacing:.08em}td{color:#b5cbd4}.link{color:#74cce9;text-decoration:none}.inline{display:inline}.inline button{border:0;background:transparent;color:#ff9eaa;cursor:pointer;font:inherit}.inline .copy{color:#8ddff0}.inline .toggle{color:#8ddff0}.inline .toggle.activate{color:#8de8cc}.inline .toggle.deactivate{color:#ffc77d}.badge{display:inline-block;padding:5px 8px;border-radius:99px;font-size:9px}.published{color:#8de8cc;background:rgba(67,194,137,.1)}.draft{color:#ffc77d;background:rgba(255,183,77,.1)}.empty{text-align:center;color:#7895a0;padding:28px}.pagination{padding:12px}@media(max-width:700px){.toolbar{align-items:stretch;flex-direction:column}.filters{max-width:none}.action{text-align:center}.table-card{border-radius:14px}}</style>@endpush
+@push('styles')<style>
+.content-pages-intro{margin-bottom:18px}
+.content-pages-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}
+.content-pages-count{color:#7898a5;font-size:10px}
+.content-pages-count strong{color:#e5f6f9;font-size:14px;margin-right:4px}
+.new-page{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 15px;border-radius:11px;background:linear-gradient(135deg,#25abc9,#1687a4);color:#fff;text-decoration:none;font-size:10px;font-weight:800;white-space:nowrap}
+.content-pages-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.content-page-card{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;min-width:0;padding:13px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,rgba(8,38,52,.9),rgba(3,21,30,.92));transition:border-color .18s,background .18s,transform .18s}
+.content-page-card:hover{border-color:rgba(78,205,232,.36);background:linear-gradient(145deg,rgba(9,42,56,.94),rgba(4,25,34,.96));transform:translateY(-1px)}
+.content-page-link{display:grid;grid-template-columns:48px minmax(0,1fr);align-items:center;gap:12px;min-width:0;color:inherit;text-decoration:none}
+.content-page-icon{width:48px;height:48px;display:grid;place-items:center;border-radius:13px;background:rgba(67,194,229,.08);border:1px solid rgba(78,205,232,.12);color:#58d0e9;font-size:17px}
+.content-page-info{min-width:0}
+.content-page-title{display:block;font-size:13px;font-weight:800;color:#e7f6f8;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.content-page-meta{display:flex;align-items:center;gap:7px;min-width:0;margin-top:7px;flex-wrap:wrap}
+.content-page-source,.content-page-slug{font-size:9px;color:#7797a3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.content-page-source{color:#80cfe0}
+.content-page-dot{width:3px;height:3px;border-radius:50%;background:#3b6977;flex:0 0 auto}
+.content-page-actions{display:flex;align-items:center;justify-content:flex-end;gap:6px}
+.content-page-actions form{margin:0}
+.page-switch{width:42px;height:26px;padding:2px;border:1px solid rgba(89,201,220,.2);border-radius:999px;background:rgba(120,151,162,.12);cursor:pointer;display:flex;align-items:center}
+.page-switch .switch-knob{width:20px;height:20px;border-radius:50%;background:#7895a0;transition:transform .18s,background .18s}
+.page-switch.on{background:rgba(49,191,139,.18);border-color:rgba(49,191,139,.3)}
+.page-switch.on .switch-knob{background:#62d6ad;transform:translateX(16px)}
+.page-switch.off .switch-knob{transform:translateX(0)}
+.page-delete{width:34px;height:34px;border:1px solid transparent;border-radius:9px;background:transparent;color:#7797a2;display:grid;place-items:center;cursor:pointer}
+.page-delete:hover{background:rgba(231,83,91,.1);color:#ff9da4;border-color:rgba(231,83,91,.18)}
+.content-page-card:focus-within{border-color:rgba(78,205,232,.45);box-shadow:0 0 0 2px rgba(78,205,232,.07)}
+.notice{padding:11px 13px;margin-bottom:12px;border-radius:11px;background:rgba(67,194,137,.1);color:#a8e5ca;font-size:10px}
+.empty{text-align:center;padding:55px 20px;border:1px dashed var(--line);border-radius:18px;color:#7898a5;grid-column:1/-1}
+.empty i{font-size:34px;color:#4fc8e4}
+.empty strong{display:block;color:#dff4f7;margin:12px 0 5px;font-size:18px}
+.empty span{font-size:10px}
+.pagination{padding-top:14px}
+@media(max-width:900px){.content-pages-list{grid-template-columns:1fr}}
+@media(max-width:560px){
+ .content-pages-toolbar{align-items:stretch;flex-direction:column}
+ .new-page{width:100%}
+ .content-page-card{grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px}
+ .content-page-link{grid-template-columns:40px minmax(0,1fr);gap:9px}
+ .content-page-icon{width:40px;height:40px;border-radius:11px;font-size:14px}
+ .content-page-title{font-size:12px}
+ .content-page-meta{gap:5px;margin-top:5px}
+ .content-page-source,.content-page-slug{font-size:8px}
+ .content-page-actions{gap:3px}
+ .page-switch{width:39px;height:25px}
+ .page-switch .switch-knob{width:19px;height:19px}
+ .page-switch.on .switch-knob{transform:translateX(14px)}
+ .page-delete{width:31px;height:31px}
+}
+</style>@endpush
