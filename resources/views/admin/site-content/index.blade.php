@@ -20,6 +20,21 @@
     </form>
     <div class="publish-count"><strong>{{ $publishedCount }}</strong><span> published</span></div>
 </div>
+@elseif($type==='resource')
+<div class="resource-control-row">
+    <a class="compact-primary" href="{{ route('admin.site-content.create',['type'=>'resource']) }}"><i class="fa-solid fa-plus"></i> <span>New resource</span></a>
+    <div class="publish-count"><strong>{{ $publishedCount }}</strong><span> published</span></div>
+    <form class="resource-toolbar" method="GET" action="{{ route('admin.site-content.index') }}">
+        <input type="hidden" name="type" value="resource">
+        <label class="search"><i class="fa-solid fa-magnifying-glass"></i><input name="q" value="{{ request('q') }}" placeholder="Search resources..."></label>
+        <select name="filter"><option value="">All</option><option value="published" @selected(request('filter')==='published')>Published</option><option value="draft" @selected(request('filter')==='draft')>Drafts</option><option value="featured" @selected(request('filter')==='featured')>Featured</option></select>
+        <select name="sort"><option value="">Newest</option><option value="oldest" @selected(request('sort')==='oldest')>Oldest</option><option value="updated" @selected(request('sort')==='updated')>Updated</option></select>
+        <button type="submit" class="filter-btn" title="Apply filters" aria-label="Apply filters"><i class="fa-solid fa-sliders"></i><span>Apply</span></button>
+    </form>
+</div>
+<div class="resource-view-tools" role="group" aria-label="Resource view">
+    <span>View</span><button type="button" class="view-toggle active" data-view="list" aria-label="List view"><i class="fa-solid fa-list"></i></button><button type="button" class="view-toggle" data-view="card" aria-label="Card view"><i class="fa-solid fa-grip"></i></button>
+</div>
 @elseif($type==='company')
 <div class="toolbar"><div><strong>{{ $items->total() }}</strong><span> company pages</span></div><span class="hint"><i class="fa-solid fa-circle-info"></i> Public menu order is managed in Navigation Builder</span></div>
 @endif
@@ -58,6 +73,23 @@
             @endif
         </div>
     @else
+        @if($type==='resource')
+            <div class="actions resource-actions">
+                @if(auth()->user()->hasPermission('website.publish'))
+                    <form method="POST" action="{{ route('admin.site-content.page.toggle',$item) }}">@csrf @method('PATCH')
+                        <button type="submit" class="resource-switch {{ $item->status==='published'?'on':'off' }}" title="{{ $item->status==='published'?'Deactivate':'Activate' }}" aria-label="{{ $item->status==='published'?'Deactivate':'Activate' }}"><span class="switch-track"><span class="switch-knob"></span></span></button>
+                    </form>
+                @endif
+                @if(auth()->user()->hasPermission('website.manage'))
+                    <form method="POST" action="{{ route('admin.site-content.resource.duplicate',$item) }}">@csrf
+                        <button type="submit" class="resource-action" title="Duplicate draft" aria-label="Duplicate draft"><i class="fa-regular fa-copy"></i></button>
+                    </form>
+                    <form method="POST" action="{{ route('admin.site-content.destroy',$item) }}" onsubmit="return confirm('Delete this resource?')">@csrf @method('DELETE')
+                        <button type="submit" class="resource-delete" title="Delete" aria-label="Delete"><i class="fa-solid fa-trash"></i></button>
+                    </form>
+                @endif
+            </div>
+        @elseif($type!=='news')
         @if(auth()->user()->hasPermission('website.manage'))
             <div class="actions">
                 <form method="POST" action="{{ route('admin.site-content.destroy',$item) }}" onsubmit="return confirm('Delete this {{ $type === 'news' ? 'publication' : 'content' }}?')">
@@ -103,6 +135,18 @@
 }
 
 </style>@endpush
+
+@push('styles')<style>
+.resource-control-row{display:grid;grid-template-columns:auto auto minmax(0,1fr);grid-template-areas:"create publish toolbar";gap:8px;align-items:center;margin-bottom:9px}.resource-control-row .compact-primary{grid-area:create}.resource-control-row .publish-count{grid-area:publish}.resource-toolbar{grid-area:toolbar;display:grid;grid-template-columns:minmax(0,1fr) 82px 82px 58px;gap:5px;min-width:0;padding:3px;border:1px solid var(--line);border-radius:11px;background:rgba(67,194,229,.025)}.resource-toolbar .search{min-width:0}.resource-toolbar select,.resource-toolbar .filter-btn{height:34px;border:1px solid var(--line);border-radius:9px;background:#061923;color:#a9c3ca;padding:0 9px;font-size:9px}.resource-toolbar .filter-btn{border:0;background:linear-gradient(135deg,#25abc9,#1687a4);color:#fff;cursor:pointer}.resource-view-tools{display:flex;align-items:center;justify-content:flex-end;gap:5px;margin:0 0 9px;color:#678692;font-size:9px}.view-toggle{width:31px;height:30px;border:1px solid var(--line);border-radius:8px;background:#061923;color:#7695a0;cursor:pointer}.view-toggle.active{color:#dff8fc;border-color:rgba(67,194,229,.3);background:rgba(67,194,229,.08)}.resource-list.card-view{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.resource-list.card-view .content-card{display:flex;flex-direction:column;align-items:stretch;gap:9px;padding:14px;min-height:190px}.resource-list.card-view .content-icon{width:52px;height:52px}.resource-list.card-view .info{width:100%}.resource-list.card-view .name{white-space:normal;line-height:1.35}.resource-list.card-view .slug{margin-top:5px}.resource-list.card-view .meta{margin-top:10px}.resource-list.card-view .actions{margin-top:auto;justify-content:flex-end}.resource-actions{gap:5px}.resource-actions form{margin:0}.resource-action,.resource-delete,.resource-switch{width:32px!important;height:32px!important;border:1px solid var(--line)!important;border-radius:9px!important;display:grid!important;place-items:center!important;background:rgba(67,194,229,.04)!important;color:#86a7b0!important;cursor:pointer}.resource-switch.on{background:rgba(67,194,137,.08)!important;border-color:rgba(67,194,137,.22)!important}.resource-switch .switch-track{width:19px;height:11px}.resource-switch .switch-knob{width:7px;height:7px;top:2px;left:2px}.resource-switch.on .switch-knob{left:10px}.resource-delete{color:#ff9eaa!important;background:rgba(255,99,113,.04)!important}.resource-action:hover,.resource-delete:hover,.resource-switch:hover{transform:translateY(-1px)}
+@media(max-width:900px){.resource-control-row{grid-template-columns:auto auto;grid-template-areas:"create publish" "toolbar toolbar"}.resource-list.card-view{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.resource-control-row{grid-template-columns:minmax(0,1fr) auto}.resource-toolbar{grid-template-columns:minmax(0,1fr) 58px 58px 34px}.resource-toolbar select,.resource-toolbar .filter-btn{height:30px;font-size:7px;padding:0 5px}.resource-toolbar .filter-btn span{display:none}.resource-list.card-view{grid-template-columns:1fr 1fr}.resource-list.card-view .content-card{min-height:170px;padding:11px}.resource-view-tools{margin-bottom:7px}}
+@media(max-width:420px){.resource-toolbar{grid-template-columns:minmax(0,1fr) 52px 52px 32px}.resource-list.card-view{grid-template-columns:1fr 1fr}}
+</style>
+@endpush
+@push('scripts')<script>
+(()=>{const list=document.querySelector('.resource-list'), buttons=document.querySelectorAll('.view-toggle');if(!list||!buttons.length)return;const key='ff-resource-view';let mode=localStorage.getItem(key)||'list';const apply=()=>{list.classList.toggle('card-view',mode==='card');buttons.forEach(b=>b.classList.toggle('active',b.dataset.view===mode));};buttons.forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.view;localStorage.setItem(key,mode);apply()}));apply();})();
+</script>
+@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
 (function(){
