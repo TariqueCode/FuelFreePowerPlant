@@ -17,7 +17,7 @@ class PowerPlantController extends Controller
     public function store(Request $request): RedirectResponse
     {
         PowerPlant::create($this->validated($request) + ['slug'=>Str::slug($request->string('name')).'-'.Str::lower(Str::random(6))]);
-        return redirect()->route('admin.plants.index')->with('success','Power plant created successfully.');
+        return redirect()->route('admin.plants.index')->with('success','Project created successfully.');
     }
 
     public function edit(PowerPlant $plant): View { return view('admin.plants.edit', ['plant'=>$plant]); }
@@ -25,7 +25,7 @@ class PowerPlantController extends Controller
     public function update(Request $request, PowerPlant $plant): RedirectResponse
     {
         $plant->update($this->validated($request));
-        return redirect()->route('admin.plants.index')->with('success','Power plant updated successfully.');
+        return redirect()->route('admin.plants.index')->with('success','Project updated successfully.');
     }
 
     private function validated(Request $request): array
