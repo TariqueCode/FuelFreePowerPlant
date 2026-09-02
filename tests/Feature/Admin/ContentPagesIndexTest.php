@@ -52,6 +52,8 @@ class ContentPagesIndexTest extends TestCase
             'is_published' => true,
         ]);
 
+        SiteContentItem::query()->where('type', 'company')->where('slug', 'about-us')->delete();
+
         $company = SiteContentItem::create([
             'type' => 'company',
             'title' => 'About Us',
