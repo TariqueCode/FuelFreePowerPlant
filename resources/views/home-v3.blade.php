@@ -2793,6 +2793,46 @@ main.shell{
     margin-left:auto !important;
 }
 
+/* === FINAL Board of Directors card presentation ===
+   Scope: homepage management cards only. No changes to other homepage sections. */
+.home-section-management .member-photo{
+    aspect-ratio:1 / 1 !important;
+}
+.home-section-management .member-contacts{
+    display:none !important;
+}
+.home-section-management .member-message{
+    min-height:4.5em !important;
+    height:4.5em !important;
+    max-height:4.5em !important;
+    margin-top:12px !important;
+    -webkit-line-clamp:3 !important;
+    line-clamp:3 !important;
+}
+.home-section-management .member-more{
+    margin-top:12px !important;
+    min-height:38px !important;
+}
+.home-section-management .member-more span{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+@media(max-width:650px){
+    .home-section-management .member-message{
+        min-height:4.5em !important;
+        height:4.5em !important;
+        max-height:4.5em !important;
+        margin-top:9px !important;
+        -webkit-line-clamp:3 !important;
+        line-clamp:3 !important;
+    }
+    .home-section-management .member-more{
+        min-height:35px !important;
+        margin-top:9px !important;
+        font-size:8px !important;
+    }
+}
 </style>
 <main class="shell home-v3">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
@@ -3087,46 +3127,3 @@ main.shell{
 
 
 @endsection
-
-
-/* === FINAL Board of Directors card presentation ===
-   Scope: homepage management cards only. No changes to other homepage sections. */
-.home-v3 .home-section-management .member-photo{
-    aspect-ratio:1 / 1 !important;
-}
-.home-v3 .home-section-management .member-contacts{
-    display:none !important;
-}
-.home-v3 .home-section-management .member-message{
-    min-height:4.5em !important;
-    height:4.5em !important;
-    max-height:4.5em !important;
-    margin-top:12px !important;
-    -webkit-line-clamp:3 !important;
-    line-clamp:3 !important;
-}
-.home-v3 .home-section-management .member-more{
-    margin-top:12px !important;
-    min-height:38px !important;
-}
-.home-v3 .home-section-management .member-more span{
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-}
-@media(max-width:650px){
-    .home-v3 .home-section-management .member-message{
-        min-height:4.5em !important;
-        height:4.5em !important;
-        max-height:4.5em !important;
-        margin-top:9px !important;
-        -webkit-line-clamp:3 !important;
-        line-clamp:3 !important;
-    }
-    .home-v3 .home-section-management .member-more{
-        min-height:35px !important;
-        margin-top:9px !important;
-        font-size:8px !important;
-    }
-}
-
