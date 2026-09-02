@@ -2935,6 +2935,128 @@ main.shell{
         padding-inline:24px !important;
     }
 }
+
+/* Board of Directors — focused message presentation. */
+.home-section-management .management-grid{
+    width:min(100%,940px);
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:18px;
+}
+.home-section-management .member-card{
+    display:grid;
+    grid-template-columns:minmax(180px,42%) minmax(0,58%);
+    min-height:230px;
+    border-radius:18px;
+}
+.home-section-management .member-photo{
+    width:100%;
+    aspect-ratio:1 / 1;
+    align-self:stretch;
+    min-height:100%;
+    border-right:1px solid rgba(83,218,240,.12);
+}
+.home-section-management .member-body{
+    min-width:0;
+    padding:18px;
+    text-align:left;
+}
+.home-section-management .member-body h3{
+    font-size:16px;
+    line-height:1.28;
+}
+.home-section-management .member-role{
+    margin-top:6px;
+    font-size:9px;
+}
+.home-section-management .member-message{
+    min-height:0;
+    margin-top:14px!important;
+    padding-top:13px;
+    font-size:10px!important;
+    line-height:1.6!important;
+    -webkit-line-clamp:3;
+    text-align:left;
+}
+.home-section-management .member-more{
+    min-height:38px;
+    margin-top:14px;
+    padding:9px 38px 9px 12px;
+    text-align:left;
+}
+.home-section-management .member-more span{text-align:left}
+.home-section-management .member-more i{right:12px}
+
+/* The Read more interaction is intentionally message-only: no contact,
+   visiting-card or external-profile actions appear after the message. */
+.home-section-management .home-profile-data{display:none!important}
+.home-profile-contact-mobile,
+.home-profile-footer{display:none!important}
+.home-profile-scroll{
+    flex:0 0 auto;
+    overflow:visible;
+    padding-bottom:30px;
+}
+.home-profile-message{
+    max-width:none;
+    overflow-wrap:anywhere;
+}
+.home-profile-message p:last-child{margin-bottom:0}
+
+@media(max-width:1099px){
+    .home-section-management .management-grid{
+        width:100%;
+        gap:14px;
+    }
+    .home-section-management .member-card{
+        grid-template-columns:minmax(150px,40%) minmax(0,60%);
+        min-height:205px;
+    }
+    .home-section-management .member-body{padding:15px}
+}
+@media(max-width:650px){
+    .home-section-management .management-grid{
+        width:100%;
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:9px;
+    }
+    .home-section-management .member-card{
+        display:block;
+        min-height:0;
+        border-radius:14px;
+    }
+    .home-section-management .member-photo{
+        width:100%;
+        min-height:0;
+        aspect-ratio:1 / 1 !important;
+        border-right:0;
+        border-bottom:1px solid rgba(83,218,240,.12);
+    }
+    .home-section-management .member-body{
+        display:block;
+        padding:9px 9px 10px;
+        text-align:center;
+    }
+    .home-section-management .member-body h3{
+        font-size:10px;
+        line-height:1.3;
+    }
+    .home-section-management .member-role{
+        margin-top:4px;
+        font-size:7px;
+    }
+    .home-section-management .member-message{
+        display:none!important;
+    }
+    .home-section-management .member-more{
+        min-height:33px;
+        margin-top:8px;
+        padding:7px 8px;
+        font-size:8px;
+        text-align:center;
+    }
+    .home-section-management .member-more span{text-align:center}
+}
+
 </style>
 <main class="shell home-v3">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
@@ -3005,10 +3127,6 @@ main.shell{
 <div class="member-body">
 <h3>{{ $member->title }}</h3>
 <p class="member-role">{{ $member->designation ?: $member->excerpt }}</p>
-<div class="member-contacts" aria-label="Contact details">
-@if($member->email)<a class="member-contact" href="mailto:{{ $member->email }}"><i class="fa-solid fa-envelope"></i><span>{{ $member->email }}</span></a>@endif
-@if($member->phone)<a class="member-contact" href="tel:{{ preg_replace('/[^0-9+]/','',$member->phone) }}"><i class="fa-solid fa-phone"></i><span>{{ $member->phone }}</span></a>@endif
-</div>
 @if($member->content)<p class="member-message">{{ \Illuminate\Support\Str::limit(trim(strip_tags((string) $member->content)), 125) }}</p>@else<p class="member-message is-empty">Leadership profile</p>@endif
 <button class="member-more" type="button" data-profile="{{ $member->id }}"><span>View full message</span><i class="fa-solid fa-arrow-right"></i></button>
 </div>
@@ -3087,18 +3205,8 @@ main.shell{
    if(messageTitle) messageTitle.textContent='Message from '+(profileRole||'Leadership');
    message.innerHTML=renderMessage(data.dataset.message||'');
    photo.innerHTML=data.dataset.image?'<img src="'+esc(data.dataset.image)+'" alt="'+esc(data.dataset.name||'')+'">':'<i class="fa-solid fa-user-tie" style="font-size:48px;color:#48d8f1"></i>';
-   const out=[];
-   if(data.dataset.phone)out.push('<a class="home-profile-link" href="tel:'+esc(data.dataset.phone.replace(/[^0-9+]/g,''))+'"><i class="fa-solid fa-phone"></i> Call</a>');
-   if(data.dataset.email)out.push('<a class="home-profile-link" href="mailto:'+esc(data.dataset.email)+'"><i class="fa-solid fa-envelope"></i> Email</a>');
-   if(data.dataset.vcard)out.push('<a class="home-profile-link primary" href="'+esc(data.dataset.vcard)+'"><i class="fa-solid fa-user-plus"></i> Add to Contacts</a>');
-   if(data.dataset.card)out.push('<a class="home-profile-link" href="'+esc(data.dataset.card)+'" target="_blank" rel="noopener"><i class="fa-regular fa-address-card"></i> Visiting Card</a>');
-   links.innerHTML=out.join('');
-   if(contactMobile){
-     const contact=[];
-     if(data.dataset.phone)contact.push('<a href="tel:'+esc(data.dataset.phone.replace(/[^0-9+]/g,''))+'"><i class="fa-solid fa-phone"></i><span>'+esc(data.dataset.phone)+'</span></a>');
-     if(data.dataset.email)contact.push('<a href="mailto:'+esc(data.dataset.email)+'"><i class="fa-solid fa-envelope"></i><span>'+esc(data.dataset.email)+'</span></a>');
-     contactMobile.innerHTML=contact.join('');
-   }
+   links.innerHTML='';
+   if(contactMobile)contactMobile.innerHTML='';
    modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; close.focus();
  };
  buttons.forEach(btn=>btn.addEventListener('click',()=>openModal(btn)));
