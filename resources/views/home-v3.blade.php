@@ -2706,6 +2706,93 @@ main.shell{
     }
 }
 
+
+/* === FINAL ADMIN ALIGNMENT AUTHORITY ===
+   Must remain after all homepage component/layout rules so the
+   Homepage Builder selection controls the rendered section. */
+.home-v3 .home-section.section-layout-left > .head,
+.home-v3 .home-section.section-layout-left > .head > div{
+    text-align:left !important;
+}
+.home-v3 .home-section.section-layout-center > .head,
+.home-v3 .home-section.section-layout-center > .head > div{
+    text-align:center !important;
+}
+.home-v3 .home-section.section-layout-right > .head,
+.home-v3 .home-section.section-layout-right > .head > div{
+    text-align:right !important;
+}
+
+.home-v3 .home-section.section-layout-left > .head > div{
+    margin-left:0 !important;
+    margin-right:0 !important;
+}
+.home-v3 .home-section.section-layout-center > .head > div{
+    margin-left:auto !important;
+    margin-right:auto !important;
+}
+.home-v3 .home-section.section-layout-right > .head > div{
+    margin-left:auto !important;
+    margin-right:0 !important;
+}
+
+/* Content grids use intrinsic card widths so alignment is visible.
+   Full-width 1fr tracks cannot visually move when justify-content changes. */
+.home-v3 .home-section-management .management-grid{
+    width:100% !important;
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),320px)) !important;
+}
+.home-v3 .home-section-projects .project-grid{
+    width:100% !important;
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),320px)) !important;
+}
+.home-v3 .home-section-news .news-grid{
+    width:100% !important;
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),360px)) !important;
+}
+.home-v3 .home-section-gallery .folders{
+    width:100% !important;
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),300px)) !important;
+}
+.home-v3 .home-section-statistics .stats-grid{
+    width:100% !important;
+    grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),280px)) !important;
+}
+
+.home-v3 .section-layout-left .management-grid,
+.home-v3 .section-layout-left .project-grid,
+.home-v3 .section-layout-left .news-grid,
+.home-v3 .section-layout-left .folders,
+.home-v3 .section-layout-left .stats-grid{
+    justify-content:start !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+}
+.home-v3 .section-layout-center .management-grid,
+.home-v3 .section-layout-center .project-grid,
+.home-v3 .section-layout-center .news-grid,
+.home-v3 .section-layout-center .folders,
+.home-v3 .section-layout-center .stats-grid{
+    justify-content:center !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+}
+.home-v3 .section-layout-right .management-grid,
+.home-v3 .section-layout-right .project-grid,
+.home-v3 .section-layout-right .news-grid,
+.home-v3 .section-layout-right .folders,
+.home-v3 .section-layout-right .stats-grid{
+    justify-content:end !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+}
+
+/* Keep the section action usable without overriding the selected content alignment. */
+.home-v3 .section-layout-center > .head > .more,
+.home-v3 .section-layout-right > .head > .more{
+    margin-left:auto !important;
+}
+
 </style>
 <main class="shell home-v3">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
