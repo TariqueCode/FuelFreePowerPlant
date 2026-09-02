@@ -3406,3 +3406,28 @@ main.shell{
 
 
 @endsection
+
+
+/* === FINAL MOBILE BOARD GRID OVERRIDE ===
+   The admin alignment authority uses 320px intrinsic tracks. On phones that
+   forces a single card per row. Mobile must explicitly own the card tracks. */
+@media (max-width:650px){
+    .home-v3 .home-section-management .management-grid{
+        width:100% !important;
+        display:grid !important;
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:9px !important;
+        justify-content:stretch !important;
+    }
+    .home-v3 .home-section-management .member-card{
+        width:100% !important;
+        min-width:0 !important;
+        max-width:none !important;
+    }
+}
+@media (max-width:380px){
+    .home-v3 .home-section-management .management-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:8px !important;
+    }
+}
