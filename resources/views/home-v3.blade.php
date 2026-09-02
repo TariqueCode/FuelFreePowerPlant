@@ -45,6 +45,7 @@ img{max-width:100%}
 @keyframes sectionReveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .section-layout-center .head{text-align:center}.section-layout-center .head>div{margin-inline:auto}
 .section-layout-right .head{text-align:right}.section-layout-right .head>div{margin-left:auto}
+.section-layout-left.home-section-hero .slider-track{margin-left:0;margin-right:auto}.section-layout-center.home-section-hero .slider-track{margin-inline:auto}.section-layout-right.home-section-hero .slider-track{margin-left:auto;margin-right:0}
 .section-layout-center .welcome-heading,.section-layout-center .welcome-copy{text-align:center;margin-inline:auto}.section-layout-right .welcome-heading,.section-layout-right .welcome-copy{margin-left:auto;text-align:right}
 .section-layout-center .cta-card{margin-inline:auto}.section-layout-right .cta-card{margin-left:auto}
 
@@ -2688,7 +2689,7 @@ main.shell{
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
 @foreach($home['section_order'] as $section)
 @if($section==='hero' && $home['slider'] && $sliders->isNotEmpty())
-<section class="home-slider" aria-label="Company highlights">
+<section class="home-slider home-section home-section-hero section-layout-{{ ($sectionSettings['hero'] ?? [])['layout'] ?? 'left' }}" aria-label="Company highlights">
 <div class="slider-track">
 @foreach($sliders as $index => $slider)
 @php($sliderUrl=$slider->link_url)
