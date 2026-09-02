@@ -14,7 +14,7 @@
 
     // Keep the registered brand spelling intact, but separate the two words
     // in the public header when the stored value is the concatenated form.
-    $publicDisplayName = preg_replace('/^FUELFREEPOWERPLANT$/i', 'FUELFREE POWERPLANT', trim((string) $publicName));
+    $publicDisplayName = preg_replace('/^FUEL\\s*FREE\\s*POWER\\s*PLANT$/i', 'FUELFREE POWERPLANT', trim((string) $publicName));
     $publicNameParts = preg_split('/\\s+/', $publicDisplayName, 2);
     $publicNameFirst = $publicNameParts[0] ?? '';
     $publicNameRest = $publicNameParts[1] ?? '';
