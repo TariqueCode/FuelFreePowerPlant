@@ -45,6 +45,16 @@ class CmsController extends Controller
         return redirect()->route('admin.cms.index')->with('status', 'CMS page updated successfully.');
     }
 
+    public function togglePublication(Request $request, CmsPage $page): RedirectResponse
+    {
+        abort_unless($request->user()->hasPermission('cms.publish'), 403, 'Publishing CMS pages requires publishing permission.');
+
+        $page->is_published = ! $page->is_published;
+        $page->save();
+
+        return redirect()->route('admin.cms.index')->with('status', $page->is_published ? 'Page activated successfully.' : 'Page deactivated successfully.');
+    }
+
     public function destroy(CmsPage $page): RedirectResponse
     {
         $page->delete();
