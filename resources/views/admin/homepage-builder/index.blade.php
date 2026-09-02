@@ -43,7 +43,7 @@
         'gallery'=>route('admin.gallery.index'),
         'highlight'=>route('admin.site-popups.index'),
     ];
-    $controlSections = ['welcome','statistics','projects','management','news','gallery','cta'];
+    $controlSections = ['hero','welcome','statistics','projects','management','news','gallery','highlight','cta'];
     $countLabels = [
         'hero'=>['key'=>'sliders','suffix'=>'published slides'],
         'projects'=>['key'=>'projects','suffix'=>'projects'],
@@ -193,6 +193,11 @@
                     <div class="simple-control">
                         <div><strong>Automatic statistics</strong><p>Figures come directly from Power Plant records. Update the source records instead of maintaining duplicate numbers here.</p></div>
                         <label><span>Section alignment</span><select name="settings[statistics][layout]"><option value="left" @selected($layout==='left')>Left</option><option value="center" @selected($layout==='center')>Center</option><option value="right" @selected($layout==='right')>Right</option></select></label>
+                    </div>
+                @elseif(in_array($section->key,['hero','highlight'],true))
+                    <div class="simple-control">
+                        <div><strong>Section display</strong><p>Use the shared homepage layout system. This setting controls placement without introducing a section-specific layout.</p></div>
+                        <label><span>Section alignment</span><select name="settings[{{ $section->key }}][layout]"><option value="left" @selected($layout==='left')>Left</option><option value="center" @selected($layout==='center')>Center</option><option value="right" @selected($layout==='right')>Right</option></select></label>
                     </div>
                 @elseif($section->key==='cta')
                     <div class="simple-control">
