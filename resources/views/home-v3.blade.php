@@ -2868,7 +2868,7 @@ main.shell{
 @if($member->phone)<a class="member-contact" href="tel:{{ preg_replace('/[^0-9+]/','',$member->phone) }}"><i class="fa-solid fa-phone"></i><span>{{ $member->phone }}</span></a>@endif
 </div>
 @if($member->content)<p class="member-message">{{ \Illuminate\Support\Str::limit(trim(strip_tags((string) $member->content)), 125) }}</p>@else<p class="member-message is-empty">Leadership profile</p>@endif
-<button class="member-more" type="button" data-profile="{{ $member->id }}"><span>More</span><i class="fa-solid fa-arrow-right"></i></button>
+<button class="member-more" type="button" data-profile="{{ $member->id }}"><span>View full message</span><i class="fa-solid fa-arrow-right"></i></button>
 </div>
 <div class="home-profile-data" hidden data-name="{{ $member->title }}" data-role="{{ $member->designation ?: $member->excerpt }}" data-message="{{ $member->content }}" data-image="{{ $member->image_path ? asset('storage/'.$member->image_path) : '' }}" data-phone="{{ $member->phone }}" data-email="{{ $member->email }}" data-vcard="{{ route('management.vcard',$member) }}" data-card="{{ $member->visiting_card_path ? asset('storage/'.$member->visiting_card_path) : '' }}"></div>
 </article>
@@ -3087,3 +3087,46 @@ main.shell{
 
 
 @endsection
+
+
+/* === FINAL Board of Directors card presentation ===
+   Scope: homepage management cards only. No changes to other homepage sections. */
+.home-v3 .home-section-management .member-photo{
+    aspect-ratio:1 / 1 !important;
+}
+.home-v3 .home-section-management .member-contacts{
+    display:none !important;
+}
+.home-v3 .home-section-management .member-message{
+    min-height:4.5em !important;
+    height:4.5em !important;
+    max-height:4.5em !important;
+    margin-top:12px !important;
+    -webkit-line-clamp:3 !important;
+    line-clamp:3 !important;
+}
+.home-v3 .home-section-management .member-more{
+    margin-top:12px !important;
+    min-height:38px !important;
+}
+.home-v3 .home-section-management .member-more span{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+@media(max-width:650px){
+    .home-v3 .home-section-management .member-message{
+        min-height:4.5em !important;
+        height:4.5em !important;
+        max-height:4.5em !important;
+        margin-top:9px !important;
+        -webkit-line-clamp:3 !important;
+        line-clamp:3 !important;
+    }
+    .home-v3 .home-section-management .member-more{
+        min-height:35px !important;
+        margin-top:9px !important;
+        font-size:8px !important;
+    }
+}
+
