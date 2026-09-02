@@ -2947,4 +2947,32 @@ main.shell{
 })();
 </script>
 @endpush
+
+<style>
+/* === FINAL DESKTOP MANAGEMENT 1x4 + 1:1 OVERRIDE === */
+@media (min-width:851px){
+    .home-v3 .home-section-management .management-grid{
+        display:grid !important;
+        grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+        gap:18px !important;
+        width:100% !important;
+        max-width:none !important;
+        margin-inline:0 !important;
+        align-items:start !important;
+    }
+    .home-v3 .home-section-management .management-grid > .member-card{
+        grid-column:auto !important;
+        width:100% !important;
+        max-width:none !important;
+        min-width:0 !important;
+        align-self:start !important;
+    }
+    .home-v3 .home-section-management .member-photo{
+        width:100% !important;
+        height:auto !important;
+        aspect-ratio:1 / 1 !important;
+    }
+}
+</style>
+
 @endsection
