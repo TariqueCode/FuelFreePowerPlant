@@ -22,6 +22,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientPortalController;
 use App\Http\Controllers\CmsPageController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\FaviconController;
 use App\Http\Controllers\CareerController;
 use App\Http\Controllers\Admin\CareerApplicationController;
 use App\Http\Controllers\Admin\MailController;
@@ -37,6 +38,7 @@ use App\Http\Controllers\SustainabilityController;
 use App\Http\Controllers\WebmailController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/favicon.ico', FaviconController::class)->name('favicon');
 Route::get('/', HomeController::class)->name('home');
 Route::get('/about-us', [PublicSiteController::class,'show'])->defaults('section','about-us')->name('site.about');
 Route::get('/plants', [PublicSiteController::class,'show'])->defaults('section','plants')->name('site.plants');
