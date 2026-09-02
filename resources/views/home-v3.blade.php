@@ -2833,6 +2833,98 @@ main.shell{
         font-size:8px !important;
     }
 }
+
+/* === FINAL MOBILE Board of Directors: two-up centered presentation ===
+   Scope: homepage management cards only. Keep all other homepage sections unchanged. */
+@media (max-width:650px){
+    .home-v3 .home-section-management .management-grid{
+        width:100% !important;
+        max-width:100% !important;
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:10px !important;
+        justify-content:center !important;
+        margin-left:0 !important;
+        margin-right:0 !important;
+    }
+
+    .home-v3 .home-section-management .member-card{
+        width:100% !important;
+        max-width:none !important;
+        min-width:0 !important;
+        align-self:stretch !important;
+        text-align:center !important;
+    }
+
+    .home-v3 .home-section-management .member-photo{
+        width:100% !important;
+        aspect-ratio:1 / 1 !important;
+    }
+
+    .home-v3 .home-section-management .member-body{
+        width:100% !important;
+        display:flex !important;
+        flex-direction:column !important;
+        align-items:center !important;
+        padding:10px 8px 10px !important;
+        text-align:center !important;
+    }
+
+    .home-v3 .home-section-management .member-body h3{
+        width:100%;
+        margin:0 !important;
+        text-align:center !important;
+        font-size:clamp(10px,2.8vw,13px) !important;
+        line-height:1.3 !important;
+    }
+
+    .home-v3 .home-section-management .member-role{
+        width:100%;
+        margin:4px 0 0 !important;
+        text-align:center !important;
+        font-size:clamp(7px,1.9vw,9px) !important;
+        line-height:1.35 !important;
+    }
+
+    .home-v3 .home-section-management .member-more{
+        position:relative !important;
+        width:100% !important;
+        min-height:35px !important;
+        margin-top:9px !important;
+        justify-content:center !important;
+        text-align:center !important;
+        padding:7px 28px !important;
+        font-size:clamp(7px,1.9vw,9px) !important;
+    }
+
+    .home-v3 .home-section-management .member-more span{
+        width:100%;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+        text-align:center !important;
+    }
+
+    .home-v3 .home-section-management .member-more i{
+        position:absolute;
+        right:9px;
+    }
+}
+
+@media (max-width:380px){
+    .home-v3 .home-section-management .management-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:8px !important;
+    }
+
+    .home-v3 .home-section-management .member-body{
+        padding:9px 7px 9px !important;
+    }
+
+    .home-v3 .home-section-management .member-more{
+        min-height:33px !important;
+        padding-inline:24px !important;
+    }
+}
 </style>
 <main class="shell home-v3">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
@@ -3127,95 +3219,3 @@ main.shell{
 
 
 @endsection
-
-/* === FINAL MOBILE Board of Directors: two-up centered presentation ===
-   Scope: homepage management cards only. Keep all other homepage sections unchanged. */
-@media (max-width:650px){
-    .home-v3 .home-section-management .management-grid{
-        width:100% !important;
-        max-width:100% !important;
-        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-        gap:10px !important;
-        justify-content:center !important;
-        margin-left:0 !important;
-        margin-right:0 !important;
-    }
-
-    .home-v3 .home-section-management .member-card{
-        width:100% !important;
-        max-width:none !important;
-        min-width:0 !important;
-        align-self:stretch !important;
-        text-align:center !important;
-    }
-
-    .home-v3 .home-section-management .member-photo{
-        width:100% !important;
-        aspect-ratio:1 / 1 !important;
-    }
-
-    .home-v3 .home-section-management .member-body{
-        width:100% !important;
-        display:flex !important;
-        flex-direction:column !important;
-        align-items:center !important;
-        padding:10px 8px 10px !important;
-        text-align:center !important;
-    }
-
-    .home-v3 .home-section-management .member-body h3{
-        width:100%;
-        margin:0 !important;
-        text-align:center !important;
-        font-size:clamp(10px,2.8vw,13px) !important;
-        line-height:1.3 !important;
-    }
-
-    .home-v3 .home-section-management .member-role{
-        width:100%;
-        margin:4px 0 0 !important;
-        text-align:center !important;
-        font-size:clamp(7px,1.9vw,9px) !important;
-        line-height:1.35 !important;
-    }
-
-    .home-v3 .home-section-management .member-more{
-        position:relative !important;
-        width:100% !important;
-        min-height:35px !important;
-        margin-top:9px !important;
-        justify-content:center !important;
-        text-align:center !important;
-        padding:7px 28px !important;
-        font-size:clamp(7px,1.9vw,9px) !important;
-    }
-
-    .home-v3 .home-section-management .member-more span{
-        width:100%;
-        overflow:hidden;
-        text-overflow:ellipsis;
-        white-space:nowrap;
-        text-align:center !important;
-    }
-
-    .home-v3 .home-section-management .member-more i{
-        position:absolute;
-        right:9px;
-    }
-}
-
-@media (max-width:380px){
-    .home-v3 .home-section-management .management-grid{
-        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-        gap:8px !important;
-    }
-
-    .home-v3 .home-section-management .member-body{
-        padding:9px 7px 9px !important;
-    }
-
-    .home-v3 .home-section-management .member-more{
-        min-height:33px !important;
-        padding-inline:24px !important;
-    }
-}
