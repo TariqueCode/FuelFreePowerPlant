@@ -43,7 +43,7 @@
                     <option value="{{ route('home') }}">Home</option>
                     <option value="{{ route('site.about') }}">About Us</option>
                     <option value="{{ route('management') }}">Board of Directors</option>
-                    <option value="{{ route('site.plants') }}">Power Plants</option>
+                    <option value="{{ route('site.plants') }}">{{ config('fuelfree.projects.label','Projects & Our Plans') }}</option>
                     <option value="{{ route('site.future-project') }}">Future Projects</option>
                     <option value="{{ route('news.index') }}">News &amp; Events</option>
                     <option value="{{ route('site.gallery') }}">Gallery</option>
