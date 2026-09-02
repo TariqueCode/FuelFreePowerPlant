@@ -23,15 +23,11 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>@yield('title', $publicName)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    {{-- Always provide a deterministic favicon. The uploaded company logo is optional and may live in storage. --}}
-    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}?v=20260901">
-    <link rel="shortcut icon" href="{{ asset('favicon.svg') }}?v=20260901">
-    @if($publicLogo)
-        <link rel="icon" type="image/png" href="{{ asset('storage/'.ltrim($publicLogo,'/')) }}">
-        <link rel="apple-touch-icon" href="{{ asset('storage/'.ltrim($publicLogo,'/')) }}">
-    @else
-        <link rel="apple-touch-icon" href="{{ asset('favicon.svg') }}?v=20260901">
-    @endif
+    {{-- The favicon endpoint always resolves to the current admin-managed company logo. --}}
+    @php($faviconVersion = $publicLogo ? sha1((string) $publicLogo) : 'default-v1')
+    <link rel="icon" href="{{ route('favicon') }}?v={{ $faviconVersion }}">
+    <link rel="shortcut icon" href="{{ route('favicon') }}?v={{ $faviconVersion }}">
+    <link rel="apple-touch-icon" href="{{ route('favicon') }}?v={{ $faviconVersion }}">
     <style>
         :root{--public-max:{{$theme['max_width']}};--public-gutter:16px;--public-bg:{{$theme['background']}};--public-surface:{{$theme['surface']}};--public-line:color-mix(in srgb, {{$theme['primary']}} 18%, transparent);--public-text:{{$theme['text']}};--public-muted:{{$theme['muted']}};--public-accent:{{$theme['primary']}};--public-radius:{{$theme['radius']}};--public-space-1:4px;--public-space-2:8px;--public-space-3:12px;--public-space-4:16px;--public-space-5:24px;--public-space-6:32px;--public-space-7:48px;--public-space-8:64px}
         .public-container{width:min(var(--public-max),calc(100% - (var(--public-gutter) * 2)));margin-inline:auto}
