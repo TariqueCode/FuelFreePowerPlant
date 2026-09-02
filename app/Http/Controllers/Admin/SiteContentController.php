@@ -27,6 +27,22 @@ class SiteContentController extends Controller
             ->when($type, function ($q) use ($type) {
                 return $type === 'news' ? $q->whereIn('type', ['news','announcement']) : $q->where('type', $type);
             })
+            ->when($type === 'resource', function ($q) use ($request) {
+                $search = trim($request->string('q')->toString());
+                $filter = $request->string('filter')->toString();
+                $sort = $request->string('sort')->toString();
+                return $q
+                    ->when($search !== '', fn($query) => $query->where(function ($inner) use ($search) {
+                        $inner->where('title', 'like', "%{$search}%")
+                            ->orWhere('excerpt', 'like', "%{$search}%")
+                            ->orWhere('slug', 'like', "%{$search}%");
+                    }))
+                    ->when(in_array($filter, ['published','draft'], true), fn($query) => $query->where('status', $filter))
+                    ->when($filter === 'featured', fn($query) => $query->where('is_featured', true))
+                    ->when($sort === 'oldest', fn($query) => $query->orderBy('published_at')->orderBy('created_at'))
+                    ->when($sort === 'updated', fn($query) => $query->orderByDesc('updated_at'))
+                    ->when(!in_array($sort, ['oldest','updated'], true), fn($query) => $query->orderBy('sort_order')->orderByDesc('published_at')->orderByDesc('created_at'));
+            })
             ->when($type === 'news', function ($q) use ($request) {
                 $search = trim($request->string('q')->toString());
                 $filter = $request->string('filter')->toString();
@@ -50,8 +66,8 @@ class SiteContentController extends Controller
             ->paginate(20)->withQueryString();
 
         $title = $type ? ($this->labels[$type] ?? ucfirst($type)).' CMS' : 'Website Content';
-        $publishedCount = $type === 'news'
-            ? SiteContentItem::query()->whereIn('type', ['news','announcement'])->where('status', 'published')->count()
+        $publishedCount = in_array($type, ['news','resource'], true)
+            ? SiteContentItem::query()->whereIn('type', $type === 'news' ? ['news','announcement'] : ['resource','resources'])->where('status', 'published')->count()
             : 0;
 
         return view('admin.site-content.index', compact('items','type','title','publishedCount'))
@@ -103,7 +119,7 @@ class SiteContentController extends Controller
 
     public function togglePage(Request $request, SiteContentItem $item): RedirectResponse
     {
-        abort_unless(in_array($item->type, ['company', 'plants', 'future-project', 'solution'], true), 404);
+        abort_unless(in_array($item->type, ['company', 'plants', 'future-project', 'solution', 'resource', 'resources'], true), 404);
         abort_unless($request->user()->hasPermission('website.publish'), 403, 'Publishing website content requires publishing permission.');
 
         $item->status = $item->status === 'published' ? 'draft' : 'published';
@@ -112,7 +128,10 @@ class SiteContentController extends Controller
         }
         $item->save();
 
-        return redirect()->route('admin.cms.index')->with('status', $item->status === 'published' ? 'Page activated successfully.' : 'Page deactivated successfully.');
+        $redirect = in_array($item->type, ['resource', 'resources'], true)
+            ? route('admin.site-content.index', ['type' => 'resource'])
+            : route('admin.cms.index');
+        return redirect($redirect)->with('status', $item->status === 'published' ? 'Page activated successfully.' : 'Page deactivated successfully.');
     }
 
     public function toggleNews(Request $request, SiteContentItem $item): RedirectResponse
@@ -159,6 +178,17 @@ class SiteContentController extends Controller
             'slug'=>['nullable','string','max:255'],
             'excerpt'=>['nullable','string','max:1000'],
             'content'=>['nullable','string'],
+            'builder_blocks'=>['nullable','array'],
+            'builder_blocks.*.type'=>['required','string','max:40'],
+            'builder_blocks.*.title'=>['nullable','string','max:180'],
+            'builder_blocks.*.content'=>['nullable','string'],
+            'builder_blocks.*.image'=>['nullable','string','max:1000'],
+            'builder_blocks.*.url'=>['nullable','string','max:1000'],
+            'builder_blocks.*.visible'=>['nullable','boolean'],
+            'template'=>['nullable','string','max:80'],
+            'use_global_framework'=>['nullable','boolean'],
+            'use_global_header'=>['nullable','boolean'],
+            'use_global_footer'=>['nullable','boolean'],
             'image_path'=>['nullable','string','max:500'],
             'cover_alt'=>['nullable','string','max:255'],
             'status'=>['required','in:draft,published'],
@@ -173,7 +203,11 @@ class SiteContentController extends Controller
         unset($data['publication_type']);
 
         $data['slug'] = $this->uniqueSlug($data['slug'] ?? '', $data['title'], $item->id, $data['type']);
-        $data['is_featured'] = in_array($data['type'], ['news','announcement'], true) && (bool)($data['is_featured'] ?? false);
+        $data['is_featured'] = in_array($data['type'], ['news','announcement','resource','resources'], true) && (bool)($data['is_featured'] ?? false);
+        $data['template'] = $data['template'] ?? 'default';
+        $data['use_global_framework'] = $request->boolean('use_global_framework', true);
+        $data['use_global_header'] = $request->boolean('use_global_header', true);
+        $data['use_global_footer'] = $request->boolean('use_global_footer', true);
         $data['show_in_navigation'] = $data['type'] === 'company' && (bool)($data['show_in_navigation'] ?? false);
 
         if ($data['type'] === 'company' && $data['show_in_navigation'] && !($item->exists && $item->type === 'company' && $item->show_in_navigation)) {
