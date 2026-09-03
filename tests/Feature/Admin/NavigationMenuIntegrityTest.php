@@ -44,6 +44,50 @@ class NavigationMenuIntegrityTest extends TestCase
         ]);
     }
 
+    private function navigationAdmin(): User
+    {
+        $view = Permission::firstOrCreate(['slug' => 'website.view'], ['name' => 'View website']);
+        $manage = Permission::firstOrCreate(['slug' => 'navigation.manage'], ['name' => 'Manage navigation']);
+        $role = Role::create(['name' => 'Navigation QA', 'slug' => 'navigation-qa', 'is_system' => false]);
+        $role->permissions()->sync([$view->id, $manage->id]);
+        $user = User::factory()->create();
+        $user->roles()->attach($role);
+
+        return $user;
+    }
+
+    public function test_folder_creation_does_not_fail_because_of_source_label_field(): void
+    {
+        $user = $this->navigationAdmin();
+
+        $response = $this->actingAs($user)->post(route('admin.navigation.store'), [
+            'menu' => 'main',
+            'kind' => 'folder',
+            'folder_label' => 'Company',
+            'target' => '_self',
+            'is_visible' => '1',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('navigation_menu_items', [
+            'menu' => 'main',
+            'source_type' => 'folder',
+            'label' => 'Company',
+            'source_key' => null,
+        ]);
+    }
+
+    public function test_navigation_source_picker_does_not_expose_technical_route_type_suffix(): void
+    {
+        $user = $this->navigationAdmin();
+
+        $this->actingAs($user)
+            ->get(route('admin.navigation.index', ['menu' => 'main']))
+            ->assertOk()
+            ->assertDontSee(' · ROUTE')
+            ->assertDontSee(' · CMS_PAGE');
+    }
+
     public function test_the_same_source_can_exist_in_main_and_dashboard_menus(): void
     {
         foreach (['main', 'dashboard'] as $position => $menu) {
