@@ -2,12 +2,15 @@
 
 namespace Tests\Unit;
 
+use App\Models\NavigationMenuItem;
 use App\Services\NavigationSourceRegistry;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class NavigationSourceRegistryTest extends TestCase
 {
+    use RefreshDatabase;
     public function test_public_registry_contains_only_real_get_destinations(): void
     {
         Route::get('/__navigation-test', fn () => 'ok')->name('navigation.test');
