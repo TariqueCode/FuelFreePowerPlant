@@ -17,6 +17,9 @@ class NavigationSourceRegistryTest extends TestCase
 
         $this->assertTrue($sources->contains('key', 'route:navigation.test'));
         $this->assertFalse($sources->contains('key', 'route:navigation.test.store'));
+
+        Route::get('/__protected-navigation-test', fn () => 'ok')->middleware('auth')->name('navigation.protected');
+        $this->assertNull(app(NavigationSourceRegistry::class)->resolveAny('route:navigation.protected', 'public'));
         $this->assertSame('Navigation Test', $sources->firstWhere('key', 'route:navigation.test')['label']);
     }
 
