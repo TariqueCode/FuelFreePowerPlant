@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\CmsPage;
 use App\Models\HomepageSection;
-use App\Models\PowerPlant;
 use App\Models\SiteContentItem;
 use App\Models\SiteSlider;
 use App\Models\SystemSetting;
@@ -14,7 +13,6 @@ class HomeController
 {
     public function __invoke(): Response
     {
-        $plants=PowerPlant::query()->orderByRaw("CASE WHEN status='operational' THEN 0 ELSE 1 END")->latest()->get();
         $homePage=CmsPage::query()->where('slug','home')->where('is_published',true)->first();
         $content=SiteContentItem::published()->whereIn('type',['news','announcement'])->orderBy('sort_order')->latest('published_at')->get()->groupBy(fn ($item) => in_array($item->type, ['news','announcement'], true) ? 'news' : $item->type);
         $gallery=SiteContentItem::published()->where('type','gallery')->whereNotNull('image_path')->withCount('galleryMedia')->orderBy('sort_order')->latest('published_at')->get();
@@ -53,16 +51,15 @@ class HomeController
         $home = [
             'slider' => isset($enabledSections['hero']),
             'welcome' => isset($enabledSections['welcome']),
-            'statistics' => isset($enabledSections['statistics']),
-            'projects' => isset($enabledSections['projects']),
+            'statistics' => false,
+            'projects' => false,
             'management' => isset($enabledSections['management']),
             'news' => isset($enabledSections['news']),
             'gallery' => isset($enabledSections['gallery']),
             'cta' => isset($enabledSections['cta']),
-            'section_order' => $sectionOrder ?: ['hero','welcome','statistics','projects','management','news','gallery','cta'],
+            'section_order' => array_values(array_filter($sectionOrder, fn ($key) => ! in_array($key, ['statistics','projects'], true))) ?: ['hero','welcome','management','news','gallery','cta'],
         ];
 
-        $projectsLimit=max(1,min(100,(int)($sectionSettings['projects']['limit']??6)));
         $managementLimit = max(1, min(100, (int) data_get($sectionSettings->get('management', []), 'limit', 4)));
         $newsLimit=max(1,min(100,(int)($sectionSettings['news']['limit']??3)));
         $galleryLimit=max(1,min(100,(int)($sectionSettings['gallery']['limit']??4)));
@@ -80,7 +77,6 @@ class HomeController
         };
 
         $newsSettings = $sectionSettings['news'] ?? [];
-        $projectSettings = $sectionSettings['projects'] ?? [];
         $managementSettings = $sectionSettings['management'] ?? [];
         $gallerySettings = $sectionSettings['gallery'] ?? [];
         $welcomeSettings = $sectionSettings['welcome'] ?? [];
@@ -110,11 +106,6 @@ class HomeController
             SiteContentItem::published()->whereIn('type',['news','announcement'])->orderBy('sort_order')->latest('published_at'),
             $newsSettings,
             $newsLimit
-        );
-        $plants = $applySelection(
-            PowerPlant::query()->orderByRaw("CASE WHEN status='operational' THEN 0 ELSE 1 END")->latest(),
-            $projectSettings,
-            $projectsLimit
         );
         $managementQuery = SiteContentItem::published()
             ->where('type','management')
@@ -152,8 +143,8 @@ class HomeController
             $gallerySettings,
             $galleryLimit
         );
-        $stats=['projects'=>PowerPlant::query()->count(),'capacity_mw'=>round((float)PowerPlant::query()->sum('capacity_kw')/1000,2),'operational'=>PowerPlant::query()->whereRaw('LOWER(status)=?', ['operational'])->count()];
+        $stats=[];
 
-        return response(view('home-v3',compact('plants','homePage','stats','content','brand','gallery','sliders','home','homeManagement','welcomeManagement','welcomeEyebrow','welcomeTitle','welcomeContent','welcomeSignoff','welcomePreviewWords','welcomeMoreWords','welcomeShowFull','welcomeLayout','welcomePreview','welcomeRemaining','welcomeHasMore','sectionSettings'))->render());
+        return response(view('home-v3',compact('homePage','stats','content','brand','gallery','sliders','home','homeManagement','welcomeManagement','welcomeEyebrow','welcomeTitle','welcomeContent','welcomeSignoff','welcomePreviewWords','welcomeMoreWords','welcomeShowFull','welcomeLayout','welcomePreview','welcomeRemaining','welcomeHasMore','sectionSettings'))->render());
     }
 }
