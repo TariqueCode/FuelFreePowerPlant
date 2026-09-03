@@ -76,4 +76,27 @@ class ContentPagesIndexTest extends TestCase
             ->assertDontSee('Duplicate')
             ->assertDontSee('> Edit <');
     }
+    public function test_legacy_resources_surface_is_removed(): void
+    {
+        $user = $this->adminUser();
+
+        $this->assertFalse(\Illuminate\Support\Facades\Route::has('resources.index'));
+        $this->assertFalse(\Illuminate\Support\Facades\Route::has('resources.show'));
+        $this->assertFalse(\Illuminate\Support\Facades\Route::has('resources.download'));
+
+        $this->actingAs($user)
+            ->get('/resources')
+            ->assertNotFound();
+
+        $this->actingAs($user)
+            ->get(route('admin.site-content.index', ['type' => 'resource']))
+            ->assertNotFound();
+
+        $this->actingAs($user)
+            ->get(route('admin.cms.index'))
+            ->assertOk()
+            ->assertDontSee('Resources CMS')
+            ->assertDontSee('Resources');
+    }
+
 }
