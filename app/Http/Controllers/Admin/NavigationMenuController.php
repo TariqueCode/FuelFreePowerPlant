@@ -108,6 +108,7 @@ class NavigationMenuController extends Controller
             'menu' => ['required', 'in:main,dashboard'],
             'source_key' => ['nullable', 'string', 'max:255'],
             'label' => ['nullable', 'string', 'max:160'],
+            'folder_label' => ['nullable', 'string', 'max:160'],
             'parent_id' => ['nullable', 'integer'],
             'target' => ['required', 'in:_self,_blank'],
             'icon' => ['nullable', 'string', 'max:100'],
@@ -124,8 +125,9 @@ class NavigationMenuController extends Controller
             $data['permission_key'] = null;
             $data['url'] = null;
             $data['route_name'] = null;
-            $data['label'] = trim((string) ($data['label'] ?? ''));
+            $data['label'] = trim((string) ($data['folder_label'] ?? ''));
             abort_if($data['label'] === '', 422, 'Folder name is required.');
+            unset($data['folder_label']);
         } else {
             abort_if(empty($data['source_key']), 422, 'Choose a live navigation source.');
             $source = $registry->resolve($data['source_key'], $area, $data['menu']);
