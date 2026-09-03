@@ -42,7 +42,7 @@ class PublicNavigationServiceTest extends TestCase
         ]);
 
         $hidden = NavigationMenuItem::create([
-            'menu' => 'test-navigation',
+            'menu' => 'main',
             'parent_id' => $folder->id,
             'label' => 'Hidden',
             'url' => '/hidden',
