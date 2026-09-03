@@ -22,6 +22,7 @@ class NavigationSourceRegistry
 
     public function available(string $area = 'public', string $menu = 'main'): Collection
     {
+        abort_unless(in_array($menu, ['main', 'dashboard'], true), 404);
         $used = $this->usedSourceKeys($menu);
 
         $routes = collect(RouteFacade::getRoutes()->getRoutes())
@@ -56,6 +57,7 @@ class NavigationSourceRegistry
 
     public function resolveAny(string $key, string $area = 'public'): ?array
     {
+        if (! in_array($area, ['public', 'dashboard'], true)) return null;
         if (Str::startsWith($key, 'route:')) {
             $name = Str::after($key, 'route:');
             foreach (RouteFacade::getRoutes()->getRoutes() as $route) {
