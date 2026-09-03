@@ -142,6 +142,41 @@
 @media(max-width:900px){.resource-control-row{grid-template-columns:auto auto;grid-template-areas:"create publish" "toolbar toolbar"}.resource-list.card-view{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.resource-control-row{grid-template-columns:minmax(0,1fr) auto}.resource-toolbar{grid-template-columns:minmax(0,1fr) 58px 58px 34px}.resource-toolbar select,.resource-toolbar .filter-btn{height:30px;font-size:7px;padding:0 5px}.resource-toolbar .filter-btn span{display:none}.resource-list.card-view{grid-template-columns:1fr 1fr}.resource-list.card-view .content-card{min-height:170px;padding:11px}.resource-view-tools{margin-bottom:7px}}
 @media(max-width:420px){.resource-toolbar{grid-template-columns:minmax(0,1fr) 52px 52px 32px}.resource-list.card-view{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){
+  .resource-control-row{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"create" "publish" "toolbar";
+    gap:8px;
+  }
+  .resource-control-row .compact-primary,
+  .resource-control-row .publish-count{width:100%;box-sizing:border-box}
+  .resource-control-row .compact-primary{justify-content:center}
+  .resource-control-row .publish-count{justify-content:flex-start;padding-inline:12px}
+  .resource-toolbar{
+    grid-template-columns:minmax(0,1fr) 64px 64px 36px!important;
+    width:100%;
+    box-sizing:border-box;
+  }
+  .resource-toolbar .search{min-width:0}
+  .resource-toolbar input{min-width:0;font-size:10px}
+  .resource-list .content-card{
+    grid-template-columns:42px minmax(0,1fr) auto;
+    gap:9px;
+    padding:9px;
+  }
+  .resource-list .content-icon{width:42px;height:42px;font-size:17px}
+  .resource-list .name{font-size:12px}
+  .resource-list .excerpt{font-size:9px}
+  .resource-list .meta{gap:6px;flex-wrap:wrap}
+  .resource-actions{gap:3px}
+  .resource-action,.resource-delete,.resource-switch{width:30px!important;height:30px!important}
+}
+@media(max-width:420px){
+  .resource-toolbar{
+    grid-template-columns:minmax(0,1fr) 58px 58px 32px!important;
+  }
+  .resource-toolbar select{font-size:7px!important}
+}
 </style>
 @endpush
 @push('scripts')<script>
