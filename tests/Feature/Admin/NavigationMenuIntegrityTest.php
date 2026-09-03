@@ -17,12 +17,12 @@ class NavigationMenuIntegrityTest extends TestCase
             'menu' => 'main',
             'parent_id' => null,
             'label' => 'Home',
-            'url' => '/',
-            'route_name' => 'home',
+            'url' => '/__navigation-unique',
+            'route_name' => 'navigation.test.unique',
             'target' => '_self',
             'is_visible' => true,
             'sort_order' => 0,
-            'source_key' => 'route:home',
+            'source_key' => 'route:test.navigation.unique',
             'source_type' => 'route',
             'area' => 'public',
         ]);
@@ -38,7 +38,7 @@ class NavigationMenuIntegrityTest extends TestCase
             'target' => '_self',
             'is_visible' => true,
             'sort_order' => 1,
-            'source_key' => 'route:home',
+            'source_key' => 'route:test.navigation.unique',
             'source_type' => 'route',
             'area' => 'public',
         ]);
@@ -56,7 +56,7 @@ class NavigationMenuIntegrityTest extends TestCase
                 'target' => '_self',
                 'is_visible' => true,
                 'sort_order' => $position,
-                'source_key' => 'route:home',
+                'source_key' => 'route:test.navigation.unique',
                 'source_type' => 'route',
                 'area' => $menu === 'dashboard' ? 'dashboard' : 'public',
             ]);
