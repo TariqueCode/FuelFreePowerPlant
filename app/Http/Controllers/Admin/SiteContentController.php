@@ -20,7 +20,6 @@ class SiteContentController extends Controller
         $type = $request->string('type')->toString();
         if ($type === 'gallery') return redirect()->route('admin.gallery.index');
         if ($type === 'management') return redirect()->route('admin.management.index');
-        if ($type === 'resource' || $type === 'resources') return redirect()->route('admin.cms.index');
         abort_unless($type === '' || in_array($type, $this->types, true), 404);
 
         $items = SiteContentItem::query()
