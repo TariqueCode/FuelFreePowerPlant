@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\HomepageSection;
-use App\Models\PowerPlant;
 use App\Models\SiteContentItem;
 use App\Models\SystemSetting;
 use Illuminate\Http\RedirectResponse;
@@ -19,7 +18,6 @@ class HomepageBuilderController extends Controller
         $sections = HomepageSection::query()->ordered()->get();
 
         $counts = [
-            'projects' => PowerPlant::query()->count(),
             'management' => SiteContentItem::query()->where('type', 'management')->where('status', 'published')->count(),
             'news' => SiteContentItem::query()->whereIn('type', ['news', 'announcement'])->where('status', 'published')->count(),
             'gallery' => SiteContentItem::query()->where('type', 'gallery')->where('status', 'published')->count(),
@@ -27,7 +25,6 @@ class HomepageBuilderController extends Controller
         ];
 
         $choices = [
-            'projects' => PowerPlant::query()->orderBy('name')->get(['id','name']),
             'management' => SiteContentItem::query()->where('type','management')->published()->orderBy('sort_order')->orderBy('title')->get(['id','title']),
             'news' => SiteContentItem::query()->whereIn('type',['news','announcement'])->published()->orderBy('sort_order')->latest('published_at')->get(['id','title','type']),
             'gallery' => SiteContentItem::query()->where('type','gallery')->published()->orderBy('sort_order')->latest('published_at')->get(['id','title']),
@@ -68,12 +65,11 @@ class HomepageBuilderController extends Controller
         }
 
         $selectedIds = [];
-        foreach (['projects','management','news','gallery'] as $key) {
+        foreach (['management','news','gallery'] as $key) {
             $selectedIds[$key] = array_values(array_unique(array_map('intval', (array) $request->input("settings.{$key}.ids", []))));
         }
 
         $validIds = [
-            'projects' => PowerPlant::query()->whereIn('id', $selectedIds['projects'])->pluck('id')->map(fn ($id) => (int) $id)->all(),
             'management' => SiteContentItem::query()->where('type', 'management')->published()->whereIn('id', $selectedIds['management'])->pluck('id')->map(fn ($id) => (int) $id)->all(),
             'news' => SiteContentItem::query()->whereIn('type', ['news','announcement'])->published()->whereIn('id', $selectedIds['news'])->pluck('id')->map(fn ($id) => (int) $id)->all(),
             'gallery' => SiteContentItem::query()->where('type', 'gallery')->published()->whereIn('id', $selectedIds['gallery'])->pluck('id')->map(fn ($id) => (int) $id)->all(),
@@ -101,7 +97,7 @@ class HomepageBuilderController extends Controller
                     2
                 ));
             }
-            if (in_array($key, ['projects','management','news','gallery'], true) && $request->has("settings.{$key}.limit")) {
+            if (in_array($key, ['management','news','gallery'], true) && $request->has("settings.{$key}.limit")) {
                 $settings['limit'] = max(1, min(100, (int) $request->input("settings.{$key}.limit")));
                 $mode = $request->input("settings.{$key}.mode", $settings['mode'] ?? 'latest');
                 $settings['mode'] = $mode;
