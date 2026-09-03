@@ -17,6 +17,7 @@ class NavigationSourceRegistry
         'news.show', 'projects.show', 'resources.show', 'resources.download',
         'resources.shared-download', 'documents.shared-download', 'webmail.redirect',
         'admin.navigation.index',
+        'admin.navigation.store', 'admin.navigation.update', 'admin.navigation.destroy', 'admin.navigation.reorder',
     ];
 
     private const LABELS = [
