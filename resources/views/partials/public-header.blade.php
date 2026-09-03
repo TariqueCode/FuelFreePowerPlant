@@ -127,7 +127,7 @@
             <nav class="public-menu" aria-label="Primary navigation">
                 @foreach($publicMenuItems as $menuItem)
                     @include('partials.public-menu-item', ['menuItem' => $menuItem])
-                @endforeach     @endforelse
+                @endforeach
                 <span class="mobile-portal-separator" aria-hidden="true"></span>
                 <a class="mobile-menu-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid {{ $isPortalUser ? 'fa-circle-user' : 'fa-right-to-bracket' }}" aria-hidden="true"></i>
