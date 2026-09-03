@@ -19,30 +19,68 @@ class NavigationMenuController extends Controller
         $menu = $request->string('menu')->toString() ?: 'main';
         $area = $menu === 'dashboard' ? 'dashboard' : 'public';
 
-        $items = NavigationMenuItem::query()
-            ->where('menu', $menu)
-            ->whereNull('parent_id')
-            ->with(['children.children.children.children'])
-            ->orderBy('sort_order')
-            ->orderBy('id')
-            ->get();
-
         $all = NavigationMenuItem::query()
             ->where('menu', $menu)
             ->orderBy('sort_order')
             ->orderBy('id')
             ->get();
 
-        $byId = $all->keyBy('id');
-        $all->each(function (NavigationMenuItem $item) use ($byId): void {
+        // The builder must reflect only destinations that are currently real and permitted.
+        // Folders are structural and remain available even when their children change.
+        $all = $all->filter(function (NavigationMenuItem $item) use ($registry, $area): bool {
+            if ($item->source_type === 'folder') {
+                return true;
+            }
+
+            if (! $item->source_key) {
+                return false;
+            }
+
+            $source = $registry->resolveAny($item->source_key, $area);
+
+            if (! $source) {
+                return false;
+            }
+
+            $item->label = $source['label'];
+            $item->url = $source['url'];
+            $item->route_name = $source['route_name'];
+            $item->permission_key = $source['permission'] ?? null;
+            $item->source_type = $source['type'];
+
+            return true;
+        })->values();
+
+        $byParent = $all->groupBy(fn (NavigationMenuItem $item) => $item->parent_id ?? 0);
+        $attachChildren = function (NavigationMenuItem $item) use (&$attachChildren, $byParent): NavigationMenuItem {
+            $children = $byParent->get($item->id, collect())
+                ->sortBy(fn (NavigationMenuItem $child) => [$child->sort_order, $child->id])
+                ->values();
+
+            $children->each(fn (NavigationMenuItem $child) => $attachChildren($child));
+            $item->setRelation('children', $children);
+
+            return $item;
+        };
+
+        $items = $byParent->get(0, collect())
+            ->sortBy(fn (NavigationMenuItem $item) => [$item->sort_order, $item->id])
+            ->values()
+            ->map($attachChildren);
+
+        $all->each(function (NavigationMenuItem $item) use ($all): void {
             $depth = 0;
             $cursor = $item->parent_id;
             $seen = [];
 
-            while ($cursor !== null && ! isset($seen[$cursor]) && isset($byId[$cursor])) {
+            while ($cursor !== null && ! isset($seen[$cursor])) {
                 $seen[$cursor] = true;
+                $parent = $all->firstWhere('id', $cursor);
+                if (! $parent) {
+                    break;
+                }
                 $depth++;
-                $cursor = $byId[$cursor]->parent_id;
+                $cursor = $parent->parent_id;
             }
 
             $item->depth = $depth;
