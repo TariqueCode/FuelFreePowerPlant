@@ -28,6 +28,7 @@ class NavigationSourceRegistry
 
         $routes = collect(RouteFacade::getRoutes()->getRoutes())
             ->filter(fn (Route $route): bool => $this->eligibleRoute($route, $area))
+            ->reject(fn (Route $route): bool => $this->hasCanonicalCmsPage($route, $area))
             ->map(fn (Route $route): array => $this->routeSource($route, $area))
             ->filter(function (array $source): bool {
                 return $source['permission'] === null || ! auth()->check() || auth()->user()->hasPermission($source['permission']);
@@ -61,6 +62,8 @@ class NavigationSourceRegistry
         if (! in_array($area, ['public', 'dashboard'], true)) return null;
         if (Str::startsWith($key, 'route:')) {
             $name = Str::after($key, 'route:');
+            $canonical = $this->canonicalCmsPageForRoute($name, $area);
+            if ($canonical) return $canonical;
             foreach (RouteFacade::getRoutes()->getRoutes() as $route) {
                 if ($route->getName() === $name && $this->eligibleRoute($route, $area)) {
                     $source = $this->routeSource($route, $area);
@@ -115,6 +118,37 @@ class NavigationSourceRegistry
         }
 
         return false;
+    }
+
+    private function hasCanonicalCmsPage(Route $route, string $area): bool
+    {
+        return $this->canonicalCmsPageForRoute((string) $route->getName(), $area) !== null;
+    }
+
+    private function canonicalCmsPageForRoute(string $name, string $area): ?array
+    {
+        if ($area !== 'public') return null;
+
+        $slug = match ($name) {
+            'site.about' => 'about-us',
+            default => null,
+        };
+
+        if ($slug === null) return null;
+
+        $page = CmsPage::query()->where('slug', $slug)->where('is_published', true)->first();
+        if (! $page) return null;
+
+        return [
+            'key' => 'cms_page:'.$page->id,
+            'type' => 'cms_page',
+            'label' => (string) $page->title,
+            'url' => route('cms.page', ['slug' => $page->slug]),
+            'route_name' => 'cms.page',
+            'area' => 'public',
+            'permission' => null,
+            'meta' => ['cms_page_id' => $page->id, 'slug' => $page->slug],
+        ];
     }
 
     private function isNavigationBuilderRoute(string $name): bool
