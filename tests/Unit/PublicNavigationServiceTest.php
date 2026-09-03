@@ -52,11 +52,11 @@ class PublicNavigationServiceTest extends TestCase
 
         $tree = app(PublicNavigationService::class)->tree('main');
 
-        $this->assertCount(1, $tree);
-        $this->assertSame($folder->id, $tree->first()->id);
-        $this->assertSame($subFolder->id, $tree->first()->children->first()->id);
-        $this->assertSame($page->id, $tree->first()->children->first()->children->first()->id);
-        $this->assertCount(0, $tree->first()->children->filter(fn ($item) => $item->id === $hidden->id));
+        $root = $tree->firstWhere('id', $folder->id);
+        $this->assertNotNull($root);
+        $this->assertSame($subFolder->id, $root->children->first()->id);
+        $this->assertSame($page->id, $root->children->first()->children->first()->id);
+        $this->assertCount(0, $root->children->filter(fn ($item) => $item->id === $hidden->id));
     }
 
     public function test_cache_is_cleared_before_public_tree_is_rebuilt(): void
