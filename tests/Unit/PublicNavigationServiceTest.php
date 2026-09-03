@@ -17,7 +17,7 @@ class PublicNavigationServiceTest extends TestCase
         Cache::forget('public.navigation.main');
 
         $folder = NavigationMenuItem::create([
-            'menu' => 'test-navigation',
+            'menu' => 'main',
             'label' => 'Company',
             'is_visible' => true,
             'sort_order' => 0,
@@ -49,7 +49,7 @@ class PublicNavigationServiceTest extends TestCase
             'sort_order' => 1,
         ]);
 
-        $tree = app(PublicNavigationService::class)->tree('test-navigation');
+        $tree = app(PublicNavigationService::class)->tree('main');
 
         $this->assertCount(1, $tree);
         $this->assertSame($folder->id, $tree->first()->id);
