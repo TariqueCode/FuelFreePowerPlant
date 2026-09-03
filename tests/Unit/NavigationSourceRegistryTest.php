@@ -44,7 +44,7 @@ class NavigationSourceRegistryTest extends TestCase
     {
         Route::get('/admin/navigation/internal', fn () => 'ok')->name('admin.navigation.internal');
 
-        $sources = app(NavigationSourceRegistry::class)->available('dashboard', 'test-dashboard-menu');
+        $sources = app(NavigationSourceRegistry::class)->available('dashboard', 'dashboard');
 
         $this->assertFalse($sources->contains('key', 'route:admin.navigation.internal'));
     }
