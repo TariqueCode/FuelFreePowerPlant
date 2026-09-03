@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -25,19 +26,30 @@ return new class extends Migration
             }
         }
 
-        // Preserve existing managed navigation identity without inventing new
-        // menu items. Legacy route-backed records become live route sources.
         if (Schema::hasColumn('navigation_menu_items', 'route_name')) {
-            \DB::table('navigation_menu_items')
+            DB::table('navigation_menu_items')
                 ->whereNull('source_key')
                 ->whereNotNull('route_name')
                 ->where('route_name', '!=', '')
                 ->update([
-                    'source_key' => \DB::raw("CONCAT('route:', route_name)"),
+                    'source_key' => DB::raw("CONCAT('route:', route_name)"),
                     'source_type' => 'route',
-                    'area' => 'public',
+                    'area' => DB::raw("CASE WHEN menu = 'dashboard' THEN 'dashboard' ELSE 'public' END"),
                 ]);
         }
+
+        DB::table('navigation_menu_items')
+            ->whereNull('source_key')
+            ->where(function ($query) {
+                $query->whereNull('url')->orWhere('url', '');
+            })
+            ->where(function ($query) {
+                $query->whereNull('route_name')->orWhere('route_name', '');
+            })
+            ->update([
+                'source_type' => 'folder',
+                'area' => DB::raw("CASE WHEN menu = 'dashboard' THEN 'dashboard' ELSE 'public' END"),
+            ]);
     }
 
     public function down(): void
