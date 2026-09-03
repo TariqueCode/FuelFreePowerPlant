@@ -39,7 +39,7 @@ class PublicNavigationServiceTest extends TestCase
             'parent_id' => $subFolder->id,
             'label' => 'Future Project',
             'url' => '/career',
-            'source_key' => 'route:site.career',
+            'source_key' => 'route:site.career.' . $i,
             'source_type' => 'route',
             'area' => 'public',
             'is_visible' => true,
