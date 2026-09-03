@@ -178,6 +178,7 @@
 
     const tree = document.getElementById('menu-tree');
     const state = document.getElementById('save-state');
+    const originalTree = tree?.innerHTML;
     if (!tree) return;
     let dragged = null;
 
@@ -195,8 +196,8 @@
             if (!response.ok) throw new Error('reorder failed');
             state.textContent = 'Saved';
         } catch (error) {
-            state.textContent = 'Save failed';
-            window.setTimeout(() => window.location.reload(), 700);
+            state.textContent = 'Save failed — changes were not saved';
+            window.setTimeout(() => window.location.reload(), 900);
         }
     };
 
