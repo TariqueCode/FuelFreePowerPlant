@@ -129,14 +129,27 @@ class NavigationSourceRegistry
     {
         if ($area !== 'public') return null;
 
-        $slug = match ($name) {
-            'site.about' => 'about-us',
-            default => null,
-        };
+        $route = collect(RouteFacade::getRoutes()->getRoutes())
+            ->first(fn (Route $route): bool => $route->getName() === $name);
 
-        if ($slug === null) return null;
+        if (! $route || ! $this->eligibleRoute($route, $area)) return null;
 
-        $page = CmsPage::query()->where('slug', $slug)->where('is_published', true)->first();
+        // A published Page Builder page owns an exact public route slug whenever
+        // the application's route is a static URI with the same slug. This
+        // prevents controller-generated labels such as "Public Site" from
+        // leaking into navigation when a CMS page exists for that destination.
+        $slug = ltrim($route->uri(), '/');
+        if ($slug === '' || str_contains($slug, '/') || str_contains($slug, '{')) return null;
+
+        $page = CmsPage::query()
+            ->where('slug', $slug)
+            ->where('is_published', true)
+            ->first();
+
+        if (! $page && $name === 'site.about') {
+            $page = CmsPage::query()->where('slug', 'about-us')->where('is_published', true)->first();
+        }
+
         if (! $page) return null;
 
         return [
