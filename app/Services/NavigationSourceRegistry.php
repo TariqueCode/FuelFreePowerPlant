@@ -20,6 +20,8 @@ class NavigationSourceRegistry
         'admin.navigation.store', 'admin.navigation.update', 'admin.navigation.destroy', 'admin.navigation.reorder',
     ];
 
+    private const NAVIGABLE_PREFIXES = ['site.', 'news.index', 'resources.index', 'sustainability', 'contact', 'management', 'home', 'dashboard', 'admin.'];
+
     private const LABELS = [
         'home' => 'Home', 'site.about' => 'About Us', 'site.plants' => 'Projects & Our Plans',
         'site.future-project' => 'Future Project', 'site.solutions' => 'Solutions',
@@ -112,12 +114,18 @@ class NavigationSourceRegistry
         $uri = ltrim($route->uri(), '/');
 
         if (! $name || ! in_array($route->methods()[0] ?? null, ['GET', 'HEAD'], true)) return false;
+        if ($this->isNavigationBuilderRoute($name)) return false;
         if (str_contains($uri, '{') || in_array($name, self::EXCLUDED_ROUTE_NAMES, true)) return false;
 
         if ($area === 'public') return ! str_starts_with($uri, 'admin/');
         if ($area === 'dashboard') return str_starts_with($uri, 'admin/') || $name === 'dashboard';
 
         return false;
+    }
+
+    private function isNavigationBuilderRoute(string $name): bool
+    {
+        return Str::startsWith($name, 'admin.navigation.');
     }
 
     private function routeSource(Route $route, string $area): array
