@@ -190,7 +190,7 @@ class NavigationMenuController extends Controller
 
             foreach ($items as $item) {
                 abort_if(
-                    $this->isDescendantOf($parent->id, $item->id),
+                    $this->isDescendantOf($parent->id, $item->id, $data['menu']),
                     422,
                     'A menu item cannot be placed inside its own descendant.'
                 );
@@ -230,7 +230,7 @@ class NavigationMenuController extends Controller
         $parent = $query->firstOrFail();
         abort_unless($parent->source_type === 'folder', 422, 'Only folders can contain navigation items.');
 
-        if ($ignoreId !== null && $this->isDescendantOf($parentId, $ignoreId)) {
+        if ($ignoreId !== null && $this->isDescendantOf($parentId, $ignoreId, $menu)) {
             abort(422, 'A menu item cannot be placed inside its own descendant.');
         }
 
@@ -276,7 +276,7 @@ class NavigationMenuController extends Controller
         )->max();
     }
 
-    private function isDescendantOf(int $candidateId, int $ancestorId): bool
+    private function isDescendantOf(int $candidateId, int $ancestorId, string $menu): bool
     {
         $seen = [];
 
@@ -286,7 +286,10 @@ class NavigationMenuController extends Controller
             }
 
             $seen[$candidateId] = true;
-            $parentId = NavigationMenuItem::query()->whereKey($candidateId)->value('parent_id');
+            $parentId = NavigationMenuItem::query()
+                ->where('menu', $menu)
+                ->whereKey($candidateId)
+                ->value('parent_id');
 
             if ($parentId === null) {
                 return false;
