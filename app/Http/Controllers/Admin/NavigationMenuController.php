@@ -81,6 +81,7 @@ class NavigationMenuController extends Controller
             abort_if(empty($data['source_key']), 422, 'Choose a live navigation source.');
             $source = $registry->resolve($data['source_key'], $area, $data['menu']);
             abort_unless($source !== null, 422, 'This navigation source is no longer available.');
+            abort_if(NavigationMenuItem::query()->where('menu', $data['menu'])->where('source_key', $data['source_key'])->exists(), 422, 'This navigation source is already in the menu.');
 
             $data['source_type'] = $source['type'];
             $data['permission_key'] = $source['permission'] ?? null;
