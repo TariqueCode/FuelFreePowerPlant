@@ -19,7 +19,7 @@ class RolePermissionSeeder extends Seeder
             'client'=>['Client','Client portal access.'],
         ];
         $permissions = [
-            'dashboard.view'=>'View dashboard','plants.view'=>'View power plants','plants.manage'=>'Manage power plants',
+            'dashboard.view'=>'View dashboard',
             'cms.view'=>'View CMS','cms.manage'=>'Manage CMS','cms.publish'=>'Publish CMS pages','website.view'=>'View website sections','website.manage'=>'Manage website sections','website.publish'=>'Publish website content',
             'users.view'=>'View users','users.manage'=>'Manage users','documents.view'=>'View documents','documents.manage'=>'Manage documents',
             'notifications.view'=>'View notifications','settings.manage'=>'Manage system settings','audit.view'=>'View audit log','health.view'=>'View system health',
@@ -34,7 +34,7 @@ class RolePermissionSeeder extends Seeder
         Role::where('slug','mail-manager')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>in_array($s,['mail.view','mail.manage'],true),ARRAY_FILTER_USE_BOTH)));
         Role::where('slug','career-manager')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>in_array($s,['career.view','career.manage'],true),ARRAY_FILTER_USE_BOTH)));
         Role::where('slug','administrator')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>!in_array($s,['settings.manage','health.view'],true),ARRAY_FILTER_USE_BOTH)));
-        Role::where('slug','project-manager')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>in_array($s,['dashboard.view','plants.view','plants.manage','users.view','documents.view','documents.manage','inquiries.view','inquiries.manage','notifications.view','social-media.manage','navigation.manage','career.view'],true),ARRAY_FILTER_USE_BOTH)));
+        Role::where('slug','project-manager')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>in_array($s,['dashboard.view','users.view','documents.view','documents.manage','inquiries.view','inquiries.manage','notifications.view','social-media.manage','navigation.manage','career.view'],true),ARRAY_FILTER_USE_BOTH)));
         Role::where('slug','client')->firstOrFail()->permissions()->sync(array_values(array_filter($models,fn($p,$s)=>in_array($s,['dashboard.view','documents.view','documents.manage','notifications.view'],true),ARRAY_FILTER_USE_BOTH)));
     }
 }
