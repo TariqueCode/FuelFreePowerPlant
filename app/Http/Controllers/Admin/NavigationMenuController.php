@@ -169,6 +169,9 @@ class NavigationMenuController extends Controller
 
         abort_unless($items->count() === count($data['ids']), 422, 'Invalid menu items.');
 
+        $currentParentIds = $items->pluck('parent_id')->map(fn ($id) => $id === null ? null : (int) $id)->unique()->values();
+        abort_if($currentParentIds->count() > 1 || ($currentParentIds->count() === 1 && $currentParentIds->first() !== $parentId), 422, 'Items must belong to the same current parent.');
+
         if ($parentId !== null) {
             $parent = NavigationMenuItem::query()
                 ->where('menu', $data['menu'])
