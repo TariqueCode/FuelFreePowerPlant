@@ -25,7 +25,7 @@ class PublicNavigationServiceTest extends TestCase
         ]);
 
         $subFolder = NavigationMenuItem::create([
-            'menu' => 'test-navigation',
+            'menu' => 'main',
             'parent_id' => $folder->id,
             'label' => 'Projects',
             'is_visible' => true,
