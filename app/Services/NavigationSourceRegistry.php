@@ -15,7 +15,7 @@ class NavigationSourceRegistry
         'favicon', 'login', 'login.store', 'logout', 'profile', 'profile.update',
         'career.store', 'career.chunks', 'contact.store', 'cms.page', 'gallery.show',
         'news.show', 'projects.show',
-        'resources.shared-download', 'documents.shared-download', 'webmail.redirect',
+        'documents.shared-download', 'webmail.redirect',
         'admin.navigation.index',
         'admin.navigation.store', 'admin.navigation.update', 'admin.navigation.destroy', 'admin.navigation.reorder',
     ];
