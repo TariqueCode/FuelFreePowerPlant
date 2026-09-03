@@ -33,7 +33,7 @@ class PublicNavigationServiceTest extends TestCase
         ]);
 
         $page = NavigationMenuItem::create([
-            'menu' => 'test-navigation',
+            'menu' => 'main',
             'parent_id' => $subFolder->id,
             'label' => 'Future Project',
             'url' => '/future-project',
