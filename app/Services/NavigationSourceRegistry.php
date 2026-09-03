@@ -17,6 +17,7 @@ class NavigationSourceRegistry
         'news.show', 'projects.show',
         'documents.shared-download', 'webmail.redirect',
         'admin.navigation.index',
+        'resources.index', 'resources.show', 'resources.download',
         'admin.navigation.store', 'admin.navigation.update', 'admin.navigation.destroy', 'admin.navigation.reorder',
     ];
 
@@ -98,6 +99,7 @@ class NavigationSourceRegistry
         if (! $name || ! in_array($route->methods()[0] ?? null, ['GET', 'HEAD'], true)) return false;
         if ($this->isNavigationBuilderRoute($name)) return false;
         if (str_contains($uri, '{') || in_array($name, self::EXCLUDED_ROUTE_NAMES, true)) return false;
+        if ($uri === 'resources' || Str::startsWith($uri, 'resources/')) return false;
 
         $middleware = collect($route->gatherMiddleware())->map(fn ($value): string => (string) $value);
 
