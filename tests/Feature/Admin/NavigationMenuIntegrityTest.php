@@ -62,6 +62,15 @@ class NavigationMenuIntegrityTest extends TestCase
             ]);
         }
 
-        $this->assertDatabaseCount('navigation_menu_items', 2);
+        $this->assertDatabaseHas('navigation_menu_items', [
+            'menu' => 'main',
+            'source_key' => 'route:test.navigation.unique',
+        ]);
+        $this->assertDatabaseHas('navigation_menu_items', [
+            'menu' => 'dashboard',
+            'source_key' => 'route:test.navigation.unique',
+        ]);
+        $this->assertSame(1, NavigationMenuItem::query()->where('menu', 'main')->where('source_key', 'route:test.navigation.unique')->count());
+        $this->assertSame(1, NavigationMenuItem::query()->where('menu', 'dashboard')->where('source_key', 'route:test.navigation.unique')->count());
     }
 }
