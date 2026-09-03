@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\NavigationMenuItem;
+use App\Models\User;
 use App\Services\NavigationSourceRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
@@ -52,8 +53,6 @@ class NavigationSourceRegistryTest extends TestCase
     {
         $user = User::factory()->create();
         $this->actingAs($user);
-
-        $routes = app(\Illuminate\Routing\Router::class)->getRoutes();
 
         $resourceRoutes = collect([
             'resources.index',
