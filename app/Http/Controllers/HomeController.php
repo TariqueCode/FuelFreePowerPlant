@@ -143,8 +143,6 @@ class HomeController
             $gallerySettings,
             $galleryLimit
         );
-        $stats=[];
-
-        return response(view('home-v3',compact('homePage','stats','content','brand','gallery','sliders','home','homeManagement','welcomeManagement','welcomeEyebrow','welcomeTitle','welcomeContent','welcomeSignoff','welcomePreviewWords','welcomeMoreWords','welcomeShowFull','welcomeLayout','welcomePreview','welcomeRemaining','welcomeHasMore','sectionSettings'))->render());
+        return response(view('home-v3',compact('homePage','content','brand','gallery','sliders','home','homeManagement','welcomeManagement','welcomeEyebrow','welcomeTitle','welcomeContent','welcomeSignoff','welcomePreviewWords','welcomeMoreWords','welcomeShowFull','welcomeLayout','welcomePreview','welcomeRemaining','welcomeHasMore','sectionSettings'))->render());
     }
 }
