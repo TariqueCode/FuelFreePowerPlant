@@ -223,7 +223,7 @@ class NavigationMenuController extends Controller
             abort(422, 'A menu item cannot be placed inside its own descendant.');
         }
 
-        $depth = 1;
+        $parentDepth = 0;
         $cursor = $parentId;
         $seen = [];
 
@@ -233,15 +233,17 @@ class NavigationMenuController extends Controller
                 ->where('menu', $menu)
                 ->whereKey($cursor)
                 ->value('parent_id');
-            $depth++;
-            if ($depth > 6) {
+            $parentDepth++;
+            if ($parentDepth > 5) {
                 abort(422, 'Navigation can have up to five nested levels.');
             }
         }
 
         if ($ignoreId !== null) {
             $subtreeDepth = $this->maxDescendantDepth($ignoreId, $menu);
-            abort_if($depth + $subtreeDepth - 1 > 5, 422, 'This move would exceed the five-level navigation limit.');
+            abort_if($parentDepth + $subtreeDepth > 5, 422, 'This move would exceed the five-level navigation limit.');
+        } else {
+            abort_if($parentDepth + 1 > 5, 422, 'Navigation can have up to five nested levels.');
         }
 
         return $parentId;
