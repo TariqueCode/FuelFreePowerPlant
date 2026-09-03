@@ -24,7 +24,7 @@
 <div class="builder-grid">
     <div class="builder-card structure-card">
         <div class="card-head"><strong>Menu Structure</strong><span id="save-state">Ready</span></div>
-        <div class="simple-tip"><i class="fa-solid fa-circle-info"></i><span>Drag a row to reorder it. Drop it on a <strong>Folder</strong> to nest it. Pages and live sources can never become parents.</span></div>
+        <div class="simple-tip"><i class="fa-solid fa-circle-info"></i><span>Drag a row to reorder it. Hold <strong>Alt</strong> while dropping on a Folder to nest it. Pages and live sources can never become parents.</span></div>
         <div id="menu-tree">
             @forelse($items as $item)
                 @include('admin.navigation._item', ['item' => $item])
@@ -237,7 +237,7 @@
             row.classList.remove('drop-target');
             if (!dragged || dragged === row || dragged.contains(row)) return;
 
-            const intoFolder = row.dataset.kind === 'folder' && (event.altKey || event.shiftKey);
+            const intoFolder = row.dataset.kind === 'folder' && event.altKey;
             let container = row.parentElement;
             if (intoFolder) {
                 let children = row.querySelector(':scope > .children');
