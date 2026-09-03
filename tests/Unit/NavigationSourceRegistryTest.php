@@ -101,4 +101,29 @@ class NavigationSourceRegistryTest extends TestCase
         $this->assertSame(route('cms.page', ['slug' => 'about-us']), $resolved['url']);
     }
 
+
+    public function test_any_static_public_route_matching_a_published_page_builder_slug_becomes_cms_source(): void
+    {
+        Route::get('/our-technology', fn () => 'legacy')->name('site.technology');
+
+        \App\Models\CmsPage::create([
+            'title' => 'Our Technology',
+            'slug' => 'our-technology',
+            'content' => '<p>Builder content</p>',
+            'is_published' => true,
+        ]);
+
+        $registry = app(NavigationSourceRegistry::class);
+
+        $this->assertFalse(
+            $registry->available('public', 'main')->contains('key', 'route:site.technology')
+        );
+
+        $source = $registry->resolveAny('route:site.technology', 'public');
+        $this->assertNotNull($source);
+        $this->assertSame('cms_page', $source['type']);
+        $this->assertSame('Our Technology', $source['label']);
+        $this->assertSame(route('cms.page', ['slug' => 'our-technology']), $source['url']);
+    }
+
 }
