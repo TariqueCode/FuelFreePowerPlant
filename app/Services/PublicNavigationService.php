@@ -31,7 +31,7 @@ class PublicNavigationService
         $valid = $items->filter(function (NavigationMenuItem $item) use ($registry): bool {
             if ($item->source_type === 'folder') return true;
             if (! $item->source_key) return false;
-            $source = $registry->resolveAny($item->source_key, 'public');
+            $source = $registry->resolveAny($item->source_key, $item->area);
             if (! $source) return false;
 
             $item->label = $source['label'];
