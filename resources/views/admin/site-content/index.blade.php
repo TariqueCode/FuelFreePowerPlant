@@ -1,10 +1,10 @@
 @extends('layouts.portal')
 @section('title',$title)
 @section('content')
-<section class="hero"><div><span class="eyebrow">CONTENT MANAGEMENT</span><h1>{{ $title }}</h1><p>{{ $type==='company' ? 'Manage company pages and corporate content in one place. Use Navigation / Menu Builder to control the public menu.' : ($type==='news' ? 'Publish news, notices and announcements with cover photos, featured placement and a professional content workflow.' : 'Manage structured public website content.')) }}</p></div>@if($type!=='news' && auth()->user()->hasPermission('website.manage'))<a class="primary" href="{{ route('admin.site-content.create', $type ? ['type'=>$type] : []) }}"><i class="fa-solid fa-plus"></i> {{ $type==='company'?'Add company content':'New content' }}</a>@endif</section>
+<section class="hero"><div><span class="eyebrow">CONTENT MANAGEMENT</span><h1>{{ $title }}</h1><p>{{ $type==='company' ? 'Manage company pages and corporate content in one place. Use Navigation / Menu Builder to control the public menu.' : ($type==='news' ? 'Publish news, notices and announcements with cover photos, featured placement and a professional content workflow.' : 'Manage structured public website content.') }}</p></div>@if($type!=='news' && auth()->user()->hasPermission('website.manage'))<a class="primary" href="{{ route('admin.site-content.create', $type ? ['type'=>$type] : []) }}"><i class="fa-solid fa-plus"></i> {{ $type==='company'?'Add company content':'New content' }}</a>@endif</section>
 @if(session('status'))<div class="notice">{{ session('status') }}</div>@endif
 @if(!$type)
-<div class="workspace"><a href="{{ route('admin.site-content.index',['type'=>'company']) }}"><i class="fa-solid fa-building"></i><strong>Company CMS</strong><span>About Us and corporate information</span></a><a href="{{ route('admin.site-content.index',['type'=>'news']) }}"><i class="fa-solid fa-newspaper"></i><strong>News &amp; Notices CMS</strong><span>News, notices and announcements</span></a><a href="{{ route('admin.site-content.index',['type'=>'resource']) }}"><i class="fa-solid fa-file-arrow-down"></i><strong>Resources CMS</strong><span>Public-safe documents and downloads</span></a></div>
+<div class="workspace"><a href="{{ route('admin.site-content.index',['type'=>'company']) }}"><i class="fa-solid fa-building"></i><strong>Company CMS</strong><span>About Us and corporate information</span></a><a href="{{ route('admin.site-content.index',['type'=>'news']) }}"><i class="fa-solid fa-newspaper"></i><strong>News &amp; Notices CMS</strong><span>News, notices and announcements</span></a></div>
 @else
 <div class="back-row"><a href="{{ route('admin.site-content.index') }}"><i class="fa-solid fa-arrow-left"></i> All content</a><span>{{ $labels[$type] ?? ucfirst($type) }}</span></div>
 @endif
@@ -31,7 +31,7 @@
         <div class="content-icon"><i class="fa-regular fa-file-lines"></i></div>
     @elseif($type==='news')
         <div class="news-cover">@if($item->image_path)<img src="{{ asset('storage/'.$item->image_path) }}" alt="{{ $item->cover_alt ?: $item->title }}" loading="lazy">@else<i class="fa-regular fa-newspaper"></i>@endif</div>
-        <div class="news-kind {{ $item->type==='announcement'?'notice':'' }}">{{ $item->type==='announcement'?'Notice':($item->type==='resource'?'Resource':'News') }}</div>
+        <div class="news-kind {{ $item->type==='announcement'?'notice':'' }}">{{ $item->type==='announcement'?'Notice':'News' }}</div>
     @endif
     <div class="info">
         <div class="name">{{ $item->title }}</div>
