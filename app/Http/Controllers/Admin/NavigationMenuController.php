@@ -32,11 +32,12 @@ class NavigationMenuController extends Controller
                 return true;
             }
 
-            if (! $item->source_key) {
+            $sourceKey = $item->source_key ?: ($item->route_name ? 'route:'.$item->route_name : null);
+            if (! $sourceKey) {
                 return false;
             }
 
-            $source = $registry->resolveAny($item->source_key, $area);
+            $source = $registry->resolveAny($sourceKey, $area);
 
             if (! $source) {
                 return false;
@@ -46,6 +47,7 @@ class NavigationMenuController extends Controller
             $item->url = $source['url'];
             $item->route_name = $source['route_name'];
             $item->permission_key = $source['permission'] ?? null;
+            $item->source_key = $source['key'];
             $item->source_type = $source['type'];
 
             return true;
