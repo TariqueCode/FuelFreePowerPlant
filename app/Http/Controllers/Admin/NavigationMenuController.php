@@ -168,6 +168,7 @@ class NavigationMenuController extends Controller
             ->keyBy('id');
 
         abort_unless($items->count() === count($data['ids']), 422, 'Invalid menu items.');
+        abort_unless($parentId === null || $items->contains('id', $parentId) === false, 422, 'Invalid reorder parent.');
 
         $currentParentIds = $items->pluck('parent_id')->map(fn ($id) => $id === null ? null : (int) $id)->unique()->values();
         abort_if($currentParentIds->count() > 1 || ($currentParentIds->count() === 1 && $currentParentIds->first() !== $parentId), 422, 'Items must belong to the same current parent.');
