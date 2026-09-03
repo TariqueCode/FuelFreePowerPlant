@@ -17,17 +17,18 @@ class NavigationSourceRegistryTest extends TestCase
 
         $this->assertTrue($sources->contains('key', 'route:navigation.test'));
         $this->assertFalse($sources->contains('key', 'route:navigation.test.store'));
+        $this->assertSame('Navigation Test', $sources->firstWhere('key', 'route:navigation.test')['label']);
     }
 
     public function test_dashboard_registry_keeps_route_permission_metadata(): void
     {
         Route::middleware('permission:documents.view')
             ->get('/admin/__navigation-permission-test', fn () => 'ok')
-            ->name('admin.navigation.permission-test');
+            ->name('admin.documents.index');
 
         $source = app(NavigationSourceRegistry::class)
             ->available('dashboard', 'test-dashboard-menu')
-            ->firstWhere('key', 'route:admin.navigation.permission-test');
+            ->firstWhere('key', 'route:admin.documents.index');
 
         $this->assertNotNull($source);
         $this->assertSame('documents.view', $source['permission']);
