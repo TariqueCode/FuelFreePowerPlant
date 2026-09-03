@@ -125,28 +125,9 @@
 
         <div id="public-navigation" class="public-header-nav">
             <nav class="public-menu" aria-label="Primary navigation">
-                @forelse($publicMenuItems as $menuItem)
+                @foreach($publicMenuItems as $menuItem)
                     @include('partials.public-menu-item', ['menuItem' => $menuItem])
-                @empty
-                    <a href="{{ route('home') }}">{{ $headerLabels['home_label'] ?? 'Home' }}</a>
-                    <div class="public-menu-dropdown" data-fallback-company>
-                        <button class="public-menu-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
-                            <span>Company</span><span class="public-menu-dropdown-chevron" aria-hidden="true"></span>
-                        </button>
-                        <div class="public-menu-dropdown-panel">
-                            <a href="{{ route('site.about') }}">{{ $headerLabels['about_label'] ?? 'About Us' }}</a>
-                            <a href="{{ route('site.plants') }}">{{ config('fuelfree.projects.label','Projects & Our Plans') }}</a>
-                            <a href="{{ route('site.future-project') }}">{{ $headerLabels['future_project_label'] ?? 'Future Project' }}</a>
-                            <a href="{{ route('site.solutions') }}">{{ $headerLabels['solutions_label'] ?? 'Solutions' }}</a>
-                        </div>
-                    </div>
-                    <a href="{{ route('management') }}">{{ $headerLabels['management_label'] ?? 'Board of Directors' }}</a>
-                    <a href="{{ route('site.gallery') }}">{{ $headerLabels['gallery_label'] ?? 'Gallery' }}</a>
-                    <a href="{{ route('news.index') }}">{{ $headerLabels['news_label'] ?? 'News & Notices' }}</a>
-                    <a href="{{ route('site.career') }}">{{ $headerLabels['career_label'] ?? 'Career' }}</a>
-                    <a href="{{ route('contact') }}">{{ $headerLabels['contact_label'] ?? 'Contact' }}</a>
-                    <a href="{{ route('webmail.redirect') }}" target="_blank" rel="noopener noreferrer">{{ $headerLabels['webmail_label'] ?? 'Webmail' }}</a>
-                @endforelse
+                @endforeach     @endforelse
                 <span class="mobile-portal-separator" aria-hidden="true"></span>
                 <a class="mobile-menu-portal" href="{{ $publicPortalUrl }}" target="_blank" rel="noopener noreferrer">
                     <i class="fa-solid {{ $isPortalUser ? 'fa-circle-user' : 'fa-right-to-bracket' }}" aria-hidden="true"></i>
