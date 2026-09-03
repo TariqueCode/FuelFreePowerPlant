@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\CmsPage;
 use App\Models\NavigationMenuItem;
+use App\Services\NavigationSourceRegistry;
 use App\Services\PublicNavigationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -14,14 +14,15 @@ use Illuminate\View\View;
 
 class NavigationMenuController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, NavigationSourceRegistry $registry): View
     {
         $menu = $request->string('menu')->toString() ?: 'main';
+        $area = $menu === 'dashboard' ? 'dashboard' : 'public';
 
         $items = NavigationMenuItem::query()
             ->where('menu', $menu)
             ->whereNull('parent_id')
-            ->with(['children.children'])
+            ->with(['children.children.children.children'])
             ->orderBy('sort_order')
             ->orderBy('id')
             ->get();
@@ -32,8 +33,6 @@ class NavigationMenuController extends Controller
             ->orderBy('id')
             ->get();
 
-        // Calculate hierarchy depth for a clear parent selector without
-        // changing the persisted navigation schema.
         $byId = $all->keyBy('id');
         $all->each(function (NavigationMenuItem $item) use ($byId): void {
             $depth = 0;
@@ -49,55 +48,107 @@ class NavigationMenuController extends Controller
             $item->depth = $depth;
         });
 
-        $pages = CmsPage::query()
-            ->orderBy('title')
-            ->get(['id', 'title', 'slug', 'is_published']);
+        $sources = $registry->available($area, $menu);
 
-        return view('admin.navigation.index', compact('items', 'all', 'pages', 'menu'));
+        return view('admin.navigation.index', compact('items', 'all', 'sources', 'menu', 'area'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, NavigationSourceRegistry $registry): RedirectResponse
     {
-        $data = $this->validateItem($request);
-        $data['menu'] = $request->string('menu')->toString() ?: 'main';
-        $data['parent_id'] = $this->validatedParentId($data['parent_id'] ?? null, $data['menu']);
-        $data['sort_order'] = (int) (
-            NavigationMenuItem::query()
-                ->where('menu', $data['menu'])
-                ->where('parent_id', $data['parent_id'])
-                ->max('sort_order') ?? -1
-        ) + 1;
+        $data = $request->validate([
+            'menu' => ['required', 'string', 'max:60'],
+            'source_key' => ['nullable', 'string', 'max:255'],
+            'label' => ['nullable', 'string', 'max:160'],
+            'parent_id' => ['nullable', 'integer'],
+            'target' => ['required', 'in:_self,_blank'],
+            'icon' => ['nullable', 'string', 'max:100'],
+            'is_visible' => ['nullable', 'boolean'],
+            'kind' => ['required', 'in:folder,source'],
+        ]) + ['is_visible' => $request->boolean('is_visible')];
+
+        $area = $data['menu'] === 'dashboard' ? 'dashboard' : 'public';
+        $parentId = $this->validatedParentId($data['parent_id'] ?? null, $data['menu']);
+
+        if ($data['kind'] === 'folder') {
+            $data['source_key'] = null;
+            $data['source_type'] = 'folder';
+            $data['permission_key'] = null;
+            $data['url'] = null;
+            $data['route_name'] = null;
+            $data['label'] = trim((string) ($data['label'] ?? ''));
+            abort_if($data['label'] === '', 422, 'Folder name is required.');
+        } else {
+            abort_if(empty($data['source_key']), 422, 'Choose a live navigation source.');
+            $source = $registry->resolve($data['source_key'], $area, $data['menu']);
+            abort_unless($source !== null, 422, 'This navigation source is no longer available.');
+
+            $data['source_type'] = $source['type'];
+            $data['permission_key'] = $source['permission'] ?? null;
+            $data['url'] = $source['url'];
+            $data['route_name'] = $source['route_name'];
+            $data['label'] = $source['label'];
+        }
+
+        $data['menu'] = $data['menu'];
+        $data['area'] = $area;
+        $data['parent_id'] = $parentId;
+        $data['sort_order'] = (int) (NavigationMenuItem::query()
+            ->where('menu', $data['menu'])
+            ->where('parent_id', $parentId)
+            ->max('sort_order') ?? -1) + 1;
+
+        unset($data['kind']);
 
         NavigationMenuItem::create($data);
         app(PublicNavigationService::class)->clear($data['menu']);
 
-        return back()->with('status', 'Menu item added.');
+        return back()->with('status', 'Navigation item added.');
     }
 
-    public function update(Request $request, NavigationMenuItem $item): RedirectResponse
+    public function update(Request $request, NavigationMenuItem $item, NavigationSourceRegistry $registry): RedirectResponse
     {
-        $data = $this->validateItem($request);
-        $data['menu'] = $item->menu;
+        $data = $request->validate([
+            'label' => ['nullable', 'string', 'max:160'],
+            'parent_id' => ['nullable', 'integer'],
+            'target' => ['required', 'in:_self,_blank'],
+            'icon' => ['nullable', 'string', 'max:100'],
+            'is_visible' => ['nullable', 'boolean'],
+        ]) + ['is_visible' => $request->boolean('is_visible')];
+
         $data['parent_id'] = $this->validatedParentId($data['parent_id'] ?? null, $item->menu, $item->id);
-        $data['sort_order'] = $item->sort_order;
+
+        if ($item->source_type === 'folder') {
+            $data['label'] = trim((string) ($data['label'] ?? ''));
+            abort_if($data['label'] === '', 422, 'Folder name is required.');
+        } elseif ($item->source_key) {
+            $source = $registry->resolveAny($item->source_key, $item->area);
+            abort_unless($source !== null, 422, 'This navigation source no longer exists.');
+            $data['label'] = $source['label'];
+            $data['url'] = $source['url'];
+            $data['route_name'] = $source['route_name'];
+            $data['permission_key'] = $source['permission'] ?? null;
+            $data['source_type'] = $source['type'];
+        }
 
         $item->update($data);
         app(PublicNavigationService::class)->clear($item->menu);
 
-        return back()->with('status', 'Menu item updated.');
+        return back()->with('status', 'Navigation item updated.');
     }
 
     public function destroy(NavigationMenuItem $item): RedirectResponse
     {
+        $menu = $item->menu;
+
         DB::transaction(function () use ($item): void {
             NavigationMenuItem::where('parent_id', $item->id)
                 ->update(['parent_id' => $item->parent_id]);
-
             $item->delete();
         });
-        app(PublicNavigationService::class)->clear($item->menu);
 
-        return back()->with('status', 'Menu item deleted.');
+        app(PublicNavigationService::class)->clear($menu);
+
+        return back()->with('status', 'Navigation item deleted.');
     }
 
     public function reorder(Request $request): JsonResponse
@@ -110,7 +161,6 @@ class NavigationMenuController extends Controller
         ]);
 
         $parentId = $data['parent_id'] ?? null;
-
         $items = NavigationMenuItem::query()
             ->where('menu', $data['menu'])
             ->whereIn('id', $data['ids'])
@@ -124,7 +174,7 @@ class NavigationMenuController extends Controller
                 ->where('menu', $data['menu'])
                 ->findOrFail($parentId);
 
-            abort_if($items->has($parent->id), 422, 'A menu item cannot be its own parent.');
+            abort_if($parent->source_type !== 'folder', 422, 'Only folders can contain navigation items.');
 
             foreach ($items as $item) {
                 abort_if(
@@ -143,37 +193,10 @@ class NavigationMenuController extends Controller
                 ]);
             }
         });
+
         app(PublicNavigationService::class)->clear($data['menu']);
 
         return response()->json(['ok' => true]);
-    }
-
-    private function validateItem(Request $request): array
-    {
-        $data = $request->validate([
-            'kind' => ['required', 'in:link,folder'],
-            'label' => ['required', 'string', 'max:160'],
-            'url' => ['nullable', 'string', 'max:500'],
-            'route_name' => ['nullable', 'string', 'max:160'],
-            'group' => ['nullable', 'string', 'max:100'],
-            'parent_id' => ['nullable', 'integer'],
-            'target' => ['required', 'in:_self,_blank'],
-            'icon' => ['nullable', 'string', 'max:100'],
-            'is_visible' => ['nullable', 'boolean'],
-        ]) + [
-            'is_visible' => $request->boolean('is_visible'),
-        ];
-
-        // A folder is a structural navigation node. It intentionally has no
-        // destination; its children provide the actual navigation targets.
-        if ($data['kind'] === 'folder') {
-            $data['url'] = null;
-            $data['route_name'] = null;
-        }
-
-        unset($data['kind']);
-
-        return $data;
     }
 
     private function validatedParentId(?int $parentId, string $menu, ?int $ignoreId = null): ?int
@@ -192,16 +215,17 @@ class NavigationMenuController extends Controller
 
         abort_unless($query->exists(), 422, 'Invalid parent menu item.');
 
+        $parent = $query->firstOrFail();
+        abort_unless($parent->source_type === 'folder', 422, 'Only folders can contain navigation items.');
+
         if ($ignoreId !== null && $this->isDescendantOf($parentId, $ignoreId)) {
             abort(422, 'A menu item cannot be placed inside its own descendant.');
         }
 
-        // Keep public navigation usable on every device while still allowing
-        // genuine folder/sub-folder structures. Five nested levels is enough
-        // for the site information architecture and prevents unusable menus.
         $depth = 1;
         $cursor = $parentId;
         $seen = [];
+
         while ($cursor !== null && ! isset($seen[$cursor])) {
             $seen[$cursor] = true;
             $cursor = NavigationMenuItem::query()->whereKey($cursor)->value('parent_id');
