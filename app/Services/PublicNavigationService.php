@@ -15,6 +15,10 @@ class PublicNavigationService
         $ids = Cache::remember($cacheKey, 600, fn (): array => NavigationMenuItem::query()
             ->where('menu', $menu)
             ->where('is_visible', true)
+            ->where(function ($query): void {
+                $query->whereNull('source_key')
+                    ->orWhere('source_key', '!=', '');
+            })
             ->orderBy('sort_order')->orderBy('id')
             ->pluck('id')->map(fn ($id): int => (int) $id)->all());
 
@@ -29,7 +33,7 @@ class PublicNavigationService
 
         $registry = app(NavigationSourceRegistry::class);
         $valid = $items->filter(function (NavigationMenuItem $item) use ($registry): bool {
-            if ($item->source_type === 'folder') return true;
+            if ($item->source_type === 'folder') return $item->source_key === null || $item->source_key === '';
             if (! $item->source_key) return false;
             $source = $registry->resolveAny($item->source_key, $item->area);
             if (! $source) return false;
