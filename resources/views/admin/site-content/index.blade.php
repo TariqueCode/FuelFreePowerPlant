@@ -58,7 +58,6 @@
             @endif
         </div>
     @else
-        @elseif($type!=='news')
         @if(auth()->user()->hasPermission('website.manage'))
             <div class="actions">
                 <form method="POST" action="{{ route('admin.site-content.destroy',$item) }}" onsubmit="return confirm('Delete this {{ $type === 'news' ? 'publication' : 'content' }}?')">
@@ -66,7 +65,6 @@
                     <button type="submit" title="Delete" aria-label="Delete"><i class="fa-solid fa-trash"></i></button>
                 </form>
             </div>
-        @endif
         @endif
     @endif
 </article>
