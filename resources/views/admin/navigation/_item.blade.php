@@ -13,7 +13,7 @@
     <div class="item-actions">
         <button type="button" class="move-btn move-up" data-id="{{ $item->id }}" title="Move up" aria-label="Move {{ $item->displayLabel() }} up">↑</button>
         <button type="button" class="move-btn move-down" data-id="{{ $item->id }}" title="Move down" aria-label="Move {{ $item->displayLabel() }} down">↓</button>
-        <a href="#edit-{{ $item->id }}">Edit</a>
+        <a href="{{ route('admin.navigation.index', ['menu' => $item->menu]) }}#edit-{{ $item->id }}">Edit</a>
     </div>
     @if($item->children->isNotEmpty())
         <div class="children">
