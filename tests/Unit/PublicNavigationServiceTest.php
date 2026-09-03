@@ -3,7 +3,6 @@
 namespace Tests\Unit;
 
 use App\Models\NavigationMenuItem;
-use App\Services\NavigationSourceRegistry;
 use App\Services\PublicNavigationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -39,8 +38,8 @@ class PublicNavigationServiceTest extends TestCase
             'menu' => 'main',
             'parent_id' => $subFolder->id,
             'label' => 'Future Project',
-            'url' => '/future-project',
-            'source_key' => 'route:home',
+            'url' => '/career',
+            'source_key' => 'route:career',
             'source_type' => 'route',
             'area' => 'public',
             'is_visible' => true,
