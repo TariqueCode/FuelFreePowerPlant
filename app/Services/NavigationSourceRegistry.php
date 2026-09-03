@@ -130,7 +130,7 @@ class NavigationSourceRegistry
         return [
             'key' => 'route:'.$name, 'type' => 'route',
             'label' => $this->routeLabel($route, $name),
-            'url' => route($name), 'route_name' => $name, 'area' => $area,
+            'url' => $route->uri() === '/' ? '/' : '/'.ltrim($route->uri(), '/'), 'route_name' => $name, 'area' => $area,
             'permission' => $permission ? Str::after($permission, 'permission:') : null,
             'meta' => [],
         ];
