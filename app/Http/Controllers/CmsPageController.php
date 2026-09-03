@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\CmsPage;
-use App\Models\PowerPlant;
 use App\Models\SiteContentItem;
 use App\Models\SystemSetting;
 use Illuminate\View\View;
