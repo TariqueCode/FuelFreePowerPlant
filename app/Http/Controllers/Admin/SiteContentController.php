@@ -8,7 +8,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class SiteContentController extends Controller
@@ -45,7 +44,7 @@ class SiteContentController extends Controller
                     ->when(!in_array($sort, ['oldest','updated'], true), fn($query) => $query->orderByDesc('published_at')->orderByDesc('created_at'));
             })
             ->when($type === 'company', fn($q) => $q->orderByRaw('CASE WHEN navigation_order IS NULL THEN 1 ELSE 0 END')->orderBy('navigation_order')->orderByDesc('created_at'))
-            ->when($type !== '' && !in_array($type, ['company','news','resource'], true), fn($q) => $q->latest('created_at'))
+            ->when($type !== '' && !in_array($type, ['company','news'], true), fn($q) => $q->latest('created_at'))
             ->when($type === '', fn($q) => $q->latest('created_at'))
             ->paginate(20)->withQueryString();
 
@@ -100,35 +99,6 @@ class SiteContentController extends Controller
         $item->delete();
         return redirect()->route('admin.site-content.index', ['type'=>$type])->with('status','Content deleted successfully.');
     }
-
-    /* Resource duplication removed: Content Pages are managed exclusively by CmsController. */
-    /*
-    public function duplicateResource(Request $request, SiteContentItem $item): RedirectResponse
-    {
-        abort_unless(in_array($item->type, ['resource', 'resources'], true), 404);
-        abort_unless($request->user()->hasPermission('website.manage'), 403);
-
-        $copy = $item->replicate();
-        $copy->title = Str::limit($item->title.' Copy', 245, '');
-        $copy->slug = $this->uniqueSlug($item->slug.'-copy', $copy->title, null, 'resource');
-        $copy->status = 'draft';
-        $copy->published_at = null;
-        $copy->is_featured = false;
-        $copy->sort_order = ((int) SiteContentItem::query()->whereIn('type', ['resource','resources'])->max('sort_order')) + 1;
-
-        if ($item->attachment_path && Storage::disk('public')->exists($item->attachment_path)) {
-            $extension = pathinfo($item->attachment_path, PATHINFO_EXTENSION);
-            $newPath = 'site-content/attachments/'.Str::random(32).($extension ? '.'.$extension : '');
-            Storage::disk('public')->copy($item->attachment_path, $newPath);
-            $copy->attachment_path = $newPath;
-        }
-
-        $copy->save();
-
-        return redirect()->route('admin.site-content.edit', $copy)->with('status', 'Resource draft copy created.');
-    }
-
-    */
 
     public function togglePage(Request $request, SiteContentItem $item): RedirectResponse
     {
