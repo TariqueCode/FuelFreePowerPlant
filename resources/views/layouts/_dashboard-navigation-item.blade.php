@@ -1,0 +1,17 @@
+@php($hasChildren = $item->children->isNotEmpty())
+@if($hasChildren)
+<div class="nav-group {{ $item->children->contains(fn($child) => request()->url() === $child->url) ? 'open' : '' }}">
+    <button type="button" class="nav-parent" aria-expanded="{{ $item->children->contains(fn($child) => request()->url() === $child->url) ? 'true' : 'false' }}">
+        <span class="nav-icon"><i class="fa-solid fa-folder-tree"></i></span><span>{{ $item->displayLabel() }}</span><i class="fa-solid fa-chevron-down nav-chevron"></i>
+    </button>
+    <div class="nav-sub">
+        @foreach($item->children as $child)
+            @include('layouts._dashboard-navigation-item',['item'=>$child])
+        @endforeach
+    </div>
+</div>
+@else
+<a class="{{ request()->url() === $item->url ? 'active' : '' }}" href="{{ $item->url }}" @if($item->target === '_blank') target="_blank" rel="noopener noreferrer" @endif>
+    <span class="nav-icon"><i class="fa-solid fa-circle-dot"></i></span><span>{{ $item->displayLabel() }}</span>
+</a>
+@endif
