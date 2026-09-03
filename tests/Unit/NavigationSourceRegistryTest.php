@@ -126,4 +126,32 @@ class NavigationSourceRegistryTest extends TestCase
         $this->assertSame(route('cms.page', ['slug' => 'our-technology']), $source['url']);
     }
 
+
+    public function test_shared_public_site_controller_uses_destination_labels(): void
+    {
+        Route::get('/solutions', [\App\Http\Controllers\PublicSiteController::class, 'show'])
+            ->defaults('section', 'solutions')->name('site.solutions');
+        Route::get('/gallery', [\App\Http\Controllers\PublicSiteController::class, 'show'])
+            ->defaults('section', 'gallery')->name('site.gallery');
+
+        $sources = app(NavigationSourceRegistry::class)->available('public', 'main');
+
+        $this->assertSame('Solutions', $sources->firstWhere('key', 'route:site.solutions')['label']);
+        $this->assertSame('Gallery', $sources->firstWhere('key', 'route:site.gallery')['label']);
+        $this->assertFalse($sources->contains(fn (array $source): bool =>
+            $source['type'] === 'route' && $source['label'] === 'Public Site'
+        ));
+    }
+
+    public function test_domain_scoped_webmail_routes_are_not_public_navigation_sources(): void
+    {
+        Route::domain('mail.fuelfreepowerplant.com')
+            ->get('/__webmail-navigation-test', fn () => 'ok')
+            ->name('webmail.navigation.test');
+
+        $sources = app(NavigationSourceRegistry::class)->available('public', 'main');
+
+        $this->assertFalse($sources->contains('key', 'route:webmail.navigation.test'));
+    }
+
 }
