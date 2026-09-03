@@ -168,9 +168,16 @@
         const option = sourceSelect.selectedOptions[0];
         sourceKey.value = option?.value || '';
         sourceLabel.value = option?.dataset.label || '';
-        preview.innerHTML = option?.value
-            ? '<strong>' + option.dataset.label + '</strong><span>↗ ' + option.dataset.url + (option.dataset.permission ? ' · ' + option.dataset.permission : '') + '</span>'
-            : 'Select an item to preview its destination.';
+        preview.replaceChildren();
+        if (option?.value) {
+            const strong = document.createElement('strong');
+            strong.textContent = option.dataset.label || '';
+            const span = document.createElement('span');
+            span.textContent = '↗ ' + (option.dataset.url || '') + (option.dataset.permission ? ' · ' + option.dataset.permission : '');
+            preview.append(strong, span);
+        } else {
+            preview.textContent = 'Select an item to preview its destination.';
+        }
         addButton.disabled = !sourceSelect.value;
     });
 
@@ -178,7 +185,6 @@
 
     const tree = document.getElementById('menu-tree');
     const state = document.getElementById('save-state');
-    const originalTree = tree?.innerHTML;
     if (!tree) return;
     let dragged = null;
 
