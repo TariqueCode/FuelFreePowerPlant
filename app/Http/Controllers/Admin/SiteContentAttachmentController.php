@@ -15,7 +15,7 @@ class SiteContentAttachmentController extends Controller
 
     public function chunk(Request $request, SiteContentItem $item): JsonResponse
     {
-        abort_unless(in_array($item->type, ['news', 'announcement', 'resource'], true), 404);
+        abort_unless(in_array($item->type, ['news', 'announcement'], true), 404);
         $uploadId = (string) $request->header('X-Upload-Id');
         $disk = Storage::disk('local');
         $dir = 'site-content/.uploads';
