@@ -45,7 +45,10 @@ class NavigationSourceRegistry
 
         $routes = collect(RouteFacade::getRoutes()->getRoutes())
             ->filter(fn (Route $route): bool => $this->eligibleRoute($route, $area))
-            ->map(fn (Route $route): array => $this->routeSource($route, $area));
+            ->map(fn (Route $route): array => $this->routeSource($route, $area))
+            ->filter(function (array $source): bool {
+                return $source['permission'] === null || ! auth()->check() || auth()->user()->hasPermission($source['permission']);
+            });
 
         $cms = $area === 'public'
             ? CmsPage::query()->where('is_published', true)->orderBy('title')
