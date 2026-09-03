@@ -127,7 +127,6 @@ class NavigationMenuController extends Controller
             $data['route_name'] = null;
             $data['label'] = trim((string) ($data['folder_label'] ?? ''));
             abort_if($data['label'] === '', 422, 'Folder name is required.');
-            unset($data['folder_label']);
         } else {
             abort_if(empty($data['source_key']), 422, 'Choose a live navigation source.');
             $source = $registry->resolve($data['source_key'], $area, $data['menu']);
@@ -141,6 +140,7 @@ class NavigationMenuController extends Controller
             $data['label'] = $source['label'];
         }
 
+        unset($data['folder_label']);
         $data['menu'] = $data['menu'];
         $data['area'] = $area;
         $data['parent_id'] = $parentId;
