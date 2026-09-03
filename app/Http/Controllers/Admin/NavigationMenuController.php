@@ -57,9 +57,9 @@ class NavigationMenuController extends Controller
     {
         abort_unless(in_array($item->menu, ['main', 'dashboard'], true), 404);
 
-        return redirect()->route('admin.navigation.index', [
+        return redirect(route('admin.navigation.index', [
             'menu' => $item->menu,
-        ]).'#edit-'.$item->id;
+]).'#edit-'.$item->id);
     }
 
     public function store(Request $request, NavigationSourceRegistry $registry): RedirectResponse
