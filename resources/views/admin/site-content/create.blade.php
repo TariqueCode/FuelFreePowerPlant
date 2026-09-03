@@ -462,6 +462,41 @@ html,body{overflow-x:hidden}
   .editor-status{max-width:118px}
 }
 
+/* Final mobile ribbon fix: keep tool groups in one horizontal track.
+   Never stack ribbon groups vertically on narrow touch screens. */
+@media (max-width:700px){
+  .word-ribbon .word-panel{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    align-items:stretch;
+    justify-content:flex-start;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    scrollbar-width:thin;
+    min-height:68px!important;
+  }
+  .word-ribbon .word-group{
+    flex:0 0 auto!important;
+    width:max-content!important;
+    max-width:none!important;
+    min-width:max-content!important;
+    flex-wrap:nowrap!important;
+    align-content:initial!important;
+  }
+  .word-ribbon .word-group-row{
+    flex:0 0 auto!important;
+    flex-wrap:nowrap!important;
+    max-width:none!important;
+    width:max-content!important;
+  }
+  .word-ribbon .word-command,
+  .word-ribbon .word-icon,
+  .word-ribbon .word-select,
+  .word-ribbon .word-color{
+    flex:0 0 auto!important;
+  }
+}
+
 /* Mobile CMS hardening: responsive form + touch-scrollable ribbon.
    Desktop rules and sticky-ribbon JavaScript remain untouched. */
 @media (max-width:700px){
