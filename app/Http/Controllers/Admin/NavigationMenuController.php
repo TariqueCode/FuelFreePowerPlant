@@ -192,14 +192,37 @@ class NavigationMenuController extends Controller
         $menu = $item->menu;
 
         DB::transaction(function () use ($item): void {
-            NavigationMenuItem::where('parent_id', $item->id)
-                ->update(['parent_id' => $item->parent_id]);
+            // Detach the item from its parent first, then promote its children.
+            // This makes folder deletion safe on MySQL installations that enforce
+            // the parent_id foreign key without ON DELETE CASCADE.
+            $children = NavigationMenuItem::query()
+                ->where('menu', $item->menu)
+                ->where('parent_id', $item->id)
+                ->orderBy('sort_order')
+                ->orderBy('id')
+                ->get();
+
+            $nextOrder = (int) (NavigationMenuItem::query()
+                ->where('menu', $item->menu)
+                ->where('parent_id', $item->parent_id)
+                ->where('id', '!=', $item->id)
+                ->max('sort_order') ?? -1) + 1;
+
+            foreach ($children as $child) {
+                $child->update([
+                    'parent_id' => $item->parent_id,
+                    'sort_order' => $nextOrder++,
+                ]);
+            }
+
             $item->delete();
         });
 
         app(PublicNavigationService::class)->clear($menu);
 
-        return back()->with('status', 'Navigation item deleted.');
+        return redirect()
+            ->route('admin.navigation.index', ['menu' => $menu])
+            ->with('status', 'Navigation item deleted successfully.');
     }
 
     public function reorder(Request $request): JsonResponse
