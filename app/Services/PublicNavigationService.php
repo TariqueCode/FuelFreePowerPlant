@@ -10,6 +10,7 @@ class PublicNavigationService
 {
     public function tree(string $menu = 'main'): Collection
     {
+        abort_unless(in_array($menu, ['main', 'dashboard'], true), 404);
         $cacheKey = "public.navigation.v3.{$menu}";
         $ids = Cache::remember($cacheKey, 600, fn (): array => NavigationMenuItem::query()
             ->where('menu', $menu)
