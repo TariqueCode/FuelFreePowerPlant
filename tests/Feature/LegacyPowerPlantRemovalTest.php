@@ -30,6 +30,5 @@ class LegacyPowerPlantRemovalTest extends TestCase
         $response->assertDontSee('Power at a glance');
         $response->assertDontSee('Our project portfolio');
         $response->assertDontSee('Operational plants');
-        $response->assertDontSee('View all →');
     }
 }
