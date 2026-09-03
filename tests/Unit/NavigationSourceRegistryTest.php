@@ -13,7 +13,7 @@ class NavigationSourceRegistryTest extends TestCase
         Route::get('/__navigation-test', fn () => 'ok')->name('navigation.test');
         Route::post('/__navigation-test-action', fn () => 'ok')->name('navigation.test.store');
 
-        $sources = app(NavigationSourceRegistry::class)->available('public', 'test-menu');
+        $sources = app(NavigationSourceRegistry::class)->available('public', 'main');
 
         $this->assertTrue($sources->contains('key', 'route:navigation.test'));
         $this->assertFalse($sources->contains('key', 'route:navigation.test.store'));
@@ -30,7 +30,7 @@ class NavigationSourceRegistryTest extends TestCase
             ->name('admin.documents.index');
 
         $source = app(NavigationSourceRegistry::class)
-            ->available('dashboard', 'test-dashboard-menu')
+            ->available('dashboard', 'dashboard')
             ->firstWhere('key', 'route:admin.documents.index');
 
         $this->assertNotNull($source);
