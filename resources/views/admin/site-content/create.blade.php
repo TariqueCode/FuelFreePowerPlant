@@ -423,6 +423,45 @@ html,body{overflow-x:hidden}
     padding-top:calc(14px + var(--ff-ribbon-height,0px)) !important;
   }
 }
+/* Mobile editor ribbon: keep every control reachable without viewport clipping. */
+@media (max-width:700px){
+  .word-panel{
+    display:flex;
+    flex-wrap:wrap;
+    align-content:flex-start;
+    min-width:0!important;
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden!important;
+    overflow-y:visible!important;
+  }
+  .word-group{
+    max-width:100%;
+    min-width:0;
+    flex-wrap:wrap;
+    align-content:flex-start;
+  }
+  .word-group-row{
+    max-width:100%;
+    flex-wrap:wrap;
+  }
+  .word-command,.word-icon,.word-select{
+    flex:0 0 auto;
+  }
+  .word-ribbon .word-tabs{
+    width:100%;
+    max-width:100%;
+  }
+}
+@media (max-width:420px){
+  .word-group{padding-left:4px;padding-right:4px}
+  .word-command{min-width:36px}
+  .word-select.format-select{width:96px}
+  .word-select.font-select{width:90px}
+  .word-select.size-select{width:60px}
+  .editor-status{max-width:118px}
+}
+
 /* Mobile CMS hardening: responsive form + touch-scrollable ribbon.
    Desktop rules and sticky-ribbon JavaScript remain untouched. */
 @media (max-width:700px){
