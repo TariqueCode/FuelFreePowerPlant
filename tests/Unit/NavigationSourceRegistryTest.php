@@ -48,4 +48,30 @@ class NavigationSourceRegistryTest extends TestCase
 
         $this->assertFalse($sources->contains('key', 'route:admin.navigation.internal'));
     }
+    public function test_legacy_resources_are_never_available_as_navigation_sources(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $routes = app(\Illuminate\Routing\Router::class)->getRoutes();
+
+        $resourceRoutes = collect([
+            'resources.index',
+            'resources.show',
+            'resources.download',
+        ]);
+
+        foreach ($resourceRoutes as $name) {
+            $this->assertNull(app(NavigationSourceRegistry::class)->resolveAny('route:'.$name, 'public'));
+        }
+
+        $this->assertTrue(
+            app(NavigationSourceRegistry::class)->available('public', 'main')
+                ->every(fn (array $source): bool =>
+                    ! str_starts_with((string) ($source['url'] ?? ''), '/resources')
+                    && ! str_starts_with((string) ($source['route_name'] ?? ''), 'resources.')
+                )
+        );
+    }
+
 }
