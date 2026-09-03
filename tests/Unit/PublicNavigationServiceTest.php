@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\NavigationMenuItem;
+use App\Services\NavigationSourceRegistry;
 use App\Services\PublicNavigationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -20,6 +21,7 @@ class PublicNavigationServiceTest extends TestCase
         $folder = NavigationMenuItem::create([
             'menu' => 'main',
             'label' => 'Company',
+            'source_type' => 'folder',
             'is_visible' => true,
             'sort_order' => 0,
         ]);
@@ -28,6 +30,7 @@ class PublicNavigationServiceTest extends TestCase
             'menu' => 'main',
             'parent_id' => $folder->id,
             'label' => 'Projects',
+            'source_type' => 'folder',
             'is_visible' => true,
             'sort_order' => 0,
         ]);
@@ -37,6 +40,9 @@ class PublicNavigationServiceTest extends TestCase
             'parent_id' => $subFolder->id,
             'label' => 'Future Project',
             'url' => '/future-project',
+            'source_key' => 'route:home',
+            'source_type' => 'route',
+            'area' => 'public',
             'is_visible' => true,
             'sort_order' => 0,
         ]);
@@ -45,7 +51,8 @@ class PublicNavigationServiceTest extends TestCase
             'menu' => 'main',
             'parent_id' => $folder->id,
             'label' => 'Hidden',
-            'url' => '/hidden',
+            'source_type' => 'folder',
+            'url' => null,
             'is_visible' => false,
             'sort_order' => 1,
         ]);
