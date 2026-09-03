@@ -265,4 +265,6 @@
     });
 })();
 </script>
+<style>/* navigation builder responsive hardening */
+.builder-card{min-width:0}.builder-grid>*{min-width:0}.card-head{position:sticky;top:70px;z-index:998;padding-top:4px;background:rgba(3,16,25,.94);backdrop-filter:blur(12px)}.edit-grid{min-width:0}.edit-details{min-width:0}.edit-content{min-width:0}.edit-box>*{min-width:0}.menu-tree{min-width:0;overflow-x:auto}.menu-row{min-width:0}.menu-main{min-width:0;overflow:hidden}.menu-main strong{overflow-wrap:anywhere}.item-actions{flex-wrap:wrap}.item-actions button,.item-actions a{min-height:30px}@media(max-width:620px){.builder-grid{grid-template-columns:1fr}.card-head{top:70px}.builder-card{padding:12px}.menu-row{grid-template-columns:22px 24px minmax(0,1fr);padding:7px 3px}.menu-row>.children{grid-column:3/-1}.menu-main small{white-space:normal;overflow-wrap:anywhere}.item-actions{grid-column:3;justify-content:flex-start;padding-top:4px}.item-actions button,.item-actions a{flex:1;min-width:52px;text-align:center}.quick-guide>div{min-width:0}.quick-guide span{overflow-wrap:anywhere}}</style>
 @endpush
