@@ -5,8 +5,6 @@
     $icons = [
         'hero'=>'fa-images',
         'welcome'=>'fa-building',
-        'statistics'=>'fa-chart-simple',
-        'projects'=>'fa-industry',
         'management'=>'fa-users',
         'news'=>'fa-newspaper',
         'gallery'=>'fa-images',
@@ -16,8 +14,6 @@
     $titles = [
         'hero'=>'Hero Slider',
         'welcome'=>'Welcome Message',
-        'statistics'=>'Power Plant Statistics',
-        'projects'=>'Power Plant Projects',
         'management'=>'Board of Directors',
         'news'=>'News & Notices',
         'gallery'=>'Gallery',
@@ -27,8 +23,6 @@
     $sourceLabels = [
         'hero'=>'Slider Manager',
         'welcome'=>'Homepage content',
-        'statistics'=>'Power Plant records',
-        'projects'=>'Power Plant Manager',
         'management'=>'Board of Directors',
         'news'=>'News & Notices',
         'gallery'=>'Gallery Manager',
@@ -37,13 +31,12 @@
     ];
     $manageRoutes = [
         'hero'=>route('admin.sliders.index'),
-        'projects'=>route('admin.plants.index'),
         'management'=>route('admin.management.index'),
         'news'=>route('admin.site-content.index',['type'=>'news']),
         'gallery'=>route('admin.gallery.index'),
         'highlight'=>route('admin.site-popups.index'),
     ];
-    $controlSections = ['hero','welcome','statistics','projects','management','news','gallery','highlight','cta'];
+    $controlSections = ['hero','welcome','management','news','gallery','highlight','cta'];
     $countLabels = [
         'hero'=>['key'=>'sliders','suffix'=>'published slides'],
         'projects'=>['key'=>'projects','suffix'=>'projects'],
@@ -99,7 +92,7 @@
     @foreach($sections as $index => $section)
         @php
             $settings = is_array($section->settings) ? $section->settings : [];
-            $limit = (int)($settings['limit'] ?? match($section->key){'projects'=>6,'management'=>4,'news'=>3,'gallery'=>4,default=>0});
+            $limit = (int)($settings['limit'] ?? match($section->key){'management'=>4,'news'=>3,'gallery'=>4,default=>0});
             $mode = $settings['mode'] ?? 'latest';
             $layout = $settings['layout'] ?? 'left';
             $hasControls = in_array($section->key,$controlSections,true);
@@ -173,7 +166,7 @@
                             <label class="check-field"><input type="checkbox" name="settings[welcome][show_full]" value="1" @checked($settings['show_full'] ?? false)><span>Show full message</span></label>
                         </div>
                     </div>
-                @elseif(in_array($section->key,['projects','management','news','gallery'],true))
+                @elseif(in_array($section->key,['management','news','gallery'],true))
                     <div class="display-grid">
                         <label><span>Items on homepage</span><div class="number-field"><input type="number" name="settings[{{ $section->key }}][limit]" min="1" max="100" value="{{ $limit }}"><em>items</em></div></label>
                         <label><span>Content selection</span><select name="settings[{{ $section->key }}][mode]" class="home-mode"><option value="latest" @selected($mode==='latest')>Latest published</option><option value="selected" @selected($mode==='selected')>Choose specific items</option></select></label>
@@ -188,11 +181,6 @@
                             <label class="picker-item" data-search="{{ strtolower($choice->title ?? $choice->name) }}"><input type="checkbox" name="settings[{{ $section->key }}][ids][]" value="{{ $choiceId }}" @checked(in_array($choiceId,$settings['ids'] ?? [],true))><span>{{ $choice->title ?? $choice->name }}</span></label>
                         @endforeach
                         </div>
-                    </div>
-                @elseif($section->key==='statistics')
-                    <div class="simple-control">
-                        <div><strong>Automatic statistics</strong><p>Figures come directly from Power Plant records. Update the source records instead of maintaining duplicate numbers here.</p></div>
-                        <label><span>Section alignment</span><select name="settings[statistics][layout]"><option value="left" @selected($layout==='left')>Left</option><option value="center" @selected($layout==='center')>Center</option><option value="right" @selected($layout==='right')>Right</option></select></label>
                     </div>
                 @elseif(in_array($section->key,['hero','highlight'],true))
                     <div class="simple-control">
