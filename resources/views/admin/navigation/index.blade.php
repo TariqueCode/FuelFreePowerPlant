@@ -225,6 +225,7 @@
     });
 
     tree.querySelectorAll('.menu-row[data-id]').forEach(row => {
+        row.setAttribute('draggable', 'true');
         row.addEventListener('dragstart', () => { dragged = row; row.classList.add('dragging'); });
         row.addEventListener('dragover', event => {
             if (!dragged || dragged === row || dragged.contains(row)) return;
