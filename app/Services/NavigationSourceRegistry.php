@@ -110,6 +110,7 @@ class NavigationSourceRegistry
     {
         $name = (string) $route->getName();
         $permission = collect($route->gatherMiddleware())
+            ->map(fn ($middleware): string => (string) $middleware)
             ->first(fn (string $middleware): bool => Str::startsWith($middleware, 'permission:'));
 
         return [
@@ -131,9 +132,7 @@ class NavigationSourceRegistry
         if ($controller && $controller !== 'Closure') {
             $method = Str::beforeLast($controller, 'Controller');
             $method = Str::headline($method);
-            if ($method && $method !== 'Closure') {
-                $label = $method;
-            }
+            if ($method && $method !== 'Closure') $label = $method;
         }
 
         return $label;
