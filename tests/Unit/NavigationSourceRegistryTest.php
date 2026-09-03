@@ -91,14 +91,14 @@ class NavigationSourceRegistryTest extends TestCase
         $page = $sources->first(fn (array $source) => str_starts_with((string) ($source['key'] ?? ''), 'cms_page:'));
         $this->assertNotNull($page);
         $this->assertSame('About Us', $page['label']);
-        $this->assertSame('/pages/about-us', $page['url']);
+        $this->assertSame(route('cms.page', ['slug' => 'about-us']), $page['url']);
         $this->assertSame('cms.page', $page['route_name']);
 
         $resolved = $registry->resolveAny('route:site.about', 'public');
         $this->assertNotNull($resolved);
         $this->assertSame('cms_page', $resolved['type']);
         $this->assertSame('About Us', $resolved['label']);
-        $this->assertSame('/pages/about-us', $resolved['url']);
+        $this->assertSame(route('cms.page', ['slug' => 'about-us']), $resolved['url']);
     }
 
 }
