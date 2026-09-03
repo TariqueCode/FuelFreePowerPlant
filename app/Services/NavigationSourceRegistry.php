@@ -62,7 +62,9 @@ class NavigationSourceRegistry
             $name = Str::after($key, 'route:');
             foreach (RouteFacade::getRoutes()->getRoutes() as $route) {
                 if ($route->getName() === $name && $this->eligibleRoute($route, $area)) {
-                    return $this->routeSource($route, $area);
+                    $source = $this->routeSource($route, $area);
+                    if ($source['permission'] !== null && (! auth()->check() || ! auth()->user()->hasPermission($source['permission']))) return null;
+                    return $source;
                 }
             }
         }
