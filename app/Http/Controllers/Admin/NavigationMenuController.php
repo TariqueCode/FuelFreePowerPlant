@@ -56,7 +56,7 @@ class NavigationMenuController extends Controller
     public function store(Request $request, NavigationSourceRegistry $registry): RedirectResponse
     {
         $data = $request->validate([
-            'menu' => ['required', 'string', 'max:60'],
+            'menu' => ['required', 'in:main,dashboard'],
             'source_key' => ['nullable', 'string', 'max:255'],
             'label' => ['nullable', 'string', 'max:160'],
             'parent_id' => ['nullable', 'integer'],
@@ -107,6 +107,8 @@ class NavigationMenuController extends Controller
 
     public function update(Request $request, NavigationMenuItem $item, NavigationSourceRegistry $registry): RedirectResponse
     {
+        abort_unless(in_array($item->menu, ['main', 'dashboard'], true), 404);
+
         $data = $request->validate([
             'label' => ['nullable', 'string', 'max:160'],
             'parent_id' => ['nullable', 'integer'],
@@ -138,6 +140,7 @@ class NavigationMenuController extends Controller
 
     public function destroy(NavigationMenuItem $item): RedirectResponse
     {
+        abort_unless(in_array($item->menu, ['main', 'dashboard'], true), 404);
         $menu = $item->menu;
 
         DB::transaction(function () use ($item): void {
@@ -154,7 +157,7 @@ class NavigationMenuController extends Controller
     public function reorder(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'menu' => ['required', 'string', 'max:60'],
+            'menu' => ['required', 'in:main,dashboard'],
             'ids' => ['required', 'array', 'min:1'],
             'ids.*' => ['integer', 'distinct'],
             'parent_id' => ['nullable', 'integer'],
