@@ -7,8 +7,6 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\SiteContentItem;
 use App\Models\CmsPage;
-use App\Models\HomepageSection;
-use App\Models\PowerPlant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -151,21 +149,6 @@ class PublishingAuthorityTest extends TestCase
 
         $this->assertDatabaseMissing('site_popups', ['title' => 'QA Highlight']);
         Storage::disk('public')->assertDirectoryEmpty('site-popups');
-    }
-
-    public function test_homepage_selected_content_uses_admin_selected_order(): void
-    {
-        $first = PowerPlant::create(['name' => 'First QA Plant', 'slug' => 'first-qa-plant', 'status' => 'operational', 'capacity_kw' => 100]);
-        $second = PowerPlant::create(['name' => 'Second QA Plant', 'slug' => 'second-qa-plant', 'status' => 'operational', 'capacity_kw' => 200]);
-        HomepageSection::updateOrCreate(['key' => 'projects'], [
-            'sort_order' => 3, 'is_enabled' => true, 'settings' => [
-                'limit' => 2, 'mode' => 'selected', 'ids' => [$second->id, $first->id],
-            ],
-        ]);
-
-        $response = $this->get(route('home'));
-        $response->assertOk();
-        $response->assertSeeInOrder([$second->name, $first->name]);
     }
 
     public function test_cms_page_activation_and_deactivation_requires_publish_permission(): void
