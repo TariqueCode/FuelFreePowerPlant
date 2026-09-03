@@ -12,7 +12,7 @@ return new class extends Migration
         if (! Schema::hasTable('navigation_menu_items')) return;
 
         $columns = [
-            'source_key' => fn (Blueprint $table) => $table->string('source_key', 255)->nullable()->index(),
+            'source_key' => fn (Blueprint $table) => $table->string('source_key', 255)->nullable(),
             'source_type' => fn (Blueprint $table) => $table->string('source_type', 40)->default('custom'),
             'area' => fn (Blueprint $table) => $table->string('area', 20)->default('public')->index(),
             'permission_key' => fn (Blueprint $table) => $table->string('permission_key', 120)->nullable()->index(),
