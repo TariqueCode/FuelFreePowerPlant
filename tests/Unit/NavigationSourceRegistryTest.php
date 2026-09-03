@@ -73,4 +73,32 @@ class NavigationSourceRegistryTest extends TestCase
         );
     }
 
+
+    public function test_published_about_page_builder_page_is_used_instead_of_generic_public_site_route(): void
+    {
+        \App\Models\CmsPage::create([
+            'title' => 'About Us',
+            'slug' => 'about-us',
+            'content' => '<p>Builder content</p>',
+            'is_published' => true,
+        ]);
+
+        $registry = app(NavigationSourceRegistry::class);
+
+        $sources = $registry->available('public', 'main');
+
+        $this->assertFalse($sources->contains('key', 'route:site.about'));
+        $page = $sources->firstWhere('key', fn ($key) => str_starts_with((string) $key, 'cms_page:'));
+        $this->assertNotNull($page);
+        $this->assertSame('About Us', $page['label']);
+        $this->assertSame('/pages/about-us', $page['url']);
+        $this->assertSame('cms.page', $page['route_name']);
+
+        $resolved = $registry->resolveAny('route:site.about', 'public');
+        $this->assertNotNull($resolved);
+        $this->assertSame('cms_page', $resolved['type']);
+        $this->assertSame('About Us', $resolved['label']);
+        $this->assertSame('/pages/about-us', $resolved['url']);
+    }
+
 }
