@@ -11,7 +11,7 @@ class PublicNavigationService
     public function tree(string $menu = 'main'): Collection
     {
         abort_unless(in_array($menu, ['main', 'dashboard'], true), 404);
-        $cacheKey = "public.navigation.v3.{$menu}";
+        $cacheKey = "public.navigation.v4.{$menu}";
         $ids = Cache::remember($cacheKey, 600, fn (): array => NavigationMenuItem::query()
             ->where('menu', $menu)
             ->where('is_visible', true)
@@ -34,14 +34,16 @@ class PublicNavigationService
         $registry = app(NavigationSourceRegistry::class);
         $valid = $items->filter(function (NavigationMenuItem $item) use ($registry): bool {
             if ($item->source_type === 'folder') return $item->source_key === null || $item->source_key === '';
-            if (! $item->source_key) return false;
-            $source = $registry->resolveAny($item->source_key, $item->area);
+            $sourceKey = $item->source_key ?: ($item->route_name ? 'route:'.$item->route_name : null);
+            if (! $sourceKey) return false;
+            $source = $registry->resolveAny($sourceKey, $item->area);
             if (! $source) return false;
 
             $item->label = $source['label'];
             $item->url = $source['url'];
             $item->route_name = $source['route_name'];
             $item->permission_key = $source['permission'] ?? null;
+            $item->setAttribute('source_key', $source['key']);
             $item->setAttribute('source_type', $source['type']);
             return true;
         })->values();
@@ -68,6 +70,7 @@ class PublicNavigationService
 
     public function clear(string $menu = 'main'): void
     {
+        Cache::forget("public.navigation.v4.{$menu}");
         Cache::forget("public.navigation.v3.{$menu}");
         Cache::forget("public.navigation.v2.{$menu}");
         Cache::forget("public.navigation.{$menu}");
