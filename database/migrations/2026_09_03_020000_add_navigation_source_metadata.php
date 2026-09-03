@@ -9,9 +9,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (! Schema::hasTable('navigation_menu_items')) {
-            return;
-        }
+        if (! Schema::hasTable('navigation_menu_items')) return;
 
         $columns = [
             'source_key' => fn (Blueprint $table) => $table->string('source_key', 255)->nullable()->index(),
@@ -21,9 +19,7 @@ return new class extends Migration
         ];
 
         foreach ($columns as $name => $definition) {
-            if (! Schema::hasColumn('navigation_menu_items', $name)) {
-                Schema::table('navigation_menu_items', $definition);
-            }
+            if (! Schema::hasColumn('navigation_menu_items', $name)) Schema::table('navigation_menu_items', $definition);
         }
 
         if (Schema::hasColumn('navigation_menu_items', 'route_name')) {
@@ -31,11 +27,14 @@ return new class extends Migration
                 ->whereNull('source_key')
                 ->whereNotNull('route_name')
                 ->where('route_name', '!=', '')
-                ->update([
-                    'source_key' => DB::raw("CONCAT('route:', route_name)"),
-                    'source_type' => 'route',
-                    'area' => DB::raw("CASE WHEN menu = 'dashboard' THEN 'dashboard' ELSE 'public' END"),
-                ]);
+                ->get(['id', 'route_name', 'menu'])
+                ->each(function ($item): void {
+                    DB::table('navigation_menu_items')->where('id', $item->id)->update([
+                        'source_key' => 'route:'.$item->route_name,
+                        'source_type' => 'route',
+                        'area' => $item->menu === 'dashboard' ? 'dashboard' : 'public',
+                    ]);
+                });
         }
 
         DB::table('navigation_menu_items')
@@ -46,17 +45,16 @@ return new class extends Migration
             ->where(function ($query) {
                 $query->whereNull('route_name')->orWhere('route_name', '');
             })
-            ->update([
-                'source_type' => 'folder',
-                'area' => DB::raw("CASE WHEN menu = 'dashboard' THEN 'dashboard' ELSE 'public' END"),
-            ]);
+            ->update(['source_type' => 'folder']);
+
+        DB::table('navigation_menu_items')
+            ->whereNull('area')
+            ->update(['area' => 'public']);
     }
 
     public function down(): void
     {
-        if (! Schema::hasTable('navigation_menu_items')) {
-            return;
-        }
+        if (! Schema::hasTable('navigation_menu_items')) return;
 
         foreach (['permission_key', 'area', 'source_type', 'source_key'] as $column) {
             if (Schema::hasColumn('navigation_menu_items', $column)) {
