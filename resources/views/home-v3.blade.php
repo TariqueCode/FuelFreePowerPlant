@@ -3173,30 +3173,6 @@ main.shell{
 </section>
 @endif
 
-@if($section==='statistics' && $home['statistics'])
-<section class="section home-section home-section-statistics section-layout-{{ ($sectionSettings['statistics'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Power at a glance</span><h2>Our footprint</h2></div><p>Key figures are calculated directly from the power plant records managed in the admin portal.</p></div>
-<div class="stats-grid">
-<div class="stat-card"><i class="fa-solid fa-industry"></i><strong>{{ number_format($stats['projects']) }}</strong><span>Projects</span></div>
-<div class="stat-card"><i class="fa-solid fa-bolt"></i><strong>{{ number_format($stats['capacity_mw'],2) }} MW</strong><span>Total capacity</span></div>
-<div class="stat-card"><i class="fa-solid fa-circle-check"></i><strong>{{ number_format($stats['operational']) }}</strong><span>Operational plants</span></div>
-<div class="stat-card"><i class="fa-solid fa-leaf"></i><strong>Future-ready</strong><span>Energy development</span></div>
-</div></section>
-@endif
-
-@if($section==='projects' && $home['projects'])
-<section class="section home-section home-section-projects section-layout-{{ ($sectionSettings['projects'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">{{ config('fuelfree.projects.eyebrow','Our project portfolio') }}</span><h2>{{ config('fuelfree.projects.label','Projects &amp; Our Plans') }}</h2></div><a class="more" href="{{ route('site.plants') }}">View all →</a></div>
-<div class="project-grid">
-@if($plants->isNotEmpty())
-@foreach($plants as $plant)
-<a class="project-card" href="{{ route('projects.show',$plant->slug) }}">
-<div class="project-media">@if($plant->image_path)<img src="{{ asset('storage/'.$plant->image_path) }}" alt="{{ $plant->name }}" loading="lazy">@else<i class="fa-solid fa-industry"></i>@endif</div>
-<div class="project-body"><div class="project-top"><span>{{ ucfirst(str_replace('_',' ',$plant->status)) }}</span><i class="fa-solid fa-arrow-up-right-from-square"></i></div><h3>{{ $plant->name }}</h3><p>{{ $plant->location ?: $plant->technology ?: 'Power generation project' }}</p><strong>{{ number_format((float)$plant->capacity_kw/1000,2) }} MW</strong></div>
-</a>
-@endforeach
-@else<div class="empty" style="grid-column:1/-1">No projects have been published yet.</div>@endif
-</div></section>
-@endif
-
 @if($section==='management' && $home['management'])
 
 <section class="section home-section home-section-management section-layout-{{ ($sectionSettings['management'] ?? [])['layout'] ?? 'left' }}"><div class="head"><div><span class="eyebrow">Leadership</span><h2>Board of Directors</h2></div><a class="more" href="{{ route('management') }}">Meet the team →</a></div>
