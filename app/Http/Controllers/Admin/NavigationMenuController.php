@@ -172,7 +172,14 @@ class NavigationMenuController extends Controller
             ->keyBy('id');
 
         abort_unless($items->count() === count($data['ids']), 422, 'Invalid menu items.');
-        abort_unless($parentId === null || $items->contains('id', $parentId) === false, 422, 'Invalid reorder parent.');
+        abort_unless(
+            $parentId === null || ! NavigationMenuItem::query()
+                ->where('menu', $data['menu'])
+                ->whereKey($parentId)
+                ->exists(),
+            422,
+            'Invalid reorder parent.'
+        );
 
         if ($parentId !== null) {
             $parent = NavigationMenuItem::query()
@@ -183,7 +190,7 @@ class NavigationMenuController extends Controller
 
             foreach ($items as $item) {
                 abort_if(
-                    $item->id !== $parent->id && $this->isDescendantOf($parent->id, $item->id),
+                    $this->isDescendantOf($parent->id, $item->id),
                     422,
                     'A menu item cannot be placed inside its own descendant.'
                 );
