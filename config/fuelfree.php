@@ -8,12 +8,6 @@ return [
         'timezone' => env('COMPANY_TIMEZONE', 'Asia/Dhaka'),
     ],
 
-    'projects' => [
-        'label' => 'Projects & Our Plans',
-        'singular' => 'Project',
-        'eyebrow' => 'Our project portfolio',
-    ],
-
     'header' => [
         'home_label' => 'Home',
         'management_label' => 'Board of Directors',
