@@ -170,9 +170,6 @@ class NavigationMenuController extends Controller
         abort_unless($items->count() === count($data['ids']), 422, 'Invalid menu items.');
         abort_unless($parentId === null || $items->contains('id', $parentId) === false, 422, 'Invalid reorder parent.');
 
-        $currentParentIds = $items->pluck('parent_id')->map(fn ($id) => $id === null ? null : (int) $id)->unique()->values();
-        abort_if($currentParentIds->count() > 1 || ($currentParentIds->count() === 1 && $currentParentIds->first() !== $parentId), 422, 'Items must belong to the same current parent.');
-
         if ($parentId !== null) {
             $parent = NavigationMenuItem::query()
                 ->where('menu', $data['menu'])
@@ -232,14 +229,38 @@ class NavigationMenuController extends Controller
 
         while ($cursor !== null && ! isset($seen[$cursor])) {
             $seen[$cursor] = true;
-            $cursor = NavigationMenuItem::query()->whereKey($cursor)->value('parent_id');
+            $cursor = NavigationMenuItem::query()
+                ->where('menu', $menu)
+                ->whereKey($cursor)
+                ->value('parent_id');
             $depth++;
             if ($depth > 6) {
                 abort(422, 'Navigation can have up to five nested levels.');
             }
         }
 
+        if ($ignoreId !== null) {
+            $subtreeDepth = $this->maxDescendantDepth($ignoreId, $menu);
+            abort_if($depth + $subtreeDepth - 1 > 5, 422, 'This move would exceed the five-level navigation limit.');
+        }
+
         return $parentId;
+    }
+
+    private function maxDescendantDepth(int $rootId, string $menu): int
+    {
+        $children = NavigationMenuItem::query()
+            ->where('menu', $menu)
+            ->where('parent_id', $rootId)
+            ->pluck('id');
+
+        if ($children->isEmpty()) {
+            return 1;
+        }
+
+        return 1 + $children->map(
+            fn ($id): int => $this->maxDescendantDepth((int) $id, $menu)
+        )->max();
     }
 
     private function isDescendantOf(int $candidateId, int $ancestorId): bool
