@@ -3,6 +3,9 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\NavigationMenuItem;
+use App\Models\Permission;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\QueryException;
 use Tests\TestCase;
