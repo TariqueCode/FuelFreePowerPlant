@@ -20,26 +20,6 @@ class NavigationSourceRegistry
         'admin.navigation.store', 'admin.navigation.update', 'admin.navigation.destroy', 'admin.navigation.reorder',
     ];
 
-    private const LABELS = [
-        'home' => 'Home', 'site.about' => 'About Us', 'site.plants' => 'Projects & Our Plans',
-        'site.future-project' => 'Future Project', 'site.solutions' => 'Solutions',
-        'site.gallery' => 'Gallery', 'management' => 'Board of Directors',
-        'news.index' => 'News & Events', 'resources.index' => 'Resources',
-        'sustainability' => 'Sustainability', 'contact' => 'Contact', 'site.career' => 'Career',
-        'dashboard' => 'Dashboard', 'admin.dashboard' => 'Dashboard',
-        'admin.users.index' => 'Users', 'admin.plants.index' => 'Power Plants',
-        'admin.plants.performance.index' => 'Plant Performance',
-        'admin.site-content.index' => 'Site Content', 'admin.site-popups.index' => 'Site Popups',
-        'admin.sliders' => 'Sliders', 'admin.management.index' => 'Management',
-        'admin.gallery.index' => 'Gallery', 'admin.helpdesk' => 'Help Desk',
-        'admin.mail' => 'Mail', 'admin.career-applications.index' => 'Career Applications',
-        'admin.inquiries.index' => 'Inquiries', 'admin.audit' => 'Audit Log',
-        'admin.health' => 'System Health', 'admin.documents' => 'Documents',
-        'admin.homepage-builder.index' => 'Homepage Builder', 'admin.design.index' => 'Design Builder',
-        'admin.theme.index' => 'Theme Builder', 'admin.cms.index' => 'CMS',
-        'admin.settings' => 'Settings', 'admin.social-links.index' => 'Social Links',
-    ];
-
     public function available(string $area = 'public', string $menu = 'main'): Collection
     {
         $used = $this->usedSourceKeys($menu);
@@ -134,16 +114,28 @@ class NavigationSourceRegistry
 
         return [
             'key' => 'route:'.$name, 'type' => 'route',
-            'label' => self::LABELS[$name] ?? $this->humanize($name),
+            'label' => $this->routeLabel($route, $name),
             'url' => route($name), 'route_name' => $name, 'area' => $area,
             'permission' => $permission ? Str::after($permission, 'permission:') : null,
             'meta' => [],
         ];
     }
 
-    private function humanize(string $name): string
+    private function routeLabel(Route $route, string $name): string
     {
-        $name = Str::replace(['admin.', '.index', '.'], ['admin ', '', ' '], $name);
-        return Str::headline($name);
+        $action = (string) ($route->getActionName() ?? '');
+        $controller = Str::afterLast($action, '\\');
+        $controller = Str::before($controller, '@');
+
+        $label = Str::headline(Str::replace(['admin.', '.index', '.'], ['admin ', '', ' '], $name));
+        if ($controller && $controller !== 'Closure') {
+            $method = Str::beforeLast($controller, 'Controller');
+            $method = Str::headline($method);
+            if ($method && $method !== 'Closure') {
+                $label = $method;
+            }
+        }
+
+        return $label;
     }
 }
