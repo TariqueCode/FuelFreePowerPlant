@@ -20,8 +20,6 @@ class NavigationSourceRegistry
         'admin.navigation.store', 'admin.navigation.update', 'admin.navigation.destroy', 'admin.navigation.reorder',
     ];
 
-    private const NAVIGABLE_PREFIXES = ['site.', 'news.index', 'resources.index', 'sustainability', 'contact', 'management', 'home', 'dashboard', 'admin.'];
-
     private const LABELS = [
         'home' => 'Home', 'site.about' => 'About Us', 'site.plants' => 'Projects & Our Plans',
         'site.future-project' => 'Future Project', 'site.solutions' => 'Solutions',
