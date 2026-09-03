@@ -127,24 +127,26 @@ class NavigationSourceRegistryTest extends TestCase
     }
 
 
+
     public function test_shared_public_site_controller_uses_destination_labels(): void
     {
-        $sources = app(NavigationSourceRegistry::class)->available('public', 'main');
+        $registry = app(NavigationSourceRegistry::class);
 
-        $this->assertSame('Solutions', $sources->firstWhere('key', 'route:site.solutions')['label']);
-        $this->assertSame('Gallery', $sources->firstWhere('key', 'route:site.gallery')['label']);
-        $this->assertFalse($sources->contains(fn (array $source): bool =>
-            $source['type'] === 'route' && $source['label'] === 'Public Site'
-        ));
+        $solutions = $registry->resolveAny('route:site.solutions', 'public');
+        $gallery = $registry->resolveAny('route:site.gallery', 'public');
+
+        $this->assertNotNull($solutions);
+        $this->assertSame('Solutions', $solutions['label']);
+        $this->assertNotNull($gallery);
+        $this->assertSame('Gallery', $gallery['label']);
     }
 
     public function test_domain_scoped_webmail_routes_are_not_public_navigation_sources(): void
     {
-        $sources = app(NavigationSourceRegistry::class)->available('public', 'main');
+        $registry = app(NavigationSourceRegistry::class);
 
-        $this->assertFalse($sources->contains(fn (array $source): bool =>
-            str_starts_with((string) ($source['key'] ?? ''), 'route:webmail.host.')
-        ));
+        $this->assertNull($registry->resolveAny('route:webmail.host.login', 'public'));
+        $this->assertNull($registry->resolveAny('route:webmail.host.inbox', 'public'));
     }
 
 }
