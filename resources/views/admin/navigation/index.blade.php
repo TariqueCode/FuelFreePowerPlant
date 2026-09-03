@@ -239,7 +239,12 @@
 
     const finishPointerDrag = async (event) => {
         if (!pointerDrag) return;
-        const { row, sourceContainer, startX, startY } = pointerDrag;
+        const { row, sourceContainer } = pointerDrag;
+        if (!pointerDrag.activated) {
+            window.clearTimeout(pointerDrag.timer);
+            pointerDrag = null;
+            return;
+        }
         row.classList.remove('dragging');
         tree.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
 
@@ -270,7 +275,7 @@
 
     tree.querySelectorAll('.drag').forEach(handle => {
         handle.addEventListener('pointerdown', event => {
-            if (event.pointerType === 'mouse' && event.button !== 0) return;
+            if (event.pointerType !== 'touch') return;
             const row = handle.closest('.menu-row[data-id]');
             if (!row) return;
 
@@ -294,7 +299,7 @@
             if (!pointerDrag || pointerDrag.pointerId !== event.pointerId) return;
             if (!pointerDrag.activated) {
                 const distance = Math.hypot(event.clientX - pointerDrag.startX, event.clientY - pointerDrag.startY);
-                if (event.pointerType === 'mouse' || distance > 8) {
+                if (distance > 8) {
                     window.clearTimeout(pointerDrag.timer);
                     pointerDrag.activated = true;
                     pointerDrag.row.classList.add('dragging');
