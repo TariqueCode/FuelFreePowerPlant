@@ -95,8 +95,18 @@ class NavigationSourceRegistry
         if ($this->isNavigationBuilderRoute($name)) return false;
         if (str_contains($uri, '{') || in_array($name, self::EXCLUDED_ROUTE_NAMES, true)) return false;
 
-        if ($area === 'public') return ! str_starts_with($uri, 'admin/');
-        if ($area === 'dashboard') return str_starts_with($uri, 'admin/') || $name === 'dashboard';
+        $middleware = collect($route->gatherMiddleware())->map(fn ($value): string => (string) $value);
+
+        if ($area === 'public') {
+            return ! str_starts_with($uri, 'admin/')
+                && ! $middleware->contains(fn (string $value): bool =>
+                    $value === 'auth' || Str::startsWith($value, ['role:', 'permission:']));
+        }
+
+        if ($area === 'dashboard') {
+            return (str_starts_with($uri, 'admin/') || $name === 'dashboard')
+                && ! $middleware->contains(fn (string $value): bool => Str::startsWith($value, 'role:'));
+        }
 
         return false;
     }
