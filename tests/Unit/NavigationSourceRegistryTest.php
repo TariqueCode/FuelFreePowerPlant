@@ -88,7 +88,7 @@ class NavigationSourceRegistryTest extends TestCase
         $sources = $registry->available('public', 'main');
 
         $this->assertFalse($sources->contains('key', 'route:site.about'));
-        $page = $sources->firstWhere('key', fn ($key) => str_starts_with((string) $key, 'cms_page:'));
+        $page = $sources->first(fn (array $source) => str_starts_with((string) ($source['key'] ?? ''), 'cms_page:'));
         $this->assertNotNull($page);
         $this->assertSame('About Us', $page['label']);
         $this->assertSame('/pages/about-us', $page['url']);
