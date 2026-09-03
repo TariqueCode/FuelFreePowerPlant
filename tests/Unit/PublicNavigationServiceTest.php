@@ -6,6 +6,7 @@ use App\Models\NavigationMenuItem;
 use App\Services\PublicNavigationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class PublicNavigationServiceTest extends TestCase
@@ -15,6 +16,7 @@ class PublicNavigationServiceTest extends TestCase
     public function test_it_builds_a_deep_navigation_tree_without_n_plus_one_relationship_loading(): void
     {
         Cache::forget('public.navigation.v3.main');
+        Route::get('/__navigation-deep-test', fn () => 'ok')->name('navigation.test.deep');
         Cache::forget('public.navigation.main');
 
         $folder = NavigationMenuItem::create([
@@ -38,8 +40,8 @@ class PublicNavigationServiceTest extends TestCase
             'menu' => 'main',
             'parent_id' => $subFolder->id,
             'label' => 'Future Project',
-            'url' => '/career',
-            'source_key' => 'route:site.career',
+            'url' => '/__navigation-deep-test',
+            'source_key' => 'route:navigation.test.deep',
             'source_type' => 'route',
             'area' => 'public',
             'is_visible' => true,
