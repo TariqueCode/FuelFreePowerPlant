@@ -33,4 +33,13 @@ class NavigationSourceRegistryTest extends TestCase
         $this->assertNotNull($source);
         $this->assertSame('documents.view', $source['permission']);
     }
+
+    public function test_navigation_builder_routes_are_never_available(): void
+    {
+        Route::get('/admin/navigation/internal', fn () => 'ok')->name('admin.navigation.internal');
+
+        $sources = app(NavigationSourceRegistry::class)->available('dashboard', 'test-dashboard-menu');
+
+        $this->assertFalse($sources->contains('key', 'route:admin.navigation.internal'));
+    }
 }
