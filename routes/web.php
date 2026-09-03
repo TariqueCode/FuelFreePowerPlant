@@ -8,8 +8,6 @@ use App\Http\Controllers\Admin\HealthController;
 use App\Http\Controllers\Admin\InquiryController;
 use App\Http\Controllers\Admin\HelpDeskController;
 use App\Http\Controllers\Admin\ManagementController as AdminManagementController;
-use App\Http\Controllers\Admin\PlantPerformanceController;
-use App\Http\Controllers\Admin\PowerPlantController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SiteContentController;
 use App\Http\Controllers\Admin\SiteContentAttachmentController;
@@ -30,7 +28,6 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ManagementController;
 use App\Http\Controllers\NewsController;
-use App\Http\Controllers\PowerPlantPageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\SustainabilityController;
@@ -52,7 +49,6 @@ Route::get('/company/{slug}', [PublicSiteController::class,'showCompanyPage'])->
 Route::get('/sections/{section}', [PublicSiteController::class,'show'])->name('site.section');
 Route::get('/management', ManagementController::class)->name('management');
 Route::get('/management/{member}/contact.vcf', [ManagementController::class,'vcard'])->name('management.vcard');
-Route::get('/projects/{slug}', [PowerPlantPageController::class,'show'])->name('projects.show');
 Route::get('/news', [NewsController::class,'index'])->name('news.index');
 Route::get('/news/{slug}', [NewsController::class,'show'])->name('news.show');
 Route::get('/shared/documents/{token}', [DocumentController::class,'sharedDownload'])->where('token', '[A-Fa-f0-9]{64}')->middleware('throttle:30,1')->name('documents.shared-download');
@@ -84,8 +80,6 @@ Route::middleware('guest')->group(function(){Route::get('/login',[AuthController
 Route::middleware('auth')->group(function(){
 Route::get('/profile',[ProfileController::class,'edit'])->name('profile');Route::patch('/profile',[ProfileController::class,'update'])->name('profile.update');Route::get('/dashboard',DashboardController::class)->name('dashboard')->middleware('permission:dashboard.view');
 Route::middleware('auth')->prefix('admin')->group(function(){Route::get('/',AdminDashboardController::class)->name('admin.dashboard')->middleware('permission:dashboard.view');Route::middleware('permission:users.view')->group(function(){Route::get('/users',[UserController::class,'index'])->name('admin.users.index');});Route::middleware('permission:users.manage')->group(function(){Route::get('/users/create',[UserController::class,'create'])->name('admin.users.create');Route::post('/users',[UserController::class,'store'])->name('admin.users.store');Route::get('/users/{user}/edit',[UserController::class,'edit'])->name('admin.users.edit');Route::patch('/users/{user}',[UserController::class,'update'])->name('admin.users.update');Route::delete('/users/{user}',[UserController::class,'destroy'])->name('admin.users.destroy');});});
-Route::prefix('admin')->middleware('permission:plants.view')->group(function(){Route::get('/plants',[PowerPlantController::class,'index'])->name('admin.plants.index');Route::get('/plants/{plant}/performance',[PlantPerformanceController::class,'index'])->name('admin.plants.performance.index');});
-Route::prefix('admin')->middleware('permission:plants.manage')->group(function(){Route::get('/plants/create',[PowerPlantController::class,'create'])->name('admin.plants.create');Route::post('/plants',[PowerPlantController::class,'store'])->name('admin.plants.store');Route::get('/plants/{plant}/edit',[PowerPlantController::class,'edit'])->name('admin.plants.edit');Route::patch('/plants/{plant}',[PowerPlantController::class,'update'])->name('admin.plants.update');Route::post('/plants/{plant}/performance',[PlantPerformanceController::class,'store'])->name('admin.plants.performance.store');Route::delete('/plants/{plant}/performance/{performance}',[PlantPerformanceController::class,'destroy'])->name('admin.plants.performance.destroy');});
 Route::prefix('admin')->middleware('permission:website.view')->group(function(){Route::get('/navigation',[\App\Http\Controllers\Admin\NavigationMenuController::class,'index'])->name('admin.navigation.index');});
 Route::prefix('admin')->middleware('permission:website.view')->group(function(){Route::get('/navigation/{item}',[\App\Http\Controllers\Admin\NavigationMenuController::class,'show'])->name('admin.navigation.show');});
 Route::prefix('admin')->middleware('permission:navigation.manage')->group(function(){Route::post('/navigation/{item}/delete', [\App\Http\Controllers\Admin\NavigationMenuController::class,'destroy'])->name('admin.navigation.destroy');Route::post('/navigation',[\App\Http\Controllers\Admin\NavigationMenuController::class,'store'])->name('admin.navigation.store');Route::patch('/navigation/{item}',[\App\Http\Controllers\Admin\NavigationMenuController::class,'update'])->name('admin.navigation.update');Route::post('/navigation/reorder',[\App\Http\Controllers\Admin\NavigationMenuController::class,'reorder'])->name('admin.navigation.reorder');});
