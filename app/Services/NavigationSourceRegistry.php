@@ -107,6 +107,11 @@ class NavigationSourceRegistry
         $middleware = collect($route->gatherMiddleware())->map(fn ($value): string => (string) $value);
 
         if ($area === 'public') {
+            // Only destinations on the primary public application host belong in
+            // the website navigation. Domain-scoped tools such as webmail must
+            // never leak into the public menu just because they expose GET routes.
+            if ($route->getDomain() !== null) return false;
+
             return ! str_starts_with($uri, 'admin/')
                 && ! $middleware->contains(fn (string $value): bool =>
                     $value === 'auth' || Str::startsWith($value, ['role:', 'permission:']));
@@ -191,6 +196,20 @@ class NavigationSourceRegistry
         $controller = Str::afterLast($action, '\\');
         $controller = Str::before($controller, '@');
 
+        // PublicSiteController is a shared renderer for several distinct public
+        // destinations. Never expose its implementation class as the menu label.
+        if ($controller === 'PublicSiteController') {
+            $section = $route->defaults['section'] ?? null;
+            if (is_string($section) && trim($section) !== '') {
+                return $this->humanizeNavigationLabel($section);
+            }
+
+            $routeSegment = trim(ltrim($route->uri(), '/'));
+            if ($routeSegment !== '' && ! str_contains($routeSegment, '/')) {
+                return $this->humanizeNavigationLabel($routeSegment);
+            }
+        }
+
         $label = Str::headline(Str::replace(['admin.', '.index', '.'], ['admin ', '', ' '], $name));
         if ($controller && $controller !== 'Closure') {
             $method = Str::beforeLast($controller, 'Controller');
@@ -199,5 +218,10 @@ class NavigationSourceRegistry
         }
 
         return $label;
+    }
+
+    private function humanizeNavigationLabel(string $value): string
+    {
+        return Str::headline(str_replace(['-', '_'], ' ', trim($value)));
     }
 }
