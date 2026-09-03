@@ -122,7 +122,7 @@
                         <button class="primary" type="submit">Save changes</button>
                     </form>
                     <form method="POST" action="{{ route('admin.navigation.destroy',$item) }}" onsubmit="return confirm('Delete this navigation item? Children will move to its parent.');">
-                        @csrf @method('DELETE')
+                        @csrf
                         <button type="submit" class="danger">Delete item</button>
                     </form>
                 </div>
