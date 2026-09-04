@@ -5,8 +5,9 @@
         'admin.page-builder.index',
         'admin.menu-builder.index',
     ];
+    $isBuilderLink = in_array((string) $item->route_name, $builderRoutes, true);
     $dashboardUrl = $item->url;
-    if (in_array((string) $item->route_name, $builderRoutes, true)) {
+    if ($isBuilderLink) {
         $dashboardUrl = route($item->route_name);
     }
 @endphp
@@ -26,8 +27,8 @@
 <a class="{{ request()->url() === $dashboardUrl ? 'active' : '' }}"
    href="{{ $dashboardUrl }}"
    data-dashboard-link="{{ $item->route_name }}"
-   @if($item->target === '_blank') target="_blank" rel="noopener noreferrer" @endif
-   @if(in_array((string) $item->route_name, $builderRoutes, true)) onclick="window.location.assign(this.href); return false;" @endif>
+   @if($isBuilderLink) data-builder-navigation="true" @endif
+   @if($item->target === '_blank') target="_blank" rel="noopener noreferrer" @endif>
     <span class="nav-icon"><i class="fa-solid fa-circle-dot"></i></span><span>{{ $item->displayLabel() }}</span>
 </a>
 @endif
