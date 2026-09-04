@@ -1,3 +1,12 @@
+@once
+<style>
+.nav-group.nav-details > summary { list-style: none; }
+.nav-group.nav-details > summary::-webkit-details-marker { display: none; }
+.nav-group.nav-details[open] > .nav-sub { display: flex; flex-direction: column; gap: 2px; }
+.nav-group.nav-details[open] > summary .nav-chevron { transform: rotate(180deg); }
+</style>
+@endonce
+
 @php
     $hasChildren = $item->children->isNotEmpty();
     $builderRoutes = [
@@ -19,7 +28,7 @@
 @endphp
 
 @if($hasChildren)
-<details class="nav-group" @if($isGroupOpen) open @endif>
+<details class="nav-group nav-details" @if($isGroupOpen) open @endif>
     <summary class="nav-parent">
         <span class="nav-icon"><i class="fa-solid fa-folder-tree"></i></span>
         <span>{{ $item->displayLabel() }}</span>
