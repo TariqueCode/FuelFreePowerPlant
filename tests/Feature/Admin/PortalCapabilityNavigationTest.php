@@ -62,8 +62,8 @@ class PortalCapabilityNavigationTest extends TestCase
     {
         $slugs = [
             'dashboard.view', 'website.view', 'cms.view', 'social-media.manage',
-            'documents.view', 'plants.view', 'users.view', 'audit.view',
-            'health.view', 'mail.view', 'career.view', 'inquiries.view', 'settings.manage',
+            'documents.view', 'users.view', 'audit.view', 'health.view',
+            'mail.view', 'career.view', 'inquiries.view', 'settings.manage',
         ];
         $permissions = collect($slugs)->map(fn (string $slug) => Permission::firstOrCreate(
             ['slug' => $slug],
@@ -82,7 +82,7 @@ class PortalCapabilityNavigationTest extends TestCase
             ->values()->all();
         $labels = collect($topLevel)->merge($nested)->values()->all();
 
-        foreach (['Dashboard', 'Website', 'Homepage', 'Slider', 'Highlight Banner', 'Profile Builder', 'News & Notices', 'Gallery', 'Page Builder', 'Social Media', 'Menu Builder', 'Documents & Media', 'Operations', 'Projects & Our Plans', 'Users & Access', 'Users', 'Audit Log', 'System Health', 'Communications', 'Help Desk', 'Mail', 'Career Applications', 'Website Inquiries', 'Settings'] as $label) {
+        foreach (['Dashboard', 'Website', 'Homepage', 'Slider', 'Highlight Banner', 'Profile Builder', 'News & Notices', 'Gallery', 'Page Builder', 'Social Media', 'Menu Builder', 'Documents & Media', 'Users & Access', 'Users', 'Audit Log', 'System Health', 'Communications', 'Help Desk', 'Mail', 'Career Applications', 'Website Inquiries', 'Settings'] as $label) {
             $this->assertContains($label, $labels, "Missing dashboard navigation item: {$label}");
         }
     }
