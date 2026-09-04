@@ -6,6 +6,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\SystemSetting;
 use App\Models\User;
+use App\Services\DashboardNavigationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -56,6 +57,35 @@ class PortalCapabilityNavigationTest extends TestCase
 
         $this->actingAs($user)->get(route('admin.users.index'))->assertOk()->assertSee('Users');
     }
+
+    public function test_dashboard_navigation_restores_missing_builtin_capabilities(): void
+    {
+        $slugs = [
+            'dashboard.view', 'website.view', 'cms.view', 'social-media.manage',
+            'documents.view', 'plants.view', 'users.view', 'audit.view',
+            'health.view', 'mail.view', 'career.view', 'inquiries.view', 'settings.manage',
+        ];
+        $permissions = collect($slugs)->map(fn (string $slug) => Permission::firstOrCreate(
+            ['slug' => $slug],
+            ['name' => ucwords(str_replace(['.', '-'], ' ', $slug))]
+        ));
+        $role = Role::create(['name'=>'Full Portal Viewer','slug'=>'full-portal-viewer','is_system'=>false]);
+        $role->permissions()->sync($permissions->pluck('id')->all());
+        $user = User::factory()->create();
+        $user->roles()->attach($role);
+
+        $tree = $this->actingAs($user)->app->make(DashboardNavigationService::class)->tree();
+        $labels = $tree->flatMap(function ($item) {
+            return $item->source_type === 'folder'
+                ? collect([$item->label])->merge($item->children->pluck('label'))
+                : collect([$item->label]);
+        })->values()->all();
+
+        foreach (['Dashboard', 'Website', 'Homepage', 'Slider', 'Highlight Banner', 'Profile Builder', 'News & Notices', 'Gallery', 'Page Builder', 'Social Media', 'Menu Builder', 'Documents & Media', 'Operations', 'Projects & Our Plans', 'Users & Access', 'Users', 'Audit Log', 'System Health', 'Communications', 'Help Desk', 'Mail', 'Career Applications', 'Website Inquiries', 'Settings'] as $label) {
+            $this->assertContains($label, $labels, "Missing dashboard navigation item: {$label}");
+        }
+    }
+
     public function test_system_settings_save_does_not_require_or_overwrite_website_owned_settings(): void
     {
         $settings = Permission::firstOrCreate(['slug'=>'settings.manage'], ['name'=>'Manage settings']);
