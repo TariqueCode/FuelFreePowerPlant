@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\SystemSetting;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -16,6 +17,44 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Keep the three global builders visually and semantically consistent even
+        // in older Blade views that still reference their legacy route names.
+        Blade::precompiler(function (string $template): string {
+            $routeMap = [
+                "admin.management." => "admin.profile-builder.",
+                "admin.cms." => "admin.page-builder.",
+                "admin.navigation." => "admin.menu-builder.",
+            ];
+
+            $template = str_replace(array_keys($routeMap), array_values($routeMap), $template);
+
+            return str_replace([
+                'Advanced Menu Builder',
+                'Board of Directors',
+                'Content Pages',
+                'Website Navigation',
+                'CONTENT MANAGEMENT',
+                'WEBSITE SECTIONS · MANAGEMENT',
+                "New CMS Page",
+                "Edit CMS Page",
+                "Add Management Member",
+                "Edit Management Profile",
+                "Add management member",
+            ], [
+                'Menu Builder',
+                'Profile Builder',
+                'Page Builder',
+                'Menu Builder',
+                'PAGE BUILDER',
+                'GLOBAL · PROFILE BUILDER',
+                'New Page',
+                'Edit Page',
+                'Add Profile',
+                'Edit Profile',
+                'Add profile',
+            ], $template);
+        });
+
         if (! Schema::hasTable('system_settings')) {
             return;
         }
