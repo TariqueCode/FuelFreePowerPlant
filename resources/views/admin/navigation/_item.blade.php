@@ -19,7 +19,7 @@
     @endif
     <span class="drag" title="Drag to reorder" aria-label="Drag to reorder" role="button" tabindex="0">☷</span>
     <div class="menu-main">
-        <strong>{{ $item->displayLabel() }}</strong>
+        <strong class="drag" title="Drag {{ $item->displayLabel() }} to reorder">{{ $item->displayLabel() }}</strong>
         <em>{{ $item->source_type === 'folder' ? 'Folder' : 'Live source' }}</em>
         <small>{{ $item->route_name ?: ($item->url ?: 'Structural node') }} · {{ $item->is_visible ? 'Visible' : 'Hidden' }}@if($item->permission_key) · {{ $item->permission_key }}@endif</small>
         <div class="inline-label-edit" id="rename-{{ $item->id }}" hidden>
