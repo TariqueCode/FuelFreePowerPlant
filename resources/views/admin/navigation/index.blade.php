@@ -253,17 +253,35 @@
     if (!tree) return;
     let dragged = null;
     let pointerDrag = null;
+    let saveInFlight = false;
 
-    const persist = async (container) => {
-        const rows = [...container.children].filter(el => el.matches('.menu-row[data-id]'));
-        const ids = rows.map(el => Number(el.dataset.id));
-        const parentRow = container.closest('.menu-row[data-id]');
+    const collectTree = () => {
+        const treeNodes = [];
+        const walk = (container, parentId = null) => {
+            const rows = [...container.children].filter(el => el.matches('.menu-row[data-id]'));
+            rows.forEach((row, sortOrder) => {
+                const id = Number(row.dataset.id);
+                treeNodes.push({id, parent_id: parentId, sort_order: sortOrder});
+                const children = row.querySelector(':scope > .children');
+                if (children) walk(children, id);
+            });
+        };
+        walk(tree);
+        return treeNodes;
+    };
+
+    const persist = async () => {
+        if (saveInFlight) return;
+        const treePayload = collectTree();
+        if (!treePayload.length) return;
+
+        saveInFlight = true;
         state.textContent = 'Saving…';
         try {
             const response = await fetch('{{ route('admin.menu-builder.reorder') }}', {
                 method: 'POST',
                 headers: {'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json'},
-                body: JSON.stringify({menu:'{{ $menu }}', ids, parent_id: parentRow ? Number(parentRow.dataset.id) : null})
+                body: JSON.stringify({menu:'{{ $menu }}', tree: treePayload})
             });
             if (!response.ok) {
                 let message = `HTTP ${response.status}`;
@@ -278,6 +296,8 @@
             console.error('Menu reorder failed:', error);
             state.textContent = 'Save failed — ' + (error?.message || 'changes were not saved');
             window.setTimeout(() => window.location.reload(), 1400);
+        } finally {
+            saveInFlight = false;
         }
     };
 
@@ -293,7 +313,7 @@
         if (!target) return;
         if (button.classList.contains('move-up')) container.insertBefore(row, target);
         else container.insertBefore(target, row);
-        await persist(container);
+        await persist();
     });
 
     tree.addEventListener('click', (event) => {
@@ -305,14 +325,9 @@
         button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
     });
 
-    const persistContainers = async (containers) => {
-        const unique = [...new Set(containers.filter(Boolean))];
-        for (const container of unique) await persist(container);
-    };
-
     const finishPointerDrag = async (event) => {
         if (!pointerDrag) return;
-        const { row, sourceContainer } = pointerDrag;
+        const { row } = pointerDrag;
         if (!pointerDrag.activated) {
             window.clearTimeout(pointerDrag.timer);
             pointerDrag = null;
@@ -337,14 +352,13 @@
                 target.appendChild(children);
             }
             children.appendChild(row);
-            await persistContainers([sourceContainer, children]);
+            await persist();
             return;
         }
 
-        const rect = target.getBoundingClientRect();
-        const before = event.clientY < rect.top + rect.height / 2;
+        const before = event.clientY < targetRect.top + targetRect.height / 2;
         targetContainer.insertBefore(row, before ? target : target.nextElementSibling);
-        await persistContainers([sourceContainer, targetContainer]);
+        await persist();
     };
 
     tree.addEventListener('pointerdown', (event) => {
@@ -352,9 +366,10 @@
         if (!handle) return;
         const row = handle.closest('.menu-row[data-id]');
         if (!row) return;
+        event.preventDefault();
+        handle.setPointerCapture?.(event.pointerId);
         pointerDrag = {
             row,
-            sourceContainer: row.parentElement,
             startX: event.clientX,
             startY: event.clientY,
             activated: false,
@@ -377,7 +392,7 @@
     tree.addEventListener('dragstart', (event) => {
         const row = event.target.closest('.menu-row[data-id]');
         if (!row) return;
-        dragged = {row, sourceContainer: row.parentElement};
+        dragged = {row};
         row.classList.add('dragging');
         event.dataTransfer.effectAllowed = 'move';
         event.dataTransfer.setData('text/plain', row.dataset.id);
@@ -398,7 +413,6 @@
         if (!dragged) return;
         const target = event.target.closest('.menu-row[data-id]');
         if (!target || target === dragged.row || dragged.row.contains(target)) return;
-        const sourceContainer = dragged.sourceContainer;
         const targetRect = target.getBoundingClientRect();
         const targetContainer = target.parentElement;
         dragged.row.classList.remove('dragging');
@@ -412,13 +426,12 @@
                 target.appendChild(children);
             }
             children.appendChild(dragged.row);
-            await persistContainers([sourceContainer, children]);
         } else {
             const before = event.clientY < targetRect.top + targetRect.height / 2;
             targetContainer.insertBefore(dragged.row, before ? target : target.nextElementSibling);
-            await persistContainers([sourceContainer, targetContainer]);
         }
         dragged = null;
+        await persist();
     });
     tree.addEventListener('dragend', () => {
         if (!dragged) return;
