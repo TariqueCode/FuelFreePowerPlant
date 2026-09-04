@@ -11,6 +11,11 @@ use Illuminate\View\View;
 
 class HealthController extends Controller
 {
+    public function index(): View
+    {
+        return $this->__invoke();
+    }
+
     public function __invoke(): View
     {
         abort_unless(request()->user()->hasPermission('health.view'), 403);
