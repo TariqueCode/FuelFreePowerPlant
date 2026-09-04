@@ -36,12 +36,12 @@ class NavigationMenuIntegrityTest extends TestCase
 
     private function navigationAdmin(): User
     {
-        $view = Permission::firstOrCreate(['slug' => 'website.view'], ['name' => 'View website']);
-        $manage = Permission::firstOrCreate(['slug' => 'navigation.manage'], ['name' => 'Manage navigation']);
-        $cms = Permission::firstOrCreate(['slug' => 'cms.view'], ['name' => 'View CMS']);
-        $dashboard = Permission::firstOrCreate(['slug' => 'dashboard.view'], ['name' => 'View dashboard']);
+        $slugs = ['website.view', 'navigation.manage', 'cms.view', 'dashboard.view', 'plants.view'];
+        $permissions = collect($slugs)->map(fn (string $slug) => Permission::firstOrCreate(
+            ['slug' => $slug], ['name' => ucwords(str_replace(['.', '-'], ' ', $slug))]
+        ));
         $role = Role::create(['name' => 'Navigation QA', 'slug' => 'navigation-qa', 'is_system' => false]);
-        $role->permissions()->sync([$view->id, $manage->id, $cms->id, $dashboard->id]);
+        $role->permissions()->sync($permissions->pluck('id')->all());
         $user = User::factory()->create();
         $user->roles()->attach($role);
         return $user;
@@ -126,16 +126,26 @@ class NavigationMenuIntegrityTest extends TestCase
             $this->assertSame(route($routeName), $source['url']);
         }
 
-        NavigationMenuItem::create([
-            'menu' => 'dashboard', 'parent_id' => null, 'label' => 'Profile Builder',
-            'url' => route('admin.profile-builder.index'), 'route_name' => 'admin.profile-builder.index',
-            'target' => '_self', 'is_visible' => true, 'sort_order' => 0,
-            'source_key' => 'route:admin.profile-builder.index', 'source_type' => 'route', 'area' => 'dashboard',
-        ]);
+        foreach ([
+            ['Profile Builder', 'admin.profile-builder.index'],
+            ['Page Builder', 'admin.page-builder.index'],
+            ['Menu Builder', 'admin.menu-builder.index'],
+        ] as $index => [$label, $routeName]) {
+            NavigationMenuItem::create([
+                'menu' => 'dashboard', 'parent_id' => null, 'label' => $label,
+                'url' => route($routeName), 'route_name' => $routeName,
+                'target' => '_self', 'is_visible' => true, 'sort_order' => $index,
+                'source_key' => 'route:'.$routeName, 'source_type' => 'route', 'area' => 'dashboard',
+            ]);
+        }
 
         $tree = app(DashboardNavigationService::class)->tree();
-        $this->assertCount(3, $tree);
-        $this->assertSame(route('admin.profile-builder.index'), $tree->first()->url);
+        $website = $tree->first(fn (NavigationMenuItem $item): bool => $item->label === 'Website');
+        $this->assertNotNull($website);
+        $this->assertSame(
+            ['Profile Builder', 'Page Builder', 'Menu Builder'],
+            $website->children->pluck('label')->intersect(['Profile Builder', 'Page Builder', 'Menu Builder'])->values()->all()
+        );
     }
 
     public function test_dashboard_builder_links_render_as_real_clickable_anchors(): void
@@ -147,11 +157,11 @@ class NavigationMenuIntegrityTest extends TestCase
             ['Profile Builder', 'admin.profile-builder.index'],
             ['Page Builder', 'admin.page-builder.index'],
             ['Menu Builder', 'admin.menu-builder.index'],
-        ] as [$label, $routeName]) {
+        ] as $index => [$label, $routeName]) {
             NavigationMenuItem::create([
                 'menu' => 'dashboard', 'parent_id' => null, 'label' => $label,
                 'url' => route($routeName), 'route_name' => $routeName,
-                'target' => '_self', 'is_visible' => true, 'sort_order' => 0,
+                'target' => '_self', 'is_visible' => true, 'sort_order' => $index,
                 'source_key' => 'route:'.$routeName, 'source_type' => 'route', 'area' => 'dashboard',
             ]);
         }
