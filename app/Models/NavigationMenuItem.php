@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class NavigationMenuItem extends Model
 {
     protected $fillable = [
-        'menu', 'group', 'parent_id', 'label', 'url', 'route_name', 'target',
+        'menu', 'group', 'parent_id', 'label', 'label_override', 'url', 'route_name', 'target',
         'icon', 'is_visible', 'sort_order', 'source_key', 'source_type',
         'area', 'permission_key',
     ];
@@ -21,16 +21,15 @@ class NavigationMenuItem extends Model
 
     public function displayLabel(): string
     {
-        $label = trim((string) $this->label);
+        if ($this->label_override !== null && trim((string) $this->label_override) !== '') {
+            return (string) $this->label_override;
+        }
 
-        // Preserve the project-wide default for the legacy Plants source while
-        // allowing administrators to explicitly choose a different navigation label.
-        if (($this->route_name === 'site.plants' || trim((string) $this->url, '/') === 'plants')
-            && ($label === '' || strcasecmp($label, 'Plants') === 0)) {
+        if ($this->route_name === 'site.plants' || trim((string) $this->url, '/') === 'plants') {
             return (string) config('fuelfree.projects.label', 'Projects & Our Plans');
         }
 
-        return $label;
+        return (string) $this->label;
     }
 
     public function parent(): BelongsTo
