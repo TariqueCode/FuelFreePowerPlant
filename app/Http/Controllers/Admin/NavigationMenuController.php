@@ -102,7 +102,7 @@ class NavigationMenuController extends Controller
     {
         abort_unless(in_array($item->menu, ['main', 'dashboard'], true), 404);
 
-        return redirect(route('admin.navigation.index', [
+        return redirect(route('admin.menu-builder.index', [
             'menu' => $item->menu,
         ]).'#edit-'.$item->id);
     }
@@ -232,7 +232,7 @@ class NavigationMenuController extends Controller
         app(PublicNavigationService::class)->clear($menu);
 
         return redirect()
-            ->route('admin.navigation.index', ['menu' => $menu])
+            ->route('admin.menu-builder.index', ['menu' => $menu])
             ->with('status', 'Navigation item deleted successfully.');
     }
 
