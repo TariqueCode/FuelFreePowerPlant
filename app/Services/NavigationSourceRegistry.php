@@ -187,6 +187,23 @@ class NavigationSourceRegistry
 
     private function routeLabel(Route $route, string $name): string
     {
+        $friendly = [
+            'home' => 'Home',
+            'management' => 'Profile Builder',
+            'site.plants' => (string) config('fuelfree.projects.label', 'Projects & Our Plans'),
+            'site.future-project' => 'Future Project',
+            'site.solutions' => 'Solutions',
+            'site.gallery' => 'Gallery',
+            'site.career' => 'Career',
+            'news.index' => 'News & Notices',
+            'sustainability' => 'Sustainability',
+            'contact' => 'Contact',
+        ];
+
+        if (array_key_exists($name, $friendly)) {
+            return $friendly[$name];
+        }
+
         $action = (string) ($route->getActionName() ?? '');
         $controller = Str::afterLast($action, '\\');
         $controller = Str::before($controller, '@');
