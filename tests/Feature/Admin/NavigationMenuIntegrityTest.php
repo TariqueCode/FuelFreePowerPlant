@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\CmsPage;
 use App\Models\NavigationMenuItem;
 use App\Models\Permission;
 use App\Models\Role;
@@ -17,33 +18,18 @@ class NavigationMenuIntegrityTest extends TestCase
     public function test_a_live_source_cannot_be_stored_twice_in_the_same_menu(): void
     {
         NavigationMenuItem::create([
-            'menu' => 'main',
-            'parent_id' => null,
-            'label' => 'Home',
-            'url' => '/__navigation-unique',
-            'route_name' => 'navigation.test.unique',
-            'target' => '_self',
-            'is_visible' => true,
-            'sort_order' => 0,
-            'source_key' => 'route:test.navigation.unique',
-            'source_type' => 'route',
-            'area' => 'public',
+            'menu' => 'main', 'parent_id' => null, 'label' => 'Home',
+            'url' => '/__navigation-unique', 'route_name' => 'navigation.test.unique',
+            'target' => '_self', 'is_visible' => true, 'sort_order' => 0,
+            'source_key' => 'route:test.navigation.unique', 'source_type' => 'route', 'area' => 'public',
         ]);
 
         $this->expectException(QueryException::class);
 
         NavigationMenuItem::create([
-            'menu' => 'main',
-            'parent_id' => null,
-            'label' => 'Home again',
-            'url' => '/',
-            'route_name' => 'home',
-            'target' => '_self',
-            'is_visible' => true,
-            'sort_order' => 1,
-            'source_key' => 'route:test.navigation.unique',
-            'source_type' => 'route',
-            'area' => 'public',
+            'menu' => 'main', 'parent_id' => null, 'label' => 'Home again',
+            'url' => '/', 'route_name' => 'home', 'target' => '_self', 'is_visible' => true,
+            'sort_order' => 1, 'source_key' => 'route:test.navigation.unique', 'source_type' => 'route', 'area' => 'public',
         ]);
     }
 
@@ -55,68 +41,56 @@ class NavigationMenuIntegrityTest extends TestCase
         $role->permissions()->sync([$view->id, $manage->id]);
         $user = User::factory()->create();
         $user->roles()->attach($role);
-
         return $user;
     }
 
     public function test_folder_creation_does_not_fail_because_of_source_label_field(): void
     {
         $user = $this->navigationAdmin();
-
         $response = $this->actingAs($user)->post(route('admin.navigation.store'), [
-            'menu' => 'main',
-            'kind' => 'folder',
-            'folder_label' => 'Company',
-            'target' => '_self',
-            'is_visible' => '1',
+            'menu' => 'main', 'kind' => 'folder', 'folder_label' => 'Company',
+            'target' => '_self', 'is_visible' => '1',
         ]);
-
         $response->assertRedirect();
         $this->assertDatabaseHas('navigation_menu_items', [
-            'menu' => 'main',
-            'source_type' => 'folder',
-            'label' => 'Company',
-            'source_key' => null,
+            'menu' => 'main', 'source_type' => 'folder', 'label' => 'Company', 'source_key' => null,
         ]);
     }
 
     public function test_navigation_source_picker_does_not_expose_technical_route_type_suffix(): void
     {
         $user = $this->navigationAdmin();
+        $this->actingAs($user)->get(route('admin.navigation.index', ['menu' => 'main']))
+            ->assertOk()->assertDontSee(' · ROUTE')->assertDontSee(' · CMS_PAGE');
+    }
 
-        $this->actingAs($user)
-            ->get(route('admin.navigation.index', ['menu' => 'main']))
-            ->assertOk()
-            ->assertDontSee(' · ROUTE')
-            ->assertDontSee(' · CMS_PAGE');
+    public function test_navigation_source_picker_hides_generated_placeholder_cms_labels(): void
+    {
+        $user = $this->navigationAdmin();
+        CmsPage::create([
+            'title' => 'Generated:: Fn M Fu Dkj Zz Nk Y L Gz',
+            'slug' => 'generated-placeholder-navigation-test',
+            'content' => '<p>test</p>',
+            'is_published' => true,
+        ]);
+
+        $this->actingAs($user)->get(route('admin.navigation.index', ['menu' => 'main']))
+            ->assertOk()->assertDontSee('Generated:: Fn M Fu Dkj Zz Nk Y L Gz');
     }
 
     public function test_the_same_source_can_exist_in_main_and_dashboard_menus(): void
     {
         foreach (['main', 'dashboard'] as $position => $menu) {
             NavigationMenuItem::create([
-                'menu' => $menu,
-                'parent_id' => null,
-                'label' => 'Home',
-                'url' => '/',
-                'route_name' => 'home',
-                'target' => '_self',
-                'is_visible' => true,
-                'sort_order' => $position,
-                'source_key' => 'route:test.navigation.unique',
-                'source_type' => 'route',
+                'menu' => $menu, 'parent_id' => null, 'label' => 'Home', 'url' => '/', 'route_name' => 'home',
+                'target' => '_self', 'is_visible' => true, 'sort_order' => $position,
+                'source_key' => 'route:test.navigation.unique', 'source_type' => 'route',
                 'area' => $menu === 'dashboard' ? 'dashboard' : 'public',
             ]);
         }
 
-        $this->assertDatabaseHas('navigation_menu_items', [
-            'menu' => 'main',
-            'source_key' => 'route:test.navigation.unique',
-        ]);
-        $this->assertDatabaseHas('navigation_menu_items', [
-            'menu' => 'dashboard',
-            'source_key' => 'route:test.navigation.unique',
-        ]);
+        $this->assertDatabaseHas('navigation_menu_items', ['menu' => 'main', 'source_key' => 'route:test.navigation.unique']);
+        $this->assertDatabaseHas('navigation_menu_items', ['menu' => 'dashboard', 'source_key' => 'route:test.navigation.unique']);
         $this->assertSame(1, NavigationMenuItem::query()->where('menu', 'main')->where('source_key', 'route:test.navigation.unique')->count());
         $this->assertSame(1, NavigationMenuItem::query()->where('menu', 'dashboard')->where('source_key', 'route:test.navigation.unique')->count());
     }
