@@ -61,8 +61,15 @@ class NavigationSourceRegistry
         if (Str::startsWith($key, 'route:')) {
             $name = Str::after($key, 'route:');
             if (isset(self::BUILDER_ROUTE_ALIASES[$name])) {
-                $route = collect(RouteFacade::getRoutes()->getRoutes())->first(fn (Route $route): bool => $route->getName() === $name);
-                if ($route) return $this->routeSource($route, $area);
+                [$canonical, $label] = self::BUILDER_ROUTE_ALIASES[$name];
+                $route = collect(RouteFacade::getRoutes()->getRoutes())
+                    ->first(fn (Route $route): bool => $route->getName() === $canonical);
+                if ($route && $this->eligibleRoute($route, $area)) {
+                    $source = $this->routeSource($route, $area);
+                    $source['label'] = $label;
+                    return $source;
+                }
+                return null;
             }
             $canonical = $this->canonicalCmsPageForRoute($name, $area);
             if ($canonical) return $canonical;
@@ -80,7 +87,7 @@ class NavigationSourceRegistry
             $page = CmsPage::query()->whereKey($id)->where('is_published', true)->first();
             if ($page && $this->isUsableNavigationLabel((string) $page->title)) {
                 return ['key' => $key, 'type' => 'cms_page', 'label' => (string) $page->title,
-                    'url' => route('cms.page', ['slug' => $page->slug]), 'route_name' => 'cms.page', 'area' => 'public', 'permission' => null,
+                    'url' => route('cms.page', ['slug' => $page->slug]), 'route_name' => 'cms.page', 'area' => $area, 'permission' => null,
                     'meta' => ['cms_page_id' => $page->id, 'slug' => $page->slug]];
             }
         }
@@ -137,11 +144,6 @@ class NavigationSourceRegistry
     {
         $name = (string) $route->getName();
         $permission = collect($route->gatherMiddleware())->map(fn ($middleware): string => (string) $middleware)->first(fn (string $middleware): bool => Str::startsWith($middleware, 'permission:'));
-        if (isset(self::BUILDER_ROUTE_ALIASES[$name])) {
-            [$canonical, $label] = self::BUILDER_ROUTE_ALIASES[$name];
-            return ['key' => 'route:'.$canonical, 'type' => 'route', 'label' => $label, 'url' => route($canonical), 'route_name' => $canonical,
-                'area' => $area, 'permission' => $permission ? Str::after($permission, 'permission:') : null, 'meta' => ['legacy_route' => $name]];
-        }
         return ['key' => 'route:'.$name, 'type' => 'route', 'label' => $this->routeLabel($route, $name),
             'url' => $route->uri() === '/' ? '/' : '/'.ltrim($route->uri(), '/'), 'route_name' => $name, 'area' => $area,
             'permission' => $permission ? Str::after($permission, 'permission:') : null, 'meta' => []];
@@ -150,8 +152,7 @@ class NavigationSourceRegistry
     private function routeLabel(Route $route, string $name): string
     {
         $friendly = [
-            'home' => 'Home', 'management' => 'Profile Builder', 'admin.management.index' => 'Profile Builder',
-            'admin.cms.index' => 'Page Builder', 'admin.navigation.index' => 'Menu Builder',
+            'home' => 'Home',
             'site.plants' => (string) config('fuelfree.projects.label', 'Projects & Our Plans'),
             'site.future-project' => 'Future Project', 'site.solutions' => 'Solutions', 'site.gallery' => 'Gallery',
             'site.career' => 'Career', 'news.index' => 'News & Notices', 'sustainability' => 'Sustainability', 'contact' => 'Contact',
