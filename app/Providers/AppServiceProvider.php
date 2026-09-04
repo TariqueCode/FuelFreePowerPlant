@@ -6,7 +6,9 @@ use App\Models\SystemSetting;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\ViewErrorBag;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -53,6 +55,13 @@ class AppServiceProvider extends ServiceProvider
                 'Edit Profile',
                 'Add profile',
             ], $template);
+        });
+
+        // The menu builder can be rendered without Laravel's session error-sharing
+        // middleware on some admin requests. Always provide a safe ViewErrorBag so
+        // its validation summary cannot turn a valid page request into HTTP 500.
+        View::composer('admin.navigation.index', function ($view): void {
+            $view->with('errors', session('errors', new ViewErrorBag()));
         });
 
         if (! Schema::hasTable('system_settings')) {
