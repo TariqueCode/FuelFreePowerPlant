@@ -164,22 +164,38 @@ class NavigationMenuIntegrityTest extends TestCase
             ['Menu Builder', 'admin.menu-builder.index'],
         ] as [$label, $routeName]) {
             $this->assertStringContainsString('href="'.route($routeName).'"', $html, $label.' destination');
-            $this->assertStringContainsString('data-builder-navigation="true"', $html, $label.' builder marker');
+            $this->assertStringNotContainsString('data-builder-navigation="true"', $html, $label.' must use native anchor navigation');
         }
     }
 
-    public function test_static_dashboard_fallback_uses_canonical_builder_destinations(): void
+    public function test_empty_dashboard_menu_gets_a_live_default_navigation_with_canonical_builders(): void
     {
         $user = $this->navigationAdmin();
         $this->actingAs($user);
 
-        $response = $this->get(route('admin.dashboard'))->assertOk();
-        $html = $response->getContent();
+        $html = $this->get(route('admin.dashboard'))->assertOk()->getContent();
 
-        $this->assertStringContainsString('href="/admin/profile-builder" data-builder-navigation="true"', $html);
-        $this->assertStringContainsString('href="/admin/page-builder" data-builder-navigation="true"', $html);
-        $this->assertStringContainsString('href="/admin/menu-builder" data-builder-navigation="true"', $html);
-        $this->assertStringContainsString('Builder destinations must win over drawer/toggle handlers on touch devices.', $html);
+        foreach ([
+            ['Profile Builder', 'admin.profile-builder.index'],
+            ['Page Builder', 'admin.page-builder.index'],
+            ['Menu Builder', 'admin.menu-builder.index'],
+        ] as [$label, $routeName]) {
+            $this->assertStringContainsString($label, $html);
+            $this->assertStringContainsString('href="'.route($routeName).'"', $html, $label.' destination');
+        }
+
+        $this->assertStringNotContainsString('href="/admin/profile-builder" data-builder-navigation="true"', $html);
+        $this->assertStringNotContainsString('href="/admin/page-builder" data-builder-navigation="true"', $html);
+        $this->assertStringNotContainsString('href="/admin/menu-builder" data-builder-navigation="true"', $html);
+    }
+
+    public function test_builder_destination_routes_are_reachable_for_an_authorized_admin(): void
+    {
+        $user = $this->navigationAdmin();
+
+        $this->actingAs($user)->get(route('admin.profile-builder.index'))->assertOk();
+        $this->actingAs($user)->get(route('admin.page-builder.index'))->assertOk();
+        $this->actingAs($user)->get(route('admin.menu-builder.index'))->assertOk();
     }
 
     public function test_the_same_source_can_exist_in_main_and_dashboard_menus(): void
