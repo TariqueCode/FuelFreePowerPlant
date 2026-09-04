@@ -21,18 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
         then: function (): void {
             Route::middleware(['auth', 'permission:website.view'])
-                ->prefix('admin/profile-builder')
-                ->name('admin.profile-builder.')
+                ->prefix('admin/profile-builder')->name('admin.profile-builder.')
                 ->group(function (): void {
                     Route::get('/', [ManagementController::class, 'index'])->name('index');
                     Route::get('/create', [ManagementController::class, 'create'])->name('create');
                     Route::get('/{member}/edit', [ManagementController::class, 'edit'])->name('edit');
-                });
-
-            Route::middleware(['auth', 'permission:website.manage'])
-                ->prefix('admin/profile-builder')
-                ->name('admin.profile-builder.')
-                ->group(function (): void {
                     Route::post('/', [ManagementController::class, 'store'])->name('store');
                     Route::patch('/{member}', [ManagementController::class, 'update'])->name('update');
                     Route::patch('/{member}/toggle', [ManagementController::class, 'toggle'])->name('toggle');
@@ -41,18 +34,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 });
 
             Route::middleware(['auth', 'permission:cms.view'])
-                ->prefix('admin/page-builder')
-                ->name('admin.page-builder.')
+                ->prefix('admin/page-builder')->name('admin.page-builder.')
                 ->group(function (): void {
                     Route::get('/', [CmsController::class, 'index'])->name('index');
                     Route::get('/create', [CmsController::class, 'create'])->name('create');
                     Route::get('/{page}/edit', [CmsController::class, 'edit'])->name('edit');
-                });
-
-            Route::middleware(['auth', 'permission:cms.manage'])
-                ->prefix('admin/page-builder')
-                ->name('admin.page-builder.')
-                ->group(function (): void {
                     Route::post('/', [CmsController::class, 'store'])->name('store');
                     Route::patch('/{page}', [CmsController::class, 'update'])->name('update');
                     Route::delete('/{page}', [CmsController::class, 'destroy'])->name('destroy');
@@ -60,27 +46,24 @@ return Application::configure(basePath: dirname(__DIR__))
                 });
 
             Route::middleware(['auth', 'permission:cms.publish'])
-                ->prefix('admin/page-builder')
-                ->name('admin.page-builder.')
+                ->prefix('admin/page-builder')->name('admin.page-builder.')
                 ->group(function (): void {
                     Route::patch('/{page}/toggle', [CmsController::class, 'togglePublication'])->name('toggle');
                 });
 
             Route::middleware(['auth', 'permission:website.view'])
-                ->prefix('admin/menu-builder')
-                ->name('admin.menu-builder.')
+                ->prefix('admin/menu-builder')->name('admin.menu-builder.')
                 ->group(function (): void {
                     Route::get('/', [NavigationMenuController::class, 'index'])->name('index');
                     Route::get('/{item}', [NavigationMenuController::class, 'show'])->name('show');
                 });
 
             Route::middleware(['auth', 'permission:navigation.manage'])
-                ->prefix('admin/menu-builder')
-                ->name('admin.menu-builder.')
+                ->prefix('admin/menu-builder')->name('admin.menu-builder.')
                 ->group(function (): void {
                     Route::post('/', [NavigationMenuController::class, 'store'])->name('store');
                     Route::patch('/{item}', [NavigationMenuController::class, 'update'])->name('update');
-                    Route::post('/{item}/delete', [NavigationMenuController::class, 'destroy'])->name('destroy');
+                    Route::delete('/{item}', [NavigationMenuController::class, 'destroy'])->name('destroy');
                     Route::post('/reorder', [NavigationMenuController::class, 'reorder'])->name('reorder');
                 });
         },
