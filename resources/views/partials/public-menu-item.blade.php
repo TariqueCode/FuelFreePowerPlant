@@ -1,8 +1,13 @@
 @php
     $children = $menuItem->children ?? collect();
-    $menuUrl = $menuItem->route_name && \Illuminate\Support\Facades\Route::has($menuItem->route_name)
-        ? route($menuItem->route_name)
-        : ($menuItem->url ?: '#');
+    // Prefer the resolved live URL. This is essential for parameterized routes
+    // such as company.page, where route($routeName) alone cannot generate a URL
+    // without the required slug parameter.
+    $menuUrl = filled($menuItem->url)
+        ? $menuItem->url
+        : ($menuItem->route_name && \Illuminate\Support\Facades\Route::has($menuItem->route_name)
+            ? route($menuItem->route_name)
+            : '#');
 @endphp
 @if($children->isNotEmpty())
 <div class="public-menu-dropdown" data-menu-id="{{ $menuItem->id }}">
