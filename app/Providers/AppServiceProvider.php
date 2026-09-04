@@ -17,8 +17,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Keep the three global builders visually and semantically consistent even
-        // in older Blade views that still reference their legacy route names.
+        // Legacy builder route names are still rewritten for older Blade/database
+        // references, but the legacy URL endpoints themselves are no longer usable.
         Blade::precompiler(function (string $template): string {
             $routeMap = [
                 "admin.management." => "admin.profile-builder.",
@@ -53,6 +53,23 @@ class AppServiceProvider extends ServiceProvider
                 'Edit Profile',
                 'Add profile',
             ], $template);
+        });
+
+        // The three old builder URL namespaces are intentionally retired. Keep
+        // this guard during the migration window so direct/legacy requests fail
+        // cleanly instead of reaching the shared builder controllers.
+        $this->app['router']->matched(function ($route): void {
+            if (in_array($route->getName(), [
+                'admin.navigation.index', 'admin.navigation.store', 'admin.navigation.reorder',
+                'admin.navigation.show', 'admin.navigation.update', 'admin.navigation.destroy',
+                'admin.management.index', 'admin.management.store', 'admin.management.create',
+                'admin.management.reorder', 'admin.management.update', 'admin.management.destroy',
+                'admin.management.edit', 'admin.management.toggle',
+                'admin.cms.index', 'admin.cms.store', 'admin.cms.create', 'admin.cms.update',
+                'admin.cms.destroy', 'admin.cms.duplicate', 'admin.cms.edit', 'admin.cms.toggle',
+            ], true)) {
+                abort(404);
+            }
         });
 
         if (! Schema::hasTable('system_settings')) {
