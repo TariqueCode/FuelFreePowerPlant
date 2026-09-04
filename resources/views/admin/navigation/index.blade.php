@@ -11,8 +11,8 @@
 @if($errors->any())<div class="notice error-notice">{{ $errors->first() }}</div>@endif
 
 <div class="mode-tabs" role="tablist" aria-label="Navigation area">
-    <a class="{{ $area === 'public' ? 'active' : '' }}" href="{{ route('admin.navigation.index', ['menu' => 'main']) }}"><i class="fa-solid fa-globe"></i><span>Website</span></a>
-    <a class="{{ $area === 'dashboard' ? 'active' : '' }}" href="{{ route('admin.navigation.index', ['menu' => 'dashboard']) }}"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+    <a class="{{ $area === 'public' ? 'active' : '' }}" href="{{ route('admin.menu-builder.index', ['menu' => 'main']) }}"><i class="fa-solid fa-globe"></i><span>Website</span></a>
+    <a class="{{ $area === 'dashboard' ? 'active' : '' }}" href="{{ route('admin.menu-builder.index', ['menu' => 'dashboard']) }}"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
 </div>
 
 <div class="mode-explain"><i class="fa-solid {{ $area === 'public' ? 'fa-globe' : 'fa-gauge-high' }}"></i><div><strong>{{ $area === 'public' ? 'Website navigation' : 'Dashboard navigation' }}</strong><span>{{ $area === 'public' ? 'Controls the menu visitors see on the public website.' : 'Controls navigation inside the admin dashboard; it does not change the public website menu.' }}</span></div></div>
@@ -44,7 +44,7 @@
             <button type="button" class="add-mode-btn" data-mode="folder">Folder</button>
         </div>
 
-        <form method="POST" action="{{ route('admin.navigation.store') }}" class="builder-form" id="add-form">
+        <form method="POST" action="{{ route('admin.menu-builder.store') }}" class="builder-form" id="add-form">
             @csrf
             <input type="hidden" name="menu" value="{{ $menu }}">
             <input type="hidden" name="kind" id="kind" value="source">
@@ -81,7 +81,6 @@
                 </select>
             </label>
 
-            
             <input type="hidden" name="target" value="_self">
             <input type="hidden" name="icon" value="">
             <label class="check"><input type="checkbox" name="is_visible" value="1" checked> Show in menu</label>
@@ -100,7 +99,7 @@
                     <i class="fa-solid fa-chevron-down"></i>
                 </summary>
                 <div class="edit-content">
-                    <form method="POST" action="{{ route('admin.navigation.update',$item) }}" class="edit-box">
+                    <form method="POST" action="{{ route('admin.menu-builder.update',$item) }}" class="edit-box">
                         @csrf @method('PATCH')
                         @if($item->source_type === 'folder')
                             <label>Folder name<input name="label" value="{{ $item->label }}" required maxlength="160"></label>
@@ -123,8 +122,9 @@
                         <label class="check"><input type="checkbox" name="is_visible" value="1" @checked($item->is_visible)> Show in menu</label>
                         <button class="primary" type="submit">Save changes</button>
                     </form>
-                    <form method="POST" action="{{ route('admin.navigation.destroy',$item) }}" onsubmit="return confirm('Delete this navigation item? Children will move to its parent.');">
+                    <form method="POST" action="{{ route('admin.menu-builder.destroy',$item) }}" onsubmit="return confirm('Delete this navigation item? Children will move to its parent.');">
                         @csrf
+                        @method('DELETE')
                         <button type="submit" class="danger">Delete item</button>
                     </form>
                 </div>
@@ -149,7 +149,7 @@
     const folderFields = document.getElementById('folder-fields');
     const sourceSelect = document.getElementById('source-select');
     const sourceKey = document.getElementById('source-key');
-        const preview = document.getElementById('source-preview');
+    const preview = document.getElementById('source-preview');
     const addButton = document.getElementById('add-button');
     const folderLabel = document.getElementById('folder-label');
 
@@ -168,7 +168,7 @@
     sourceSelect?.addEventListener('change', () => {
         const option = sourceSelect.selectedOptions[0];
         sourceKey.value = option?.value || '';
-                preview.replaceChildren();
+        preview.replaceChildren();
         if (option?.value) {
             const strong = document.createElement('strong');
             strong.textContent = option.dataset.label || '';
@@ -195,7 +195,7 @@
         const parentRow = container.closest('.menu-row[data-id]');
         state.textContent = 'Saving…';
         try {
-            const response = await fetch('{{ route('admin.navigation.reorder') }}', {
+            const response = await fetch('{{ route('admin.menu-builder.reorder') }}', {
                 method: 'POST',
                 headers: {'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json'},
                 body: JSON.stringify({menu:'{{ $menu }}', ids, parent_id: parentRow ? Number(parentRow.dataset.id) : null})
@@ -268,97 +268,84 @@
             return;
         }
 
-        if (ratio <= 0.5) targetContainer.insertBefore(row, target);
-        else targetContainer.insertBefore(row, target.nextSibling);
+        const siblings = [...targetContainer.children].filter(el => el.matches('.menu-row[data-id]'));
+        const targetIndex = siblings.indexOf(target);
+        const rect = target.getBoundingClientRect();
+        const before = event.clientY < rect.top + rect.height / 2;
+        targetContainer.insertBefore(row, before ? target : target.nextElementSibling);
         await persistContainers([sourceContainer, targetContainer]);
     };
 
-    tree.querySelectorAll('.drag').forEach(handle => {
-        handle.addEventListener('pointerdown', event => {
-            if (event.pointerType !== 'touch') return;
-            const row = handle.closest('.menu-row[data-id]');
-            if (!row) return;
-
-            pointerDrag = {
-                row,
-                sourceContainer: row.parentElement,
-                startX: event.clientX,
-                startY: event.clientY,
-                pointerId: event.pointerId,
-                activated: false,
-                timer: window.setTimeout(() => {
-                    if (!pointerDrag || pointerDrag.row !== row) return;
-                    pointerDrag.activated = true;
-                    row.classList.add('dragging');
-                }, event.pointerType === 'touch' ? 180 : 0)
-            };
-            handle.setPointerCapture?.(event.pointerId);
-        });
-
-        handle.addEventListener('pointermove', event => {
-            if (!pointerDrag || pointerDrag.pointerId !== event.pointerId) return;
-            if (!pointerDrag.activated) {
-                const distance = Math.hypot(event.clientX - pointerDrag.startX, event.clientY - pointerDrag.startY);
-                if (distance > 8) {
-                    window.clearTimeout(pointerDrag.timer);
-                    pointerDrag.activated = true;
-                    pointerDrag.row.classList.add('dragging');
-                } else {
-                    return;
-                }
-            }
-            event.preventDefault();
-            const target = document.elementFromPoint(event.clientX, event.clientY)?.closest?.('.menu-row[data-id]');
-            tree.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
-            if (target && target !== pointerDrag.row && !pointerDrag.row.contains(target)) target.classList.add('drop-target');
-        });
-
-        const cancelPointerDrag = event => {
-            if (!pointerDrag || pointerDrag.pointerId !== event.pointerId) return;
-            window.clearTimeout(pointerDrag.timer);
-            pointerDrag.row.classList.remove('dragging');
-            tree.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
-            pointerDrag = null;
-        };
-
-        handle.addEventListener('pointerup', finishPointerDrag);
-        handle.addEventListener('pointercancel', cancelPointerDrag);
+    tree.addEventListener('pointerdown', (event) => {
+        const handle = event.target.closest('.drag');
+        if (!handle) return;
+        const row = handle.closest('.menu-row[data-id]');
+        if (!row) return;
+        pointerDrag = {row, sourceContainer: row.parentElement, activated: false, timer: window.setTimeout(() => { pointerDrag.activated = true; row.classList.add('dragging'); }, 140)};
     });
+    tree.addEventListener('pointermove', (event) => {
+        if (pointerDrag && !pointerDrag.activated) {
+            const dx = event.clientX - event.clientX;
+            if (Math.abs(dx) > 4) pointerDrag.activated = true;
+        }
+    });
+    tree.addEventListener('pointerup', finishPointerDrag);
+    tree.addEventListener('pointercancel', finishPointerDrag);
 
-    tree.querySelectorAll('.menu-row[data-id]').forEach(row => {
-        row.setAttribute('draggable', 'true');
-        row.addEventListener('dragstart', () => { dragged = row; row.classList.add('dragging'); });
-        row.addEventListener('dragover', event => {
-            if (!dragged || dragged === row || dragged.contains(row)) return;
-            event.preventDefault();
-            row.classList.add('drop-target');
-        });
-        row.addEventListener('dragleave', () => row.classList.remove('drop-target'));
-        row.addEventListener('drop', async event => {
-            event.preventDefault();
-            row.classList.remove('drop-target');
-            if (!dragged || dragged === row || dragged.contains(row)) return;
+    tree.addEventListener('dragstart', (event) => {
+        const row = event.target.closest('.menu-row[data-id]');
+        if (!row) return;
+        dragged = {row, sourceContainer: row.parentElement};
+        row.classList.add('dragging');
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', row.dataset.id);
+    });
+    tree.addEventListener('dragover', (event) => {
+        const target = event.target.closest('.menu-row[data-id]');
+        if (!dragged || !target || target === dragged.row || dragged.row.contains(target)) return;
+        event.preventDefault();
+        tree.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
+        target.classList.add('drop-target');
+    });
+    tree.addEventListener('dragleave', (event) => {
+        const target = event.target.closest('.menu-row[data-id]');
+        if (target) target.classList.remove('drop-target');
+    });
+    tree.addEventListener('drop', async (event) => {
+        event.preventDefault();
+        if (!dragged) return;
+        const target = event.target.closest('.menu-row[data-id]');
+        if (!target || target === dragged.row || dragged.row.contains(target)) return;
+        const sourceContainer = dragged.sourceContainer;
+        const targetRect = target.getBoundingClientRect();
+        const ratio = (event.clientY - targetRect.top) / Math.max(targetRect.height, 1);
+        const targetContainer = target.parentElement;
+        dragged.row.classList.remove('dragging');
+        tree.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
 
-            const intoFolder = row.dataset.kind === 'folder' && event.altKey;
-            let container = row.parentElement;
-            if (intoFolder) {
-                let children = row.querySelector(':scope > .children');
-                if (!children) { children = document.createElement('div'); children.className = 'children'; row.appendChild(children); }
-                children.appendChild(dragged);
-                container = children;
-            } else {
-                container.insertBefore(dragged, row);
+        if (event.altKey && target.dataset.kind === 'folder') {
+            let children = target.querySelector(':scope > .children');
+            if (!children) {
+                children = document.createElement('div');
+                children.className = 'children';
+                target.appendChild(children);
             }
-            await persist(container);
-        });
-        row.addEventListener('dragend', () => {
-            row.classList.remove('dragging');
-            tree.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
-            dragged = null;
-        });
+            children.appendChild(dragged.row);
+            await persistContainers([sourceContainer, children]);
+        } else {
+            const siblings = [...targetContainer.children].filter(el => el.matches('.menu-row[data-id]'));
+            const before = event.clientY < targetRect.top + targetRect.height / 2;
+            targetContainer.insertBefore(dragged.row, before ? target : target.nextElementSibling);
+            await persistContainers([sourceContainer, targetContainer]);
+        }
+        dragged = null;
+    });
+    tree.addEventListener('dragend', () => {
+        if (!dragged) return;
+        dragged.row.classList.remove('dragging');
+        tree.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
+        dragged = null;
     });
 })();
 </script>
-<style>/* navigation builder responsive hardening */
-.builder-card{min-width:0}.builder-grid>*{min-width:0}.card-head{position:sticky;top:0;z-index:998;padding-top:4px;background:rgba(3,16,25,.94);backdrop-filter:blur(12px)}.edit-grid{min-width:0}.edit-details{min-width:0}.edit-content{min-width:0}.edit-box>*{min-width:0}.menu-tree{min-width:0;overflow-x:auto}.menu-row{min-width:0}.drag{touch-action:none;-webkit-user-select:none;user-select:none}.menu-main{min-width:0;overflow:hidden}.menu-main strong{overflow-wrap:anywhere}.item-actions{flex-wrap:wrap}.item-actions button,.item-actions a{min-height:30px}@media(max-width:620px){.builder-grid{grid-template-columns:1fr}.card-head{top:0}.builder-card{padding:12px}.menu-row{grid-template-columns:22px 24px minmax(0,1fr);padding:7px 3px}.menu-row>.children{grid-column:3/-1}.menu-main small{white-space:normal;overflow-wrap:anywhere}.item-actions{grid-column:3;justify-content:flex-start;padding-top:4px}.item-actions button,.item-actions a{flex:1;min-width:52px;text-align:center}.quick-guide>div{min-width:0}.quick-guide span{overflow-wrap:anywhere}.mode-explain{min-width:0}.mode-explain div{min-width:0}.mode-tabs a{min-width:0}.mode-tabs span{white-space:nowrap}}</style>
 @endpush
