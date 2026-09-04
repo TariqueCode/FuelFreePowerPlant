@@ -11,13 +11,13 @@
 @media(max-width:700px){.rename-btn{padding:5px 7px}.inline-label-edit{margin-top:7px}.inline-label-edit input[name="label"]{flex-basis:100%}}
 </style>
 @endif
-<div class="menu-row" draggable="true" data-id="{{ $item->id }}" data-kind="{{ $item->source_type }}">
+<div class="menu-row" draggable="false" data-id="{{ $item->id }}" data-kind="{{ $item->source_type }}">
     @if($item->children->isNotEmpty())
         <button type="button" class="tree-toggle" aria-expanded="true" aria-label="Collapse {{ $item->displayLabel() }}">⌄</button>
     @else
         <span class="tree-toggle-spacer" aria-hidden="true"></span>
     @endif
-    <span class="drag" title="Drag to reorder" aria-label="Drag to reorder" role="button">☷</span>
+    <span class="drag" title="Drag to reorder" aria-label="Drag to reorder" role="button" tabindex="0">☷</span>
     <div class="menu-main">
         <strong>{{ $item->displayLabel() }}</strong>
         <em>{{ $item->source_type === 'folder' ? 'Folder' : 'Live source' }}</em>
