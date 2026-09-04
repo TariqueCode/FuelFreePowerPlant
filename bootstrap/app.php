@@ -55,7 +55,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('admin/menu-builder')->name('admin.menu-builder.')
                 ->group(function (): void {
                     Route::get('/', [NavigationMenuController::class, 'index'])->name('index');
-                    Route::get('/{item}', [NavigationMenuController::class, 'show'])->name('show');
+                    // Keep the item endpoint read-only while accepting legacy POST navigations
+                    // that can still exist in cached/older admin markup during deployment.
+                    Route::match(['get', 'post'], '/{item}', [NavigationMenuController::class, 'show'])->name('show');
                 });
 
             Route::middleware(['auth', 'permission:navigation.manage'])
