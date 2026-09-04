@@ -27,11 +27,13 @@ class NavigationMenuItem extends Model
             }
 
             $requestedLabel = trim((string) request()->input('label', ''));
-            if ($requestedLabel !== '' && $requestedLabel !== trim((string) $item->label)) {
-                $item->label_override = $requestedLabel;
-            } elseif ($requestedLabel !== '' && $item->label_override !== null && $requestedLabel === trim((string) $item->label_override)) {
-                $item->label_override = $requestedLabel;
+            if ($requestedLabel === '') {
+                return;
             }
+
+            $item->label_override = $requestedLabel === trim((string) $item->label)
+                ? null
+                : $requestedLabel;
         });
     }
 
