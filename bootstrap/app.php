@@ -20,7 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function (): void {
-            Route::middleware(['auth', 'permission:website.view'])
+            Route::middleware(['web', 'auth', 'permission:website.view'])
                 ->prefix('admin/profile-builder')->name('admin.profile-builder.')
                 ->group(function (): void {
                     Route::get('/', [ManagementController::class, 'index'])->name('index');
@@ -33,7 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     Route::post('/reorder', [ManagementController::class, 'reorder'])->name('reorder');
                 });
 
-            Route::middleware(['auth', 'permission:cms.view'])
+            Route::middleware(['web', 'auth', 'permission:cms.view'])
                 ->prefix('admin/page-builder')->name('admin.page-builder.')
                 ->group(function (): void {
                     Route::get('/', [CmsController::class, 'index'])->name('index');
@@ -45,20 +45,20 @@ return Application::configure(basePath: dirname(__DIR__))
                     Route::post('/{page}/duplicate', [CmsController::class, 'duplicate'])->name('duplicate');
                 });
 
-            Route::middleware(['auth', 'permission:cms.publish'])
+            Route::middleware(['web', 'auth', 'permission:cms.publish'])
                 ->prefix('admin/page-builder')->name('admin.page-builder.')
                 ->group(function (): void {
                     Route::patch('/{page}/toggle', [CmsController::class, 'togglePublication'])->name('toggle');
                 });
 
-            Route::middleware(['auth', 'permission:website.view'])
+            Route::middleware(['web', 'auth', 'permission:website.view'])
                 ->prefix('admin/menu-builder')->name('admin.menu-builder.')
                 ->group(function (): void {
                     Route::get('/', [NavigationMenuController::class, 'index'])->name('index');
                     Route::get('/{item}', [NavigationMenuController::class, 'show'])->name('show');
                 });
 
-            Route::middleware(['auth', 'permission:navigation.manage'])
+            Route::middleware(['web', 'auth', 'permission:navigation.manage'])
                 ->prefix('admin/menu-builder')->name('admin.menu-builder.')
                 ->group(function (): void {
                     Route::post('/', [NavigationMenuController::class, 'store'])->name('store');
