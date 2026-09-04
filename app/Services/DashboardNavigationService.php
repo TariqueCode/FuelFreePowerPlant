@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\Route;
 
 class DashboardNavigationService
 {
+    private const BUILDER_ALIASES = [
+        'admin.management.index' => 'admin.profile-builder.index',
+        'admin.cms.index' => 'admin.page-builder.index',
+        'admin.navigation.index' => 'admin.menu-builder.index',
+    ];
+
     public function tree(string $menu = 'dashboard'): Collection
     {
         $items = NavigationMenuItem::query()
@@ -23,9 +29,14 @@ class DashboardNavigationService
                 return true;
             }
 
-            $routeName = (string) ($item->route_name ?: '');
+            $routeName = $this->canonicalRouteName((string) ($item->route_name ?: ''));
             if ($routeName === '' || ! Route::has($routeName)) {
                 return false;
+            }
+
+            if ($routeName !== $item->route_name) {
+                $item->route_name = $routeName;
+                $item->source_key = 'route:' . $routeName;
             }
 
             $permission = $item->permission_key;
@@ -63,19 +74,22 @@ class DashboardNavigationService
         return $build();
     }
 
+    private function canonicalRouteName(string $routeName): string
+    {
+        return self::BUILDER_ALIASES[$routeName] ?? $routeName;
+    }
+
     private function restoreDefaultCapabilities(Collection $items): Collection
     {
         $nextId = -1000;
         $nextSort = max(100, (int) $items->max('sort_order') + 1);
 
-        $folders = [
+        foreach ([
             ['Website', 10],
             ['Operations', 20],
             ['Users & Access', 30],
             ['Communications', 40],
-        ];
-
-        foreach ($folders as [$label, $sort]) {
+        ] as [$label, $sort]) {
             $folder = $items->first(fn (NavigationMenuItem $item): bool =>
                 $item->source_type === 'folder' && strcasecmp(trim((string) $item->label), $label) === 0
             );
@@ -116,9 +130,10 @@ class DashboardNavigationService
             if ($permission && auth()->user() && !auth()->user()->hasPermission($permission)) {
                 continue;
             }
-            if ($items->contains(fn (NavigationMenuItem $item): bool => $item->route_name === $routeName)) {
-                continue;
-            }
+
+            $existing = $items->first(function (NavigationMenuItem $item) use ($routeName): bool {
+                return $this->canonicalRouteName((string) $item->route_name) === $routeName;
+            });
 
             $parentId = null;
             if ($folderLabel !== null) {
@@ -126,6 +141,19 @@ class DashboardNavigationService
                     $item->source_type === 'folder' && strcasecmp(trim((string) $item->label), $folderLabel) === 0
                 );
                 $parentId = $parent?->id;
+            }
+
+            if ($existing) {
+                // Built-in capabilities always live in their professional group.
+                // This also repairs an item that was previously saved at root level.
+                $existing->route_name = $routeName;
+                $existing->source_key = 'route:' . $routeName;
+                if ($folderLabel !== null) {
+                    $existing->parent_id = $parentId;
+                } else {
+                    $existing->parent_id = null;
+                }
+                continue;
             }
 
             $item = new NavigationMenuItem();
