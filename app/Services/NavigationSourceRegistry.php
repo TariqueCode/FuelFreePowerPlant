@@ -60,6 +60,30 @@ class NavigationSourceRegistry
         if (! in_array($area, ['public', 'dashboard'], true)) return null;
         if (Str::startsWith($key, 'route:')) {
             $name = Str::after($key, 'route:');
+
+            // Builder links may already have been persisted with their canonical
+            // route key. Treat them as first-class live sources so an existing
+            // dashboard menu never turns into a dead link after a rename.
+            $canonicalAlias = collect(self::BUILDER_ROUTE_ALIASES)
+                ->first(fn (array $alias): bool => $alias[0] === $name);
+            if ($canonicalAlias) {
+                [$canonical, $label] = $canonicalAlias;
+                $route = collect(RouteFacade::getRoutes()->getRoutes())
+                    ->first(fn (Route $route): bool => $route->getName() === $canonical);
+                if ($route) {
+                    $permission = collect($route->gatherMiddleware())
+                        ->map(fn ($middleware): string => (string) $middleware)
+                        ->first(fn (string $middleware): bool => Str::startsWith($middleware, 'permission:'));
+                    $permission = $permission ? Str::after($permission, 'permission:') : null;
+                    if ($permission !== null && (! auth()->check() || ! auth()->user()->hasPermission($permission))) return null;
+                    return [
+                        'key' => 'route:'.$canonical, 'type' => 'route', 'label' => $label,
+                        'url' => route($canonical), 'route_name' => $canonical, 'area' => $area,
+                        'permission' => $permission, 'meta' => ['canonical_builder' => true],
+                    ];
+                }
+            }
+
             if (isset(self::BUILDER_ROUTE_ALIASES[$name])) {
                 $route = collect(RouteFacade::getRoutes()->getRoutes())->first(fn (Route $route): bool => $route->getName() === $name);
                 if ($route) return $this->routeSource($route, $area);
