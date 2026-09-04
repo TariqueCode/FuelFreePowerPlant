@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\SystemSetting;
+use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
@@ -58,8 +59,10 @@ class AppServiceProvider extends ServiceProvider
         // The three old builder URL namespaces are intentionally retired. Keep
         // this guard during the migration window so direct/legacy requests fail
         // cleanly instead of reaching the shared builder controllers.
-        $this->app['router']->matched(function ($route): void {
-            if (in_array($route->getName(), [
+        $this->app['router']->matched(function (RouteMatched $event): void {
+            $routeName = $event->route->getName();
+
+            if (in_array($routeName, [
                 'admin.navigation.index', 'admin.navigation.store', 'admin.navigation.reorder',
                 'admin.navigation.show', 'admin.navigation.update', 'admin.navigation.destroy',
                 'admin.management.index', 'admin.management.store', 'admin.management.create',
