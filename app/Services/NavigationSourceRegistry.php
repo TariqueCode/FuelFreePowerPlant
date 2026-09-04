@@ -14,8 +14,7 @@ class NavigationSourceRegistry
     private const EXCLUDED_ROUTE_NAMES = [
         'favicon', 'login', 'login.store', 'logout', 'profile', 'profile.update',
         'career.store', 'career.chunks', 'contact.store', 'cms.page', 'gallery.show',
-        'news.show', 'projects.show',
-        'documents.shared-download', 'webmail.redirect',
+        'news.show', 'projects.show', 'documents.shared-download', 'webmail.redirect',
         'resources.index', 'resources.show', 'resources.download',
     ];
 
@@ -29,9 +28,9 @@ class NavigationSourceRegistry
     {
         abort_unless(in_array($menu, ['main', 'dashboard'], true), 404);
         $used = $this->usedSourceKeys($menu);
-
         $routes = collect(RouteFacade::getRoutes()->getRoutes())
             ->filter(fn (Route $route): bool => $this->eligibleRoute($route, $area))
+            ->reject(fn (Route $route): bool => isset(self::BUILDER_ROUTE_ALIASES[$route->getName()]))
             ->reject(fn (Route $route): bool => $this->hasCanonicalCmsPage($route, $area))
             ->map(fn (Route $route): array => $this->routeSource($route, $area))
             ->filter(fn (array $source): bool => $source['permission'] === null || ! auth()->check() || auth()->user()->hasPermission($source['permission']));
@@ -40,8 +39,8 @@ class NavigationSourceRegistry
             ? CmsPage::query()->where('is_published', true)->orderBy('title')->get(['id', 'title', 'slug'])
                 ->map(fn (CmsPage $page): array => [
                     'key' => 'cms_page:'.$page->id, 'type' => 'cms_page', 'label' => (string) $page->title,
-                    'url' => route('cms.page', ['slug' => $page->slug]), 'route_name' => 'cms.page',
-                    'area' => 'public', 'permission' => null, 'meta' => ['cms_page_id' => $page->id, 'slug' => $page->slug],
+                    'url' => route('cms.page', ['slug' => $page->slug]), 'route_name' => 'cms.page', 'area' => 'public', 'permission' => null,
+                    'meta' => ['cms_page_id' => $page->id, 'slug' => $page->slug],
                 ])
             : collect();
 
@@ -61,6 +60,10 @@ class NavigationSourceRegistry
         if (! in_array($area, ['public', 'dashboard'], true)) return null;
         if (Str::startsWith($key, 'route:')) {
             $name = Str::after($key, 'route:');
+            if (isset(self::BUILDER_ROUTE_ALIASES[$name])) {
+                $route = collect(RouteFacade::getRoutes()->getRoutes())->first(fn (Route $route): bool => $route->getName() === $name);
+                if ($route) return $this->routeSource($route, $area);
+            }
             $canonical = $this->canonicalCmsPageForRoute($name, $area);
             if ($canonical) return $canonical;
             $route = collect(RouteFacade::getRoutes()->getRoutes())->first(fn (Route $route): bool => $route->getName() === $name);
@@ -127,7 +130,7 @@ class NavigationSourceRegistry
 
     private function isNavigationBuilderRoute(string $name): bool
     {
-        return Str::startsWith($name, ['admin.navigation.', 'admin.menu-builder.', 'admin.management.', 'admin.profile-builder.', 'admin.cms.', 'admin.page-builder.']);
+        return Str::startsWith($name, ['admin.navigation.', 'admin.menu-builder.', 'admin.profile-builder.', 'admin.page-builder.']);
     }
 
     private function routeSource(Route $route, string $area): array
