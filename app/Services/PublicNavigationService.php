@@ -39,7 +39,7 @@ class PublicNavigationService
             // registry. They are still constrained by the same trusted URL format at
             // creation/update time in NavigationMenuController.
             if ($item->source_type === 'external_link') {
-                return trim((string) $item->url) !== '' && preg_match('/^(?:https?:\/\/|\/[^\/]|#)/i', (string) $item->url) === 1;
+                return trim((string) $item->url) !== '' && preg_match('#^(?:https?://|/(?!/)|#)#i', (string) $item->url) === 1;
             }
 
             $sourceKey = $item->source_key ?: ($item->route_name ? 'route:'.$item->route_name : null);
