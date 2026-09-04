@@ -76,11 +76,11 @@ class PortalCapabilityNavigationTest extends TestCase
 
         $this->actingAs($user);
         $tree = $this->app->make(DashboardNavigationService::class)->tree();
-        $labels = $tree->flatMap(function ($item) {
-            return $item->source_type === 'folder'
-                ? collect([$item->label])->merge($item->children->pluck('label'))
-                : collect([$item->label]);
-        })->values()->all();
+        $topLevel = $tree->pluck('label')->values()->all();
+        $nested = $tree->filter(fn ($item) => $item->source_type === 'folder')
+            ->flatMap(fn ($item) => $item->children->pluck('label'))
+            ->values()->all();
+        $labels = collect($topLevel)->merge($nested)->values()->all();
 
         foreach (['Dashboard', 'Website', 'Homepage', 'Slider', 'Highlight Banner', 'Profile Builder', 'News & Notices', 'Gallery', 'Page Builder', 'Social Media', 'Menu Builder', 'Documents & Media', 'Operations', 'Projects & Our Plans', 'Users & Access', 'Users', 'Audit Log', 'System Health', 'Communications', 'Help Desk', 'Mail', 'Career Applications', 'Website Inquiries', 'Settings'] as $label) {
             $this->assertContains($label, $labels, "Missing dashboard navigation item: {$label}");
