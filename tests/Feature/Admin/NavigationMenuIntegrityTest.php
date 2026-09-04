@@ -134,7 +134,7 @@ class NavigationMenuIntegrityTest extends TestCase
         ]);
 
         $tree = app(DashboardNavigationService::class)->tree();
-        $this->assertCount(1, $tree);
+        $this->assertCount(3, $tree);
         $this->assertSame(route('admin.profile-builder.index'), $tree->first()->url);
     }
 
