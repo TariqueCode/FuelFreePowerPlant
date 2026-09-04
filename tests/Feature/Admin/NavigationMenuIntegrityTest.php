@@ -29,8 +29,8 @@ class NavigationMenuIntegrityTest extends TestCase
 
         NavigationMenuItem::create([
             'menu' => 'main', 'parent_id' => null, 'label' => 'Home again',
-            'url' => '/', 'route_name' => 'home', 'target' => '_self', 'is_visible' => true,
-            'sort_order' => 1, 'source_key' => 'route:test.navigation.unique', 'source_type' => 'route', 'area' => 'public',
+            'url' => '/', 'route_name' => 'home', 'target' => '_self', 'is_visible' => true, 'sort_order' => 1,
+            'source_key' => 'route:test.navigation.unique', 'source_type' => 'route', 'area' => 'public',
         ]);
     }
 
@@ -148,6 +148,36 @@ class NavigationMenuIntegrityTest extends TestCase
         $tree = app(DashboardNavigationService::class)->tree();
         $this->assertCount(1, $tree);
         $this->assertSame(route('admin.profile-builder.index'), $tree->first()->url);
+    }
+
+    public function test_dashboard_builder_links_render_as_real_clickable_anchors(): void
+    {
+        $user = $this->navigationAdmin();
+        $this->actingAs($user);
+
+        foreach ([
+            ['Profile Builder', 'admin.profile-builder.index'],
+            ['Page Builder', 'admin.page-builder.index'],
+            ['Menu Builder', 'admin.menu-builder.index'],
+        ] as [$label, $routeName]) {
+            NavigationMenuItem::create([
+                'menu' => 'dashboard', 'parent_id' => null, 'label' => $label,
+                'url' => route($routeName), 'route_name' => $routeName,
+                'target' => '_self', 'is_visible' => true, 'sort_order' => 0,
+                'source_key' => 'route:'.$routeName, 'source_type' => 'route', 'area' => 'dashboard',
+            ]);
+        }
+
+        $html = $this->get(route('admin.dashboard'))->assertOk()->getContent();
+
+        foreach ([
+            ['Profile Builder', '/admin/profile-builder'],
+            ['Page Builder', '/admin/page-builder'],
+            ['Menu Builder', '/admin/menu-builder'],
+        ] as [$label, $path]) {
+            $this->assertStringContainsString('href="'.$path.'"', $html, $label.' destination');
+            $this->assertStringContainsString('data-dashboard-link="admin.'.strtolower(str_replace(' ', '-', $label)).'.index"', $html, $label.' route marker');
+        }
     }
 
     public function test_the_same_source_can_exist_in_main_and_dashboard_menus(): void
