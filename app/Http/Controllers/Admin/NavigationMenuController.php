@@ -274,50 +274,140 @@ class NavigationMenuController extends Controller
     {
         $data = $request->validate([
             'menu' => ['required', 'in:main,dashboard'],
-            'ids' => ['required', 'array'],
+            'tree' => ['nullable', 'array'],
+            'tree.*.id' => ['required', 'integer', 'distinct'],
+            'tree.*.parent_id' => ['nullable', 'integer'],
+            'tree.*.sort_order' => ['required', 'integer', 'min:0'],
+            // Keep the old payload contract working for older cached pages.
+            'ids' => ['nullable', 'array'],
             'ids.*' => ['integer', 'distinct'],
             'parent_id' => ['nullable', 'integer'],
         ]);
 
-        $parentId = $data['parent_id'] ?? null;
-        $ids = array_values($data['ids']);
+        $menu = $data['menu'];
+        $tree = array_values($data['tree'] ?? []);
+
+        if ($tree === []) {
+            $ids = array_values($data['ids'] ?? []);
+            $parentId = $data['parent_id'] ?? null;
+
+            $items = NavigationMenuItem::query()
+                ->where('menu', $menu)
+                ->whereIn('id', $ids)
+                ->get()
+                ->keyBy('id');
+
+            abort_unless($items->count() === count($ids), 422, 'Invalid menu items.');
+
+            if ($parentId !== null) {
+                $parent = NavigationMenuItem::query()
+                    ->where('menu', $menu)
+                    ->find($parentId);
+
+                abort_unless($parent !== null, 422, 'Invalid reorder parent.');
+                abort_if($parent->source_type !== 'folder', 422, 'Only folders can contain navigation items.');
+
+                foreach ($ids as $id) {
+                    abort_if($id === (int) $parentId, 422, 'A folder cannot contain itself.');
+                    abort_if(
+                        $this->isDescendantOf((int) $parentId, $id, $menu),
+                        422,
+                        'A menu item cannot be placed inside its own descendant.'
+                    );
+                }
+            }
+
+            DB::transaction(function () use ($menu, $items, $parentId, $ids): void {
+                foreach ($ids as $position => $id) {
+                    $items[$id]->update([
+                        'parent_id' => $parentId,
+                        'sort_order' => $position,
+                    ]);
+                }
+            });
+
+            app(PublicNavigationService::class)->clear($menu);
+
+            return response()->json(['ok' => true]);
+        }
+
+        $ids = array_map(static fn (array $node): int => (int) $node['id'], $tree);
+        abort_unless(count($ids) === count(array_unique($ids)), 422, 'Duplicate menu items in reorder tree.');
 
         $items = NavigationMenuItem::query()
-            ->where('menu', $data['menu'])
+            ->where('menu', $menu)
             ->whereIn('id', $ids)
             ->get()
             ->keyBy('id');
 
         abort_unless($items->count() === count($ids), 422, 'Invalid menu items.');
 
-        if ($parentId !== null) {
+        $parentMap = [];
+        foreach ($tree as $node) {
+            $id = (int) $node['id'];
+            $parentId = isset($node['parent_id']) ? ($node['parent_id'] === null ? null : (int) $node['parent_id']) : null;
+            $parentMap[$id] = $parentId;
+
+            if ($parentId === null) {
+                continue;
+            }
+
+            abort_if($id === $parentId, 422, 'A menu item cannot contain itself.');
+
             $parent = NavigationMenuItem::query()
-                ->where('menu', $data['menu'])
+                ->where('menu', $menu)
                 ->find($parentId);
 
             abort_unless($parent !== null, 422, 'Invalid reorder parent.');
             abort_if($parent->source_type !== 'folder', 422, 'Only folders can contain navigation items.');
+        }
 
-            foreach ($ids as $id) {
-                abort_if($id === (int) $parentId, 422, 'A folder cannot contain itself.');
-                abort_if(
-                    $this->isDescendantOf((int) $parentId, $id, $data['menu']),
-                    422,
-                    'A menu item cannot be placed inside its own descendant.'
-                );
+        // Validate the complete submitted tree before touching the database.
+        // This catches cycles even when two or more nodes are moved together.
+        foreach ($parentMap as $id => $parentId) {
+            $depth = 0;
+            $cursor = $parentId;
+            $seen = [$id => true];
+
+            while ($cursor !== null) {
+                if (isset($seen[$cursor])) {
+                    abort(422, 'A menu item cannot be placed inside its own descendant.');
+                }
+
+                $seen[$cursor] = true;
+                $depth++;
+                abort_if($depth > 5, 422, 'Navigation can have up to five nested levels.');
+
+                $cursor = $parentMap[$cursor] ?? NavigationMenuItem::query()
+                    ->where('menu', $menu)
+                    ->whereKey($cursor)
+                    ->value('parent_id');
             }
         }
 
-        DB::transaction(function () use ($data, $items, $parentId, $ids): void {
-            foreach ($ids as $position => $id) {
+        // Every sibling gets a deterministic zero-based order. Temporarily move the
+        // submitted nodes out of the way so this remains safe even if the database
+        // has an optional unique index on (menu, parent_id, sort_order).
+        DB::transaction(function () use ($menu, $items, $tree): void {
+            $submittedIds = array_keys($items->all());
+            $temporaryBase = -1;
+
+            foreach ($submittedIds as $id) {
+                $items[$id]->update(['sort_order' => $temporaryBase--]);
+            }
+
+            foreach ($tree as $node) {
+                $id = (int) $node['id'];
                 $items[$id]->update([
-                    'parent_id' => $parentId,
-                    'sort_order' => $position,
+                    'parent_id' => isset($node['parent_id']) && $node['parent_id'] !== null
+                        ? (int) $node['parent_id']
+                        : null,
+                    'sort_order' => (int) $node['sort_order'],
                 ]);
             }
         });
 
-        app(PublicNavigationService::class)->clear($data['menu']);
+        app(PublicNavigationService::class)->clear($menu);
 
         return response()->json(['ok' => true]);
     }
