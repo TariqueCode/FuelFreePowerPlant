@@ -47,7 +47,7 @@ class NavigationMenuIntegrityTest extends TestCase
     public function test_folder_creation_does_not_fail_because_of_source_label_field(): void
     {
         $user = $this->navigationAdmin();
-        $response = $this->actingAs($user)->post(route('admin.navigation.store'), [
+        $response = $this->actingAs($user)->post(route('admin.menu-builder.store'), [
             'menu' => 'main', 'kind' => 'folder', 'folder_label' => 'Company',
             'target' => '_self', 'is_visible' => '1',
         ]);
@@ -60,7 +60,7 @@ class NavigationMenuIntegrityTest extends TestCase
     public function test_navigation_source_picker_does_not_expose_technical_route_type_suffix(): void
     {
         $user = $this->navigationAdmin();
-        $this->actingAs($user)->get(route('admin.navigation.index', ['menu' => 'main']))
+        $this->actingAs($user)->get(route('admin.menu-builder.index', ['menu' => 'main']))
             ->assertOk()->assertDontSee(' · ROUTE')->assertDontSee(' · CMS_PAGE');
     }
 
@@ -74,7 +74,7 @@ class NavigationMenuIntegrityTest extends TestCase
             'is_published' => true,
         ]);
 
-        $this->actingAs($user)->get(route('admin.navigation.index', ['menu' => 'main']))
+        $this->actingAs($user)->get(route('admin.menu-builder.index', ['menu' => 'main']))
             ->assertOk()->assertDontSee('Generated:: Fn M Fu Dkj Zz Nk Y L Gz');
     }
 
@@ -99,7 +99,7 @@ class NavigationMenuIntegrityTest extends TestCase
             'source_key' => $sourceKey, 'source_type' => 'cms_page', 'area' => 'public',
         ]);
 
-        $response = $this->actingAs($user)->patch(route('admin.navigation.update', $item), [
+        $response = $this->actingAs($user)->patch(route('admin.menu-builder.update', $item), [
             'label' => 'Profile Builder',
             'parent_id' => '',
             'target' => '_self',
