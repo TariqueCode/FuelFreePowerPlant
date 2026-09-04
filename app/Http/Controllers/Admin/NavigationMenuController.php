@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class NavigationMenuController extends Controller
@@ -26,9 +27,9 @@ class NavigationMenuController extends Controller
             ->get();
 
         // The builder must reflect only destinations that are currently real and permitted.
-        // Folders are structural and remain available even when their children change.
+        // Folders and manually entered links are independent of the live source registry.
         $all = $all->filter(function (NavigationMenuItem $item) use ($registry, $area): bool {
-            if ($item->source_type === 'folder') {
+            if ($item->source_type === 'folder' || $item->source_type === 'external_link') {
                 return true;
             }
 
@@ -114,11 +115,12 @@ class NavigationMenuController extends Controller
             'source_key' => ['nullable', 'string', 'max:255'],
             'label' => ['nullable', 'string', 'max:160'],
             'folder_label' => ['nullable', 'string', 'max:160'],
+            'url' => ['nullable', 'string', 'max:2048'],
             'parent_id' => ['nullable', 'integer'],
             'target' => ['required', 'in:_self,_blank'],
             'icon' => ['nullable', 'string', 'max:100'],
             'is_visible' => ['nullable', 'boolean'],
-            'kind' => ['required', 'in:folder,source'],
+            'kind' => ['required', 'in:folder,source,url'],
         ]) + ['is_visible' => $request->boolean('is_visible')];
 
         $area = $data['menu'] === 'dashboard' ? 'dashboard' : 'public';
@@ -132,6 +134,25 @@ class NavigationMenuController extends Controller
             $data['route_name'] = null;
             $data['label'] = trim((string) ($data['folder_label'] ?? ''));
             abort_if($data['label'] === '', 422, 'Folder name is required.');
+        } elseif ($data['kind'] === 'url') {
+            $data['source_key'] = null;
+            $data['source_type'] = 'external_link';
+            $data['permission_key'] = null;
+            $data['route_name'] = null;
+            $data['label'] = trim((string) ($data['label'] ?? ''));
+            $data['url'] = $this->normalizeNavigationUrl((string) ($data['url'] ?? ''));
+
+            abort_if($data['label'] === '', 422, 'Link label is required.');
+            abort_if($data['url'] === '', 422, 'A valid link URL is required.');
+            abort_if(
+                NavigationMenuItem::query()
+                    ->where('menu', $data['menu'])
+                    ->where('source_type', 'external_link')
+                    ->where('url', $data['url'])
+                    ->exists(),
+                422,
+                'This link is already in the menu.'
+            );
         } else {
             abort_if(empty($data['source_key']), 422, 'Choose a live navigation source.');
             $source = $registry->resolve($data['source_key'], $area, $data['menu']);
@@ -146,7 +167,6 @@ class NavigationMenuController extends Controller
         }
 
         unset($data['folder_label']);
-        $data['menu'] = $data['menu'];
         $data['area'] = $area;
         $data['parent_id'] = $parentId;
         $data['sort_order'] = (int) (NavigationMenuItem::query()
@@ -168,6 +188,7 @@ class NavigationMenuController extends Controller
 
         $data = $request->validate([
             'label' => ['required', 'string', 'max:160'],
+            'url' => ['nullable', 'string', 'max:2048'],
             'parent_id' => ['nullable', 'integer'],
             'target' => ['required', 'in:_self,_blank'],
             'icon' => ['nullable', 'string', 'max:100'],
@@ -180,6 +201,20 @@ class NavigationMenuController extends Controller
 
         if ($item->source_type === 'folder') {
             abort_if($data['label'] === '', 422, 'Folder name is required.');
+            unset($data['url']);
+        } elseif ($item->source_type === 'external_link') {
+            $data['url'] = $this->normalizeNavigationUrl((string) ($data['url'] ?? ''));
+            abort_if($data['url'] === '', 422, 'A valid link URL is required.');
+            abort_if(
+                NavigationMenuItem::query()
+                    ->where('menu', $item->menu)
+                    ->where('source_type', 'external_link')
+                    ->where('url', $data['url'])
+                    ->whereKeyNot($item->id)
+                    ->exists(),
+                422,
+                'This link is already in the menu.'
+            );
         } elseif ($item->source_key) {
             $source = $registry->resolveAny($item->source_key, $item->area);
             abort_unless($source !== null, 422, 'This navigation source no longer exists.');
@@ -290,6 +325,28 @@ class NavigationMenuController extends Controller
         app(PublicNavigationService::class)->clear($data['menu']);
 
         return response()->json(['ok' => true]);
+    }
+
+    private function normalizeNavigationUrl(string $url): string
+    {
+        $url = trim($url);
+        if ($url === '' || preg_match('/[\x00-\x1F\x7F\\]/', $url)) {
+            return '';
+        }
+
+        if (str_starts_with($url, '/') && ! str_starts_with($url, '//')) {
+            return $url;
+        }
+
+        if (str_starts_with($url, '#')) {
+            return $url;
+        }
+
+        if (preg_match('#^https?://#i', $url) && filter_var($url, FILTER_VALIDATE_URL)) {
+            return $url;
+        }
+
+        return '';
     }
 
     private function validatedParentId(?int $parentId, string $menu, ?int $ignoreId = null): ?int
