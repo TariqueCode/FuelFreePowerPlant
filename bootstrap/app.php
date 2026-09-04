@@ -55,15 +55,16 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('admin/menu-builder')->name('admin.menu-builder.')
                 ->group(function (): void {
                     Route::get('/', [NavigationMenuController::class, 'index'])->name('index');
-                    // Keep the item endpoint read-only while accepting legacy POST navigations
-                    // that can still exist in cached/older admin markup during deployment.
-                    Route::match(['get', 'post'], '/{item}', [NavigationMenuController::class, 'show'])->name('show');
+                    Route::get('/{item}', [NavigationMenuController::class, 'show'])->name('show');
                 });
 
             Route::middleware(['auth', 'permission:navigation.manage'])
                 ->prefix('admin/menu-builder')->name('admin.menu-builder.')
                 ->group(function (): void {
                     Route::post('/', [NavigationMenuController::class, 'store'])->name('store');
+                    // Legacy admin markup submits deletion as POST to /{item}.
+                    // Keep that compatibility path permission-protected and map it to destroy.
+                    Route::post('/{item}', [NavigationMenuController::class, 'destroy'])->name('legacy-destroy');
                     Route::patch('/{item}', [NavigationMenuController::class, 'update'])->name('update');
                     Route::delete('/{item}', [NavigationMenuController::class, 'destroy'])->name('destroy');
                     Route::post('/reorder', [NavigationMenuController::class, 'reorder'])->name('reorder');
