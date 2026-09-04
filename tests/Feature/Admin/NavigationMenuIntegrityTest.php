@@ -164,7 +164,7 @@ class NavigationMenuIntegrityTest extends TestCase
             ['Menu Builder', 'admin.menu-builder.index'],
         ] as [$label, $routeName]) {
             $this->assertStringContainsString('href="'.route($routeName).'"', $html, $label.' destination');
-            $this->assertStringNotContainsString('data-builder-navigation="true"', $html, $label.' must use native anchor navigation');
+            $this->assertStringContainsString('data-dashboard-link="'.$routeName.'"', $html, $label.' native anchor marker');
         }
     }
 
@@ -182,6 +182,7 @@ class NavigationMenuIntegrityTest extends TestCase
         ] as [$label, $routeName]) {
             $this->assertStringContainsString($label, $html);
             $this->assertStringContainsString('href="'.route($routeName).'"', $html, $label.' destination');
+            $this->assertStringContainsString('data-dashboard-link="'.$routeName.'"', $html, $label.' native anchor marker');
         }
 
         $this->assertStringNotContainsString('href="/admin/profile-builder" data-builder-navigation="true"', $html);
