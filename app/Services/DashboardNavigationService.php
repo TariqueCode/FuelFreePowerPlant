@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\NavigationMenuItem;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Route;
 
 class DashboardNavigationService
 {
@@ -13,58 +14,47 @@ class DashboardNavigationService
             ->where('menu', $menu)
             ->where('area', 'dashboard')
             ->where('is_visible', true)
-            ->orderBy('sort_order')->orderBy('id')->get();
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get();
 
-        $registry = app(NavigationSourceRegistry::class);
+        $valid = $items->filter(function (NavigationMenuItem $item): bool {
+            if ($item->source_type === 'folder') {
+                return true;
+            }
 
-        $valid = $items->filter(function (NavigationMenuItem $item) use ($registry): bool {
-            if ($item->source_type === 'folder') return true;
-            if (! $item->source_key) return false;
-            $source = $registry->resolveAny($item->source_key, 'dashboard');
-            if (! $source) return false;
+            $routeName = (string) ($item->route_name ?: '');
+            if ($routeName === '' || ! Route::has($routeName)) {
+                return false;
+            }
 
-            $permission = $source['permission'] ?? null;
-            if ($permission && auth()->user() && ! auth()->user()->hasPermission($permission)) return false;
+            $permission = $item->permission_key;
+            if ($permission && auth()->user() && ! auth()->user()->hasPermission($permission)) {
+                return false;
+            }
 
-            $item->label = $source['label'];
-            $item->url = $source['url'];
-            $item->route_name = $source['route_name'];
-            $item->permission_key = $permission;
             return true;
         })->values();
 
-        // If an installation has no usable dashboard rows at all, keep the
-        // complete capability-aware sidebar available instead of falling back
-        // to a second Blade-only navigation implementation.
-        if ($valid->isEmpty()) {
-            $valid = $this->defaultNavigation($registry);
-        }
-
-        // Persisted navigation may be incomplete after migrations or older
-        // customizations. Keep those custom rows, but restore any missing
-        // built-in capabilities so the admin never silently loses features.
-        $valid = $this->ensureBuilderLinks($valid, $registry);
-        $valid = $this->ensureDefaultCapabilities($valid, $registry);
-
-        $valid = $valid->sortBy(function (NavigationMenuItem $item): array {
-            return [$item->parent_id ?? 0, (int) $item->sort_order, (int) $item->id];
-        })->values();
+        $valid = $this->restoreDefaultCapabilities($valid);
 
         $children = $valid->groupBy(fn (NavigationMenuItem $item) => $item->parent_id ?? 0);
         $building = [];
 
         $build = function (int $parentId = 0, int $depth = 0) use (&$build, $children, &$building): Collection {
-            if ($depth > 20 || isset($building[$parentId])) return collect();
-            $building[$parentId] = true;
+            if ($depth > 20 || isset($building[$parentId])) {
+                return collect();
+            }
 
+            $building[$parentId] = true;
             $result = $children->get($parentId, collect())
+                ->sortBy(fn (NavigationMenuItem $item) => [(int) $item->sort_order, (int) $item->id])
                 ->map(function (NavigationMenuItem $item) use (&$build, $depth): NavigationMenuItem {
                     $item->setRelation('children', $build((int) $item->id, $depth + 1));
                     return $item;
                 })
-                ->filter(function (NavigationMenuItem $item): bool {
-                    return $item->source_type !== 'folder' || $item->children->isNotEmpty();
-                })->values();
+                ->filter(fn (NavigationMenuItem $item): bool => $item->source_type !== 'folder' || $item->children->isNotEmpty())
+                ->values();
 
             unset($building[$parentId]);
             return $result;
@@ -73,186 +63,106 @@ class DashboardNavigationService
         return $build();
     }
 
-    private function ensureBuilderLinks(Collection $valid, NavigationSourceRegistry $registry): Collection
+    private function restoreDefaultCapabilities(Collection $items): Collection
     {
-        $builders = [
-            ['Profile Builder', 'admin.profile-builder.index', 'website.view'],
-            ['Page Builder', 'admin.page-builder.index', 'cms.view'],
-            ['Menu Builder', 'admin.menu-builder.index', 'website.view'],
+        $nextId = -1000;
+        $nextSort = max(100, (int) $items->max('sort_order') + 1);
+
+        $folders = [
+            ['Website', 10],
+            ['Operations', 20],
+            ['Users & Access', 30],
+            ['Communications', 40],
         ];
 
-        $websiteFolder = $valid->first(function (NavigationMenuItem $item): bool {
-            return $item->source_type === 'folder' && strcasecmp(trim((string) $item->label), 'Website') === 0;
-        });
-        $parentId = $websiteFolder?->id;
-        $nextSort = ((int) $valid->max('sort_order')) + 1;
-        $nextId = -1;
+        foreach ($folders as [$label, $sort]) {
+            $folder = $items->first(fn (NavigationMenuItem $item): bool =>
+                $item->source_type === 'folder' && strcasecmp(trim((string) $item->label), $label) === 0
+            );
 
-        foreach ($builders as [$label, $routeName, $permission]) {
-            if ($valid->contains(fn (NavigationMenuItem $item): bool => $item->route_name === $routeName)) continue;
+            if (!$folder) {
+                $folder = $this->makeFolder($label, $nextId--, $sort);
+                $items->push($folder);
+            }
+        }
 
-            $source = $registry->resolveAny('route:'.$routeName, 'dashboard');
-            if (! $source) continue;
-            if ($permission && auth()->user() && ! auth()->user()->hasPermission($permission)) continue;
+        $defaults = [
+            ['Dashboard', 'admin.dashboard', 'dashboard.view', null],
+            ['Homepage', 'admin.homepage-builder.index', 'website.view', 'Website'],
+            ['Slider', 'admin.sliders.index', 'website.view', 'Website'],
+            ['Highlight Banner', 'admin.site-popups.index', 'website.view', 'Website'],
+            ['Profile Builder', 'admin.profile-builder.index', 'website.view', 'Website'],
+            ['News & Notices', 'admin.site-content.index', 'website.view', 'Website'],
+            ['Gallery', 'admin.gallery.index', 'website.view', 'Website'],
+            ['Page Builder', 'admin.page-builder.index', 'cms.view', 'Website'],
+            ['Social Media', 'admin.social-links.index', 'social-media.manage', 'Website'],
+            ['Menu Builder', 'admin.menu-builder.index', 'website.view', 'Website'],
+            ['Documents & Media', 'admin.documents', 'documents.view', 'Website'],
+            [(string) config('fuelfree.projects.label', 'Projects & Our Plans'), 'admin.plants.index', 'plants.view', 'Operations'],
+            ['Users', 'admin.users.index', 'users.view', 'Users & Access'],
+            ['Audit Log', 'admin.audit', 'audit.view', 'Users & Access'],
+            ['System Health', 'admin.health', 'health.view', 'Users & Access'],
+            ['Help Desk', 'admin.helpdesk', 'mail.view', 'Communications'],
+            ['Mail', 'admin.mail', 'mail.view', 'Communications'],
+            ['Career Applications', 'admin.career-applications.index', 'career.view', 'Communications'],
+            ['Website Inquiries', 'admin.inquiries.index', 'inquiries.view', 'Communications'],
+            ['Settings', 'admin.settings', 'settings.manage', null],
+        ];
+
+        foreach ($defaults as [$label, $routeName, $permission, $folderLabel]) {
+            if (!Route::has($routeName)) {
+                continue;
+            }
+            if ($permission && auth()->user() && !auth()->user()->hasPermission($permission)) {
+                continue;
+            }
+            if ($items->contains(fn (NavigationMenuItem $item): bool => $item->route_name === $routeName)) {
+                continue;
+            }
+
+            $parentId = null;
+            if ($folderLabel !== null) {
+                $parent = $items->first(fn (NavigationMenuItem $item): bool =>
+                    $item->source_type === 'folder' && strcasecmp(trim((string) $item->label), $folderLabel) === 0
+                );
+                $parentId = $parent?->id;
+            }
 
             $item = new NavigationMenuItem();
             $item->id = $nextId--;
             $item->menu = 'dashboard';
             $item->parent_id = $parentId;
             $item->label = $label;
-            $item->url = $source['url'];
-            $item->route_name = $source['route_name'];
+            $item->url = route($routeName);
+            $item->route_name = $routeName;
             $item->target = '_self';
             $item->is_visible = true;
             $item->sort_order = $nextSort++;
-            $item->source_key = $source['key'];
+            $item->source_key = 'route:' . $routeName;
             $item->source_type = 'route';
             $item->area = 'dashboard';
-            $item->permission_key = $source['permission'] ?? $permission;
-            $valid->push($item);
+            $item->permission_key = $permission;
+            $items->push($item);
         }
 
-        return $valid->values();
+        return $items->values();
     }
 
-    private function ensureDefaultCapabilities(Collection $valid, NavigationSourceRegistry $registry): Collection
+    private function makeFolder(string $label, int $id, int $sort): NavigationMenuItem
     {
-        $defaults = $this->defaultNavigation($registry);
-        $nextId = -1000;
-
-        foreach ($defaults as $default) {
-            if ($default->source_type !== 'folder') {
-                if ($default->route_name && $valid->contains(fn (NavigationMenuItem $item): bool => $item->route_name === $default->route_name)) {
-                    continue;
-                }
-
-                if (! $default->id || (int) $default->id >= 0) {
-                    $default->id = $nextId--;
-                }
-                $valid->push($default);
-                continue;
-            }
-
-            $existingFolder = $valid->first(function (NavigationMenuItem $item) use ($default): bool {
-                return $item->source_type === 'folder'
-                    && strcasecmp(trim((string) $item->label), trim((string) $default->label)) === 0;
-            });
-
-            if (! $existingFolder) {
-                $default->id = $nextId--;
-                $valid->push($default);
-                $existingFolder = $default;
-            }
-
-            $defaultChildren = $default->children instanceof Collection
-                ? $default->children
-                : collect();
-
-            foreach ($defaultChildren as $child) {
-                if (! $child->route_name) continue;
-                if ($valid->contains(fn (NavigationMenuItem $item): bool => $item->route_name === $child->route_name)) continue;
-
-                $child->id = $nextId--;
-                $child->parent_id = $existingFolder->id;
-                $valid->push($child);
-            }
-        }
-
-        return $valid->values();
-    }
-
-    private function defaultNavigation(NavigationSourceRegistry $registry): Collection
-    {
-        $id = -1;
-        $makeLink = function (string $label, string $routeName, ?string $permission = null, int $parentId = 0) use ($registry, &$id): ?NavigationMenuItem {
-            $source = $registry->resolveAny('route:'.$routeName, 'dashboard');
-            if (! $source) return null;
-            if ($permission && auth()->user() && ! auth()->user()->hasPermission($permission)) return null;
-            $item = new NavigationMenuItem();
-            $item->id = $id--;
-            $item->menu = 'dashboard';
-            $item->parent_id = $parentId ?: null;
-            $item->label = $label;
-            $item->url = $source['url'];
-            $item->route_name = $source['route_name'];
-            $item->target = '_self';
-            $item->is_visible = true;
-            $item->sort_order = abs($id);
-            $item->source_key = $source['key'];
-            $item->source_type = 'route';
-            $item->area = 'dashboard';
-            $item->permission_key = $source['permission'] ?? $permission;
-            return $item;
-        };
-
-        $folder = function (string $label, int $sort) use (&$id): NavigationMenuItem {
-            $item = new NavigationMenuItem();
-            $item->id = $id--;
-            $item->menu = 'dashboard';
-            $item->parent_id = null;
-            $item->label = $label;
-            $item->url = '#';
-            $item->route_name = null;
-            $item->target = '_self';
-            $item->is_visible = true;
-            $item->sort_order = $sort;
-            $item->source_key = null;
-            $item->source_type = 'folder';
-            $item->area = 'dashboard';
-            return $item;
-        };
-
-        $result = collect();
-        if ($item = $makeLink('Dashboard', 'admin.dashboard', 'dashboard.view')) $result->push($item);
-
-        $website = $folder('Website', 10);
-        $website->setRelation('children', collect());
-        foreach ([
-            ['Homepage', 'admin.homepage-builder.index', 'website.view'],
-            ['Slider', 'admin.sliders.index', 'website.view'],
-            ['Highlight Banner', 'admin.site-popups.index', 'website.view'],
-            ['Profile Builder', 'admin.profile-builder.index', 'website.view'],
-            ['News & Notices', 'admin.site-content.index', 'website.view'],
-            ['Gallery', 'admin.gallery.index', 'website.view'],
-            ['Page Builder', 'admin.page-builder.index', 'cms.view'],
-            ['Social Media', 'admin.social-links.index', 'social-media.manage'],
-            ['Menu Builder', 'admin.menu-builder.index', 'website.view'],
-            ['Documents & Media', 'admin.documents', 'documents.view'],
-        ] as [$label, $routeName, $permission]) {
-            if ($item = $makeLink($label, $routeName, $permission, $website->id)) $website->children->push($item);
-        }
-        if ($website->children->isNotEmpty()) $result->push($website);
-
-        $operations = $folder('Operations', 20);
-        $operations->setRelation('children', collect());
-        if ($item = $makeLink((string) config('fuelfree.projects.label', 'Projects & Our Plans'), 'admin.plants.index', 'plants.view', $operations->id)) $operations->children->push($item);
-        if ($operations->children->isNotEmpty()) $result->push($operations);
-
-        $access = $folder('Users & Access', 30);
-        $access->setRelation('children', collect());
-        foreach ([
-            ['Users', 'admin.users.index', 'users.view'],
-            ['Audit Log', 'admin.audit', 'audit.view'],
-            ['System Health', 'admin.health', 'health.view'],
-        ] as [$label, $routeName, $permission]) {
-            if ($item = $makeLink($label, $routeName, $permission, $access->id)) $access->children->push($item);
-        }
-        if ($access->children->isNotEmpty()) $result->push($access);
-
-        $communications = $folder('Communications', 40);
-        $communications->setRelation('children', collect());
-        foreach ([
-            ['Help Desk', 'admin.helpdesk', 'mail.view'],
-            ['Mail', 'admin.mail', 'mail.view'],
-            ['Career Applications', 'admin.career-applications.index', 'career.view'],
-            ['Website Inquiries', 'admin.inquiries.index', 'inquiries.view'],
-        ] as [$label, $routeName, $permission]) {
-            if ($item = $makeLink($label, $routeName, $permission, $communications->id)) $communications->children->push($item);
-        }
-        if ($communications->children->isNotEmpty()) $result->push($communications);
-
-        if ($item = $makeLink('Settings', 'admin.settings', 'settings.manage')) $result->push($item);
-
-        return $result;
+        $item = new NavigationMenuItem();
+        $item->id = $id;
+        $item->menu = 'dashboard';
+        $item->parent_id = null;
+        $item->label = $label;
+        $item->url = '#';
+        $item->route_name = null;
+        $item->target = '_self';
+        $item->is_visible = true;
+        $item->sort_order = $sort;
+        $item->source_key = null;
+        $item->source_type = 'folder';
+        $item->area = 'dashboard';
+        return $item;
     }
 }
