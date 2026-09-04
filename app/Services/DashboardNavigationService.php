@@ -40,7 +40,15 @@ class DashboardNavigationService
             $valid = $this->defaultNavigation($registry);
         }
 
+        // Persisted navigation may be incomplete after migrations or older
+        // customizations. Keep those custom rows, but restore any missing
+        // built-in capabilities so the admin never silently loses features.
         $valid = $this->ensureBuilderLinks($valid, $registry);
+        $valid = $this->ensureDefaultCapabilities($valid, $registry);
+
+        $valid = $valid->sortBy(function (NavigationMenuItem $item): array {
+            return [$item->parent_id ?? 0, (int) $item->sort_order, (int) $item->id];
+        })->values();
 
         $children = $valid->groupBy(fn (NavigationMenuItem $item) => $item->parent_id ?? 0);
         $building = [];
@@ -102,6 +110,52 @@ class DashboardNavigationService
             $item->area = 'dashboard';
             $item->permission_key = $source['permission'] ?? $permission;
             $valid->push($item);
+        }
+
+        return $valid->values();
+    }
+
+    private function ensureDefaultCapabilities(Collection $valid, NavigationSourceRegistry $registry): Collection
+    {
+        $defaults = $this->defaultNavigation($registry);
+        $nextId = -1000;
+
+        foreach ($defaults as $default) {
+            if ($default->source_type !== 'folder') {
+                if ($default->route_name && $valid->contains(fn (NavigationMenuItem $item): bool => $item->route_name === $default->route_name)) {
+                    continue;
+                }
+
+                if (! $default->id || (int) $default->id >= 0) {
+                    $default->id = $nextId--;
+                }
+                $valid->push($default);
+                continue;
+            }
+
+            $existingFolder = $valid->first(function (NavigationMenuItem $item) use ($default): bool {
+                return $item->source_type === 'folder'
+                    && strcasecmp(trim((string) $item->label), trim((string) $default->label)) === 0;
+            });
+
+            if (! $existingFolder) {
+                $default->id = $nextId--;
+                $valid->push($default);
+                $existingFolder = $default;
+            }
+
+            $defaultChildren = $default->children instanceof Collection
+                ? $default->children
+                : collect();
+
+            foreach ($defaultChildren as $child) {
+                if (! $child->route_name) continue;
+                if ($valid->contains(fn (NavigationMenuItem $item): bool => $item->route_name === $child->route_name)) continue;
+
+                $child->id = $nextId--;
+                $child->parent_id = $existingFolder->id;
+                $valid->push($child);
+            }
         }
 
         return $valid->values();
