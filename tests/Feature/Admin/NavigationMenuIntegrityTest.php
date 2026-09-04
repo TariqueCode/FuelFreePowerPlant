@@ -8,8 +8,8 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\DashboardNavigationService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\QueryException;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class NavigationMenuIntegrityTest extends TestCase
@@ -164,8 +164,22 @@ class NavigationMenuIntegrityTest extends TestCase
             ['Menu Builder', 'admin.menu-builder.index'],
         ] as [$label, $routeName]) {
             $this->assertStringContainsString('href="'.route($routeName).'"', $html, $label.' destination');
-            $this->assertStringContainsString('onclick="window.location.assign(this.href); return false;"', $html, $label.' click handler');
+            $this->assertStringContainsString('data-builder-navigation="true"', $html, $label.' builder marker');
         }
+    }
+
+    public function test_static_dashboard_fallback_uses_canonical_builder_destinations(): void
+    {
+        $user = $this->navigationAdmin();
+        $this->actingAs($user);
+
+        $response = $this->get(route('admin.dashboard'))->assertOk();
+        $html = $response->getContent();
+
+        $this->assertStringContainsString('href="/admin/profile-builder" data-builder-navigation="true"', $html);
+        $this->assertStringContainsString('href="/admin/page-builder" data-builder-navigation="true"', $html);
+        $this->assertStringContainsString('href="/admin/menu-builder" data-builder-navigation="true"', $html);
+        $this->assertStringContainsString('Builder destinations must win over drawer/toggle handlers on touch devices.', $html);
     }
 
     public function test_the_same_source_can_exist_in_main_and_dashboard_menus(): void
