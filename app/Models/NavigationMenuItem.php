@@ -69,6 +69,6 @@ class NavigationMenuItem extends Model
 
     public function isDestination(): bool
     {
-        return in_array($this->source_type, ['route', 'cms_page', 'external_link'], true);
+        return in_array($this->source_type, ['route', 'cms_page', 'site_content', 'external_link'], true);
     }
 }
