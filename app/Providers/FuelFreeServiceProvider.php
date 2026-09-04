@@ -25,20 +25,23 @@ class FuelFreeServiceProvider extends ServiceProvider
                 ->get('/navigation', [NavigationMenuController::class, 'index'])
                 ->name('admin.menu-builder.index');
 
-            Route::middleware('permission:website.view')
-                ->get('/navigation/{item}', [NavigationMenuController::class, 'show'])
-                ->name('admin.menu-builder.show');
-
+            // Static endpoints must be registered before the {item} wildcard.
+            // Otherwise POST /admin/navigation/reorder is interpreted as an
+            // attempt to resolve a NavigationMenuItem whose key is "reorder".
             Route::middleware('permission:navigation.manage')->group(function (): void {
                 Route::post('/navigation', [NavigationMenuController::class, 'store'])
                     ->name('admin.menu-builder.store');
+                Route::post('/navigation/reorder', [NavigationMenuController::class, 'reorder'])
+                    ->name('admin.menu-builder.reorder');
                 Route::patch('/navigation/{item}', [NavigationMenuController::class, 'update'])
                     ->name('admin.menu-builder.update');
                 Route::delete('/navigation/{item}', [NavigationMenuController::class, 'destroy'])
                     ->name('admin.menu-builder.destroy');
-                Route::post('/navigation/reorder', [NavigationMenuController::class, 'reorder'])
-                    ->name('admin.menu-builder.reorder');
             });
+
+            Route::middleware('permission:website.view')
+                ->get('/navigation/{item}', [NavigationMenuController::class, 'show'])
+                ->name('admin.menu-builder.show');
         });
     }
 }
