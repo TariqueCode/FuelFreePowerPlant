@@ -1,4 +1,16 @@
-@php($hasChildren = $item->children->isNotEmpty())
+@php
+    $hasChildren = $item->children->isNotEmpty();
+    $builderRoutes = [
+        'admin.profile-builder.index',
+        'admin.page-builder.index',
+        'admin.menu-builder.index',
+    ];
+    $dashboardUrl = $item->url;
+    if (in_array((string) $item->route_name, $builderRoutes, true)) {
+        $dashboardUrl = route($item->route_name);
+    }
+@endphp
+
 @if($hasChildren)
 <div class="nav-group {{ $item->children->contains(fn($child) => request()->url() === $child->url) ? 'open' : '' }}">
     <button type="button" class="nav-parent" aria-expanded="{{ $item->children->contains(fn($child) => request()->url() === $child->url) ? 'true' : 'false' }}">
@@ -11,7 +23,11 @@
     </div>
 </div>
 @else
-<a class="{{ request()->url() === $item->url ? 'active' : '' }}" href="{{ $item->url }}" @if($item->target === '_blank') target="_blank" rel="noopener noreferrer" @endif>
+<a class="{{ request()->url() === $dashboardUrl ? 'active' : '' }}"
+   href="{{ $dashboardUrl }}"
+   data-dashboard-link="{{ $item->route_name }}"
+   @if($item->target === '_blank') target="_blank" rel="noopener noreferrer" @endif
+   @if(in_array((string) $item->route_name, $builderRoutes, true)) onclick="window.location.assign(this.href); return false;" @endif>
     <span class="nav-icon"><i class="fa-solid fa-circle-dot"></i></span><span>{{ $item->displayLabel() }}</span>
 </a>
 @endif
