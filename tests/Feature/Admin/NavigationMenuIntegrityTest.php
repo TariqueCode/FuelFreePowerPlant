@@ -84,14 +84,9 @@ class NavigationMenuIntegrityTest extends TestCase
     public function test_live_source_label_can_be_customized_without_changing_its_destination(): void
     {
         $user = $this->navigationAdmin();
-
-        // Use a test-owned published CMS page so the source is a genuine live
-        // registry entry without colliding with seeded navigation data.
         $page = CmsPage::create([
-            'title' => 'Navigation Label QA',
-            'slug' => 'navigation-label-qa',
-            'content' => '<p>test</p>',
-            'is_published' => true,
+            'title' => 'Navigation Label QA', 'slug' => 'navigation-label-qa',
+            'content' => '<p>test</p>', 'is_published' => true,
         ]);
 
         $sourceKey = 'cms_page:'.$page->id;
@@ -103,21 +98,14 @@ class NavigationMenuIntegrityTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)->patch(route('admin.navigation.update', $item), [
-            'label' => 'Profile Builder',
-            'parent_id' => '',
-            'target' => '_self',
-            'icon' => '',
-            'is_visible' => '1',
+            'label' => 'Profile Builder', 'parent_id' => '', 'target' => '_self', 'icon' => '', 'is_visible' => '1',
         ]);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('navigation_menu_items', [
-            'id' => $item->id,
-            'label' => 'Profile Builder',
-            'url' => route('cms.page', ['slug' => $page->slug]),
-            'route_name' => 'cms.page',
-            'source_key' => $sourceKey,
-            'source_type' => 'cms_page',
+            'id' => $item->id, 'label' => 'Profile Builder',
+            'url' => route('cms.page', ['slug' => $page->slug]), 'route_name' => 'cms.page',
+            'source_key' => $sourceKey, 'source_type' => 'cms_page',
         ]);
     }
 
@@ -125,7 +113,6 @@ class NavigationMenuIntegrityTest extends TestCase
     {
         $user = $this->navigationAdmin();
         $this->actingAs($user);
-
         $registry = app(\App\Services\NavigationSourceRegistry::class);
 
         foreach ([
@@ -172,11 +159,11 @@ class NavigationMenuIntegrityTest extends TestCase
         $html = $this->get(route('admin.dashboard'))->assertOk()->getContent();
 
         foreach ([
-            ['Profile Builder', '/admin/profile-builder'],
-            ['Page Builder', '/admin/page-builder'],
-            ['Menu Builder', '/admin/menu-builder'],
-        ] as [$label, $path]) {
-            $this->assertStringContainsString('href="'.$path.'"', $html, $label.' destination');
+            ['Profile Builder', 'admin.profile-builder.index'],
+            ['Page Builder', 'admin.page-builder.index'],
+            ['Menu Builder', 'admin.menu-builder.index'],
+        ] as [$label, $routeName]) {
+            $this->assertStringContainsString('href="'.route($routeName).'"', $html, $label.' destination');
             $this->assertStringContainsString('onclick="window.location.assign(this.href); return false;"', $html, $label.' click handler');
         }
     }
