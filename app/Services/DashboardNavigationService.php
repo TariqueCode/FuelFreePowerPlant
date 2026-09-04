@@ -33,14 +33,14 @@ class DashboardNavigationService
             return true;
         })->values();
 
-        $valid = $this->ensureBuilderLinks($valid, $registry);
-
         // If an installation has no usable dashboard rows at all, keep the
         // complete capability-aware sidebar available instead of falling back
         // to a second Blade-only navigation implementation.
         if ($valid->isEmpty()) {
             $valid = $this->defaultNavigation($registry);
         }
+
+        $valid = $this->ensureBuilderLinks($valid, $registry);
 
         $children = $valid->groupBy(fn (NavigationMenuItem $item) => $item->parent_id ?? 0);
         $building = [];
