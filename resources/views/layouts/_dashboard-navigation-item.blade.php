@@ -10,19 +10,27 @@
     if ($isBuilderLink) {
         $dashboardUrl = route($item->route_name);
     }
+    $isGroupOpen = $hasChildren && $item->children->contains(function ($child): bool {
+        if ($child->children->isNotEmpty()) {
+            return $child->children->contains(fn ($nested) => request()->url() === $nested->url);
+        }
+        return request()->url() === $child->url;
+    });
 @endphp
 
 @if($hasChildren)
-<div class="nav-group {{ $item->children->contains(fn($child) => request()->url() === $child->url) ? 'open' : '' }}">
-    <button type="button" class="nav-parent" aria-expanded="{{ $item->children->contains(fn($child) => request()->url() === $child->url) ? 'true' : 'false' }}">
-        <span class="nav-icon"><i class="fa-solid fa-folder-tree"></i></span><span>{{ $item->displayLabel() }}</span><i class="fa-solid fa-chevron-down nav-chevron"></i>
-    </button>
+<details class="nav-group" @if($isGroupOpen) open @endif>
+    <summary class="nav-parent">
+        <span class="nav-icon"><i class="fa-solid fa-folder-tree"></i></span>
+        <span>{{ $item->displayLabel() }}</span>
+        <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
+    </summary>
     <div class="nav-sub">
         @foreach($item->children as $child)
             @include('layouts._dashboard-navigation-item',['item'=>$child])
         @endforeach
     </div>
-</div>
+</details>
 @else
 <a class="{{ request()->url() === $dashboardUrl ? 'active' : '' }}"
    href="{{ $dashboardUrl }}"
