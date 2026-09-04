@@ -48,6 +48,7 @@ class NavigationSourceRegistry
 
         return $routes->concat($cms)
             ->reject(fn (array $source): bool => $used->contains($source['key']))
+            ->reject(fn (array $source): bool => ! $this->isUsableNavigationLabel($source['label']))
             ->sortBy(fn (array $source): string => mb_strtolower($source['label']))
             ->values();
     }
@@ -67,6 +68,7 @@ class NavigationSourceRegistry
             foreach (RouteFacade::getRoutes()->getRoutes() as $route) {
                 if ($route->getName() === $name && $this->eligibleRoute($route, $area)) {
                     $source = $this->routeSource($route, $area);
+                    if (! $this->isUsableNavigationLabel($source['label'])) return null;
                     if ($source['permission'] !== null && (! auth()->check() || ! auth()->user()->hasPermission($source['permission']))) return null;
                     return $source;
                 }
@@ -76,7 +78,7 @@ class NavigationSourceRegistry
         if (Str::startsWith($key, 'cms_page:') && $area === 'public') {
             $id = (int) Str::after($key, 'cms_page:');
             $page = CmsPage::query()->whereKey($id)->where('is_published', true)->first();
-            if ($page) {
+            if ($page && $this->isUsableNavigationLabel((string) $page->title)) {
                 return [
                     'key' => $key, 'type' => 'cms_page', 'label' => (string) $page->title,
                     'url' => route('cms.page', ['slug' => $page->slug]), 'route_name' => 'cms.page',
@@ -107,9 +109,6 @@ class NavigationSourceRegistry
         $middleware = collect($route->gatherMiddleware())->map(fn ($value): string => (string) $value);
 
         if ($area === 'public') {
-            // Only destinations on the primary public application host belong in
-            // the website navigation. Domain-scoped tools such as webmail must
-            // never leak into the public menu just because they expose GET routes.
             if ($route->getDomain() !== null) return false;
 
             return ! str_starts_with($uri, 'admin/')
@@ -139,10 +138,6 @@ class NavigationSourceRegistry
 
         if (! $route || ! $this->eligibleRoute($route, $area)) return null;
 
-        // A published Page Builder page owns an exact public route slug whenever
-        // the application's route is a static URI with the same slug. This
-        // prevents controller-generated labels such as "Public Site" from
-        // leaking into navigation when a CMS page exists for that destination.
         $slug = ltrim($route->uri(), '/');
         if ($slug === '' || str_contains($slug, '/') || str_contains($slug, '{')) return null;
 
@@ -155,7 +150,7 @@ class NavigationSourceRegistry
             $page = CmsPage::query()->where('slug', 'about-us')->where('is_published', true)->first();
         }
 
-        if (! $page) return null;
+        if (! $page || ! $this->isUsableNavigationLabel((string) $page->title)) return null;
 
         return [
             'key' => 'cms_page:'.$page->id,
@@ -196,8 +191,6 @@ class NavigationSourceRegistry
         $controller = Str::afterLast($action, '\\');
         $controller = Str::before($controller, '@');
 
-        // PublicSiteController is a shared renderer for several distinct public
-        // destinations. Never expose its implementation class as the menu label.
         if ($controller === 'PublicSiteController') {
             $section = $route->defaults['section'] ?? null;
             if (is_string($section) && trim($section) !== '') {
@@ -223,5 +216,15 @@ class NavigationSourceRegistry
     private function humanizeNavigationLabel(string $value): string
     {
         return Str::headline(str_replace(['-', '_'], ' ', trim($value)));
+    }
+
+    private function isUsableNavigationLabel(string $label): bool
+    {
+        $normalized = trim($label);
+        if ($normalized === '') return false;
+
+        // Generated placeholder/test labels are implementation artefacts, not
+        // real destinations. They must never leak into the admin navigation UI.
+        return ! Str::startsWith(Str::lower($normalized), 'generated::');
     }
 }
