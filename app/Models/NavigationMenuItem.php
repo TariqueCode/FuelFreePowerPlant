@@ -21,11 +21,16 @@ class NavigationMenuItem extends Model
 
     public function displayLabel(): string
     {
-        if ($this->route_name === 'site.plants' || trim((string) $this->url, '/') === 'plants') {
+        $label = trim((string) $this->label);
+
+        // Preserve the project-wide default for the legacy Plants source while
+        // allowing administrators to explicitly choose a different navigation label.
+        if (($this->route_name === 'site.plants' || trim((string) $this->url, '/') === 'plants')
+            && ($label === '' || strcasecmp($label, 'Plants') === 0)) {
             return (string) config('fuelfree.projects.label', 'Projects & Our Plans');
         }
 
-        return (string) $this->label;
+        return $label;
     }
 
     public function parent(): BelongsTo
