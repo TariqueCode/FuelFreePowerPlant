@@ -39,7 +39,14 @@ class PublicNavigationService
             $source = $registry->resolveAny($sourceKey, $item->area);
             if (! $source) return false;
 
-            $item->label = $source['label'];
+            // The destination stays synchronized with the live source, while the
+            // navigation label remains owned by the menu item. A label_override
+            // must never be replaced by the source registry's default label.
+            if ($item->label_override !== null && trim((string) $item->label_override) !== '') {
+                $item->label = (string) $item->label_override;
+            } elseif (trim((string) $item->label) === '') {
+                $item->label = $source['label'];
+            }
             $item->url = $source['url'];
             $item->route_name = $source['route_name'];
             $item->permission_key = $source['permission'] ?? null;
