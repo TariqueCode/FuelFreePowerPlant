@@ -57,6 +57,75 @@ class NavigationMenuIntegrityTest extends TestCase
         ]);
     }
 
+    public function test_custom_url_can_be_added_to_the_menu_and_rendered_by_public_navigation(): void
+    {
+        $user = $this->navigationAdmin();
+        $response = $this->actingAs($user)->post(route('admin.menu-builder.store'), [
+            'menu' => 'main',
+            'kind' => 'url',
+            'label' => 'Partner Portal',
+            'url' => 'https://example.com/portal',
+            'target' => '_blank',
+            'is_visible' => '1',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('navigation_menu_items', [
+            'menu' => 'main',
+            'source_type' => 'external_link',
+            'source_key' => null,
+            'label' => 'Partner Portal',
+            'url' => 'https://example.com/portal',
+            'route_name' => null,
+            'target' => '_blank',
+        ]);
+    }
+
+    public function test_custom_url_rejects_unsafe_javascript_destination(): void
+    {
+        $user = $this->navigationAdmin();
+        $response = $this->actingAs($user)->post(route('admin.menu-builder.store'), [
+            'menu' => 'main',
+            'kind' => 'url',
+            'label' => 'Unsafe',
+            'url' => 'javascript:alert(1)',
+            'target' => '_self',
+            'is_visible' => '1',
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertDatabaseMissing('navigation_menu_items', ['label' => 'Unsafe']);
+    }
+
+    public function test_custom_url_can_be_updated_without_becoming_a_live_source(): void
+    {
+        $user = $this->navigationAdmin();
+        $item = NavigationMenuItem::create([
+            'menu' => 'main', 'parent_id' => null, 'label' => 'Old Link',
+            'url' => 'https://example.com/old', 'route_name' => null,
+            'target' => '_self', 'is_visible' => true, 'sort_order' => 0,
+            'source_key' => null, 'source_type' => 'external_link', 'area' => 'public',
+        ]);
+
+        $response = $this->actingAs($user)->patch(route('admin.menu-builder.update', $item), [
+            'label' => 'New Link',
+            'url' => '/partner-portal',
+            'parent_id' => '',
+            'target' => '_self',
+            'icon' => '',
+            'is_visible' => '1',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('navigation_menu_items', [
+            'id' => $item->id,
+            'source_type' => 'external_link',
+            'source_key' => null,
+            'label' => 'New Link',
+            'url' => '/partner-portal',
+        ]);
+    }
+
     public function test_navigation_source_picker_does_not_expose_technical_route_type_suffix(): void
     {
         $user = $this->navigationAdmin();
