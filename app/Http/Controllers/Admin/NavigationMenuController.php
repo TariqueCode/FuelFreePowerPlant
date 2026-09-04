@@ -274,46 +274,42 @@ class NavigationMenuController extends Controller
     {
         $data = $request->validate([
             'menu' => ['required', 'in:main,dashboard'],
-            'ids' => ['required', 'array', 'min:1'],
+            'ids' => ['required', 'array'],
             'ids.*' => ['integer', 'distinct'],
             'parent_id' => ['nullable', 'integer'],
         ]);
 
         $parentId = $data['parent_id'] ?? null;
+        $ids = array_values($data['ids']);
+
         $items = NavigationMenuItem::query()
             ->where('menu', $data['menu'])
-            ->whereIn('id', $data['ids'])
+            ->whereIn('id', $ids)
             ->get()
             ->keyBy('id');
 
-        abort_unless($items->count() === count($data['ids']), 422, 'Invalid menu items.');
-        abort_unless(
-            $parentId === null || ! NavigationMenuItem::query()
-                ->where('menu', $data['menu'])
-                ->whereKey($parentId)
-                ->exists(),
-            422,
-            'Invalid reorder parent.'
-        );
+        abort_unless($items->count() === count($ids), 422, 'Invalid menu items.');
 
         if ($parentId !== null) {
             $parent = NavigationMenuItem::query()
                 ->where('menu', $data['menu'])
-                ->findOrFail($parentId);
+                ->find($parentId);
 
+            abort_unless($parent !== null, 422, 'Invalid reorder parent.');
             abort_if($parent->source_type !== 'folder', 422, 'Only folders can contain navigation items.');
 
-            foreach ($items as $item) {
+            foreach ($ids as $id) {
+                abort_if($id === (int) $parentId, 422, 'A folder cannot contain itself.');
                 abort_if(
-                    $this->isDescendantOf($parent->id, $item->id, $data['menu']),
+                    $this->isDescendantOf((int) $parentId, $id, $data['menu']),
                     422,
                     'A menu item cannot be placed inside its own descendant.'
                 );
             }
         }
 
-        DB::transaction(function () use ($data, $items, $parentId): void {
-            foreach ($data['ids'] as $position => $id) {
+        DB::transaction(function () use ($data, $items, $parentId, $ids): void {
+            foreach ($ids as $position => $id) {
                 $items[$id]->update([
                     'parent_id' => $parentId,
                     'sort_order' => $position,
