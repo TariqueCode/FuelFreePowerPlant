@@ -43,7 +43,12 @@ class NavigationMenuController extends Controller
                 return false;
             }
 
-            $item->label = $source['label'];
+            // Live sources keep their destination in sync, but their navigation label
+            // is user-owned after the item has been added. Do not silently overwrite a
+            // custom menu label every time the builder page is opened.
+            if (trim((string) $item->label) === '') {
+                $item->label = $source['label'];
+            }
             $item->url = $source['url'];
             $item->route_name = $source['route_name'];
             $item->permission_key = $source['permission'] ?? null;
@@ -99,7 +104,7 @@ class NavigationMenuController extends Controller
 
         return redirect(route('admin.navigation.index', [
             'menu' => $item->menu,
-]).'#edit-'.$item->id);
+        ]).'#edit-'.$item->id);
     }
 
     public function store(Request $request, NavigationSourceRegistry $registry): RedirectResponse
@@ -162,22 +167,24 @@ class NavigationMenuController extends Controller
         abort_unless(in_array($item->menu, ['main', 'dashboard'], true), 404);
 
         $data = $request->validate([
-            'label' => ['nullable', 'string', 'max:160'],
+            'label' => ['required', 'string', 'max:160'],
             'parent_id' => ['nullable', 'integer'],
             'target' => ['required', 'in:_self,_blank'],
             'icon' => ['nullable', 'string', 'max:100'],
             'is_visible' => ['nullable', 'boolean'],
         ]) + ['is_visible' => $request->boolean('is_visible')];
 
+        $data['label'] = trim($data['label']);
+        abort_if($data['label'] === '', 422, 'Navigation label is required.');
         $data['parent_id'] = $this->validatedParentId($data['parent_id'] ?? null, $item->menu, $item->id);
 
         if ($item->source_type === 'folder') {
-            $data['label'] = trim((string) ($data['label'] ?? ''));
             abort_if($data['label'] === '', 422, 'Folder name is required.');
         } elseif ($item->source_key) {
             $source = $registry->resolveAny($item->source_key, $item->area);
             abort_unless($source !== null, 422, 'This navigation source no longer exists.');
-            $data['label'] = $source['label'];
+            // Destination remains live and synchronized; the label is intentionally
+            // taken from the admin's submitted value so live sources can be renamed.
             $data['url'] = $source['url'];
             $data['route_name'] = $source['route_name'];
             $data['permission_key'] = $source['permission'] ?? null;
