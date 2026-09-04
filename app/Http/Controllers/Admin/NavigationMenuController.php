@@ -329,7 +329,7 @@ class NavigationMenuController extends Controller
     private function normalizeNavigationUrl(string $url): string
     {
         $url = trim($url);
-        if ($url === '' || preg_match('/[\x00-\x1F\x7F\\]/', $url)) {
+        if ($url === '' || preg_match('~[\x00-\x1F\x7F\\]~', $url)) {
             return '';
         }
 
