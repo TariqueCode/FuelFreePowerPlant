@@ -39,8 +39,9 @@ class NavigationMenuIntegrityTest extends TestCase
         $view = Permission::firstOrCreate(['slug' => 'website.view'], ['name' => 'View website']);
         $manage = Permission::firstOrCreate(['slug' => 'navigation.manage'], ['name' => 'Manage navigation']);
         $cms = Permission::firstOrCreate(['slug' => 'cms.view'], ['name' => 'View CMS']);
+        $dashboard = Permission::firstOrCreate(['slug' => 'dashboard.view'], ['name' => 'View dashboard']);
         $role = Role::create(['name' => 'Navigation QA', 'slug' => 'navigation-qa', 'is_system' => false]);
-        $role->permissions()->sync([$view->id, $manage->id, $cms->id]);
+        $role->permissions()->sync([$view->id, $manage->id, $cms->id, $dashboard->id]);
         $user = User::factory()->create();
         $user->roles()->attach($role);
         return $user;
@@ -176,7 +177,7 @@ class NavigationMenuIntegrityTest extends TestCase
             ['Menu Builder', '/admin/menu-builder'],
         ] as [$label, $path]) {
             $this->assertStringContainsString('href="'.$path.'"', $html, $label.' destination');
-            $this->assertStringContainsString('data-dashboard-link="admin.'.strtolower(str_replace(' ', '-', $label)).'.index"', $html, $label.' route marker');
+            $this->assertStringContainsString('onclick="window.location.assign(this.href); return false;"', $html, $label.' click handler');
         }
     }
 
