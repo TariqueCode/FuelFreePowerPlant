@@ -19,6 +19,22 @@ class NavigationMenuItem extends Model
         'sort_order' => 'integer',
     ];
 
+    protected static function booted(): void
+    {
+        static::saving(function (self $item): void {
+            if ($item->source_type === 'folder' || app()->runningInConsole()) {
+                return;
+            }
+
+            $requestedLabel = trim((string) request()->input('label', ''));
+            if ($requestedLabel !== '' && $requestedLabel !== trim((string) $item->label)) {
+                $item->label_override = $requestedLabel;
+            } elseif ($requestedLabel !== '' && $item->label_override !== null && $requestedLabel === trim((string) $item->label_override)) {
+                $item->label_override = $requestedLabel;
+            }
+        });
+    }
+
     public function displayLabel(): string
     {
         if ($this->label_override !== null && trim((string) $this->label_override) !== '') {
