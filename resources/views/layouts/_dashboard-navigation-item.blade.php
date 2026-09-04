@@ -27,7 +27,6 @@
 <a class="{{ request()->url() === $dashboardUrl ? 'active' : '' }}"
    href="{{ $dashboardUrl }}"
    data-dashboard-link="{{ $item->route_name }}"
-   @if($isBuilderLink) data-builder-navigation="true" @endif
    @if($item->target === '_blank') target="_blank" rel="noopener noreferrer" @endif>
     <span class="nav-icon"><i class="fa-solid fa-circle-dot"></i></span><span>{{ $item->displayLabel() }}</span>
 </a>
