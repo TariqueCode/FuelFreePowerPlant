@@ -10,7 +10,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class NavigationMenuController extends Controller
@@ -210,7 +209,7 @@ class NavigationMenuController extends Controller
                     ->where('menu', $item->menu)
                     ->where('source_type', 'external_link')
                     ->where('url', $data['url'])
-                    ->whereKeyNot($item->id)
+                    ->where('id', '!=', $item->id)
                     ->exists(),
                 422,
                 'This link is already in the menu.'
