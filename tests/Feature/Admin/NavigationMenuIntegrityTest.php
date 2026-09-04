@@ -78,6 +78,33 @@ class NavigationMenuIntegrityTest extends TestCase
             ->assertOk()->assertDontSee('Generated:: Fn M Fu Dkj Zz Nk Y L Gz');
     }
 
+    public function test_live_source_label_can_be_customized_without_changing_its_destination(): void
+    {
+        $user = $this->navigationAdmin();
+        $item = NavigationMenuItem::create([
+            'menu' => 'main', 'parent_id' => null, 'label' => 'Home', 'url' => '/', 'route_name' => 'home',
+            'target' => '_self', 'is_visible' => true, 'sort_order' => 0,
+            'source_key' => 'route:home', 'source_type' => 'route', 'area' => 'public',
+        ]);
+
+        $response = $this->actingAs($user)->patch(route('admin.navigation.update', $item), [
+            'label' => 'Profile Builder',
+            'parent_id' => '',
+            'target' => '_self',
+            'icon' => '',
+            'is_visible' => '1',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('navigation_menu_items', [
+            'id' => $item->id,
+            'label' => 'Profile Builder',
+            'url' => '/',
+            'route_name' => 'home',
+            'source_key' => 'route:home',
+        ]);
+    }
+
     public function test_the_same_source_can_exist_in_main_and_dashboard_menus(): void
     {
         foreach (['main', 'dashboard'] as $position => $menu) {
