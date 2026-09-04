@@ -352,7 +352,14 @@
         if (!handle) return;
         const row = handle.closest('.menu-row[data-id]');
         if (!row) return;
-        pointerDrag = {row, sourceContainer: row.parentElement, activated: false, timer: window.setTimeout(() => { pointerDrag.activated = true; row.classList.add('dragging'); }, 140)};
+        pointerDrag = {
+            row,
+            sourceContainer: row.parentElement,
+            startX: event.clientX,
+            startY: event.clientY,
+            activated: false,
+            timer: window.setTimeout(() => { pointerDrag.activated = true; row.classList.add('dragging'); }, 140)
+        };
     });
     tree.addEventListener('pointermove', (event) => {
         if (!pointerDrag || pointerDrag.activated) return;
