@@ -82,9 +82,9 @@ class NavigationMenuIntegrityTest extends TestCase
     {
         $user = $this->navigationAdmin();
         $item = NavigationMenuItem::create([
-            'menu' => 'main', 'parent_id' => null, 'label' => 'Home', 'url' => '/', 'route_name' => 'home',
+            'menu' => 'main', 'parent_id' => null, 'label' => 'Home QA', 'url' => '/__navigation-customizable', 'route_name' => 'navigation.test.customizable',
             'target' => '_self', 'is_visible' => true, 'sort_order' => 0,
-            'source_key' => 'route:home', 'source_type' => 'route', 'area' => 'public',
+            'source_key' => 'route:test.navigation.customizable', 'source_type' => 'route', 'area' => 'public',
         ]);
 
         $response = $this->actingAs($user)->patch(route('admin.navigation.update', $item), [
@@ -99,9 +99,9 @@ class NavigationMenuIntegrityTest extends TestCase
         $this->assertDatabaseHas('navigation_menu_items', [
             'id' => $item->id,
             'label' => 'Profile Builder',
-            'url' => '/',
-            'route_name' => 'home',
-            'source_key' => 'route:home',
+            'url' => '/__navigation-customizable',
+            'route_name' => 'navigation.test.customizable',
+            'source_key' => 'route:test.navigation.customizable',
         ]);
     }
 
