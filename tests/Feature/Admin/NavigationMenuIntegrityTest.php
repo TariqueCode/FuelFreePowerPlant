@@ -7,6 +7,7 @@ use App\Models\NavigationMenuItem;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\DashboardNavigationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\QueryException;
 use Tests\TestCase;
@@ -37,8 +38,9 @@ class NavigationMenuIntegrityTest extends TestCase
     {
         $view = Permission::firstOrCreate(['slug' => 'website.view'], ['name' => 'View website']);
         $manage = Permission::firstOrCreate(['slug' => 'navigation.manage'], ['name' => 'Manage navigation']);
+        $cms = Permission::firstOrCreate(['slug' => 'cms.view'], ['name' => 'View CMS']);
         $role = Role::create(['name' => 'Navigation QA', 'slug' => 'navigation-qa', 'is_system' => false]);
-        $role->permissions()->sync([$view->id, $manage->id]);
+        $role->permissions()->sync([$view->id, $manage->id, $cms->id]);
         $user = User::factory()->create();
         $user->roles()->attach($role);
         return $user;
@@ -116,6 +118,36 @@ class NavigationMenuIntegrityTest extends TestCase
             'source_key' => $sourceKey,
             'source_type' => 'cms_page',
         ]);
+    }
+
+    public function test_canonical_builder_sources_resolve_to_real_dashboard_urls(): void
+    {
+        $user = $this->navigationAdmin();
+        $this->actingAs($user);
+
+        $registry = app(\App\Services\NavigationSourceRegistry::class);
+
+        foreach ([
+            'route:admin.profile-builder.index' => 'admin.profile-builder.index',
+            'route:admin.page-builder.index' => 'admin.page-builder.index',
+            'route:admin.menu-builder.index' => 'admin.menu-builder.index',
+        ] as $sourceKey => $routeName) {
+            $source = $registry->resolveAny($sourceKey, 'dashboard');
+            $this->assertNotNull($source, $sourceKey);
+            $this->assertSame($routeName, $source['route_name']);
+            $this->assertSame(route($routeName), $source['url']);
+        }
+
+        NavigationMenuItem::create([
+            'menu' => 'dashboard', 'parent_id' => null, 'label' => 'Profile Builder',
+            'url' => route('admin.profile-builder.index'), 'route_name' => 'admin.profile-builder.index',
+            'target' => '_self', 'is_visible' => true, 'sort_order' => 0,
+            'source_key' => 'route:admin.profile-builder.index', 'source_type' => 'route', 'area' => 'dashboard',
+        ]);
+
+        $tree = app(DashboardNavigationService::class)->tree();
+        $this->assertCount(1, $tree);
+        $this->assertSame(route('admin.profile-builder.index'), $tree->first()->url);
     }
 
     public function test_the_same_source_can_exist_in_main_and_dashboard_menus(): void
