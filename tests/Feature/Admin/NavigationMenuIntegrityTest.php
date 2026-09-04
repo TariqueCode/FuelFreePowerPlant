@@ -81,12 +81,22 @@ class NavigationMenuIntegrityTest extends TestCase
     public function test_live_source_label_can_be_customized_without_changing_its_destination(): void
     {
         $user = $this->navigationAdmin();
+
+        // Use a test-owned published CMS page so the source is a genuine live
+        // registry entry without colliding with seeded navigation data.
+        $page = CmsPage::create([
+            'title' => 'Navigation Label QA',
+            'slug' => 'navigation-label-qa',
+            'content' => '<p>test</p>',
+            'is_published' => true,
+        ]);
+
+        $sourceKey = 'cms_page:'.$page->id;
         $item = NavigationMenuItem::create([
-            // Use a real public route so the test exercises the same live-source
-            // resolution contract enforced by the navigation registry.
-            'menu' => 'main', 'parent_id' => null, 'label' => 'Career QA', 'url' => '/career', 'route_name' => 'site.career',
+            'menu' => 'main', 'parent_id' => null, 'label' => 'Navigation Label QA',
+            'url' => '/navigation-label-qa', 'route_name' => 'cms.page',
             'target' => '_self', 'is_visible' => true, 'sort_order' => 0,
-            'source_key' => 'route:site.career', 'source_type' => 'route', 'area' => 'public',
+            'source_key' => $sourceKey, 'source_type' => 'cms_page', 'area' => 'public',
         ]);
 
         $response = $this->actingAs($user)->patch(route('admin.navigation.update', $item), [
@@ -101,9 +111,10 @@ class NavigationMenuIntegrityTest extends TestCase
         $this->assertDatabaseHas('navigation_menu_items', [
             'id' => $item->id,
             'label' => 'Profile Builder',
-            'url' => '/career',
-            'route_name' => 'site.career',
-            'source_key' => 'route:site.career',
+            'url' => route('cms.page', ['slug' => $page->slug]),
+            'route_name' => 'cms.page',
+            'source_key' => $sourceKey,
+            'source_type' => 'cms_page',
         ]);
     }
 
