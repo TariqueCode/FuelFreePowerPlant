@@ -34,6 +34,14 @@ class PublicNavigationService
         $registry = app(NavigationSourceRegistry::class);
         $valid = $items->filter(function (NavigationMenuItem $item) use ($registry): bool {
             if ($item->source_type === 'folder') return $item->source_key === null || $item->source_key === '';
+
+            // Manually entered links are intentionally independent of the live route
+            // registry. They are still constrained by the same trusted URL format at
+            // creation/update time in NavigationMenuController.
+            if ($item->source_type === 'external_link') {
+                return trim((string) $item->url) !== '' && preg_match('/^(?:https?:\/\/|\/[^\/]|#)/i', (string) $item->url) === 1;
+            }
+
             $sourceKey = $item->source_key ?: ($item->route_name ? 'route:'.$item->route_name : null);
             if (! $sourceKey) return false;
             $source = $registry->resolveAny($sourceKey, $item->area);
