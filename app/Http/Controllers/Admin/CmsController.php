@@ -9,7 +9,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
 class CmsController extends Controller
@@ -18,10 +17,10 @@ class CmsController extends Controller
     {
         $pageBuilder = CmsPage::query()->get()->map(function (CmsPage $page) {
             $page->content_source = 'Page Builder';
-            $page->edit_url = route('admin.cms.edit', $page);
-            $page->toggle_url = route('admin.cms.toggle', $page);
-            $page->delete_url = route('admin.cms.destroy', $page);
-            $page->duplicate_url = route('admin.cms.duplicate', $page);
+            $page->edit_url = route('admin.page-builder.edit', $page);
+            $page->toggle_url = route('admin.page-builder.toggle', $page);
+            $page->delete_url = route('admin.page-builder.destroy', $page);
+            $page->duplicate_url = route('admin.page-builder.duplicate', $page);
             return $page;
         });
 
@@ -66,7 +65,7 @@ class CmsController extends Controller
         $this->guardPublishing($request, $data['is_published'] ?? false);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title']);
         CmsPage::create($data);
-        return redirect()->route('admin.cms.index')->with('status', 'CMS page created successfully.');
+        return redirect()->route('admin.page-builder.index')->with('status', 'Page created successfully.');
     }
 
     public function edit(CmsPage $page): View
@@ -80,23 +79,21 @@ class CmsController extends Controller
         $this->guardPublishing($request, $data['is_published'] ?? false);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title'], $page->id);
         $page->update($data);
-        return redirect()->route('admin.cms.index')->with('status', 'CMS page updated successfully.');
+        return redirect()->route('admin.page-builder.index')->with('status', 'Page updated successfully.');
     }
 
     public function togglePublication(Request $request, CmsPage $page): RedirectResponse
     {
-        abort_unless($request->user()->hasPermission('cms.publish'), 403, 'Publishing CMS pages requires publishing permission.');
-
+        abort_unless($request->user()->hasPermission('cms.publish'), 403, 'Publishing pages requires publishing permission.');
         $page->is_published = ! $page->is_published;
         $page->save();
-
-        return redirect()->route('admin.cms.index')->with('status', $page->is_published ? 'Page activated successfully.' : 'Page deactivated successfully.');
+        return redirect()->route('admin.page-builder.index')->with('status', $page->is_published ? 'Page activated successfully.' : 'Page deactivated successfully.');
     }
 
     public function destroy(CmsPage $page): RedirectResponse
     {
         $page->delete();
-        return back()->with('status', 'CMS page deleted successfully.');
+        return back()->with('status', 'Page deleted successfully.');
     }
 
     public function duplicate(CmsPage $page): RedirectResponse
@@ -106,7 +103,7 @@ class CmsController extends Controller
         $copy->slug = $this->uniqueSlug($page->slug.'-copy');
         $copy->is_published = false;
         $copy->save();
-        return redirect()->route('admin.cms.edit', $copy)->with('status', 'Draft copy created.');
+        return redirect()->route('admin.page-builder.edit', $copy)->with('status', 'Draft copy created.');
     }
 
     private function validatePage(Request $request): array
@@ -145,7 +142,7 @@ class CmsController extends Controller
 
     private function guardPublishing(Request $request, bool $publishing): void
     {
-        abort_unless(! $publishing || $request->user()->hasPermission('cms.publish'), 403, 'Publishing CMS pages requires publishing permission.');
+        abort_unless(! $publishing || $request->user()->hasPermission('cms.publish'), 403, 'Publishing pages requires publishing permission.');
     }
 
     private function uniqueSlug(string $value, ?int $ignoreId = null): string
