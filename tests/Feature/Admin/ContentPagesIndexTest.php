@@ -67,15 +67,16 @@ class ContentPagesIndexTest extends TestCase
         $response->assertOk()
             ->assertSee('Future Projects')
             ->assertSee('About Us')
-            ->assertSee(route('admin.cms.edit', $cms), false)
+            ->assertSee(route('admin.page-builder.edit', $cms), false)
             ->assertSee(route('admin.site-content.edit', $company), false)
-            ->assertSee(route('admin.cms.toggle', $cms), false)
+            ->assertSee(route('admin.page-builder.toggle', $cms), false)
             ->assertSee(route('admin.site-content.page.toggle', $company), false)
-            ->assertSee(route('admin.cms.destroy', $cms), false)
+            ->assertSee(route('admin.page-builder.destroy', $cms), false)
             ->assertSee(route('admin.site-content.destroy', $company), false)
             ->assertDontSee('Duplicate')
             ->assertDontSee('> Edit <');
     }
+
     public function test_legacy_resources_surface_is_removed(): void
     {
         $user = $this->adminUser();
@@ -98,5 +99,4 @@ class ContentPagesIndexTest extends TestCase
             ->assertDontSee('Resources CMS')
             ->assertDontSee('Resources');
     }
-
 }
