@@ -33,11 +33,11 @@ class DashboardNavigationService
             return true;
         })->values();
 
-        // An empty dashboard menu must never leave the administrator with
-        // dead-looking builder entries. Build the same capability-aware
-        // navigation from live route sources until a custom dashboard menu
-        // has been configured. This also keeps the three builders reachable
-        // when an older installation has no dashboard navigation rows yet.
+        $valid = $this->ensureBuilderLinks($valid, $registry);
+
+        // If an installation has no usable dashboard rows at all, keep the
+        // complete capability-aware sidebar available instead of falling back
+        // to a second Blade-only navigation implementation.
         if ($valid->isEmpty()) {
             $valid = $this->defaultNavigation($registry);
         }
@@ -63,6 +63,48 @@ class DashboardNavigationService
         };
 
         return $build();
+    }
+
+    private function ensureBuilderLinks(Collection $valid, NavigationSourceRegistry $registry): Collection
+    {
+        $builders = [
+            ['Profile Builder', 'admin.profile-builder.index', 'website.view'],
+            ['Page Builder', 'admin.page-builder.index', 'cms.view'],
+            ['Menu Builder', 'admin.menu-builder.index', 'website.view'],
+        ];
+
+        $websiteFolder = $valid->first(function (NavigationMenuItem $item): bool {
+            return $item->source_type === 'folder' && strcasecmp(trim((string) $item->label), 'Website') === 0;
+        });
+        $parentId = $websiteFolder?->id;
+        $nextSort = ((int) $valid->max('sort_order')) + 1;
+        $nextId = -1;
+
+        foreach ($builders as [$label, $routeName, $permission]) {
+            if ($valid->contains(fn (NavigationMenuItem $item): bool => $item->route_name === $routeName)) continue;
+
+            $source = $registry->resolveAny('route:'.$routeName, 'dashboard');
+            if (! $source) continue;
+            if ($permission && auth()->user() && ! auth()->user()->hasPermission($permission)) continue;
+
+            $item = new NavigationMenuItem();
+            $item->id = $nextId--;
+            $item->menu = 'dashboard';
+            $item->parent_id = $parentId;
+            $item->label = $label;
+            $item->url = $source['url'];
+            $item->route_name = $source['route_name'];
+            $item->target = '_self';
+            $item->is_visible = true;
+            $item->sort_order = $nextSort++;
+            $item->source_key = $source['key'];
+            $item->source_type = 'route';
+            $item->area = 'dashboard';
+            $item->permission_key = $source['permission'] ?? $permission;
+            $valid->push($item);
+        }
+
+        return $valid->values();
     }
 
     private function defaultNavigation(NavigationSourceRegistry $registry): Collection
