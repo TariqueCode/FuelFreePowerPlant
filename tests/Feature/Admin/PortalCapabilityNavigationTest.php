@@ -74,7 +74,8 @@ class PortalCapabilityNavigationTest extends TestCase
         $user = User::factory()->create();
         $user->roles()->attach($role);
 
-        $tree = $this->actingAs($user)->app->make(DashboardNavigationService::class)->tree();
+        $this->actingAs($user);
+        $tree = $this->app->make(DashboardNavigationService::class)->tree();
         $labels = $tree->flatMap(function ($item) {
             return $item->source_type === 'folder'
                 ? collect([$item->label])->merge($item->children->pluck('label'))
