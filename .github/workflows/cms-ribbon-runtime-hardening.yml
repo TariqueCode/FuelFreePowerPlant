@@ -1,0 +1,70 @@
+name: CMS ribbon runtime hardening
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Harden active ribbon panel visibility
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('resources/views/partials/mail-editor.blade.php')
+          s = p.read_text()
+          old = '''.cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar .ff-ribbon-panel{display:none;align-items:center;gap:4px;width:max-content;min-width:100%;white-space:nowrap}
+.cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar .ff-ribbon-panel.is-active{display:flex}'''
+          new = '''.ff-editor-toolbar.ff-ribbon-toolbar .ff-ribbon-panel{display:none!important;align-items:center;gap:4px;width:max-content;min-width:100%;white-space:nowrap}
+.ff-editor-toolbar.ff-ribbon-toolbar .ff-ribbon-panel.is-active{display:flex!important}'''
+          if old not in s:
+              raise SystemExit('Expected ribbon panel CSS was not found; refusing an unsafe edit.')
+          s = s.replace(old, new, 1)
+          old_js = '''Object.entries(panels).forEach(([n,p])=>p.classList.toggle('is-active',n===name));
+      toolbar.dataset.ribbonActive=name;'''
+          new_js = '''Object.entries(panels).forEach(([n,p])=>{
+        const active=n===name;
+        p.classList.toggle('is-active',active);
+        p.style.display=active?'flex':'none';
+        p.setAttribute('aria-hidden',active?'false':'true');
+      });
+      toolbar.dataset.ribbonActive=name;'''
+          if old_js not in s:
+              raise SystemExit('Expected ribbon activation code was not found; refusing an unsafe edit.')
+          s = s.replace(old_js, new_js, 1)
+          old_insert = '''toolbar.parentNode.insertBefore(tabs,toolbar);
+    toolbar.classList.add('ff-ribbon-toolbar');
+    activate('home');'''
+          new_insert = '''toolbar.parentNode.insertBefore(tabs,toolbar);
+    toolbar.classList.add('ff-ribbon-toolbar');
+    Object.values(panels).forEach(panel=>{
+      panel.style.display='none';
+      panel.setAttribute('aria-hidden','true');
+    });
+    activate('home');'''
+          if old_insert not in s:
+              raise SystemExit('Expected ribbon initialization code was not found; refusing an unsafe edit.')
+          s = s.replace(old_insert, new_insert, 1)
+          p.write_text(s)
+          PY
+          python3 - <<'PY'
+          from pathlib import Path
+          s = Path('resources/views/partials/mail-editor.blade.php').read_text()
+          assert s.count('<script>') == s.count('</script>'), 'Unbalanced script tags'
+          assert '.ff-editor-toolbar.ff-ribbon-toolbar .ff-ribbon-panel{display:none!important;' in s
+          assert "p.style.display=active?'flex':'none';" in s
+          print('CMS ribbon runtime hardening checks passed')
+          PY
+      - name: Commit and remove temporary workflow
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add resources/views/partials/mail-editor.blade.php
+          git rm -f .github/workflows/cms-ribbon-runtime-hardening.yml
+          git commit -m 'Fix CMS ribbon active panel visibility'
+          git push origin main
