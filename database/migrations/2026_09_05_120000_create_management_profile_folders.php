@@ -25,7 +25,10 @@ return new class extends Migration {
                 ->after('type')
                 ->constrained('management_profile_folders')
                 ->nullOnDelete();
-            $table->index(['type', 'management_profile_folder_id', 'status', 'sort_order']);
+            $table->index(
+                ['type', 'management_profile_folder_id', 'status', 'sort_order'],
+                'sci_management_profile_folder_idx'
+            );
         });
 
         $folder = ManagementProfileFolder::query()->create([
@@ -45,7 +48,7 @@ return new class extends Migration {
     {
         Schema::table('site_content_items', function (Blueprint $table) {
             $table->dropForeign(['management_profile_folder_id']);
-            $table->dropIndex(['type', 'management_profile_folder_id', 'status', 'sort_order']);
+            $table->dropIndex('sci_management_profile_folder_idx');
             $table->dropColumn('management_profile_folder_id');
         });
 
