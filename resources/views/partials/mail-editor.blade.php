@@ -228,7 +228,6 @@
  update();
 })();
 
-<script>
 (function(){
   const root=document.querySelector('[data-editor="{{ $editorId }}"]');
   if(!root || root.dataset.mode!=='cms') return;
@@ -250,7 +249,5 @@
   const endResize=()=>{if(!drag)return;drag=null;editor.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'formatResize'}));};
   handle.addEventListener('pointerdown',startResize);handle.addEventListener('pointermove',moveResize);handle.addEventListener('pointerup',endResize);handle.addEventListener('pointercancel',endResize);editor.addEventListener('scroll',positionHandle,{passive:true});window.addEventListener('scroll',positionHandle,{passive:true});window.addEventListener('resize',positionHandle,{passive:true});
 })();
-</script>
-
 </script>
 @endpush
