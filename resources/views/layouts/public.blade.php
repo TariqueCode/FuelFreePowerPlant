@@ -44,13 +44,13 @@
 
             /* Desktop homepage only: wider two-column leadership cards with exact 4:5 portraits. */
             @media (min-width: 992px) {
-                .home-section-management .management-grid {
+                html body .section-layout-center .management-grid {
                     grid-template-columns:repeat(2,minmax(0,1fr)) !important;
                     gap:24px !important;
                     width:100% !important;
                     max-width:none !important;
                 }
-                .home-section-management .member-card {
+                html body .section-layout-center .member-card {
                     display:grid !important;
                     grid-template-columns:minmax(0,40%) minmax(0,1fr) !important;
                     min-width:0 !important;
@@ -58,20 +58,20 @@
                     height:auto !important;
                     align-items:stretch !important;
                 }
-                .home-section-management .member-photo {
+                html body .section-layout-center .member-photo {
                     width:100% !important;
                     height:auto !important;
                     min-height:0 !important;
                     aspect-ratio:4 / 5 !important;
                     align-self:start !important;
                 }
-                .home-section-management .member-photo img {
+                html body .section-layout-center .member-photo img {
                     width:100% !important;
                     height:100% !important;
                     aspect-ratio:4 / 5 !important;
                     object-fit:cover !important;
                 }
-                .home-section-management .member-body {
+                html body .section-layout-center .member-body {
                     min-width:0 !important;
                     min-height:312px !important;
                     padding:22px !important;
