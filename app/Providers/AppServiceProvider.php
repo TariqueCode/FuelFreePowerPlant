@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\Admin\ManagementController as AdminManagementController;
+use App\Http\Controllers\ManagementController as PublicManagementController;
 use App\Models\SystemSetting;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Facades\Blade;
@@ -18,8 +20,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Legacy builder route names are still rewritten for older Blade/database
-        // references, but the legacy URL endpoints themselves are no longer usable.
+        // Keep legacy builder route names source-compatible without changing
+        // public-facing content labels. Profile Builder is an admin module;
+        // it must never replace the public folder title such as Board of Directors.
         Blade::precompiler(function (string $template): string {
             $routeMap = [
                 "admin.management." => "admin.profile-builder.",
@@ -31,19 +34,17 @@ class AppServiceProvider extends ServiceProvider
 
             return str_replace([
                 'Advanced Menu Builder',
-                'Board of Directors',
                 'Content Pages',
                 'Website Navigation',
                 'CONTENT MANAGEMENT',
                 'WEBSITE SECTIONS · MANAGEMENT',
-                "New CMS Page",
-                "Edit CMS Page",
-                "Add Management Member",
-                "Edit Management Profile",
-                "Add management member",
+                'New CMS Page',
+                'Edit CMS Page',
+                'Add Management Member',
+                'Edit Management Profile',
+                'Add management member',
             ], [
                 'Menu Builder',
-                'Profile Builder',
                 'Page Builder',
                 'Menu Builder',
                 'PAGE BUILDER',
@@ -56,9 +57,8 @@ class AppServiceProvider extends ServiceProvider
             ], $template);
         });
 
-        // The three old builder URL namespaces are intentionally retired. Keep
-        // this guard during the migration window so direct/legacy requests fail
-        // cleanly instead of reaching the shared builder controllers.
+        // The old builder namespaces remain blocked; the canonical builder
+        // aliases below are the supported admin endpoints.
         $this->app['router']->matched(function (RouteMatched $event): void {
             $routeName = $event->route->getName();
 
@@ -74,6 +74,47 @@ class AppServiceProvider extends ServiceProvider
                 abort(404);
             }
         });
+
+        $router = $this->app['router'];
+
+        // Canonical Profile Builder admin endpoints.
+        $router->get('/admin/profile-builder', [AdminManagementController::class, 'index'])
+            ->middleware(['auth', 'permission:website.view'])->name('admin.profile-builder.index');
+        $router->get('/admin/profile-builder/folders/create', [AdminManagementController::class, 'folderCreate'])
+            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.folders.create');
+        $router->post('/admin/profile-builder/folders', [AdminManagementController::class, 'folderStore'])
+            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.folders.store');
+        $router->get('/admin/profile-builder/folders/{folder}/edit', [AdminManagementController::class, 'folderEdit'])
+            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.folders.edit');
+        $router->patch('/admin/profile-builder/folders/{folder}', [AdminManagementController::class, 'folderUpdate'])
+            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.folders.update');
+        $router->delete('/admin/profile-builder/folders/{folder}', [AdminManagementController::class, 'folderDestroy'])
+            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.folders.destroy');
+        $router->post('/admin/profile-builder/folders/reorder', [AdminManagementController::class, 'folderReorder'])
+            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.folders.reorder');
+
+        $router->get('/admin/profile-builder/create', [AdminManagementController::class, 'create'])
+            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.create');
+        $router->post('/admin/profile-builder', [AdminManagementController::class, 'store'])
+            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.store');
+        $router->get('/admin/profile-builder/{member}/edit', [AdminManagementController::class, 'edit'])
+            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.edit');
+        $router->patch('/admin/profile-builder/{member}', [AdminManagementController::class, 'update'])
+            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.update');
+        $router->delete('/admin/profile-builder/{member}', [AdminManagementController::class, 'destroy'])
+            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.destroy');
+        $router->patch('/admin/profile-builder/{member}/toggle', [AdminManagementController::class, 'toggle'])
+            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.toggle');
+        $router->post('/admin/profile-builder/reorder', [AdminManagementController::class, 'reorder'])
+            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.reorder');
+
+        // Pretty public folder URLs. This is deliberately registered after the
+        // explicit application routes so /about-us, /career, /contact, etc.
+        // keep their existing routes. Only a real published profile folder is
+        // served; unknown one-segment URLs return 404.
+        $router->get('/{folderSlug}', [PublicManagementController::class, 'folder'])
+            ->where('folderSlug', '[A-Za-z0-9][A-Za-z0-9\-]*')
+            ->name('management.folder');
 
         if (! Schema::hasTable('system_settings')) {
             return;
