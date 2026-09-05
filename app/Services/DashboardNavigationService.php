@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\NavigationMenuItem;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class DashboardNavigationService
 {
@@ -30,6 +31,13 @@ class DashboardNavigationService
             $item->url = $source['url'];
             $item->route_name = $source['route_name'];
             $item->permission_key = $permission;
+
+            // Profile Builder is an admin-only builder label. Its public
+            // destination remains the dynamically named management folder.
+            if (Str::startsWith((string) $item->source_key, 'management_folder:') || $item->route_name === 'management') {
+                $item->label_override = 'Profile Builder';
+            }
+
             return true;
         })->values();
 
