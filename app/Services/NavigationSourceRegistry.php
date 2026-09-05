@@ -17,7 +17,7 @@ class NavigationSourceRegistry
         'career.store', 'career.chunks', 'contact.store', 'cms.page', 'gallery.show',
         'news.show', 'projects.show', 'documents.shared-download', 'webmail.redirect',
         'resources.index', 'resources.show', 'resources.download',
-        'site.plants', 'site.future-project', 'site.solutions', 'sustainability',
+        'site.plants', 'site.future-project', 'sustainability',
     ];
 
     private const BUILDER_ROUTE_ALIASES = [
