@@ -3,8 +3,10 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\HomepageSection;
+use App\Models\ManagementProfileFolder;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\SiteContentItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -34,9 +36,36 @@ class HomepageWelcomeSettingsTest extends TestCase
         return $user;
     }
 
+    private function managementConfiguration(): array
+    {
+        $folder = ManagementProfileFolder::create([
+            'name' => 'Welcome Test Folder',
+            'slug' => 'welcome-test-folder-' . uniqid(),
+            'status' => 'published',
+            'sort_order' => 1,
+        ]);
+
+        $profile = SiteContentItem::create([
+            'type' => 'management',
+            'management_profile_folder_id' => $folder->id,
+            'title' => 'Welcome Management Profile',
+            'slug' => 'welcome-management-profile-' . uniqid(),
+            'designation' => 'Director',
+            'phone' => '+8801700000000',
+            'email' => 'welcome@example.com',
+            'content' => 'Leadership message.',
+            'status' => 'published',
+            'sort_order' => 1,
+            'published_at' => now(),
+        ]);
+
+        return ['folder_id' => $folder->id, 'ids' => [$profile->id]];
+    }
+
     public function test_welcome_message_can_be_fully_configured(): void
     {
         $user = $this->manager();
+        $management = $this->managementConfiguration();
         $order = HomepageSection::query()->ordered()->pluck('key')->all();
         $sections = array_fill_keys($order, '1');
 
@@ -44,6 +73,12 @@ class HomepageWelcomeSettingsTest extends TestCase
             'section_order' => $order,
             'sections' => $sections,
             'settings' => [
+                'management' => [
+                    'folder_id' => $management['folder_id'],
+                    'mode' => 'selected',
+                    'ids' => $management['ids'],
+                    'layout' => 'left',
+                ],
                 'welcome' => [
                     'eyebrow' => 'FUEL FREE POWER PLANT LIMITED',
                     'signoff' => 'FUEL FREE POWER PLANT LIMITED — Powering a cleaner, smarter future.',
