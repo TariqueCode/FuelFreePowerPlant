@@ -2,22 +2,39 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ManagementProfileFolder;
 use App\Models\SiteContentItem;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
 class ManagementController extends Controller
 {
-    public function __invoke(): View
+    public function __invoke(): Response|\Illuminate\Http\RedirectResponse
     {
-        $members = SiteContentItem::query()
-            ->where('type', 'management')
-            ->published()
-            ->orderBy('sort_order')
-            ->orderBy('title')
-            ->get();
+        $folder = ManagementProfileFolder::query()
+            ->where('status', 'published')
+            ->orderBy('sort_order')->orderBy('id')->first();
 
-        return view('management.index', compact('members'));
+        if (!$folder) {
+            abort(404);
+        }
+
+        return Redirect::route('management.folder', ['folderSlug' => $folder->slug]);
+    }
+
+    public function folder(string $folderSlug): View
+    {
+        $folder = ManagementProfileFolder::query()
+            ->where('slug', $folderSlug)
+            ->where('status', 'published')
+            ->firstOrFail();
+
+        $members = $folder->profiles()
+            ->published()
+            ->orderBy('sort_order')->orderBy('title')->get();
+
+        return view('management.folder', compact('folder', 'members'));
     }
 
     public function vcard(SiteContentItem $member): Response
