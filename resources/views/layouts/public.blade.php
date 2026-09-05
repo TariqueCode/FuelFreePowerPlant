@@ -74,6 +74,47 @@
             .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown > .public-menu-dropdown-toggle { width:100%!important; }
             .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown-chevron { flex:0 0 auto;width:7px;height:7px;margin-left:auto; }
             .public-header-nav .public-menu > .public-menu-dropdown > .public-menu-dropdown-toggle[aria-expanded="true"] { background:rgba(67,209,240,.09)!important;border-color:rgba(86,210,238,.17)!important;color:#effcff!important; }
+
+            /* Premium mobile Portal CTA: visually separated from navigation, refined rather than flashy. */
+            .public-header-nav .mobile-portal-separator {
+                display:block!important;height:1px!important;margin:14px 8px 10px!important;
+                background:linear-gradient(90deg,transparent 0%,rgba(86,210,238,.16) 16%,rgba(86,210,238,.42) 50%,rgba(86,210,238,.16) 84%,transparent 100%)!important;
+            }
+            .public-header-nav .mobile-menu-portal {
+                position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;
+                width:calc(100% - 8px)!important;min-height:52px!important;height:52px!important;box-sizing:border-box!important;
+                margin:0 4px 4px!important;padding:0 17px!important;overflow:hidden!important;
+                border:1px solid rgba(98,217,238,.38)!important;border-radius:13px!important;
+                background:linear-gradient(135deg,rgba(72,216,241,.14),rgba(72,216,241,.045) 55%,rgba(114,223,191,.055))!important;
+                color:#effcff!important;font-size:15px!important;line-height:1!important;font-weight:800!important;letter-spacing:.01em!important;
+                text-decoration:none!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 8px 22px rgba(0,0,0,.16)!important;
+                isolation:isolate;transition:border-color .18s ease,background .18s ease,transform .18s ease,box-shadow .18s ease!important;
+            }
+            .public-header-nav .mobile-menu-portal::before {
+                content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;
+                background:radial-gradient(circle at 50% -80%,rgba(98,217,238,.26),transparent 58%);
+            }
+            .public-header-nav .mobile-menu-portal::after {
+                content:"";position:absolute;left:14px;right:14px;top:0;height:1px;pointer-events:none;
+                background:linear-gradient(90deg,transparent,rgba(255,255,255,.32),transparent);opacity:.55;
+            }
+            .public-header-nav .mobile-menu-portal i {
+                display:grid!important;place-items:center!important;width:27px!important;height:27px!important;flex:0 0 27px!important;
+                border:1px solid rgba(139,243,255,.28)!important;border-radius:8px!important;
+                background:rgba(4,18,26,.42)!important;color:#8bf3ff!important;font-size:12px!important;
+                box-shadow:0 0 0 3px rgba(86,210,238,.035)!important;
+            }
+            .public-header-nav .mobile-menu-portal span { position:relative!important;top:0!important; }
+            .public-header-nav .mobile-menu-portal:hover,
+            .public-header-nav .mobile-menu-portal:focus-visible {
+                background:linear-gradient(135deg,rgba(72,216,241,.19),rgba(72,216,241,.07) 55%,rgba(114,223,191,.08))!important;
+                border-color:rgba(98,217,238,.58)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 10px 28px rgba(0,0,0,.22),0 0 0 3px rgba(86,210,238,.055)!important;
+                outline:none!important;
+            }
+            .public-header-nav .mobile-menu-portal:active { transform:translateY(1px)!important; }
+        }
+        @media (prefers-reduced-motion:reduce) {
+            .public-header-nav .mobile-menu-portal { transition:none!important; }
         }
         @media (min-width:721px) {
             .public-header-nav .public-menu-dropdown-panel { max-width:min(320px,calc(100vw - 24px)); }
