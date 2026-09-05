@@ -320,3 +320,87 @@
         font-size: 11px !important;
     }
 }
+
+/* Mobile/tablet profile viewer readability: larger type, unchanged layout. */
+@media (max-width: 1099px) {
+    .home-profile-modal .home-profile-title {
+        font-size: 28px !important;
+        line-height: 1.25 !important;
+    }
+
+    .home-profile-modal .home-profile-role {
+        font-size: 16px !important;
+        line-height: 1.5 !important;
+    }
+
+    .home-profile-modal .home-profile-contact-mobile,
+    .home-profile-modal .home-profile-contact-mobile a,
+    .home-profile-modal .home-profile-contact {
+        font-size: 15px !important;
+        line-height: 1.6 !important;
+    }
+
+    .home-profile-modal .home-profile-scroll,
+    .home-profile-modal .home-profile-scroll p,
+    .home-profile-modal .home-profile-message {
+        font-size: 19px !important;
+        line-height: 1.85 !important;
+    }
+
+    .home-profile-modal .home-profile-footer,
+    .home-profile-modal .home-profile-links > .home-profile-link {
+        font-size: 15px !important;
+        line-height: 1.45 !important;
+    }
+}
+
+@media (max-width: 650px) {
+    .home-profile-modal .home-profile-title {
+        font-size: 27px !important;
+    }
+
+    .home-profile-modal .home-profile-role {
+        font-size: 15px !important;
+    }
+
+    .home-profile-modal .home-profile-contact-mobile,
+    .home-profile-modal .home-profile-contact-mobile a,
+    .home-profile-modal .home-profile-contact {
+        font-size: 14px !important;
+    }
+
+    .home-profile-modal .home-profile-scroll,
+    .home-profile-modal .home-profile-scroll p,
+    .home-profile-modal .home-profile-message {
+        font-size: 18px !important;
+        line-height: 1.85 !important;
+    }
+
+    .home-profile-modal .home-profile-footer,
+    .home-profile-modal .home-profile-links > .home-profile-link {
+        font-size: 14px !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .home-profile-modal .home-profile-title {
+        font-size: 26px !important;
+    }
+
+    .home-profile-modal .home-profile-role {
+        font-size: 15px !important;
+    }
+
+    .home-profile-modal .home-profile-contact-mobile,
+    .home-profile-modal .home-profile-contact-mobile a,
+    .home-profile-modal .home-profile-contact {
+        font-size: 14px !important;
+    }
+
+    .home-profile-modal .home-profile-scroll,
+    .home-profile-modal .home-profile-scroll p,
+    .home-profile-modal .home-profile-message {
+        font-size: 18px !important;
+        line-height: 1.8 !important;
+    }
+}
