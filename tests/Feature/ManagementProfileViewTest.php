@@ -14,8 +14,8 @@ class ManagementProfileViewTest extends TestCase
     public function test_folder_profile_cards_have_a_working_profile_view_target(): void
     {
         $folder = ManagementProfileFolder::create([
-            'name' => 'Board of Directors',
-            'slug' => 'board-of-directors',
+            'name' => 'Test Board of Directors',
+            'slug' => 'test-board-of-directors',
             'status' => 'published',
             'sort_order' => 1,
         ]);
@@ -32,7 +32,7 @@ class ManagementProfileViewTest extends TestCase
             'published_at' => now(),
         ]);
 
-        $response = $this->get('/board-of-directors');
+        $response = $this->get('/'.$folder->slug);
 
         $response->assertOk();
         $response->assertSee('data-profile-target="profile-'.$member->id.'"', false);
