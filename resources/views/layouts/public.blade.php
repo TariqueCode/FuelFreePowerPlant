@@ -60,6 +60,94 @@
         </style>
     @endif
     @stack('head')
+    <style>
+        /* Mobile public navigation: nested folders stay in the vertical flow. */
+        @media (max-width: 720px) {
+            .public-header-nav .public-menu-dropdown {
+                display: block;
+                width: 100%;
+                flex: 0 0 auto;
+            }
+
+            .public-header-nav .public-menu-dropdown-panel,
+            .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown-panel {
+                position: static !important;
+                inset: auto !important;
+                top: auto !important;
+                right: auto !important;
+                bottom: auto !important;
+                left: auto !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 6px 0 4px 12px !important;
+                transform: none !important;
+                background: transparent !important;
+                border: 0 !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+            }
+
+            .public-header-nav .public-menu-dropdown.is-open > .public-menu-dropdown-panel {
+                display: block;
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+            }
+
+            .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown {
+                width: 100%;
+            }
+
+            .public-header-nav .public-menu-dropdown-panel > a,
+            .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle {
+                width: 100%;
+                min-height: 44px;
+                height: auto;
+                justify-content: space-between;
+                box-sizing: border-box;
+                padding: 10px 13px;
+                border: 1px solid rgba(86,210,238,.075);
+                border-left: 2px solid rgba(86,210,238,.24);
+                border-radius: 0 10px 10px 0;
+                background: rgba(67,209,240,.025);
+                color: #a8c1c9 !important;
+                font-size: 14px;
+                line-height: 1.35;
+                margin: 2px 0;
+            }
+
+            .public-header-nav .public-menu-dropdown-panel > a:hover,
+            .public-header-nav .public-menu-dropdown-panel > a:focus,
+            .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle:hover,
+            .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle:focus,
+            .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle[aria-expanded="true"] {
+                background: rgba(67,209,240,.075);
+                border-color: rgba(86,210,238,.14);
+                border-left-color: rgba(86,210,238,.48);
+                color: #effcff !important;
+                outline: none;
+            }
+
+            .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-panel {
+                padding-left: 10px !important;
+            }
+
+            .public-header-nav .public-menu-dropdown > .public-menu-dropdown-toggle {
+                position: relative;
+            }
+
+            .public-header-nav .public-menu-dropdown > .public-menu-dropdown-toggle i {
+                flex: 0 0 auto;
+            }
+
+            .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown-chevron {
+                flex: 0 0 auto;
+                margin-left: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
     @if($useGlobalHeader) @include('partials.public-header', ['brand' => $publicBrand]) @endif
