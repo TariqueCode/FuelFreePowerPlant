@@ -22,50 +22,52 @@ class NavigationMenuItem extends Model
     protected static function booted(): void
     {
         static::saving(function (self $item): void {
-            if ($item->source_type === 'folder' || app()->runningInConsole()) {
-                return;
-            }
-
+            if ($item->source_type === 'folder' || app()->runningInConsole()) return;
             $requestedLabel = trim((string) request()->input('label', ''));
-            if ($requestedLabel === '') {
-                return;
-            }
-
-            $item->label_override = $requestedLabel === trim((string) $item->label)
-                ? null
-                : $requestedLabel;
+            if ($requestedLabel === '') return;
+            $item->label_override = $requestedLabel === trim((string) $item->label) ? null : $requestedLabel;
         });
+    }
+
+    public function setRouteNameAttribute($value): void
+    {
+        $this->attributes['route_name'] = $value;
+
+        // The legacy management route now resolves to the first published
+        // Profile Builder folder. Keep old navigation records working while
+        // exposing the folder's human name and pretty URL instead of /management.
+        if ($value === 'management' && class_exists(ManagementProfileFolder::class)) {
+            $folder = ManagementProfileFolder::query()
+                ->where('status', 'published')
+                ->orderBy('sort_order')->orderBy('id')->first();
+            if ($folder) {
+                $this->attributes['url'] = '/'.$folder->slug;
+                $this->attributes['label'] = $folder->name;
+                $this->attributes['source_type'] = 'external_link';
+                $this->attributes['source_key'] = 'management_folder:'.$folder->id;
+            }
+        }
     }
 
     public function displayLabel(): string
     {
-        if ($this->label_override !== null && trim((string) $this->label_override) !== '') {
-            return (string) $this->label_override;
+        if ($this->route_name === 'management' && class_exists(ManagementProfileFolder::class)) {
+            $folder = ManagementProfileFolder::query()->where('status', 'published')->orderBy('sort_order')->orderBy('id')->first();
+            if ($folder) return $folder->name;
         }
-
-        if ($this->route_name === 'site.plants' || trim((string) $this->url, '/') === 'plants') {
-            return (string) config('fuelfree.projects.label', 'Projects & Our Plans');
-        }
-
+        if ($this->label_override !== null && trim((string) $this->label_override) !== '') return (string) $this->label_override;
+        if ($this->route_name === 'site.plants' || trim((string) $this->url, '/') === 'plants') return (string) config('fuelfree.projects.label', 'Projects & Our Plans');
         return (string) $this->label;
     }
 
-    public function parent(): BelongsTo
-    {
-        return $this->belongsTo(self::class, 'parent_id');
-    }
+    public function parent(): BelongsTo { return $this->belongsTo(self::class, 'parent_id'); }
 
     public function children(): HasMany
     {
-        return $this->hasMany(self::class, 'parent_id')
-            ->orderBy('sort_order')
-            ->orderBy('id');
+        return $this->hasMany(self::class, 'parent_id')->orderBy('sort_order')->orderBy('id');
     }
 
-    public function isFolder(): bool
-    {
-        return $this->source_type === 'folder';
-    }
+    public function isFolder(): bool { return $this->source_type === 'folder'; }
 
     public function isDestination(): bool
     {
