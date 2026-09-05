@@ -28,36 +28,20 @@ jobs:
           path = Path('resources/views/home-v3.blade.php')
           text = path.read_text()
 
-          replacements = {
-              '.home-section-management .member-body h3{\n   letter-spacing:-.015em;\n }': '.home-section-management .member-body h3{\n   letter-spacing:-.01em;\n   font-size:clamp(16px,1.25vw,20px);\n   line-height:1.35;\n }',
-              'font-size:9.5px!important;\n   line-height:1.55!important;': 'font-size:11px!important;\n   line-height:1.65!important;',
-              '.welcome-profile-modal-title{margin:6px 0 0;color:#effbfc;font-size:26px;line-height:1.18;letter-spacing:-.03em}': '.welcome-profile-modal-title{margin:6px 0 0;color:#effbfc;font-size:clamp(28px,2.2vw,34px);line-height:1.2;letter-spacing:-.025em}',
-              '.welcome-profile-modal-role{margin-top:7px;color:#68d8eb;font-size:10px;font-weight:750}': '.welcome-profile-modal-role{margin-top:8px;color:#68d8eb;font-size:12px;line-height:1.45;font-weight:750}',
-              '.welcome-profile-modal-scroll{min-height:0;overflow:auto;padding:22px 28px 28px;color:#a4bdc6;font-size:12px;line-height:1.9;white-space:normal}': '.welcome-profile-modal-scroll{min-height:0;overflow:auto;padding:22px 28px 28px;color:#a4bdc6;font-size:15px;line-height:1.9;white-space:normal}',
-              '.welcome-profile-modal-label{margin:0 0 10px;color:#70ddec;font-size:8px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}': '.welcome-profile-modal-label{margin:0 0 11px;color:#70ddec;font-size:10px;font-weight:800;line-height:1.4;letter-spacing:.12em;text-transform:uppercase}',
-              '.welcome-profile-modal-scroll{padding:16px 18px 20px;font-size:11px;line-height:1.8}': '.welcome-profile-modal-scroll{padding:18px 18px 22px;font-size:15px;line-height:1.85}',
-              '.welcome-profile-modal-title{font-size:21px}': '.welcome-profile-modal-title{font-size:24px;line-height:1.22}',
-          }
+          marker = '<style>\n/* === HOMEPAGE MANAGEMENT PROFILE ACCESSIBILITY POLISH === */\n'
+          css = '''<style>\n/* === HOMEPAGE MANAGEMENT PROFILE ACCESSIBILITY POLISH === */\n/* Larger reading sizes for older users; layout and controls remain unchanged. */\n.home-v3 .home-section-management .member-body h3{font-size:18px!important;line-height:1.35!important}\n.home-v3 .home-section-management .member-role{font-size:10px!important;line-height:1.5!important}\n.home-v3 .home-section-management .member-contact{font-size:10px!important;line-height:1.5!important}\n.home-v3 .home-section-management .member-message{font-size:11px!important;line-height:1.65!important}\n.home-v3 .home-section-management .member-more{font-size:10px!important;min-height:40px!important}\n.welcome-profile-modal-title{font-size:clamp(28px,2.2vw,34px)!important;line-height:1.2!important}\n.welcome-profile-modal-role{font-size:12px!important;line-height:1.45!important}\n.welcome-profile-modal-scroll{font-size:15px!important;line-height:1.9!important}\n.welcome-profile-modal-label{font-size:10px!important;line-height:1.4!important}\n.home-profile-title{font-size:31px!important;line-height:1.2!important}\n.home-profile-role{font-size:12px!important;line-height:1.5!important}\n.home-profile-message{font-size:15px!important;line-height:1.9!important}\n.home-profile-section-title{font-size:10px!important;line-height:1.45!important}\n.home-profile-link{font-size:11px!important;min-height:44px!important}\n@media(max-width:1099px){\n .home-profile-title{font-size:28px!important}\n .home-profile-role{font-size:12px!important}\n .home-profile-message{font-size:15px!important;line-height:1.85!important}\n}\n@media(max-width:650px){\n .home-v3 .home-section-management .member-body h3{font-size:12px!important;line-height:1.35!important}\n .home-v3 .home-section-management .member-role{font-size:8px!important;line-height:1.45!important}\n .home-v3 .home-section-management .member-more{font-size:9px!important;min-height:36px!important}\n .home-profile-title{font-size:23px!important;line-height:1.2!important}\n .home-profile-role{font-size:10px!important;line-height:1.45!important}\n .home-profile-contact-mobile a{font-size:9px!important;line-height:1.5!important}\n .home-profile-scroll{font-size:15px!important;line-height:1.85!important}\n .home-profile-section-title{font-size:9px!important;line-height:1.45!important}\n .home-profile-message{font-size:14px!important;line-height:1.85!important}\n .home-profile-link{font-size:10px!important;min-height:42px!important}\n}\n@media(max-width:420px){\n .home-profile-title{font-size:22px!important}\n .home-profile-message{font-size:14px!important;line-height:1.85!important}\n}\n</style>\n'''
 
-          for old, new in replacements.items():
-              if old not in text:
-                  raise SystemExit(f'Missing expected CSS fragment: {old}')
-              text = text.replace(old, new, 1)
-
-          mobile_anchor = '@media(max-width:650px){\n'
-          mobile_patch = '''@media(max-width:650px){\n .home-section-management .member-body h3{font-size:15px;line-height:1.35}\n .home-section-management .member-role{font-size:9px!important;line-height:1.45}\n .home-section-management .member-contact{font-size:9px!important;line-height:1.45}\n .home-section-management .member-message{font-size:10px!important;line-height:1.6!important}\n'''
-          if mobile_anchor not in text:
-              raise SystemExit('Missing mobile media anchor')
-          text = text.replace(mobile_anchor, mobile_patch, 1)
-
+          if marker not in text:
+              needle = '</style>\n<main class="shell home-v3">'
+              if needle not in text:
+                  raise SystemExit('Homepage style insertion point missing')
+              text = text.replace(needle, css + '<main class="shell home-v3">', 1)
           path.write_text(text)
           PY
-          grep -q 'font-size:15px;line-height:1.85' resources/views/home-v3.blade.php
-          grep -q 'font-size:clamp(28px,2.2vw,34px)' resources/views/home-v3.blade.php
-          grep -q 'font-size:15px;line-height:1.6!important' resources/views/home-v3.blade.php
 
-          # Remove the temporary runner and this one-shot CI patch step after the
-          # real source change is committed, leaving the normal CI workflow clean.
+          grep -q 'HOMEPAGE MANAGEMENT PROFILE ACCESSIBILITY POLISH' resources/views/home-v3.blade.php
+          grep -q 'font-size:14px!important;line-height:1.85!important' resources/views/home-v3.blade.php
+
           rm -f .github/workflows/temporary-accessibility-polish.yml
           python3 - <<'PY'
           from pathlib import Path
@@ -78,6 +62,7 @@ jobs:
           git diff --cached --check
           git commit -m 'Improve management profile text readability'
           git push origin main
+
       # ACCESSIBILITY_POLISH_END
 
       - name: Setup Node
