@@ -9,9 +9,9 @@ class ExampleTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_application_health_endpoint_is_available(): void
+    public function test_public_homepage_is_available(): void
     {
-        $this->get('/up')->assertSuccessful();
+        $this->get('/')->assertSuccessful();
     }
 
     public function test_public_career_page_is_available(): void
