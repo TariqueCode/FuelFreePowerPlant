@@ -98,7 +98,7 @@ class HomepageBuilderController extends Controller
             'gallery' => SiteContentItem::query()->where('type', 'gallery')->published()->whereIn('id', $selectedIds['gallery'])->pluck('id')->map(fn ($id) => (int) $id)->all(),
         ];
 
-        DB::transaction(function () use ($order, $request, $validIds) {
+        DB::transaction(function () use ($order, $request, $validIds, $managementFolderId) {
         foreach ($order as $position => $key) {
             $section = HomepageSection::query()->where('key', $key)->first();
             $settings = is_array($section?->settings) ? $section->settings : [];
