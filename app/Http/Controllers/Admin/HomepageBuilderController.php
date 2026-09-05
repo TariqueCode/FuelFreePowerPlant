@@ -22,7 +22,7 @@ class HomepageBuilderController extends Controller
             'management' => SiteContentItem::query()->where('type', 'management')->where('status', 'published')->count(),
             'news' => SiteContentItem::query()->whereIn('type', ['news', 'announcement'])->where('status', 'published')->count(),
             'gallery' => SiteContentItem::query()->where('type', 'gallery')->where('status', 'published')->count(),
-            'sliders' => \\App\\Models\\SiteSlider::query()->where('is_published', true)->count(),
+            'sliders' => \App\Models\SiteSlider::query()->where('is_published', true)->count(),
         ];
 
         $managementFolders = ManagementProfileFolder::query()
