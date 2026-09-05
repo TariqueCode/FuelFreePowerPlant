@@ -37,6 +37,7 @@ class NavigationMenuItem extends Model
 
     public function displayLabel(): string
     {
+        if (!app()->runningInConsole() && request()->is('admin/*') && str_starts_with((string)$this->source_key, 'management_folder:')) return 'Profile Builder';
         if ($this->route_name === 'management' && !app()->runningInConsole() && request()->is('admin/*')) return 'Profile Builder';
         if ($this->route_name === 'management' && Schema::hasTable('management_profile_folders')) {
             $folder = ManagementProfileFolder::query()->where('status','published')->orderBy('sort_order')->orderBy('id')->first();
