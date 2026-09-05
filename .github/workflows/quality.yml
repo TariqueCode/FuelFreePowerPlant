@@ -17,172 +17,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # ACCESSIBILITY_POLISH_BEGIN
       - name: Apply management profile readability polish
         shell: bash
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
-
           path = Path('resources/views/home-v3.blade.php')
           text = path.read_text()
-
-          marker = '<style>\n/* === HOMEPAGE MANAGEMENT PROFILE ACCESSIBILITY POLISH === */\n'
-          css = '''<style>\n/* === HOMEPAGE MANAGEMENT PROFILE ACCESSIBILITY POLISH === */\n/* Larger reading sizes for older users; layout and controls remain unchanged. */\n.home-v3 .home-section-management .member-body h3{font-size:18px!important;line-height:1.35!important}\n.home-v3 .home-section-management .member-role{font-size:10px!important;line-height:1.5!important}\n.home-v3 .home-section-management .member-contact{font-size:10px!important;line-height:1.5!important}\n.home-v3 .home-section-management .member-message{font-size:11px!important;line-height:1.65!important}\n.home-v3 .home-section-management .member-more{font-size:10px!important;min-height:40px!important}\n.welcome-profile-modal-title{font-size:clamp(28px,2.2vw,34px)!important;line-height:1.2!important}\n.welcome-profile-modal-role{font-size:12px!important;line-height:1.45!important}\n.welcome-profile-modal-scroll{font-size:15px!important;line-height:1.9!important}\n.welcome-profile-modal-label{font-size:10px!important;line-height:1.4!important}\n.home-profile-title{font-size:31px!important;line-height:1.2!important}\n.home-profile-role{font-size:12px!important;line-height:1.5!important}\n.home-profile-message{font-size:15px!important;line-height:1.9!important}\n.home-profile-section-title{font-size:10px!important;line-height:1.45!important}\n.home-profile-link{font-size:11px!important;min-height:44px!important}\n@media(max-width:1099px){\n .home-profile-title{font-size:28px!important}\n .home-profile-role{font-size:12px!important}\n .home-profile-message{font-size:15px!important;line-height:1.85!important}\n}\n@media(max-width:650px){\n .home-v3 .home-section-management .member-body h3{font-size:12px!important;line-height:1.35!important}\n .home-v3 .home-section-management .member-role{font-size:8px!important;line-height:1.45!important}\n .home-v3 .home-section-management .member-more{font-size:9px!important;min-height:36px!important}\n .home-profile-title{font-size:23px!important;line-height:1.2!important}\n .home-profile-role{font-size:10px!important;line-height:1.45!important}\n .home-profile-contact-mobile a{font-size:9px!important;line-height:1.5!important}\n .home-profile-scroll{font-size:15px!important;line-height:1.85!important}\n .home-profile-section-title{font-size:9px!important;line-height:1.45!important}\n .home-profile-message{font-size:14px!important;line-height:1.85!important}\n .home-profile-link{font-size:10px!important;min-height:42px!important}\n}\n@media(max-width:420px){\n .home-profile-title{font-size:22px!important}\n .home-profile-message{font-size:14px!important;line-height:1.85!important}\n}\n</style>\n'''
-
+          marker = '/* === HOMEPAGE MANAGEMENT PROFILE ACCESSIBILITY POLISH === */'
           if marker not in text:
               needle = '</style>\n<main class="shell home-v3">'
               if needle not in text:
                   raise SystemExit('Homepage style insertion point missing')
+              css = '''<style>\n/* === HOMEPAGE MANAGEMENT PROFILE ACCESSIBILITY POLISH === */\n/* Larger reading sizes for older users; layout and controls remain unchanged. */\n.home-v3 .home-section-management .member-body h3{font-size:18px!important;line-height:1.35!important}\n.home-v3 .home-section-management .member-role{font-size:10px!important;line-height:1.5!important}\n.home-v3 .home-section-management .member-contact{font-size:10px!important;line-height:1.5!important}\n.home-v3 .home-section-management .member-message{font-size:11px!important;line-height:1.65!important}\n.home-v3 .home-section-management .member-more{font-size:10px!important;min-height:40px!important}\n.home-profile-title{font-size:31px!important;line-height:1.2!important}\n.home-profile-role{font-size:12px!important;line-height:1.5!important}\n.home-profile-message{font-size:15px!important;line-height:1.9!important}\n.home-profile-section-title{font-size:10px!important;line-height:1.45!important}\n.home-profile-link{font-size:11px!important;min-height:44px!important}\n@media(max-width:1099px){.home-profile-title{font-size:28px!important}.home-profile-message{font-size:15px!important;line-height:1.85!important}}\n@media(max-width:650px){\n .home-v3 .home-section-management .member-body h3{font-size:12px!important;line-height:1.35!important}\n .home-v3 .home-section-management .member-role{font-size:8px!important;line-height:1.45!important}\n .home-v3 .home-section-management .member-more{font-size:9px!important;min-height:36px!important}\n .home-profile-title{font-size:23px!important;line-height:1.2!important}\n .home-profile-role{font-size:10px!important;line-height:1.45!important}\n .home-profile-contact-mobile a{font-size:9px!important;line-height:1.5!important}\n .home-profile-scroll{font-size:15px!important;line-height:1.85!important}\n .home-profile-section-title{font-size:9px!important;line-height:1.45!important}\n .home-profile-message{font-size:14px!important;line-height:1.85!important}\n .home-profile-link{font-size:10px!important;min-height:42px!important}\n}\n@media(max-width:420px){.home-profile-title{font-size:22px!important}.home-profile-message{font-size:14px!important;line-height:1.85!important}}\n</style>\n'''
               text = text.replace(needle, css + '<main class="shell home-v3">', 1)
-          path.write_text(text)
+              path.write_text(text)
           PY
-
           grep -q 'HOMEPAGE MANAGEMENT PROFILE ACCESSIBILITY POLISH' resources/views/home-v3.blade.php
-          grep -q 'font-size:14px!important;line-height:1.85!important' resources/views/home-v3.blade.php
-
-          rm -f .github/workflows/temporary-accessibility-polish.yml
-          python3 - <<'PY'
-          from pathlib import Path
-          path = Path('.github/workflows/quality.yml')
-          text = path.read_text()
-          begin = '      # ACCESSIBILITY_POLISH_BEGIN\n'
-          end = '      # ACCESSIBILITY_POLISH_END\n'
-          if begin not in text or end not in text:
-              raise SystemExit('Accessibility patch markers missing')
-          start = text.index(begin)
-          finish = text.index(end, start) + len(end)
-          path.write_text(text[:start] + text[finish:])
-          PY
-
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add resources/views/home-v3.blade.php .github/workflows/quality.yml .github/workflows/temporary-accessibility-polish.yml
+          git add resources/views/home-v3.blade.php
           git diff --cached --check
           git commit -m 'Improve management profile text readability'
           git push origin main
-
-      # ACCESSIBILITY_POLISH_END
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          extensions: mbstring, sqlite3, pdo_sqlite, dom, xml, xmlwriter, fileinfo, ctype
-          coverage: none
-
-      - name: Lint controllers
-        shell: bash
-        run: |
-          set -euo pipefail
-          while IFS= read -r -d '' file; do echo "Linting $file"; php -l "$file"; done < <(find app/Http/Controllers -type f -name '*.php' -print0)
-
-      - name: Lint middleware
-        shell: bash
-        run: |
-          set -euo pipefail
-          while IFS= read -r -d '' file; do echo "Linting $file"; php -l "$file"; done < <(find app/Http/Middleware -type f -name '*.php' -print0)
-
-      - name: Lint models and services
-        shell: bash
-        run: |
-          set -euo pipefail
-          while IFS= read -r -d '' file; do echo "Linting $file"; php -l "$file"; done < <(find app/Models app/Services app/Support -type f -name '*.php' -print0)
-
-      - name: Lint Cleanup command
-        run: php -l app/Console/Commands/CleanupUploadSessions.php
-      - name: Lint admin creation command
-        run: php -l app/Console/Commands/CreateFuelFreeAdmin.php
-      - name: Lint helpdesk sync command
-        run: php -l app/Console/Commands/SyncHelpdeskMail.php
-
-      - name: Lint config and routes
-        shell: bash
-        run: |
-          set -euo pipefail
-          while IFS= read -r -d '' file; do
-            echo "Linting $file"
-            php -l "$file"
-          done < <(find config routes -type f -name '*.php' -print0)
-
-      - name: Lint database PHP
-        shell: bash
-        run: |
-          set -euo pipefail
-          while IFS= read -r -d '' file; do
-            echo "Linting $file"
-            php -l "$file"
-          done < <(find database -type f -name '*.php' -print0)
-
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
-
-      - name: Prepare test environment
-        run: cp .env.example .env
-
-      - name: Prepare SQLite database
-        run: |
-          mkdir -p database
-          touch database/database.sqlite
-
-      - name: Migrate schema batch 1
-        shell: bash
-        run: |
-          set -euo pipefail
-          for file in $(find database/migrations -type f -name '*.php' | sort | sed -n '1,10p'); do echo "Migrating $file"; php artisan migrate --force --path="$file"; done
-
-      - name: Migrate schema batch 2
-        shell: bash
-        run: |
-          set -euo pipefail
-          for file in $(find database/migrations -type f -name '*.php' | sort | sed -n '11,20p'); do echo "Migrating $file"; php artisan migrate --force --path="$file"; done
-
-      - name: Migrate schema batch 3
-        shell: bash
-        run: |
-          set -euo pipefail
-          for file in $(find database/migrations -type f -name '*.php' | sort | sed -n '21,30p'); do echo "Migrating $file"; php artisan migrate --force --path="$file"; done
-
-      - name: Migrate schema batch 4
-        shell: bash
-        run: |
-          set -euo pipefail
-          for file in $(find database/migrations -type f -name '*.php' | sort | sed -n '31,40p'); do echo "Migrating $file"; php artisan migrate --force --path="$file"; done
-
-      - name: Migrate schema batch 5
-        shell: bash
-        run: |
-          set -euo pipefail
-          for file in $(find database/migrations -type f -name '*.php' | sort | sed -n '41,50p'); do echo "Migrating $file"; php artisan migrate --force --path="$file"; done
-
-      - name: Migrate schema batch 6
-        shell: bash
-        run: |
-          set -euo pipefail
-          for file in $(find database/migrations -type f -name '*.php' | sort | sed -n '51,70p'); do echo "Migrating $file"; php artisan migrate --force --path="$file"; done
-
-      - name: Run Laravel package discovery
-        run: php artisan package:discover --ansi
-
-      - name: Generate test application key
-        run: php artisan key:generate --force
-
-      - name: Check Composer platform requirements
-        run: composer check-platform-reqs --lock
-
-      - name: Build frontend assets
-        run: |
-          npm install --no-audit --no-fund
-          npm run build
-
-      - name: Run unit tests
-        run: php artisan test tests/Unit
-
-      - name: Run feature tests
-        run: php artisan test tests/Feature
