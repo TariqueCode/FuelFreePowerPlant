@@ -226,3 +226,97 @@
         font-size: 0.7rem !important;
     }
 }
+
+/*
+ * Final specificity guard: the homepage profile viewer also has an inline
+ * readability layer, so these selectors intentionally outrank it while
+ * leaving the existing layout, scrolling and controls untouched.
+ */
+.home-v3.home-v3 .home-section-management .member-body h3,
+.home-v3.home-v3 .home-section-management .member-card h3 {
+    font-size: 20px !important;
+    line-height: 1.35 !important;
+}
+
+.home-v3.home-v3 .home-section-management .member-role {
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+}
+
+.home-v3.home-v3 .home-section-management .member-contact,
+.home-v3.home-v3 .home-section-management .member-contact span {
+    font-size: 11px !important;
+    line-height: 1.55 !important;
+}
+
+.home-v3.home-v3 .home-section-management .member-message {
+    font-size: 13px !important;
+    line-height: 1.7 !important;
+}
+
+.home-v3.home-v3 .home-section-management .member-more {
+    font-size: 12px !important;
+    min-height: 44px !important;
+}
+
+.welcome-profile-modal.welcome-profile-modal .welcome-profile-modal-title {
+    font-size: clamp(28px, 2.2vw, 34px) !important;
+    line-height: 1.22 !important;
+}
+
+.welcome-profile-modal.welcome-profile-modal .welcome-profile-modal-role {
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+}
+
+.welcome-profile-modal.welcome-profile-modal .welcome-profile-modal-scroll {
+    font-size: 18px !important;
+    line-height: 1.9 !important;
+}
+
+.welcome-profile-modal.welcome-profile-modal .welcome-profile-modal-label {
+    font-size: 12px !important;
+    line-height: 1.45 !important;
+}
+
+@media (max-width: 650px) {
+    .home-v3.home-v3 .home-section-management .member-body h3,
+    .home-v3.home-v3 .home-section-management .member-card h3 {
+        font-size: 15px !important;
+    }
+
+    .home-v3.home-v3 .home-section-management .member-role {
+        font-size: 10px !important;
+    }
+
+    .home-v3.home-v3 .home-section-management .member-contact,
+    .home-v3.home-v3 .home-section-management .member-contact span {
+        font-size: 10px !important;
+    }
+
+    .home-v3.home-v3 .home-section-management .member-message {
+        font-size: 11px !important;
+    }
+
+    .home-v3.home-v3 .home-section-management .member-more {
+        font-size: 10px !important;
+        min-height: 42px !important;
+    }
+
+    .welcome-profile-modal.welcome-profile-modal .welcome-profile-modal-title {
+        font-size: 26px !important;
+    }
+
+    .welcome-profile-modal.welcome-profile-modal .welcome-profile-modal-role {
+        font-size: 14px !important;
+    }
+
+    .welcome-profile-modal.welcome-profile-modal .welcome-profile-modal-scroll {
+        font-size: 17px !important;
+        line-height: 1.85 !important;
+    }
+
+    .welcome-profile-modal.welcome-profile-modal .welcome-profile-modal-label {
+        font-size: 11px !important;
+    }
+}
