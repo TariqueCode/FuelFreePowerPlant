@@ -3260,6 +3260,181 @@ main.shell{
  .home-profile-link{font-size:10px!important;min-height:42px!important}
 }
 @media(max-width:420px){.home-profile-title{font-size:22px!important}.home-profile-message{font-size:14px!important;line-height:1.85!important}}
+
+<style>
+/* === DESKTOP BOARD OF DIRECTORS — REFERENCE DESIGN === */
+@media (min-width:1100px){
+    .home-v3 .home-section-management{
+        padding-top:72px !important;
+        padding-bottom:84px !important;
+    }
+    .home-v3 .home-section-management .head{
+        margin-bottom:28px !important;
+    }
+    .home-v3 .home-section-management .management-grid{
+        display:grid !important;
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:28px !important;
+        width:100% !important;
+        max-width:none !important;
+        align-items:stretch !important;
+    }
+    .home-v3 .home-section-management .member-card{
+        display:grid !important;
+        grid-template-columns:minmax(250px,43%) minmax(0,57%) !important;
+        width:100% !important;
+        min-width:0 !important;
+        min-height:428px !important;
+        height:428px !important;
+        margin:0 !important;
+        padding:0 !important;
+        border:1px solid rgba(72,216,241,.20) !important;
+        border-radius:20px !important;
+        overflow:hidden !important;
+        background:linear-gradient(145deg,rgba(8,37,50,.96),rgba(3,19,27,.98)) !important;
+        box-shadow:none !important;
+    }
+    .home-v3 .home-section-management .member-card:hover{
+        transform:none !important;
+        border-color:rgba(72,216,241,.34) !important;
+        box-shadow:0 18px 48px rgba(0,0,0,.20) !important;
+    }
+    .home-v3 .home-section-management .member-photo{
+        position:relative !important;
+        width:100% !important;
+        height:100% !important;
+        min-height:0 !important;
+        aspect-ratio:auto !important;
+        border-radius:0 !important;
+        background:#061923 !important;
+        overflow:hidden !important;
+    }
+    .home-v3 .home-section-management .member-photo img{
+        width:100% !important;
+        height:100% !important;
+        display:block !important;
+        object-fit:cover !important;
+        object-position:center center !important;
+    }
+    .home-v3 .home-section-management .member-photo:after{
+        content:"" !important;
+        position:absolute !important;
+        inset:0 !important;
+        pointer-events:none !important;
+        background:linear-gradient(180deg,transparent 64%,rgba(1,10,15,.18)) !important;
+    }
+    .home-v3 .home-section-management .member-body{
+        display:flex !important;
+        flex-direction:column !important;
+        justify-content:flex-start !important;
+        min-width:0 !important;
+        min-height:0 !important;
+        height:100% !important;
+        padding:31px 28px 28px !important;
+        background:linear-gradient(180deg,rgba(5,26,36,.18),rgba(3,18,26,.62)) !important;
+    }
+    .home-v3 .home-section-management .member-body h3{
+        margin:0 !important;
+        color:#effcff !important;
+        font-size:28px !important;
+        line-height:1.16 !important;
+        letter-spacing:-.035em !important;
+        font-weight:850 !important;
+        overflow-wrap:anywhere !important;
+    }
+    .home-v3 .home-section-management .member-role{
+        margin:11px 0 0 !important;
+        color:#43d1f0 !important;
+        font-size:13px !important;
+        line-height:1.35 !important;
+        font-weight:850 !important;
+        letter-spacing:.10em !important;
+        text-transform:uppercase !important;
+    }
+    .home-v3 .home-section-management .member-contacts{
+        display:grid !important;
+        gap:13px !important;
+        margin-top:25px !important;
+        padding-top:0 !important;
+        border-top:0 !important;
+    }
+    .home-v3 .home-section-management .member-contact{
+        display:flex !important;
+        align-items:center !important;
+        gap:14px !important;
+        min-width:0 !important;
+        color:#b2c9d0 !important;
+        font-size:15px !important;
+        line-height:1.45 !important;
+        white-space:nowrap !important;
+        overflow:hidden !important;
+        text-overflow:ellipsis !important;
+    }
+    .home-v3 .home-section-management .member-contact i{
+        flex:0 0 25px !important;
+        width:25px !important;
+        color:#43d1f0 !important;
+        font-size:23px !important;
+        text-align:center !important;
+    }
+    .home-v3 .home-section-management .member-contact span{
+        min-width:0 !important;
+        overflow:hidden !important;
+        text-overflow:ellipsis !important;
+        white-space:nowrap !important;
+    }
+    .home-v3 .home-section-management .member-message{
+        position:relative !important;
+        display:-webkit-box !important;
+        margin:27px 0 0 !important;
+        padding:0 0 0 39px !important;
+        min-height:0 !important;
+        color:#b2c9d0 !important;
+        font-size:15px !important;
+        line-height:1.62 !important;
+        -webkit-line-clamp:3 !important;
+        -webkit-box-orient:vertical !important;
+        overflow:hidden !important;
+    }
+    .home-v3 .home-section-management .member-message:before{
+        content:"\f075" !important;
+        position:absolute !important;
+        left:0 !important;
+        top:2px !important;
+        margin:0 !important;
+        color:#43d1f0 !important;
+        font-family:"Font Awesome 6 Free" !important;
+        font-size:25px !important;
+        font-weight:900 !important;
+    }
+    .home-v3 .home-section-management .member-more{
+        align-self:flex-start !important;
+        width:auto !important;
+        min-width:240px !important;
+        min-height:55px !important;
+        margin-top:auto !important;
+        padding:12px 25px !important;
+        justify-content:center !important;
+        gap:12px !important;
+        border:1px solid rgba(72,216,241,.25) !important;
+        border-radius:14px !important;
+        background:rgba(72,216,241,.025) !important;
+        color:#43d1f0 !important;
+        font-size:15px !important;
+        font-weight:850 !important;
+        letter-spacing:.01em !important;
+    }
+    .home-v3 .home-section-management .member-more i{
+        font-size:15px !important;
+    }
+    .home-v3 .home-section-management .member-more:hover{
+        transform:none !important;
+        border-color:rgba(72,216,241,.45) !important;
+        background:rgba(72,216,241,.07) !important;
+    }
+}
+</style>
+
 </style>
 <main class="shell home-v3">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
