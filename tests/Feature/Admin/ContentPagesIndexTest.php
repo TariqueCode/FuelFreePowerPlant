@@ -62,7 +62,7 @@ class ContentPagesIndexTest extends TestCase
             'status' => 'published',
         ]);
 
-        $response = $this->actingAs($user)->get(route('admin.cms.index'));
+        $response = $this->actingAs($user)->get(route('admin.page-builder.index'));
 
         $response->assertOk()
             ->assertSee('Future Projects')
@@ -94,7 +94,7 @@ class ContentPagesIndexTest extends TestCase
             ->assertNotFound();
 
         $this->actingAs($user)
-            ->get(route('admin.cms.index'))
+            ->get(route('admin.page-builder.index'))
             ->assertOk()
             ->assertDontSee('Resources CMS')
             ->assertDontSee('Resources');
