@@ -1,70 +1,10 @@
 name: Temporary Desktop Photo Fit
 
 on:
-  push:
-    branches:
-      - main
-
-permissions:
-  contents: write
+  workflow_dispatch:
 
 jobs:
-  patch:
+  retired:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-
-      - name: Apply desktop 4x5 management card fit
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ "${GITHUB_ACTOR}" == "github-actions[bot]" ]]; then
-            echo "Skipping bot-triggered run."
-            exit 0
-          fi
-          python3 - <<'PY'
-          from pathlib import Path
-          path = Path('resources/views/home-v3.blade.php')
-          text = path.read_text(encoding='utf-8')
-          marker = '/* DESKTOP: MANAGEMENT CARD 4X5 PHOTO FIT */'
-          if marker not in text:
-              css = r'''
-/* DESKTOP: MANAGEMENT CARD 4X5 PHOTO FIT */
-@media (min-width:651px){
-  .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important}
-  .home-section-management .member-card{display:grid!important;grid-template-columns:minmax(0,42%) minmax(0,58%)!important;align-items:stretch!important;min-width:0!important}
-  .home-section-management .member-photo{width:100%!important;height:100%!important;aspect-ratio:4/5!important;min-height:0!important}
-  .home-section-management .member-photo img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important}
-  .home-section-management .member-body{min-width:0!important;min-height:100%!important;display:flex!important;flex-direction:column!important;justify-content:center!important;padding:22px!important}
-  .home-section-management .member-body h3{font-size:clamp(19px,1.55vw,25px)!important;line-height:1.28!important}
-  .home-section-management .member-role{font-size:12px!important;line-height:1.5!important}
-  .home-section-management .member-contact{font-size:11px!important;line-height:1.55!important}
-  .home-section-management .member-message{font-size:13px!important;line-height:1.65!important}
-  .home-section-management .member-more{align-self:flex-start!important;width:auto!important;min-width:240px!important;font-size:12px!important;min-height:46px!important;margin-top:15px!important}
-}
-'''
-              if '</style>' not in text:
-                  raise SystemExit('Missing closing style tag')
-              text = text.replace('</style>', css + '\n</style>', 1)
-              path.write_text(text, encoding='utf-8')
-          if marker not in path.read_text(encoding='utf-8'):
-              raise SystemExit('Patch marker missing after write')
-          PY
-          grep -q 'aspect-ratio:4/5!important' resources/views/home-v3.blade.php
-          git diff --check
-
-      - name: Commit patch and remove workflow
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add resources/views/home-v3.blade.php
-          git rm .github/workflows/temporary-desktop-photo-fit.yml
-          git diff --cached --check
-          git commit -m 'Fix desktop management profile photo framing'
-          git push origin main
+      - run: echo retired
