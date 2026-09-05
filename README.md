@@ -311,6 +311,10 @@ Energy data integrations must follow the same security principle: plant credenti
 - `resources/views` — Blade UI
 - `routes/web.php` — authenticated web routes
 
+## Responsive CMS editor
+
+The CMS rich-text editor is designed to remain usable on compact screens without removing its editing capabilities. On mobile, the editor toolbar stays on a single horizontal touch-scrollable rail, while the editor canvas remains width-constrained to the device. CMS media insertion supports selecting multiple image/video files in one action, and inserted images can be resized from their selection handle while retaining responsive max-width behavior.
+
 ## License
 
 This project is application-specific software. Review the repository's deployment and licensing requirements before redistribution.
