@@ -56,7 +56,10 @@ class HomeController
             'section_order' => array_values(array_filter($sectionOrder, fn ($key) => ! in_array($key, ['statistics','projects'], true))) ?: ['hero','welcome','management','news','gallery','cta'],
         ];
 
-        $managementLimit = max(1, min(100, (int) data_get($sectionSettings->get('management', []), 'limit', 4)));
+        $managementSettings = $sectionSettings['management'] ?? [];
+        $managementFolderId = (int) ($managementSettings['folder_id'] ?? 0);
+        $managementSelectedIds = array_values(array_unique(array_filter(array_map('intval', $managementSettings['ids'] ?? []))));
+        $managementLimit = max(1, min(100, (int) data_get($managementSettings, 'limit', count($managementSelectedIds) ?: 4)));
         $newsLimit=max(1,min(100,(int)($sectionSettings['news']['limit']??3)));
         $galleryLimit=max(1,min(100,(int)($sectionSettings['gallery']['limit']??4)));
         $resolveIds = static fn (array $settings): array => array_values(array_unique(array_filter(array_map('intval', $settings['ids'] ?? []))));
@@ -73,7 +76,6 @@ class HomeController
         };
 
         $newsSettings = $sectionSettings['news'] ?? [];
-        $managementSettings = $sectionSettings['management'] ?? [];
         $gallerySettings = $sectionSettings['gallery'] ?? [];
         $welcomeSettings = $sectionSettings['welcome'] ?? [];
         $welcomeManagementIds = array_values(array_unique(array_filter(array_map('intval', (array) ($welcomeSettings['management_ids'] ?? [])))));
@@ -107,17 +109,16 @@ class HomeController
             ->orderBy('sort_order')
             ->orderBy('title');
 
-        if (($managementSettings['mode'] ?? 'latest') === 'selected') {
-            $homeManagement = $applySelection($managementQuery, $managementSettings, $managementLimit);
-        } else {
-            $homeManagement = SiteContentItem::published()
-                ->where('type', 'management')
-                ->orderBy('sort_order')
-                ->orderBy('title')
-                ->limit(100)
+        if ($managementFolderId > 0 && $managementSelectedIds) {
+            $position = array_flip($managementSelectedIds);
+            $homeManagement = $managementQuery
+                ->where('management_profile_folder_id', $managementFolderId)
+                ->whereIn('id', $managementSelectedIds)
                 ->get()
-                ->take($managementLimit)
+                ->sortBy(fn ($item) => $position[(int) $item->id] ?? PHP_INT_MAX)
                 ->values();
+        } else {
+            $homeManagement = collect();
         }
 
         $welcomeManagement = $welcomeManagement

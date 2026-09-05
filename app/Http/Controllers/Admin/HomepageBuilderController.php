@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\HomepageSection;
 use App\Models\SiteContentItem;
+use App\Models\ManagementProfileFolder;
 use App\Models\SystemSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,13 +25,17 @@ class HomepageBuilderController extends Controller
             'sliders' => \App\Models\SiteSlider::query()->where('is_published', true)->count(),
         ];
 
+        $managementFolders = ManagementProfileFolder::query()
+            ->where('status', 'published')
+            ->with(['profiles' => fn ($query) => $query->where('status', 'published')->orderBy('sort_order')->orderBy('title')->select(['id','management_profile_folder_id','title'])])
+            ->orderBy('sort_order')->orderBy('id')->get();
+
         $choices = [
-            'management' => SiteContentItem::query()->where('type','management')->published()->orderBy('sort_order')->orderBy('title')->get(['id','title']),
             'news' => SiteContentItem::query()->whereIn('type',['news','announcement'])->published()->orderBy('sort_order')->latest('published_at')->get(['id','title','type']),
             'gallery' => SiteContentItem::query()->where('type','gallery')->published()->orderBy('sort_order')->latest('published_at')->get(['id','title']),
         ];
 
-        return view('admin.homepage-builder.index', compact('sections', 'counts', 'choices'));
+        return view('admin.homepage-builder.index', compact('sections', 'counts', 'choices', 'managementFolders'));
     }
 
     public function update(Request $request): RedirectResponse
@@ -44,6 +49,9 @@ class HomepageBuilderController extends Controller
             'settings.*.mode' => ['nullable', 'in:latest,selected'],
             'settings.*.ids' => ['nullable', 'array', 'max:100'],
             'settings.*.ids.*' => ['integer', 'distinct'],
+            'settings.management.folder_id' => ['required', 'integer', 'exists:management_profile_folders,id'],
+            'settings.management.ids' => ['required', 'array', 'min:1', 'max:100'],
+            'settings.management.ids.*' => ['required', 'integer', 'distinct'],
             'settings.welcome.eyebrow' => ['nullable', 'string', 'max:120'],
             'settings.welcome.signoff' => ['nullable', 'string', 'max:240'],
             'settings.welcome.title' => ['nullable', 'string', 'max:240'],
@@ -68,9 +76,24 @@ class HomepageBuilderController extends Controller
         foreach (['management','news','gallery'] as $key) {
             $selectedIds[$key] = array_values(array_unique(array_map('intval', (array) $request->input("settings.{$key}.ids", []))));
         }
+        $managementFolderId = (int) $request->input('settings.management.folder_id');
+        $managementFolder = ManagementProfileFolder::query()->where('status', 'published')->find($managementFolderId);
+        if (! $managementFolder) {
+            return back()->withErrors(['settings.management.folder_id' => 'Choose a valid published profile folder.']);
+        }
+
+        $managementValidIds = SiteContentItem::query()
+            ->where('type', 'management')
+            ->where('management_profile_folder_id', $managementFolderId)
+            ->published()
+            ->whereIn('id', $selectedIds['management'])
+            ->pluck('id')->map(fn ($id) => (int) $id)->all();
+        if (count($managementValidIds) < 1) {
+            return back()->withErrors(['settings.management.ids' => 'Select at least one published profile from the selected folder.']);
+        }
 
         $validIds = [
-            'management' => SiteContentItem::query()->where('type', 'management')->published()->whereIn('id', $selectedIds['management'])->pluck('id')->map(fn ($id) => (int) $id)->all(),
+            'management' => $managementValidIds,
             'news' => SiteContentItem::query()->whereIn('type', ['news','announcement'])->published()->whereIn('id', $selectedIds['news'])->pluck('id')->map(fn ($id) => (int) $id)->all(),
             'gallery' => SiteContentItem::query()->where('type', 'gallery')->published()->whereIn('id', $selectedIds['gallery'])->pluck('id')->map(fn ($id) => (int) $id)->all(),
         ];
@@ -97,7 +120,12 @@ class HomepageBuilderController extends Controller
                     2
                 ));
             }
-            if (in_array($key, ['management','news','gallery'], true) && $request->has("settings.{$key}.limit")) {
+            if ($key === 'management') {
+                $settings['folder_id'] = $managementFolderId;
+                $settings['mode'] = 'selected';
+                $settings['ids'] = array_values(array_slice($validIds['management'], 0, 100));
+                unset($settings['limit']);
+            } elseif (in_array($key, ['news','gallery'], true) && $request->has("settings.{$key}.limit")) {
                 $settings['limit'] = max(1, min(100, (int) $request->input("settings.{$key}.limit")));
                 $mode = $request->input("settings.{$key}.mode", $settings['mode'] ?? 'latest');
                 $settings['mode'] = $mode;
