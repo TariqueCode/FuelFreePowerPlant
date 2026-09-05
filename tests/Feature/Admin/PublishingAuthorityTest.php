@@ -51,6 +51,7 @@ class PublishingAuthorityTest extends TestCase
         $this->assertTrue($user->hasPermission('cms.manage'));
         $this->assertFalse($user->hasPermission('cms.publish'));
     }
+
     public function test_news_publication_toggle_requires_publish_permission_and_works_when_granted(): void
     {
         $manage = Permission::firstOrCreate(['slug' => 'website.manage'], ['name' => 'Manage website sections']);
@@ -88,7 +89,7 @@ class PublishingAuthorityTest extends TestCase
         $user = User::factory()->create();
         $user->roles()->attach($role);
 
-        $this->actingAs($user)->post(route('admin.management.store'), [
+        $this->actingAs($user)->post(route('admin.profile-builder.store'), [
             'title' => 'QA Manager', 'designation' => 'Director', 'phone' => '01700000000',
             'status' => 'published',
         ])->assertForbidden();
@@ -173,15 +174,13 @@ class PublishingAuthorityTest extends TestCase
             'is_published' => false,
         ]);
 
-        $this->actingAs($manager)->patch(route('admin.cms.toggle', $page))->assertForbidden();
+        $this->actingAs($manager)->patch(route('admin.page-builder.toggle', $page))->assertForbidden();
         $this->assertFalse($page->fresh()->is_published);
 
-        $this->actingAs($publisher)->patch(route('admin.cms.toggle', $page))->assertRedirect();
+        $this->actingAs($publisher)->patch(route('admin.page-builder.toggle', $page))->assertRedirect();
         $this->assertTrue($page->fresh()->is_published);
 
-        $this->actingAs($publisher)->patch(route('admin.cms.toggle', $page))->assertRedirect();
+        $this->actingAs($publisher)->patch(route('admin.page-builder.toggle', $page))->assertRedirect();
         $this->assertFalse($page->fresh()->is_published);
     }
-
-
 }
