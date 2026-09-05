@@ -32,7 +32,7 @@ body{
     min-height:100vh;
 }
 .shell{width:min(1240px,calc(100% - 48px));margin:auto}
-main{padding:72px 0 88px}
+main{padding:72px 0 32px}
 .hero{margin:0 auto 38px;max-width:920px}
 .eyebrow{
     display:inline-flex;
@@ -101,7 +101,7 @@ main{padding:72px 0 88px}
     pointer-events:none;
     background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 65%,rgba(0,12,18,.08));
 }
-.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.photo img{width:100%;height:100%;object-fit:cover;object-position:center center;display:block}
 .photo i{font-size:46px;color:#4fd5ef}
 .body{padding:21px 21px 22px}
 .body h2{
@@ -176,6 +176,8 @@ main{padding:72px 0 88px}
 .contact:hover{color:#eaf8fb}
 .contact i{
     flex:0 0 26px;
+    font-family:"Font Awesome 6 Free" !important;
+    font-weight:900 !important;
     width:26px;
     height:26px;
     display:grid;
@@ -377,13 +379,13 @@ main{padding:72px 0 88px}
     }
 }
 @media(max-width:850px){
-    main{padding:55px 0 70px}
+    main{padding:55px 0 28px}
     .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
     .hero{margin-bottom:30px}
 }
 @media(max-width:600px){
     .shell{width:calc(100% - 24px)}
-    main{padding:40px 0 58px}
+    main{padding:40px 0 24px}
     .hero h1{font-size:clamp(34px,10vw,46px)}
     .hero p{font-size:12px;line-height:1.7}
     .grid{grid-template-columns:1fr;gap:16px}

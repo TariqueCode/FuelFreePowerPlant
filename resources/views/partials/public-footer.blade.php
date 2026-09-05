@@ -17,12 +17,13 @@
 
 <style>
 .public-footer{margin-top:60px;border-top:1px solid rgba(86,210,238,.12);padding:46px 0 24px;color:#8aa8b1;font-size:14px;line-height:1.7}
+.public-footer-management{margin-top:28px}
 .public-footer-shell{width:min(1120px,calc(100% - 40px));margin:0 auto}
 .public-footer-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);gap:46px;padding-bottom:38px}
 .public-footer-section{min-width:0}
 .public-footer-brand-section{padding-right:20px}
 .public-footer-brand-row{display:flex;align-items:center;gap:11px;margin-bottom:9px}
-.public-footer-logo{width:38px;height:38px;object-fit:contain;flex:0 0 38px}
+.public-footer-logo{width:38px;height:38px;object-fit:contain;object-position:center;display:block;align-self:center;flex:0 0 38px}
 .public-footer-brand{color:#effcff;font-size:20px;font-weight:800;line-height:1.25;letter-spacing:-.2px}.public-footer-brand-first{color:#51d8f0}.public-footer-brand-rest{color:#effcff}
 .public-footer-tagline{color:#5fcde5;font-size:12px;font-weight:700;margin:0 0 6px 49px}
 .public-footer-tech{color:#7899a5;font-size:12px;line-height:1.7;max-width:300px}
@@ -33,7 +34,7 @@
 .public-footer-contact{display:grid;gap:12px}
 .public-footer-contact a{display:flex;align-items:flex-start;gap:11px;color:#8aa8b1;text-decoration:none;font-size:13px;line-height:1.55;transition:color .2s ease,transform .2s ease}
 .public-footer-contact a:hover,.public-footer-contact a:focus-visible{color:#effcff;transform:translateX(2px)}
-.public-footer-contact i{width:16px;color:#51d8f0;margin-top:3px;text-align:center;flex:0 0 16px}
+.public-footer-contact i{width:18px;height:18px;display:inline-grid;place-items:center;color:#51d8f0;margin-top:2px;text-align:center;flex:0 0 18px;font-family:"Font Awesome 6 Free" !important;font-weight:900 !important;font-style:normal;line-height:1}
 .public-footer-social-wrap{display:flex;align-items:center;justify-content:flex-start;gap:9px;flex-wrap:wrap;margin-top:20px}
 .public-footer-social{--social-color:#51d8f0;width:36px;height:36px;display:grid;place-items:center;border:1px solid rgba(86,210,238,.14);border-radius:10px;background:rgba(67,209,240,.035);color:#7899a5;text-decoration:none;transition:.2s ease}
 .public-footer-social:hover,.public-footer-social:focus-visible,.public-footer-social.is-touched{color:var(--social-color);background:rgba(67,209,240,.07);border-color:rgba(86,210,238,.35);transform:translateY(-2px)}
@@ -44,6 +45,7 @@
 .public-footer-developer a:hover,.public-footer-developer a:focus-visible{color:#79aebb}
 @media(max-width:760px){
     .public-footer{margin-top:44px;padding:34px 0 20px}
+    .public-footer-management{margin-top:24px;padding:28px 0 16px}
     .public-footer-shell{width:min(100% - 32px,560px)}
     .public-footer-grid{grid-template-columns:1fr 1fr;gap:34px 22px;padding-bottom:28px}
     .public-footer-brand-section{grid-column:1/-1;padding:0;text-align:center;display:flex;flex-direction:column;align-items:center}
@@ -69,7 +71,7 @@
 }
 </style>
 
-<footer class="public-footer">
+<footer class="public-footer{{ request()->routeIs('management') ? ' public-footer-management' : '' }}">
     <div class="public-footer-shell">
         <div class="public-footer-grid">
             <section class="public-footer-section public-footer-brand-section">
