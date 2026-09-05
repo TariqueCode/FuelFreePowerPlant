@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SiteContentItem extends Model
 {
     protected $fillable = [
-        'type', 'title', 'slug', 'excerpt', 'designation', 'phone', 'email',
+        'type', 'management_profile_folder_id', 'title', 'slug', 'excerpt', 'designation', 'phone', 'email',
         'content', 'builder_blocks', 'template', 'use_global_framework', 'use_global_header', 'use_global_footer', 'image_path', 'attachment_path', 'attachment_name', 'attachment_size', 'attachment_mime', 'cover_alt', 'visiting_card_path', 'status', 'sort_order', 'published_at',
         'is_featured', 'meta_title', 'meta_description',
         'show_in_navigation', 'navigation_order',
@@ -28,6 +29,11 @@ class SiteContentItem extends Model
             'use_global_footer' => 'boolean',
             'attachment_size' => 'integer',
         ];
+    }
+
+    public function managementProfileFolder(): BelongsTo
+    {
+        return $this->belongsTo(ManagementProfileFolder::class, 'management_profile_folder_id');
     }
 
     public function galleryMedia(): HasMany
