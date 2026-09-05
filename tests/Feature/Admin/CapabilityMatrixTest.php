@@ -45,7 +45,7 @@ class CapabilityMatrixTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->patch(route('admin.navigation.update', $item), [
+            ->patch(route('admin.menu-builder.update', $item), [
                 'kind' => 'link',
                 'label' => 'Changed',
                 'url' => '/changed',
@@ -70,7 +70,7 @@ class CapabilityMatrixTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->patch(route('admin.navigation.update', $item), [
+            ->patch(route('admin.menu-builder.update', $item), [
                 'kind' => 'link',
                 'label' => 'Changed',
                 'url' => '/changed',
