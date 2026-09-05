@@ -14,10 +14,7 @@ class NavigationMenuItem extends Model
         'area', 'permission_key',
     ];
 
-    protected $casts = [
-        'is_visible' => 'boolean',
-        'sort_order' => 'integer',
-    ];
+    protected $casts = ['is_visible' => 'boolean', 'sort_order' => 'integer'];
 
     protected static function booted(): void
     {
@@ -32,14 +29,8 @@ class NavigationMenuItem extends Model
     public function setRouteNameAttribute($value): void
     {
         $this->attributes['route_name'] = $value;
-
-        // The legacy management route now resolves to the first published
-        // Profile Builder folder. Keep old navigation records working while
-        // exposing the folder's human name and pretty URL instead of /management.
-        if ($value === 'management' && class_exists(ManagementProfileFolder::class)) {
-            $folder = ManagementProfileFolder::query()
-                ->where('status', 'published')
-                ->orderBy('sort_order')->orderBy('id')->first();
+        if ($value === 'management') {
+            $folder = ManagementProfileFolder::query()->where('status','published')->orderBy('sort_order')->orderBy('id')->first();
             if ($folder) {
                 $this->attributes['url'] = '/'.$folder->slug;
                 $this->attributes['label'] = $folder->name;
@@ -51,26 +42,17 @@ class NavigationMenuItem extends Model
 
     public function displayLabel(): string
     {
-        if ($this->route_name === 'management' && class_exists(ManagementProfileFolder::class)) {
-            $folder = ManagementProfileFolder::query()->where('status', 'published')->orderBy('sort_order')->orderBy('id')->first();
+        if ($this->route_name === 'management') {
+            $folder = ManagementProfileFolder::query()->where('status','published')->orderBy('sort_order')->orderBy('id')->first();
             if ($folder) return $folder->name;
         }
-        if ($this->label_override !== null && trim((string) $this->label_override) !== '') return (string) $this->label_override;
-        if ($this->route_name === 'site.plants' || trim((string) $this->url, '/') === 'plants') return (string) config('fuelfree.projects.label', 'Projects & Our Plans');
-        return (string) $this->label;
+        if ($this->label_override !== null && trim((string)$this->label_override) !== '') return (string)$this->label_override;
+        if ($this->route_name === 'site.plants' || trim((string)$this->url,'/') === 'plants') return (string)config('fuelfree.projects.label','Projects & Our Plans');
+        return (string)$this->label;
     }
 
     public function parent(): BelongsTo { return $this->belongsTo(self::class, 'parent_id'); }
-
-    public function children(): HasMany
-    {
-        return $this->hasMany(self::class, 'parent_id')->orderBy('sort_order')->orderBy('id');
-    }
-
+    public function children(): HasMany { return $this->hasMany(self::class, 'parent_id')->orderBy('sort_order')->orderBy('id'); }
     public function isFolder(): bool { return $this->source_type === 'folder'; }
-
-    public function isDestination(): bool
-    {
-        return in_array($this->source_type, ['route', 'cms_page', 'site_content', 'external_link'], true);
-    }
+    public function isDestination(): bool { return in_array($this->source_type, ['route','cms_page','site_content','external_link'], true); }
 }
