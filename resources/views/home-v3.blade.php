@@ -3468,6 +3468,102 @@ main.shell{
         -webkit-tap-highlight-color:transparent;
     }
 }
+
+/* ONE-TIME DESKTOP PROFILE CARD REPAIR */
+@media (min-width: 651px) {
+    .home-v3.home-v3 .home-section-management .management-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 20px !important;
+        align-items: stretch !important;
+    }
+    .home-v3.home-v3 .home-section-management .member-card {
+        display: grid !important;
+        grid-template-columns: minmax(0, 40%) minmax(0, 60%) !important;
+        align-items: stretch !important;
+        height: auto !important;
+        min-height: 0 !important;
+    }
+    .home-v3.home-v3 .home-section-management .member-photo {
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        aspect-ratio: 4 / 5 !important;
+        align-self: stretch !important;
+        overflow: hidden !important;
+        display: block !important;
+    }
+    .home-v3.home-v3 .home-section-management .member-photo img {
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        object-fit: contain !important;
+        object-position: center center !important;
+    }
+    .home-v3.home-v3 .home-section-management .member-body {
+        min-width: 0 !important;
+        min-height: 100% !important;
+        padding: 24px 26px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+    }
+    .home-v3.home-v3 .home-section-management .member-body h3 {
+        font-size: clamp(20px, 1.5vw, 25px) !important;
+        line-height: 1.3 !important;
+    }
+    .home-v3.home-v3 .home-section-management .member-role {
+        margin-top: 7px !important;
+        font-size: 12px !important;
+        line-height: 1.5 !important;
+    }
+    .home-v3.home-v3 .home-section-management .member-contacts {
+        margin-top: 14px !important;
+        padding-top: 0 !important;
+        border-top: 0 !important;
+    }
+    .home-v3.home-v3 .home-section-management .member-contact {
+        font-size: 12px !important;
+        line-height: 1.55 !important;
+    }
+    .home-v3.home-v3 .home-section-management .member-message {
+        margin-top: 14px !important;
+        padding-top: 0 !important;
+        border-top: 0 !important;
+        font-size: 14px !important;
+        line-height: 1.65 !important;
+        font-weight: 500 !important;
+    }
+    .home-v3.home-v3 .home-section-management .member-message:before {
+        content: none !important;
+    }
+    .home-v3.home-v3 .home-section-management .member-more {
+        align-self: flex-start !important;
+        width: auto !important;
+        min-width: 210px !important;
+        min-height: 48px !important;
+        margin-top: 16px !important;
+        font-size: 13px !important;
+    }
+}
+
+@media (min-width: 651px) and (max-width: 1099px) {
+    .home-v3.home-v3 .home-section-management .member-card {
+        grid-template-columns: minmax(0, 42%) minmax(0, 58%) !important;
+    }
+    .home-v3.home-v3 .home-section-management .member-body {
+        padding: 18px !important;
+    }
+    .home-v3.home-v3 .home-section-management .member-body h3 {
+        font-size: 19px !important;
+    }
+    .home-v3.home-v3 .home-section-management .member-contact {
+        font-size: 10px !important;
+    }
+    .home-v3.home-v3 .home-section-management .member-message {
+        font-size: 12px !important;
+    }
+}
 </style>
 
 <script>
