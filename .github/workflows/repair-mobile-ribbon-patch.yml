@@ -1,111 +1,34 @@
-# Merge-triggered repair: use PR merge so the guarded workflow executes with a normal push event.
 name: Repair mobile Site Content ribbon patch
 on:
   push:
     branches: [main]
 jobs:
   repair:
-    if: contains(github.event.head_commit.message, 'Repair mobile-only Site Content ribbon patch') == false
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Patch verified editor
-        shell: python
+      - name: Remove malformed temporary patch
         run: |
+          python3 - <<'PY'
           from pathlib import Path
-          p=Path('resources/views/admin/site-content/create.blade.php')
-          s=p.read_text()
-          assert 'FF_MOBILE_ONLY_RIBBON_FIX_V2' in s
-          start=s.index('\\n<style>\\n/* FF_MOBILE_ONLY_RIBBON_FIX_V2 */')
-          end=s.index('</style>\\n</style>@endpush', start)
-          s=s[:start] + s[end+len('</style>\\n'):]
-          css='''
-<style>
-/* FF_MOBILE_ONLY_RIBBON_FIX_V2 */
-@media (max-width:700px){
-  .editor-shell{overflow:visible!important;position:relative!important}
-  .editor-shell .word-ribbon{width:100%!important;max-width:100%!important;min-width:0!important;overflow:hidden!important}
-  .editor-shell .word-tabs{display:flex!important;flex-wrap:nowrap!important;width:100%!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch;touch-action:pan-x;scrollbar-width:none}
-  .editor-shell .word-tabs::-webkit-scrollbar{display:none}
-  .editor-shell .word-panel{display:none!important;flex:0 0 100%!important;flex-wrap:nowrap!important;align-items:stretch!important;width:100%!important;min-width:100%!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain;scrollbar-width:thin}
-  .editor-shell .word-panel.active,.editor-shell .word-panel[aria-hidden="false"]{display:flex!important}
-  .editor-shell .word-panel>*{flex:0 0 auto!important}
-  .editor-shell .word-group{flex:0 0 auto!important;width:max-content!important;min-width:max-content!important;max-width:none!important;flex-wrap:nowrap!important}
-  .editor-shell .word-group-row{flex:0 0 auto!important;width:max-content!important;max-width:none!important;flex-wrap:nowrap!important}
-  .editor-shell .word-command,.editor-shell .word-icon,.editor-shell .word-select,.editor-shell .word-color{flex:0 0 auto!important}
-  .editor-shell.ff-mobile-ribbon-fixed .word-ribbon{position:fixed!important;top:var(--ff-mobile-ribbon-top,70px)!important;left:var(--ff-mobile-ribbon-left,0px)!important;width:var(--ff-mobile-ribbon-width,100%)!important;z-index:9999!important;margin:0!important}
-  .editor-shell.ff-mobile-ribbon-fixed .editor{padding-top:calc(14px + var(--ff-mobile-ribbon-height,0px))!important}
-}
-</style>
-'''
-          s=s.replace('</style>@endpush', css+'</style>@endpush', 1)
-          marker='\\n<script>\\n(function(){\\n  const shell=document.querySelector(\'.editor-shell\');'
-          assert marker in s
-          js_start=s.index(marker)
-          js_end=s.index('</script>\\n', js_start)
-          s=s[:js_start] + s[js_end+len('</script>\\n'):]
-          js='''
-(function(){
-  const shell=document.querySelector('.editor-shell');
-  if(!shell)return;
-  const ribbon=shell.querySelector('.word-ribbon');
-  const tabs=[...shell.querySelectorAll('[data-editor-tab]')];
-  const panels=[...shell.querySelectorAll('[data-editor-panel]')];
-  if(!ribbon||!tabs.length||!panels.length)return;
-  const isMobile=()=>window.matchMedia('(max-width:700px)').matches;
-  let current=tabs.find(t=>t.classList.contains('active'))?.dataset.editorTab||'home';
-  function setTab(name){
-    if(!tabs.some(t=>t.dataset.editorTab===name))return;
-    current=name;
-    tabs.forEach(t=>{const on=t.dataset.editorTab===name;t.classList.toggle('active',on);t.setAttribute('aria-selected',on?'true':'false');});
-    panels.forEach(p=>{const on=p.dataset.editorPanel===name;p.classList.toggle('active',on);p.hidden=!on;p.setAttribute('aria-hidden',on?'false':'true');p.style.display=on?'flex':'none';});
-  }
-  setTab(current);
-  ribbon.addEventListener('click',function(e){
-    const tab=e.target.closest?.('[data-editor-tab]');
-    if(!tab||!ribbon.contains(tab))return;
-    e.preventDefault();e.stopPropagation();
-    setTab(tab.dataset.editorTab);
-  },true);
-  ribbon.addEventListener('keydown',function(e){
-    const tab=e.target.closest?.('[data-editor-tab]');
-    if(!tab||!ribbon.contains(tab))return;
-    if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();setTab(tab.dataset.editorTab);}
-  },true);
-  let raf=0;
-  function sticky(){
-    raf=0;
-    if(!isMobile()){shell.classList.remove('ff-mobile-ribbon-fixed');return;}
-    const topbar=document.querySelector('.topbar');
-    const top=Math.max(0,Math.round(topbar?.getBoundingClientRect().bottom||0));
-    const sr=shell.getBoundingClientRect();
-    const h=ribbon.getBoundingClientRect().height;
-    const on=sr.top<=top && sr.bottom>top+h;
-    if(on){
-      shell.style.setProperty('--ff-mobile-ribbon-top',top+'px');
-      shell.style.setProperty('--ff-mobile-ribbon-left',sr.left+'px');
-      shell.style.setProperty('--ff-mobile-ribbon-width',sr.width+'px');
-      shell.style.setProperty('--ff-mobile-ribbon-height',h+'px');
-      shell.classList.add('ff-mobile-ribbon-fixed');
-    }else shell.classList.remove('ff-mobile-ribbon-fixed');
-  }
-  function req(){if(!raf)raf=requestAnimationFrame(sticky)}
-  window.addEventListener('scroll',req,{passive:true});
-  window.addEventListener('resize',req,{passive:true});
-  window.addEventListener('orientationchange',req,{passive:true});
-  if(window.ResizeObserver)new ResizeObserver(req).observe(ribbon);
-  sticky();
-})();
-'''
-          close=s.rfind('</script>')
-          assert close!=-1
-          s=s[:close]+js+s[close:]
-          assert s.count('FF_MOBILE_ONLY_RIBBON_FIX_V2')==1
+          p = Path('resources/views/admin/site-content/create.blade.php')
+          s = p.read_text()
+          marker = 'FF_MOBILE_ONLY_RIBBON_FIX_V2'
+          assert marker in s, 'Expected malformed temporary patch marker not found'
+          start = s.index('\\n<style>\\n/* FF_MOBILE_ONLY_RIBBON_FIX_V2 */')
+          end = s.index('</style>\\n</style>@endpush', start)
+          s = s[:start] + s[end + len('</style>\\n'):]
+          script_marker = '\\n<script>\\n(function(){\\n  const shell=document.querySelector(\'.editor-shell\');'
+          assert script_marker in s, 'Expected malformed nested script not found'
+          js_start = s.index(script_marker)
+          js_end = s.index('</script>\\n', js_start)
+          s = s[:js_start] + s[js_end + len('</script>\\n'):]
+          assert marker not in s
           assert '\\n<style>\\n/* FF_MOBILE_ONLY_RIBBON_FIX_V2 */' not in s
-          assert '<script>\\n(function(){\\n  const shell=document.querySelector(\'.editor-shell\');' not in s
           p.write_text(s)
+          PY
       - name: Commit repair
         run: |
           git config user.name 'github-actions[bot]'
