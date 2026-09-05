@@ -134,6 +134,48 @@
                 .home-profile-modal .home-profile-scroll { margin:14px 16px 12px!important; padding:13px 13px 18px!important; }
                 .home-profile-modal .home-profile-footer { padding:0 16px calc(12px + env(safe-area-inset-bottom))!important; }
             }
+
+            /* Desktop homepage only: use the entire content area for two wide leadership cards. */
+            @media (min-width: 992px) {
+                html body main.shell.home-v3 .home-section-management .management-grid {
+                    display:grid !important;
+                    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+                    gap:24px !important;
+                    width:100% !important;
+                    max-width:none !important;
+                    margin-left:0 !important;
+                    margin-right:0 !important;
+                    justify-content:stretch !important;
+                }
+                html body main.shell.home-v3 .home-section-management .member-card {
+                    display:grid !important;
+                    grid-template-columns:minmax(0,40%) minmax(0,1fr) !important;
+                    width:100% !important;
+                    min-width:0 !important;
+                    min-height:0 !important;
+                    height:auto !important;
+                    align-items:stretch !important;
+                }
+                html body main.shell.home-v3 .home-section-management .member-photo {
+                    width:100% !important;
+                    height:auto !important;
+                    min-height:0 !important;
+                    aspect-ratio:4 / 5 !important;
+                    align-self:stretch !important;
+                }
+                html body main.shell.home-v3 .home-section-management .member-photo img {
+                    width:100% !important;
+                    height:100% !important;
+                    aspect-ratio:4 / 5 !important;
+                    object-fit:cover !important;
+                }
+                html body main.shell.home-v3 .home-section-management .member-body {
+                    min-width:0 !important;
+                    min-height:0 !important;
+                    height:100% !important;
+                    padding:22px !important;
+                }
+            }
         </style>
     @endif
     @stack('head')
@@ -161,7 +203,7 @@
             .public-header-nav .public-menu-dropdown-panel > a:hover,
             .public-header-nav .public-menu-dropdown-panel > a:focus,
             .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle:hover,
-            .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown > .public-menu-dropdown-toggle:focus,
+            .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle:focus,
             .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle[aria-expanded="true"] { background:rgba(67,209,240,.07)!important;color:#effcff!important;outline:none; }
             .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown { display:block!important;width:100%!important;position:static!important; }
             .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown > .public-menu-dropdown-toggle { width:100%!important; }
