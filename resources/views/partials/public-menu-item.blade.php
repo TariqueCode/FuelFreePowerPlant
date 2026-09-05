@@ -11,7 +11,7 @@
 @endphp
 @if($children->isNotEmpty())
 <div class="public-menu-dropdown" data-menu-id="{{ $menuItem->id }}">
-    <button class="public-menu-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false">
+    <button class="public-menu-dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" style="font-size:14px !important;">
         @if($menuItem->icon)<i class="{{ $menuItem->icon }}" aria-hidden="true"></i>@endif
         <span>{{ $menuItem->displayLabel() }}</span><span class="public-menu-dropdown-chevron" aria-hidden="true"></span>
     </button>
@@ -22,7 +22,7 @@
     </div>
 </div>
 @else
-<a href="{{ $menuUrl }}" target="{{ $menuItem->target }}" @if($menuItem->target==='_blank') rel="noopener noreferrer" @endif>
+<a href="{{ $menuUrl }}" target="{{ $menuItem->target }}" @if($menuItem->target==='_blank') rel="noopener noreferrer" @endif style="font-size:14px !important;">
     @if($menuItem->icon)<i class="{{ $menuItem->icon }}" aria-hidden="true"></i>@endif {{ $menuItem->displayLabel() }}
 </a>
 @endif
