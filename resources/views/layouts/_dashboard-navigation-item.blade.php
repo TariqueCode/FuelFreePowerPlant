@@ -4,19 +4,19 @@
        desktop administrators a larger, easier-to-read interface. */
     .sidebar .nav > a,
     .sidebar .nav-parent {
-        font-size: 14px;
+        font-size: 15px !important;
     }
 
     .sidebar .nav-sub a {
-        font-size: 12px;
+        font-size: 14px !important;
     }
 
     .sidebar .nav-label {
-        font-size: 10px;
+        font-size: 10px !important;
     }
 
     .content {
-        font-size: 14px;
+        font-size: 15px !important;
     }
 
     .content p,
@@ -28,20 +28,56 @@
     .content select,
     .content textarea,
     .content button,
-    .content a {
-        font-size: 14px;
+    .content a,
+    .content span,
+    .content strong {
+        font-size: 15px !important;
     }
 
     .content h2 {
-        font-size: 21px;
+        font-size: 22px !important;
     }
 
     .content h3 {
-        font-size: 18px;
+        font-size: 19px !important;
     }
 
     .content small {
-        font-size: 12px;
+        font-size: 13px !important;
+    }
+
+    /* Profile Builder rows were using very small component-level sizes;
+       explicitly lift those labels without changing the mobile layout. */
+    .content .profile-info strong {
+        font-size: 15px !important;
+    }
+
+    .content .profile-info span {
+        font-size: 13px !important;
+    }
+
+    .content .folder-title h2 {
+        font-size: 22px !important;
+    }
+
+    .content .folder-title span,
+    .content .folder-meta,
+    .content .profile-status,
+    .content .folder-status {
+        font-size: 13px !important;
+    }
+
+    .content .hero p,
+    .content .builder-note,
+    .content .notice,
+    .content .errors {
+        font-size: 14px !important;
+    }
+
+    .content .primary,
+    .content .secondary,
+    .content .add-profile {
+        font-size: 14px !important;
     }
 }
 </style>
