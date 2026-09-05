@@ -1,0 +1,137 @@
+name: Accessibility Hotfix
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ github.event.head_commit.message == 'chore: prepare readability accessibility patch' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apply readability improvements
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('resources/views/layouts/public.blade.php')
+          text = path.read_text(encoding='utf-8')
+          marker = '        </style>\n    @endif\n    @stack(\'head\')'
+          if marker not in text:
+              raise SystemExit('Target home-page style block marker not found.')
+
+          css = '''
+
+            /* Accessibility readability pass: larger type for leadership cards and the
+               profile viewer, with comfortable line-height and preserved responsive layout. */
+            .home-section-management .member-body h3 {
+                font-size:20px !important;
+                line-height:1.25 !important;
+            }
+            .home-section-management .member-role {
+                font-size:12px !important;
+                line-height:1.45 !important;
+                letter-spacing:.08em !important;
+            }
+            .home-section-management .member-contact {
+                font-size:12px !important;
+                line-height:1.5 !important;
+            }
+            .home-section-management .member-message {
+                font-size:13px !important;
+                line-height:1.7 !important;
+            }
+            .home-section-management .member-more {
+                min-height:44px !important;
+                font-size:12px !important;
+                line-height:1.35 !important;
+            }
+
+            .home-profile-modal .home-profile-title {
+                font-size:clamp(23px,2.2vw,34px) !important;
+                line-height:1.2 !important;
+            }
+            .home-profile-modal .home-profile-role {
+                font-size:14px !important;
+                line-height:1.5 !important;
+            }
+            .home-profile-modal .home-profile-contact-mobile {
+                font-size:14px !important;
+                line-height:1.55 !important;
+            }
+            .home-profile-modal .home-profile-scroll {
+                font-size:17px !important;
+                line-height:1.8 !important;
+            }
+            .home-profile-modal .home-profile-footer .home-profile-link {
+                font-size:14px !important;
+                line-height:1.4 !important;
+                min-height:48px !important;
+            }
+
+            @media (max-width:650px) {
+                .home-section-management .member-body h3 {
+                    font-size:15px !important;
+                    line-height:1.3 !important;
+                }
+                .home-section-management .member-role {
+                    font-size:10px !important;
+                }
+                .home-section-management .member-contact {
+                    font-size:10px !important;
+                    line-height:1.45 !important;
+                }
+                .home-section-management .member-message {
+                    font-size:10px !important;
+                    line-height:1.6 !important;
+                }
+                .home-section-management .member-more {
+                    min-height:42px !important;
+                    font-size:10px !important;
+                    padding:9px 10px !important;
+                }
+
+                .home-profile-modal .home-profile-title {
+                    font-size:23px !important;
+                }
+                .home-profile-modal .home-profile-role {
+                    font-size:13px !important;
+                }
+                .home-profile-modal .home-profile-contact-mobile {
+                    font-size:13px !important;
+                    line-height:1.5 !important;
+                }
+                .home-profile-modal .home-profile-scroll {
+                    font-size:16px !important;
+                    line-height:1.78 !important;
+                }
+                .home-profile-modal .home-profile-footer .home-profile-link {
+                    font-size:14px !important;
+                    min-height:48px !important;
+                }
+            }
+'''
+          replacement = marker.replace('        </style>', css + '        </style>')
+          text = text.replace(marker, replacement, 1)
+          path.write_text(text, encoding='utf-8')
+
+          workflow = Path('.github/workflows/accessibility-hotfix.yml')
+          workflow.unlink()
+
+      - name: Commit readability update
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add resources/views/layouts/public.blade.php .github/workflows/accessibility-hotfix.yml
+          git diff --cached --quiet && { echo "No changes generated."; exit 1; }
+          git commit -m "feat: improve public profile text readability"
+          git push origin HEAD:main
