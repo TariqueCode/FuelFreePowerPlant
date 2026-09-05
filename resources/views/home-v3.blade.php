@@ -3783,3 +3783,100 @@ main.shell{
     }
 }
 </style>
+
+<style>
+/* FINAL PROFILE CARD PROPORTION + CONTACT POLISH */
+@media (min-width: 651px) {
+    .home-v3 .home-section-management .member-card {
+        display: grid !important;
+        grid-template-columns: minmax(0, 40%) minmax(0, 60%) !important;
+        grid-template-rows: minmax(0, 1fr) !important;
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 2 / 1 !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: hidden !important;
+        align-items: stretch !important;
+    }
+    .home-v3 .home-section-management .member-photo {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        width: 100% !important;
+        height: 100% !important;
+        aspect-ratio: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        align-self: stretch !important;
+        overflow: hidden !important;
+    }
+    .home-v3 .home-section-management .member-photo img {
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        object-fit: cover !important;
+        object-position: center center !important;
+    }
+    .home-v3 .home-section-management .member-body {
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        width: 100% !important;
+        height: 100% !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-self: stretch !important;
+        overflow: hidden !important;
+        padding: 20px 24px !important;
+    }
+    .home-v3 .home-section-management .member-contact {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        font-size: 11px !important;
+        line-height: 1.5 !important;
+        text-transform: none !important;
+    }
+    .home-v3 .home-section-management .member-contact i {
+        display: inline-flex !important;
+        flex: 0 0 14px !important;
+        width: 14px !important;
+        justify-content: center !important;
+        align-items: center !important;
+        font-size: 10px !important;
+    }
+    .home-v3 .home-section-management .member-contacts a[href^="tel:"] { order: 1 !important; }
+    .home-v3 .home-section-management .member-contacts a[href^="mailto:"] { order: 2 !important; }
+    .home-v3 .home-section-management .member-message {
+        margin-top: 12px !important;
+        padding: 0 !important;
+        border: 0 !important;
+        color: #a9c1c9 !important;
+        font-size: 12px !important;
+        line-height: 1.55 !important;
+        font-weight: 400 !important;
+        text-transform: none !important;
+        letter-spacing: normal !important;
+        text-align: left !important;
+        -webkit-line-clamp: 3 !important;
+        line-clamp: 3 !important;
+        overflow: hidden !important;
+    }
+    .home-v3 .home-section-management .member-message:before {
+        content: none !important;
+        display: none !important;
+    }
+    .home-v3 .home-section-management .member-more {
+        align-self: flex-start !important;
+        width: auto !important;
+        min-width: 190px !important;
+        min-height: 42px !important;
+        margin-top: 13px !important;
+        padding: 8px 15px !important;
+        font-size: 11px !important;
+        text-transform: none !important;
+    }
+}
+</style>
