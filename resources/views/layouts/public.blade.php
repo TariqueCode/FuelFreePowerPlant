@@ -42,6 +42,19 @@
                 .home-profile-modal .home-profile-links > .home-profile-link.primary { grid-column:1/-1!important;width:100%;min-height:44px;margin-inline:auto; }
             }
 
+            /* Mobile + tablet message viewer polish: keep the identity block vertically centered with the photo. */
+            @media (max-width: 1099px) {
+                .home-profile-modal .home-profile-kicker { display:none!important; }
+                .home-profile-modal .home-profile-panel { align-items:center!important; }
+                .home-profile-modal .home-profile-photo { align-self:center!important; }
+                .home-profile-modal .home-profile-info { align-self:center!important; }
+                .home-profile-modal .home-profile-head { align-items:center!important; }
+                .home-profile-modal .home-profile-head > div { align-self:center!important; }
+                .home-profile-modal .home-profile-title,
+                .home-profile-modal .home-profile-role,
+                .home-profile-modal .home-profile-contact-mobile { position:relative; }
+            }
+
             /* Desktop homepage only: use the entire content area for two wide leadership cards. */
             @media (min-width: 992px) {
                 html body main.shell.home-v3 .home-section-management .management-grid {
