@@ -45,33 +45,41 @@
 .ff-editor-toolbar{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:8px;border-bottom:1px solid #d8e2e6;background:#f5f8f9;position:sticky;top:70px;z-index:900;align-self:flex-start;max-width:100%;min-width:0;border-radius:15px 15px 0 0;box-shadow:0 2px 8px rgba(15,55,70,.08)}
 .ff-editor-toolbar button,.ff-editor-toolbar select{height:34px;border:1px solid #d7e1e5;border-radius:7px;background:#fff;color:#334155;cursor:pointer;font-size:12px;padding:0 8px;flex:0 0 auto}
 .ff-editor-toolbar button:hover,.ff-editor-toolbar select:focus{border-color:#22b8d5;background:#eefbfe}
-.ff-editor-toolbar button{min-width:34px}.ff-tool-label{display:inline}@media(max-width:760px){.ff-tool-label{display:none}}.ff-editor-toolbar select{max-width:130px}.ff-sep{width:1px;height:24px;background:#d5e0e4;margin:0 3px}
+.ff-editor-toolbar button{min-width:34px}.ff-tool-label{display:inline}@media(max-width:760px){.ff-tool-label{display:none}}.ff-editor-toolbar select{max-width:130px}.ff-sep{width:1px;height:24px;background:#d5e0e4;margin:0 3px;flex:0 0 1px}
 .ff-color-control{height:34px!important;display:inline-flex;align-items:center;gap:6px;padding:0 8px!important;border:1px solid #d7e1e5;border-radius:7px;background:#fff;color:#536873;cursor:pointer;position:relative}
 .ff-color-control input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .ff-color-swatch{width:17px;height:17px;border-radius:4px;border:1px solid #b9c8ce;background:#1f2937;box-shadow:inset 0 -3px 0 rgba(0,0,0,.14)}
 .ff-editor-body{min-height:390px;padding:22px;outline:none;line-height:1.7;font-family:Arial,sans-serif;font-size:15px;overflow:auto}.ff-editor-body:empty:before{content:'Write your email here…';color:#94a3b8}.ff-editor-body h1{font-size:2em}.ff-editor-body h2{font-size:1.6em}.ff-editor-body h3{font-size:1.3em}.ff-editor-body blockquote{margin:12px 0;padding:8px 14px;border-left:4px solid #28b9d7;background:#f3fafc;color:#526873}.ff-editor-body pre{padding:12px;border-radius:8px;background:#17232b;color:#e6f7fb;white-space:pre-wrap}.ff-editor-body img{max-width:100%;height:auto;border-radius:6px}.ff-editor-body table{border-collapse:collapse;width:100%;margin:12px 0}.ff-editor-body .ff-chart{margin:18px 0;padding:14px;border:1px solid #d8e2e6;border-radius:10px;overflow:auto;color:#246b7a}.ff-editor-body .ff-chart figcaption{font-weight:700;margin-bottom:8px}.ff-editor-body .ff-chart svg{display:block;width:100%;min-width:520px;height:auto}.ff-editor-body img{cursor:default;max-width:100%;height:auto}.ff-editor-body img.ff-selected{outline:2px solid #22b8d5;outline-offset:3px}.ff-editor-body table{table-layout:fixed}.ff-editor-body td,.ff-editor-body th{overflow-wrap:anywhere}.ff-editor-body td,.ff-editor-body th{border:1px solid #cbd5db;padding:8px;min-width:60px}.ff-editor-source{width:100%;min-height:390px;padding:18px;border:0;outline:none;resize:vertical;font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;background:#07161e;color:#dff7fb}
 .ff-attachments{padding:10px 12px;border-top:1px solid #dbe5e8;background:#f8fbfc}.ff-attach-btn{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid #cbd9de;border-radius:8px;background:#fff;color:#334e58;font-size:12px;font-weight:700;cursor:pointer}.ff-attach-help{margin-left:8px;color:#78909a;font-size:11px}.ff-file-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ff-file{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:7px;background:#eaf5f8;color:#31505b;font-size:11px}.ff-file button{border:0;background:none;color:#78909a;cursor:pointer}
 .ff-editor-status{display:flex;justify-content:space-between;gap:10px;padding:7px 12px;border-top:1px solid #dbe5e8;color:#718790;background:#fbfdfe;font-size:10px}.ff-editor-status i{color:#1db58b}
-.ff-mail-editor.is-fullscreen{position:fixed;inset:12px;z-index:9999;display:flex;flex-direction:column;box-shadow:0 30px 100px rgba(0,0,0,.55)}.ff-mail-editor.is-fullscreen .ff-editor-body,.ff-mail-editor.is-fullscreen .ff-editor-source{flex:1;min-height:0}
+.ff-mail-editor.is-fullscreen{position:fixed;inset:12px;z-index:9999;display:flex;flex-direction:column;box-shadow:0 30px 100px rgba(0,0,0,.55)}.ff-mail-editor.is-fullscreen .ff-editor-toolbar{top:0}.ff-mail-editor.is-fullscreen .ff-editor-body,.ff-mail-editor.is-fullscreen .ff-editor-source{flex:1;min-height:0}
 @media(max-width:760px){
- .ff-editor-toolbar{top:70px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;align-content:center;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x;padding:7px}
+ .ff-editor-toolbar{top:70px;display:flex;flex-wrap:nowrap;flex-direction:row;justify-content:flex-start;align-items:center;align-content:center;gap:4px;overflow-x:auto;overflow-y:hidden;width:100%;max-width:100%;min-width:0;box-sizing:border-box;scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scroll-behavior:smooth;scroll-padding-inline:10px;touch-action:pan-x;padding:7px 10px}
  .ff-editor-toolbar::-webkit-scrollbar{display:none}
- .ff-editor-toolbar select{max-width:112px}
- .ff-editor-body{min-height:280px;padding:14px;font-size:14px;overflow:auto;overflow-wrap:break-word;word-break:normal}
+ .ff-editor-toolbar>*{flex:0 0 auto;white-space:nowrap}
+ .ff-editor-toolbar button,.ff-editor-toolbar select,.ff-editor-toolbar .ff-color-control{flex:0 0 auto}
+ .ff-editor-toolbar button{min-width:34px}
+ .ff-editor-toolbar select{max-width:112px;min-width:max-content}
+ .ff-editor-toolbar .ff-sep{display:block;flex:0 0 1px;width:1px;height:24px}
+ .ff-editor-body{width:100%;max-width:100%;min-width:0;box-sizing:border-box;min-height:280px;padding:14px;font-size:14px;overflow:auto;overflow-wrap:anywhere;word-break:normal;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
  .ff-editor-body img{max-width:100%;height:auto}
  .ff-editor-body table{width:100%;max-width:100%;table-layout:auto}
- .ff-editor-body td,.ff-editor-body th{max-width:100%;overflow-wrap:break-word;word-break:normal}
- .ff-editor-source{min-height:280px;max-width:100%;overflow:auto}
+ .ff-editor-body td,.ff-editor-body th{max-width:100%;overflow-wrap:anywhere;word-break:normal}
+ .ff-editor-body .ff-chart{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+ .ff-editor-source{width:100%;min-height:280px;max-width:100%;box-sizing:border-box;overflow:auto}
  .ff-attachments{padding:9px}
  .ff-attach-help{display:block;margin:6px 0 0;line-height:1.5}
  .ff-file-list{max-height:90px;overflow:auto}
  .ff-editor-status{font-size:9px;flex-wrap:wrap;line-height:1.5}
+ .ff-mail-editor.is-fullscreen{inset:0;border-radius:0}
+ .ff-mail-editor.is-fullscreen .ff-editor-toolbar{top:0}
 }
 @media(max-width:420px){
- .ff-editor-toolbar{gap:3px;padding:6px}
- .ff-editor-toolbar button,.ff-editor-toolbar select,.ff-color-control{height:32px!important}
+ .ff-editor-toolbar{gap:3px;padding:6px 8px}
+ .ff-editor-toolbar button,.ff-editor-toolbar select,.ff-editor-toolbar .ff-color-control{height:32px!important}
  .ff-editor-toolbar button{min-width:32px;padding:0 6px}
- .ff-color-control{min-width:58px!important;padding:0 7px!important}
+ .ff-editor-toolbar select{max-width:108px}
+ .ff-editor-toolbar .ff-color-control{min-width:58px!important;padding:0 7px!important}
  .ff-editor-body{min-height:240px;padding:12px;font-size:13px}
 }
 </style>
