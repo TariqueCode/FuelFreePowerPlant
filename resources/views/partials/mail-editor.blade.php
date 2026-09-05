@@ -98,88 +98,30 @@
 .ff-editor-body img.ff-resizable-selected{outline:2px solid #22b8d5;outline-offset:3px}
 .ff-image-resize-handle{position:fixed;width:12px;height:12px;border-radius:50%;background:#22b8d5;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35);z-index:10050;display:none;touch-action:none}
 
-</style>
 
-/* CMS ribbon tabs: keep existing controls and handlers, but present them as distinct Home / Insert / View groups. */
-.ff-editor-ribbon-tabs{display:flex;align-items:center;gap:4px;padding:6px 8px;border-bottom:1px solid rgba(104,204,235,.14);background:#081b25;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.ff-editor-ribbon-tabs::-webkit-scrollbar{display:none}
-.ff-editor-ribbon-tab{appearance:none;border:1px solid transparent;background:transparent;color:#88a9b5;border-radius:8px;padding:8px 14px;min-height:34px;font:700 12px/1 inherit;cursor:pointer;white-space:nowrap;flex:0 0 auto}
-.ff-editor-ribbon-tab:hover{background:rgba(49,175,210,.08);color:#dff8fc}
-.ff-editor-ribbon-tab.is-active{background:rgba(49,175,210,.14);border-color:rgba(49,175,210,.38);color:#e8fbff;box-shadow:inset 0 -2px 0 #31afd2}
-.cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar{display:flex!important;flex-wrap:nowrap!important;flex-direction:row!important;align-items:center!important;overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important;gap:4px!important;border-radius:0!important;position:sticky!important;top:108px!important}
-.cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar>*{display:none!important;flex:0 0 auto!important;white-space:nowrap!important}
-.cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar .ff-ribbon-visible{display:flex!important}
-.cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar .ff-ribbon-visible.ff-sep{display:block!important}
+/* CMS ribbon: tabs own structural panels so only the active tab's controls render. */
+.cms-editor-shell .ff-editor-ribbon-tabs{display:flex;align-items:center;gap:4px;padding:6px 8px;border-bottom:1px solid rgba(104,204,235,.14);background:#081b25;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.cms-editor-shell .ff-editor-ribbon-tabs::-webkit-scrollbar{display:none}
+.cms-editor-shell .ff-editor-ribbon-tab{appearance:none;border:1px solid transparent;background:transparent;color:#88a9b5;border-radius:8px;padding:8px 14px;min-height:34px;font:700 12px/1 inherit;cursor:pointer;white-space:nowrap;flex:0 0 auto}
+.cms-editor-shell .ff-editor-ribbon-tab:hover{background:rgba(49,175,210,.08);color:#dff8fc}
+.cms-editor-shell .ff-editor-ribbon-tab.is-active{background:rgba(49,175,210,.14);border-color:rgba(49,175,210,.38);color:#e8fbff;box-shadow:inset 0 -2px 0 #31afd2}
+.cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar{display:block!important;position:sticky!important;top:108px!important;padding:7px 8px!important;border-radius:0!important;white-space:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-x!important}
+.cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar::-webkit-scrollbar{display:none}
+.cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar .ff-ribbon-panel{display:none;align-items:center;gap:4px;width:max-content;min-width:100%;white-space:nowrap}
+.cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar .ff-ribbon-panel.is-active{display:flex}
+.cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar .ff-ribbon-panel>*{flex:0 0 auto;white-space:nowrap}
 @media(max-width:760px){
   .cms-editor-shell .ff-editor-ribbon-tabs{position:sticky;top:70px;z-index:1002;padding:5px 8px}
-  .cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar{top:111px!important;padding:7px 8px!important;scrollbar-width:none!important;touch-action:pan-x!important;-webkit-overflow-scrolling:touch!important}
-  .cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar::-webkit-scrollbar{display:none!important}
-  .cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar>*{flex:0 0 auto!important}
+  .cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar{top:111px!important}
 }
 @media(max-width:420px){
   .cms-editor-shell .ff-editor-ribbon-tabs{padding:4px 6px}
-  .ff-editor-ribbon-tab{padding:7px 12px;font-size:11px}
+  .cms-editor-shell .ff-editor-ribbon-tab{padding:7px 12px;font-size:11px}
   .cms-editor-shell .ff-editor-toolbar.ff-ribbon-toolbar{top:106px!important}
 }
 
+</style>
 
-<script>
-(()=>{
-  const setup=()=>document.querySelectorAll('.ff-mail-editor[data-mode="cms"] .ff-editor-toolbar').forEach(toolbar=>{
-    if(toolbar.dataset.ribbonTabsReady==='1') return;
-    toolbar.dataset.ribbonTabsReady='1';
-    const editor=toolbar.closest('.ff-mail-editor');
-    const tabs=document.createElement('div');
-    tabs.className='ff-editor-ribbon-tabs';
-    tabs.setAttribute('role','tablist');
-    tabs.setAttribute('aria-label','CMS editor ribbon');
-    const groups={home:[],insert:[],view:[]};
-    const groupFor=(el)=>{
-      const a=el.getAttribute?.('data-action')||'';
-      const c=el.getAttribute?.('data-cmd')||'';
-      const tool=el.getAttribute?.('data-tool')||'';
-      if(a==='source'||a==='fullscreen') return 'view';
-      if(a==='link'||a==='image'||a==='table'||a==='media'||a==='image-settings'||a==='table-row'||a==='table-column'||a==='table-cell'||a==='table-delete-row'||a==='table-delete-column'||a==='chart'||a==='delete-element') return 'insert';
-      if(c==='insertHorizontalRule') return 'insert';
-      if(tool||c) return 'home';
-      if(el.classList?.contains('ff-sep')) return null;
-      return 'insert';
-    };
-    [...toolbar.children].forEach(el=>{
-      const g=groupFor(el);
-      el.dataset.ribbonGroup=g||'';
-      if(g) groups[g].push(el);
-    });
-    const labels=[['home','Home'],['insert','Insert'],['view','View']];
-    const activate=(name)=>{
-      tabs.querySelectorAll('.ff-editor-ribbon-tab').forEach(btn=>{
-        const active=btn.dataset.ribbonTab===name;
-        btn.classList.toggle('is-active',active);
-        btn.setAttribute('aria-selected',active?'true':'false');
-      });
-      toolbar.querySelectorAll('[data-ribbon-group]').forEach(el=>{
-        const visible=el.dataset.ribbonGroup===name;
-        el.classList.toggle('ff-ribbon-visible',visible);
-      });
-      toolbar.dataset.ribbonActive=name;
-      try{toolbar.scrollLeft=0}catch(e){}
-    };
-    labels.forEach(([name,label],i)=>{
-      const b=document.createElement('button');
-      b.type='button'; b.className='ff-editor-ribbon-tab'; b.dataset.ribbonTab=name;
-      b.setAttribute('role','tab'); b.setAttribute('aria-selected',i===0?'true':'false'); b.textContent=label;
-      b.addEventListener('click',()=>activate(name));
-      tabs.appendChild(b);
-    });
-    toolbar.classList.add('ff-ribbon-toolbar');
-    toolbar.parentNode.insertBefore(tabs,toolbar);
-    activate('home');
-  });
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setup,{once:true}); else setup();
-})();
-</script>
-
-@endpush
 @push('scripts')
 <script>
 (function(){
@@ -329,5 +271,42 @@
   const endResize=()=>{if(!drag)return;drag=null;editor.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'formatResize'}));};
   handle.addEventListener('pointerdown',startResize);handle.addEventListener('pointermove',moveResize);handle.addEventListener('pointerup',endResize);handle.addEventListener('pointercancel',endResize);editor.addEventListener('scroll',positionHandle,{passive:true});window.addEventListener('scroll',positionHandle,{passive:true});window.addEventListener('resize',positionHandle,{passive:true});
 })();
+
+(()=>{
+  const setup=()=>document.querySelectorAll('.ff-mail-editor[data-mode="cms"] .ff-editor-toolbar').forEach(toolbar=>{
+    if(toolbar.dataset.ribbonTabsReady==='2') return;
+    toolbar.dataset.ribbonTabsReady='2';
+    const editor=toolbar.closest('.ff-mail-editor');
+    const tabs=document.createElement('div');
+    tabs.className='ff-editor-ribbon-tabs';
+    tabs.setAttribute('role','tablist');
+    tabs.setAttribute('aria-label','CMS editor ribbon');
+    const panels={home:document.createElement('div'),insert:document.createElement('div'),view:document.createElement('div')};
+    Object.entries(panels).forEach(([name,panel])=>{panel.className='ff-ribbon-panel';panel.dataset.ribbonPanel=name;panel.setAttribute('role','tabpanel');toolbar.appendChild(panel);});
+    const groupFor=el=>{
+      const a=el.getAttribute?.('data-action')||'', c=el.getAttribute?.('data-cmd')||'', tool=el.getAttribute?.('data-tool')||'';
+      if(a==='source'||a==='fullscreen') return 'view';
+      if(['link','image','table','media','image-settings','table-row','table-column','table-cell','table-delete-row','table-delete-column','chart','delete-element'].includes(a)||c==='insertHorizontalRule') return 'insert';
+      if(tool||c) return 'home';
+      return 'insert';
+    };
+    const original=[...toolbar.children].filter(el=>!el.classList.contains('ff-ribbon-panel'));
+    original.forEach(el=>{const g=groupFor(el);if(g) panels[g].appendChild(el);});
+    const labels=[['home','Home'],['insert','Insert'],['view','View']];
+    const activate=name=>{
+      labels.forEach(([n])=>{const b=tabs.querySelector(`[data-ribbon-tab="${n}"]`);if(b){const active=n===name;b.classList.toggle('is-active',active);b.setAttribute('aria-selected',active?'true':'false');}});
+      Object.entries(panels).forEach(([n,p])=>p.classList.toggle('is-active',n===name));
+      toolbar.dataset.ribbonActive=name;
+      toolbar.scrollLeft=0;
+    };
+    labels.forEach(([name,label],i)=>{const b=document.createElement('button');b.type='button';b.className='ff-editor-ribbon-tab';b.dataset.ribbonTab=name;b.setAttribute('role','tab');b.setAttribute('aria-selected',i===0?'true':'false');b.textContent=label;b.addEventListener('click',()=>activate(name));tabs.appendChild(b);});
+    toolbar.parentNode.insertBefore(tabs,toolbar);
+    toolbar.classList.add('ff-ribbon-toolbar');
+    activate('home');
+  });
+};
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setup,{once:true}); else setup();
+})();
+
 </script>
 @endpush
