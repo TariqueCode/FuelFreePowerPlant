@@ -3233,6 +3233,33 @@ main.shell{
         padding: 8px 15px !important;
     }
 }
+<style>
+/* === HOMEPAGE MANAGEMENT PROFILE ACCESSIBILITY POLISH === */
+/* Larger reading sizes for older users; layout and controls remain unchanged. */
+.home-v3 .home-section-management .member-body h3{font-size:18px!important;line-height:1.35!important}
+.home-v3 .home-section-management .member-role{font-size:10px!important;line-height:1.5!important}
+.home-v3 .home-section-management .member-contact{font-size:10px!important;line-height:1.5!important}
+.home-v3 .home-section-management .member-message{font-size:11px!important;line-height:1.65!important}
+.home-v3 .home-section-management .member-more{font-size:10px!important;min-height:40px!important}
+.home-profile-title{font-size:31px!important;line-height:1.2!important}
+.home-profile-role{font-size:12px!important;line-height:1.5!important}
+.home-profile-message{font-size:15px!important;line-height:1.9!important}
+.home-profile-section-title{font-size:10px!important;line-height:1.45!important}
+.home-profile-link{font-size:11px!important;min-height:44px!important}
+@media(max-width:1099px){.home-profile-title{font-size:28px!important}.home-profile-message{font-size:15px!important;line-height:1.85!important}}
+@media(max-width:650px){
+ .home-v3 .home-section-management .member-body h3{font-size:12px!important;line-height:1.35!important}
+ .home-v3 .home-section-management .member-role{font-size:8px!important;line-height:1.45!important}
+ .home-v3 .home-section-management .member-more{font-size:9px!important;min-height:36px!important}
+ .home-profile-title{font-size:23px!important;line-height:1.2!important}
+ .home-profile-role{font-size:10px!important;line-height:1.45!important}
+ .home-profile-contact-mobile a{font-size:9px!important;line-height:1.5!important}
+ .home-profile-scroll{font-size:15px!important;line-height:1.85!important}
+ .home-profile-section-title{font-size:9px!important;line-height:1.45!important}
+ .home-profile-message{font-size:14px!important;line-height:1.85!important}
+ .home-profile-link{font-size:10px!important;min-height:42px!important}
+}
+@media(max-width:420px){.home-profile-title{font-size:22px!important}.home-profile-message{font-size:14px!important;line-height:1.85!important}}
 </style>
 <main class="shell home-v3">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
