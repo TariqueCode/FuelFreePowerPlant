@@ -1,0 +1,37 @@
+name: Final Management Card Layout Patch
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.event.head_commit.message != 'fix: finalize management card image ratio and text styling'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply final card CSS
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('resources/views/home-v3.blade.php')
+          s = p.read_text()
+          marker = '/* FINAL MANAGEMENT CARD LAYOUT PATCH */'
+          if marker in s:
+              raise SystemExit('Patch already present')
+          css = r'''\n/* FINAL MANAGEMENT CARD LAYOUT PATCH */\n@media(min-width:651px){\n  .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:18px !important;align-items:start !important;}\n  .home-section-management .member-card{display:grid !important;grid-template-columns:minmax(0,40%) minmax(0,60%) !important;align-items:stretch !important;height:auto !important;min-height:0 !important;}\n  .home-section-management .member-photo{width:100% !important;height:auto !important;aspect-ratio:4 / 5 !important;min-height:0 !important;flex:none !important;}\n  .home-section-management .member-photo img{width:100% !important;height:100% !important;object-fit:cover !important;object-position:center center !important;}\n  .home-section-management .member-body{min-width:0 !important;min-height:0 !important;height:auto !important;display:flex !important;flex-direction:column !important;justify-content:center !important;padding:22px !important;}\n  .home-section-management .member-body h3{font-size:clamp(18px,1.55vw,24px) !important;line-height:1.2 !important;text-transform:none !important;}\n  .home-section-management .member-role{font-size:11px !important;line-height:1.4 !important;text-transform:uppercase !important;}\n  .home-section-management .member-contacts{margin-top:13px !important;padding-top:0 !important;border-top:0 !important;gap:7px !important;}\n  .home-section-management .member-contact{display:flex !important;align-items:center !important;gap:9px !important;font-size:11px !important;line-height:1.45 !important;text-transform:none !important;}\n  .home-section-management .member-contact i{display:inline-flex !important;flex:0 0 16px !important;width:16px !important;justify-content:center !important;color:var(--cyan) !important;}\n  .home-section-management .member-contact span{min-width:0 !important;overflow:hidden !important;text-overflow:ellipsis !important;white-space:nowrap !important;}\n  .home-section-management .member-message{margin-top:13px !important;padding-top:0 !important;border-top:0 !important;font-size:12px !important;line-height:1.55 !important;font-weight:500 !important;text-transform:none !important;letter-spacing:normal !important;-webkit-line-clamp:3 !important;}\n  .home-section-management .member-message:before{content:none !important;display:none !important;}\n  .home-section-management .member-more{align-self:flex-start !important;width:auto !important;min-width:160px !important;min-height:42px !important;margin-top:15px !important;padding:10px 16px !important;font-size:11px !important;}\n}\n@media(max-width:650px){\n  .home-section-management .member-message{text-transform:none !important;letter-spacing:normal !important;}\n  .home-section-management .member-contact i{display:inline-flex !important;}\n}\n'''
+          if '</style>' not in s:
+              raise SystemExit('style closing tag not found')
+          s = s.replace('</style>', css + '</style>', 1)
+          p.write_text(s)
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add resources/views/home-v3.blade.php
+          git commit -m "fix: finalize management card image ratio and text styling"
+          git push
