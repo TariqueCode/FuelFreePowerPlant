@@ -66,9 +66,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     // Keep that compatibility path permission-protected and map it to destroy.
                     Route::post('/{item}', [NavigationMenuController::class, 'destroy'])->name('legacy-destroy');
                     Route::patch('/{item}', [NavigationMenuController::class, 'update'])->name('update');
-                    // Use a unique canonical name so route:cache remains deterministic
-                    // even if an older deployment still exposes the legacy navigation route.
-                    Route::delete('/{item}', [NavigationMenuController::class, 'destroy'])->name('remove');
+                    Route::delete('/{item}', [NavigationMenuController::class, 'destroy'])->name('destroy');
                     Route::post('/reorder', [NavigationMenuController::class, 'reorder'])->name('reorder');
                 });
         },
