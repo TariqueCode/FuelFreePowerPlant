@@ -7,3 +7,119 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/*
+ * Management profile readability pass.
+ * Keep the established visual system, but give the profile viewer and
+ * leadership cards a more comfortable reading scale for older users.
+ */
+.home-profile-modal .home-profile-title {
+    font-size: 1.5rem !important;
+    line-height: 1.25 !important;
+}
+
+.home-profile-modal .home-profile-role {
+    font-size: 0.95rem !important;
+    line-height: 1.45 !important;
+}
+
+.home-profile-modal .home-profile-contact-mobile,
+.home-profile-modal .home-profile-contact-mobile a,
+.home-profile-modal .home-profile-contact {
+    font-size: 0.9rem !important;
+    line-height: 1.55 !important;
+}
+
+.home-profile-modal .home-profile-scroll,
+.home-profile-modal .home-profile-scroll p,
+.home-profile-modal .home-profile-message {
+    font-size: 1.05rem !important;
+    line-height: 1.85 !important;
+}
+
+.home-profile-modal .home-profile-footer,
+.home-profile-modal .home-profile-links > .home-profile-link {
+    font-size: 0.95rem !important;
+    line-height: 1.4 !important;
+}
+
+/* Leadership cards: improve scanability without changing the card layout. */
+.home-section-management .member-body h3,
+.home-section-management .member-card h3 {
+    font-size: 1.05rem !important;
+    line-height: 1.35 !important;
+}
+
+.home-section-management .member-role {
+    font-size: 0.72rem !important;
+    line-height: 1.45 !important;
+}
+
+.home-section-management .member-contact,
+.home-section-management .member-contact span {
+    font-size: 0.72rem !important;
+    line-height: 1.5 !important;
+}
+
+.home-section-management .member-message {
+    font-size: 0.82rem !important;
+    line-height: 1.65 !important;
+}
+
+.home-section-management .member-more {
+    font-size: 0.78rem !important;
+    line-height: 1.4 !important;
+    min-height: 42px !important;
+}
+
+@media (max-width: 650px) {
+    .home-profile-modal .home-profile-title {
+        font-size: 1.35rem !important;
+    }
+
+    .home-profile-modal .home-profile-role {
+        font-size: 0.9rem !important;
+    }
+
+    .home-profile-modal .home-profile-contact-mobile,
+    .home-profile-modal .home-profile-contact-mobile a,
+    .home-profile-modal .home-profile-contact {
+        font-size: 0.82rem !important;
+    }
+
+    .home-profile-modal .home-profile-scroll,
+    .home-profile-modal .home-profile-scroll p,
+    .home-profile-modal .home-profile-message {
+        font-size: 1rem !important;
+        line-height: 1.8 !important;
+    }
+
+    .home-profile-modal .home-profile-footer,
+    .home-profile-modal .home-profile-links > .home-profile-link {
+        font-size: 0.9rem !important;
+    }
+
+    .home-section-management .member-body h3,
+    .home-section-management .member-card h3 {
+        font-size: 0.95rem !important;
+    }
+
+    .home-section-management .member-role {
+        font-size: 0.68rem !important;
+    }
+
+    .home-section-management .member-contact,
+    .home-section-management .member-contact span {
+        font-size: 0.68rem !important;
+    }
+
+    .home-section-management .member-message {
+        font-size: 0.76rem !important;
+        line-height: 1.6 !important;
+    }
+
+    .home-section-management .member-more {
+        font-size: 0.72rem !important;
+        min-height: 40px !important;
+    }
+}
