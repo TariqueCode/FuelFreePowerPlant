@@ -10,8 +10,7 @@ class NavigationMenuItem extends Model
 {
     protected $fillable = [
         'menu', 'group', 'parent_id', 'label', 'label_override', 'url', 'route_name', 'target',
-        'icon', 'is_visible', 'sort_order', 'source_key', 'source_type',
-        'area', 'permission_key',
+        'icon', 'is_visible', 'sort_order', 'source_key', 'source_type', 'area', 'permission_key',
     ];
 
     protected $casts = ['is_visible' => 'boolean', 'sort_order' => 'integer'];
@@ -22,7 +21,7 @@ class NavigationMenuItem extends Model
             if ($item->source_type === 'folder' || app()->runningInConsole()) return;
             $requestedLabel = trim((string) request()->input('label', ''));
             if ($requestedLabel === '') return;
-            $item->label_override = $requestedLabel === trim((string) $item->label) ? null : $requestedLabel;
+            $item->label_override = $requestedLabel === trim((string)$item->label) ? null : $requestedLabel;
         });
     }
 
