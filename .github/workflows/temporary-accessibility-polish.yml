@@ -1,0 +1,111 @@
+name: Temporary Accessibility Polish
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Increase management profile reading sizes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          home = Path('resources/views/home-v3.blade.php')
+          layout = Path('resources/views/layouts/public.blade.php')
+          marker = '/* ACCESSIBILITY: MANAGEMENT PROFILE READABILITY */'
+
+          home_text = home.read_text()
+          if marker not in home_text:
+              home_css = r'''
+/* ACCESSIBILITY: MANAGEMENT PROFILE READABILITY */
+.home-section-management .member-body h3{font-size:clamp(17px,1.35vw,21px)!important;line-height:1.35!important;letter-spacing:-.01em!important}
+.home-section-management .member-role{font-size:11px!important;line-height:1.5!important}
+.home-section-management .member-contact{font-size:10.5px!important;line-height:1.5!important}
+.home-section-management .member-message{font-size:12px!important;line-height:1.7!important}
+.home-section-management .member-more{font-size:11px!important;min-height:42px!important}
+@media(max-width:650px){
+ .home-section-management .member-body h3{font-size:15px!important;line-height:1.35!important}
+ .home-section-management .member-role{font-size:10px!important;line-height:1.5!important}
+ .home-section-management .member-contact{font-size:10px!important;line-height:1.5!important}
+ .home-section-management .member-message{font-size:11px!important;line-height:1.65!important}
+ .home-section-management .member-more{font-size:10px!important;min-height:40px!important}
+}
+@media(max-width:380px){
+ .home-section-management .member-body h3{font-size:14px!important}
+ .home-section-management .member-role{font-size:9.5px!important}
+ .home-section-management .member-contact{font-size:9.5px!important}
+ .home-section-management .member-message{font-size:10.5px!important}
+ .home-section-management .member-more{font-size:9.5px!important}
+}
+'''
+              closing = '</style>'
+              if closing not in home_text:
+                  raise SystemExit('Missing closing style tag in home-v3.blade.php')
+              home_text = home_text.replace(closing, home_css + '\n' + closing, 1)
+              home.write_text(home_text)
+
+          viewer_marker = '/* ACCESSIBILITY: HOME PROFILE VIEWER READABILITY */'
+          layout_text = layout.read_text()
+          if viewer_marker not in layout_text:
+              viewer_css = r'''
+/* ACCESSIBILITY: HOME PROFILE VIEWER READABILITY */
+.home-profile-modal .home-profile-title{font-size:clamp(24px,2.2vw,34px)!important;line-height:1.22!important;letter-spacing:-.02em!important}
+.home-profile-modal .home-profile-role{font-size:14px!important;line-height:1.5!important}
+.home-profile-modal .home-profile-contact-mobile{font-size:14px!important;line-height:1.55!important}
+.home-profile-modal .home-profile-scroll{font-size:17px!important;line-height:1.85!important}
+.home-profile-modal .home-profile-footer .home-profile-link{font-size:14px!important;line-height:1.4!important;min-height:48px!important}
+@media(max-width:650px){
+ .home-profile-modal .home-profile-title{font-size:23px!important;line-height:1.25!important}
+ .home-profile-modal .home-profile-role{font-size:13px!important}
+ .home-profile-modal .home-profile-contact-mobile{font-size:13px!important;line-height:1.5!important}
+ .home-profile-modal .home-profile-scroll{font-size:16px!important;line-height:1.78!important}
+ .home-profile-modal .home-profile-footer .home-profile-link{font-size:14px!important;min-height:48px!important}
+}
+'''
+              closing = '</style>'
+              if closing not in layout_text:
+                  raise SystemExit('Missing closing style tag in public.blade.php')
+              layout_text = layout_text.replace(closing, viewer_css + '\n' + closing, 1)
+              layout.write_text(layout_text)
+
+          if marker not in home.read_text():
+              raise SystemExit('Home readability patch was not written')
+          if viewer_marker not in layout.read_text():
+              raise SystemExit('Viewer readability patch was not written')
+          PY
+
+      - name: Verify accessibility CSS patch
+        run: |
+          set -euo pipefail
+          grep -q 'ACCESSIBILITY: MANAGEMENT PROFILE READABILITY' resources/views/home-v3.blade.php
+          grep -q 'font-size:17px!important;line-height:1.7!important' resources/views/home-v3.blade.php
+          grep -q 'ACCESSIBILITY: HOME PROFILE VIEWER READABILITY' resources/views/layouts/public.blade.php
+          grep -q 'font-size:17px!important;line-height:1.85!important' resources/views/layouts/public.blade.php
+          git diff --check
+
+      - name: Commit and push patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add resources/views/home-v3.blade.php resources/views/layouts/public.blade.php
+          git rm .github/workflows/temporary-accessibility-polish.yml
+          git diff --cached --check
+          git commit -m 'Improve management profile text readability'
+          git push origin main
