@@ -1,3 +1,4 @@
+# Trigger repair workflow after adding the guarded patch.
 name: Repair mobile Site Content ribbon patch
 on:
   push:
@@ -10,7 +11,7 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Repair verified editor patch
+      - name: Patch verified editor
         shell: python
         run: |
           from pathlib import Path
