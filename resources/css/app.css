@@ -46,30 +46,72 @@
 /* Leadership cards: improve scanability without changing the card layout. */
 .home-section-management .member-body h3,
 .home-section-management .member-card h3 {
-    font-size: 1.05rem !important;
+    font-size: 1.2rem !important;
     line-height: 1.35 !important;
 }
 
 .home-section-management .member-role {
-    font-size: 0.72rem !important;
-    line-height: 1.45 !important;
+    font-size: 0.85rem !important;
+    line-height: 1.5 !important;
 }
 
 .home-section-management .member-contact,
 .home-section-management .member-contact span {
-    font-size: 0.72rem !important;
-    line-height: 1.5 !important;
+    font-size: 0.82rem !important;
+    line-height: 1.55 !important;
 }
 
 .home-section-management .member-message {
-    font-size: 0.82rem !important;
-    line-height: 1.65 !important;
+    font-size: 0.95rem !important;
+    line-height: 1.7 !important;
 }
 
 .home-section-management .member-more {
-    font-size: 0.78rem !important;
+    font-size: 0.85rem !important;
     line-height: 1.4 !important;
-    min-height: 42px !important;
+    min-height: 44px !important;
+}
+
+/* Actual public management-profile viewer typography. */
+.welcome-profile-name {
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+}
+
+.welcome-profile-role {
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+}
+
+.welcome-profile-message {
+    font-size: 13px !important;
+    line-height: 1.7 !important;
+}
+
+.welcome-profile-hint {
+    font-size: 11px !important;
+    line-height: 1.5 !important;
+}
+
+.welcome-profile-modal-title {
+    font-size: clamp(28px, 2.2vw, 34px) !important;
+    line-height: 1.22 !important;
+}
+
+.welcome-profile-modal-role {
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+}
+
+.welcome-profile-modal-scroll {
+    font-size: 18px !important;
+    line-height: 1.9 !important;
+}
+
+.welcome-profile-modal-label {
+    font-size: 12px !important;
+    line-height: 1.45 !important;
+    letter-spacing: .1em !important;
 }
 
 @media (max-width: 650px) {
@@ -99,13 +141,76 @@
         font-size: 0.9rem !important;
     }
 
+    /* Keep the two-column mobile cards readable without making them cramped. */
+    .home-section-management .member-body h3,
+    .home-section-management .member-card h3 {
+        font-size: 1rem !important;
+        line-height: 1.35 !important;
+    }
+
+    .home-section-management .member-role {
+        font-size: 0.75rem !important;
+    }
+
+    .home-section-management .member-contact,
+    .home-section-management .member-contact span {
+        font-size: 0.72rem !important;
+    }
+
+    .home-section-management .member-message {
+        font-size: 0.8rem !important;
+        line-height: 1.65 !important;
+    }
+
+    .home-section-management .member-more {
+        font-size: 0.75rem !important;
+        min-height: 42px !important;
+    }
+
+    .welcome-profile-name {
+        font-size: 15px !important;
+    }
+
+    .welcome-profile-role {
+        font-size: 11px !important;
+    }
+
+    .welcome-profile-message {
+        font-size: 12px !important;
+        line-height: 1.65 !important;
+    }
+
+    .welcome-profile-hint {
+        font-size: 10px !important;
+    }
+
+    .welcome-profile-modal-title {
+        font-size: 26px !important;
+        line-height: 1.25 !important;
+    }
+
+    .welcome-profile-modal-role {
+        font-size: 14px !important;
+    }
+
+    .welcome-profile-modal-scroll {
+        font-size: 17px !important;
+        line-height: 1.85 !important;
+    }
+
+    .welcome-profile-modal-label {
+        font-size: 11px !important;
+    }
+}
+
+@media (max-width: 380px) {
     .home-section-management .member-body h3,
     .home-section-management .member-card h3 {
         font-size: 0.95rem !important;
     }
 
     .home-section-management .member-role {
-        font-size: 0.68rem !important;
+        font-size: 0.7rem !important;
     }
 
     .home-section-management .member-contact,
@@ -115,11 +220,9 @@
 
     .home-section-management .member-message {
         font-size: 0.76rem !important;
-        line-height: 1.6 !important;
     }
 
     .home-section-management .member-more {
-        font-size: 0.72rem !important;
-        min-height: 40px !important;
+        font-size: 0.7rem !important;
     }
 }
