@@ -505,6 +505,102 @@ html,body{overflow-x:hidden}
 </style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
+/* FF_ROBUST_SITE_CONTENT_RIBBON_BOOTSTRAP */
+(function(){
+  const shell=document.querySelector('.editor-shell');
+  if(!shell)return;
+  const ribbon=shell.querySelector('.word-ribbon');
+  if(!ribbon)return;
+  const tabs=[...ribbon.querySelectorAll('[data-editor-tab]')];
+  const panels=[...ribbon.querySelectorAll('[data-editor-panel]')];
+  if(!tabs.length||!panels.length)return;
+
+  function activateRibbonTab(name){
+    tabs.forEach(tab=>{
+      const active=tab.dataset.editorTab===name;
+      tab.classList.toggle('active',active);
+      tab.setAttribute('aria-selected',active?'true':'false');
+      tab.setAttribute('tabindex',active?'0':'-1');
+    });
+    panels.forEach(panel=>{
+      const active=panel.dataset.editorPanel===name;
+      panel.classList.toggle('active',active);
+      panel.hidden=!active;
+      panel.setAttribute('aria-hidden',active?'false':'true');
+      panel.style.display=active?'flex':'none';
+    });
+  }
+
+  const initial=tabs.find(t=>t.classList.contains('active'))?.dataset.editorTab||tabs[0].dataset.editorTab;
+  activateRibbonTab(initial);
+
+  ribbon.addEventListener('pointerup',event=>{
+    const tab=event.target.closest?.('[data-editor-tab]');
+    if(!tab||!ribbon.contains(tab))return;
+    event.preventDefault();
+    activateRibbonTab(tab.dataset.editorTab);
+  },true);
+  ribbon.addEventListener('keydown',event=>{
+    const tab=event.target.closest?.('[data-editor-tab]');
+    if(!tab||!ribbon.contains(tab))return;
+    if(event.key==='Enter'||event.key===' '){
+      event.preventDefault();
+      activateRibbonTab(tab.dataset.editorTab);
+    }
+  });
+
+  const topbar=document.querySelector('.topbar');
+  let ticking=false;
+  function updateStickyRibbon(){
+    ticking=false;
+    if(shell.classList.contains('is-fullscreen')){
+      shell.classList.remove('ff-ribbon-active');
+      ribbon.style.removeProperty('top');
+      ribbon.style.removeProperty('left');
+      ribbon.style.removeProperty('width');
+      return;
+    }
+    const shellRect=shell.getBoundingClientRect();
+    const topbarRect=topbar?.getBoundingClientRect();
+    const topOffset=Math.max(0,Math.round(topbarRect?.bottom||0));
+    const ribbonHeight=ribbon.getBoundingClientRect().height;
+    const active=shellRect.top<=topOffset && shellRect.bottom>topOffset+Math.max(1,ribbonHeight);
+    if(active){
+      shell.style.setProperty('--ff-ribbon-left',shellRect.left+'px');
+      shell.style.setProperty('--ff-ribbon-width',shellRect.width+'px');
+      shell.style.setProperty('--ff-ribbon-height',ribbonHeight+'px');
+      shell.classList.add('ff-ribbon-active');
+      ribbon.style.setProperty('top',topOffset+'px','important');
+      ribbon.style.setProperty('left',shellRect.left+'px','important');
+      ribbon.style.setProperty('width',shellRect.width+'px','important');
+    }else{
+      shell.classList.remove('ff-ribbon-active');
+      shell.style.removeProperty('--ff-ribbon-left');
+      shell.style.removeProperty('--ff-ribbon-width');
+      shell.style.removeProperty('--ff-ribbon-height');
+      ribbon.style.removeProperty('top');
+      ribbon.style.removeProperty('left');
+      ribbon.style.removeProperty('width');
+    }
+  }
+  function requestStickyUpdate(){
+    if(ticking)return;
+    ticking=true;
+    requestAnimationFrame(updateStickyRibbon);
+  }
+
+  const scrollParents=[];
+  let parent=shell.parentElement;
+  while(parent&&parent!==document.body){
+    const style=getComputedStyle(parent);
+    if(/auto|scroll|overlay/.test(style.overflow+style.overflowY+style.overflowX))scrollParents.push(parent);
+    parent=parent.parentElement;
+  }
+  [window,...scrollParents].forEach(target=>target.addEventListener('scroll',requestStickyUpdate,{passive:true}));
+  window.addEventListener('resize',requestStickyUpdate,{passive:true});
+  if(window.ResizeObserver)new ResizeObserver(requestStickyUpdate).observe(ribbon);
+  requestStickyUpdate();
+})();
 const editor=document.getElementById('editor'),source=document.getElementById('content-source'),form=document.getElementById('content-form'),mediaInput=document.getElementById('media-input'),galleryInput=document.getElementById('gallery-input'),galleryBatchInput=document.getElementById('gallery-batch-input'),galleryStatus=document.getElementById('gallery-upload-status');
 
 
