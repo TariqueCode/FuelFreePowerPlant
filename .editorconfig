@@ -17,6 +17,4 @@ indent_size = 2
 [{compose,docker-compose}.{yml,yaml}]
 indent_size = 4
 
-# CMS editor mobile patch trigger
-# CMS editor final patch retry
-# CMS editor final patch workflow fix
+# trigger final CMS editor structure fix
