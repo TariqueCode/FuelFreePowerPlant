@@ -139,3 +139,121 @@
     }
 }
 </style>
+
+@if(request()->routeIs('home'))
+<style>
+/* Mobile/tablet profile viewer: identity is fixed above one independent message scroller. */
+@media (max-width:1099px){
+    .home-profile-modal{overflow:hidden!important;touch-action:none!important;}
+    .home-profile-modal .home-profile-panel{
+        display:grid!important;
+        grid-template-columns:minmax(0,32%) minmax(0,68%)!important;
+        grid-template-rows:auto minmax(0,1fr) auto!important;
+        grid-template-areas:"photo head" "message message" "footer footer"!important;
+        width:100%!important;
+        height:min(90svh,720px)!important;
+        max-height:calc(100svh - 24px)!important;
+        min-height:0!important;
+        overflow:hidden!important;
+        position:relative!important;
+        align-items:stretch!important;
+    }
+    .home-profile-modal .home-profile-info{display:contents!important;}
+    .home-profile-modal .home-profile-kicker{display:none!important;}
+    .home-profile-modal .home-profile-photo{
+        grid-area:photo!important;
+        align-self:center!important;
+        justify-self:center!important;
+        width:100%!important;
+        max-width:100%!important;
+        min-width:0!important;
+        min-height:0!important;
+        height:auto!important;
+        padding:14px 0 14px 16px!important;
+        border:0!important;
+        overflow:hidden!important;
+    }
+    .home-profile-modal .home-profile-photo img{
+        display:block!important;
+        width:100%!important;
+        height:auto!important;
+        aspect-ratio:4 / 5!important;
+        object-fit:cover!important;
+    }
+    .home-profile-modal .home-profile-head{
+        grid-area:head!important;
+        align-self:center!important;
+        min-width:0!important;
+        width:100%!important;
+        padding:25px 58px 12px 14px!important;
+        display:flex!important;
+        flex-direction:column!important;
+        justify-content:center!important;
+    }
+    .home-profile-modal .home-profile-title,
+    .home-profile-modal .home-profile-role,
+    .home-profile-modal .home-profile-contact-mobile{position:static!important;}
+    .home-profile-modal .home-profile-divider{display:none!important;}
+    .home-profile-modal .home-profile-scroll{
+        grid-area:message!important;
+        min-width:0!important;
+        min-height:0!important;
+        width:calc(100% - 32px)!important;
+        height:auto!important;
+        max-height:none!important;
+        margin:14px 16px 12px!important;
+        padding:13px 13px 18px!important;
+        overflow-y:auto!important;
+        overflow-x:hidden!important;
+        overscroll-behavior:contain!important;
+        -webkit-overflow-scrolling:touch!important;
+        touch-action:pan-y!important;
+        position:relative!important;
+        z-index:1!important;
+        box-sizing:border-box!important;
+        scrollbar-gutter:stable!important;
+    }
+    .home-profile-modal .home-profile-footer{
+        grid-area:footer!important;
+        min-width:0!important;
+        min-height:0!important;
+        width:100%!important;
+        position:relative!important;
+        z-index:3!important;
+        padding:0 16px calc(12px + env(safe-area-inset-bottom))!important;
+    }
+}
+@media (max-width:650px){
+    .home-profile-modal{padding:12px!important;align-items:center!important;}
+    .home-profile-modal .home-profile-panel{
+        height:min(90svh,720px)!important;
+        max-height:calc(100svh - 24px)!important;
+        border-radius:22px!important;
+    }
+    .home-profile-modal .home-profile-photo{padding:14px 0 14px 16px!important;}
+    .home-profile-modal .home-profile-head{padding:25px 58px 12px 14px!important;}
+    .home-profile-modal .home-profile-scroll{
+        width:calc(100% - 32px)!important;
+        margin:14px 16px 12px!important;
+        padding:13px 13px 18px!important;
+    }
+    .home-profile-modal .home-profile-footer{padding:0 16px calc(12px + env(safe-area-inset-bottom))!important;}
+}
+@media (min-width:651px) and (max-width:1099px){
+    .home-profile-modal .home-profile-panel{
+        width:min(92vw,900px)!important;
+        height:min(86svh,760px)!important;
+        max-height:calc(100svh - 40px)!important;
+        border-radius:24px!important;
+    }
+    .home-profile-modal .home-profile-photo{padding:18px 0 18px 20px!important;}
+    .home-profile-modal .home-profile-head{padding:28px 64px 16px 18px!important;}
+    .home-profile-modal .home-profile-scroll{
+        width:calc(100% - 40px)!important;
+        margin:16px 20px 14px!important;
+        padding:16px 16px 20px!important;
+    }
+    .home-profile-modal .home-profile-footer{padding:0 20px 18px!important;}
+}
+</style>
+@endif
