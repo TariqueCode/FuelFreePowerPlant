@@ -99,9 +99,8 @@
     <div class="word-panel" data-editor-panel="insert">
       <div class="word-group">
         <button type="button" class="word-command" id="insert-link" title="Insert link"><i class="fa-solid fa-link"></i><span>Link</span></button>
-        <button type="button" class="word-command" id="upload-image" title="Upload image"><i class="fa-regular fa-image"></i><span>Picture</span></button>
+        <button type="button" class="word-command" id="upload-media" title="Upload images or videos"><i class="fa-solid fa-photo-film"></i><span>Media</span></button>
         <button type="button" class="word-command" id="insert-image-url" title="Insert image from URL"><i class="fa-solid fa-image"></i><span>Image URL</span></button>
-        <button type="button" class="word-command" id="upload-video" title="Upload video"><i class="fa-solid fa-video"></i><span>Video</span></button>
         <button type="button" class="word-command" id="insert-video-url" title="Insert video from URL"><i class="fa-solid fa-link"></i><span>Video URL</span></button>
         <button type="button" class="word-command" id="insert-table" title="Insert table"><i class="fa-solid fa-table"></i><span>Table</span></button>
         <span class="word-group-label">Media</span>
@@ -138,7 +137,7 @@
   </div>
 <div id="editor" class="editor" contenteditable="true">{!! old('content',$item->content) !!}</div>
 <div class="editor-tools-footer"><span class="editor-counts" id="editor-counts">0 words • 0 characters</span></div>
-</div><textarea id="content-source" name="content" hidden></textarea><input id="media-input" type="file" hidden accept="image/jpeg,image/png,image/webp,image/gif"><input id="gallery-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif"><input id="video-input" type="file" hidden accept="video/mp4,video/webm">@if($contentType==='gallery')<input id="gallery-batch-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">@endif</div>
+</div><textarea id="content-source" name="content" hidden></textarea><input id="media-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"><input id="gallery-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif">@if($contentType==='gallery')<input id="gallery-batch-input" type="file" hidden multiple accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm">@endif</div>
 <div><label>{{ $contentType==='gallery' ? 'Event date &amp; time' : 'Publish date/time' }}</label><input type="datetime-local" name="published_at" value="{{ old('published_at',$item->published_at?->format('Y-m-d\\TH:i')) }}"></div>
 </div><div class="actions"><a class="back" href="{{ route('admin.site-content.index',['type'=>in_array($item->type,['news','announcement'],true)?'news':$item->type]) }}">Cancel</a><button class="save" type="submit"><i class="fa-solid fa-floppy-disk"></i> {{ $item->exists?'Save changes':'Create content' }}</button></div></form></div>
 @endsection
@@ -177,7 +176,16 @@
 .word-view-note{display:flex;align-items:center;gap:9px;color:#7e9da6;font-size:10px;max-width:300px;line-height:1.5;padding:0 12px}
 .word-view-note i{color:#43c2e5}
 .editor{width:100%;max-width:100%;min-width:0;box-sizing:border-box;min-height:430px;padding:18px;color:#e6f4f7;line-height:1.75;font-size:13px;outline:none;overflow-wrap:anywhere;word-break:break-word}
-.editor>*{max-width:100%;box-sizing:border-box}.editor h1{font-size:30px}.editor h2{font-size:24px}.editor h3{font-size:19px}.editor h4{font-size:17px}.editor h5{font-size:15px}.editor h6{font-size:13px;text-transform:uppercase;letter-spacing:.04em}.editor blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid #43c2e5;background:rgba(67,194,229,.06);color:#b9d7df}.editor table{width:100%;max-width:100%;border-collapse:collapse;margin:14px 0}.editor td,.editor th{border:1px solid rgba(120,170,185,.35);padding:9px;text-align:left;overflow-wrap:anywhere;word-break:break-word}.editor th{background:rgba(67,194,229,.08)}.editor img,.editor video,.editor iframe{max-width:100%;height:auto;box-sizing:border-box}.editor iframe{width:100%;min-width:0}.editor.source-mode{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap}
+.editor>*{max-width:100%;box-sizing:border-box}.editor h1{font-size:30px}.editor h2{font-size:24px}.editor h3{font-size:19px}.editor h4{font-size:17px}.editor h5{font-size:15px}.editor h6{font-size:13px;text-transform:uppercase;letter-spacing:.04em}.editor blockquote{margin:14px 0;padding:10px 16px;border-left:3px solid #43c2e5;background:rgba(67,194,229,.06);color:#b9d7df}.editor table{width:100%;max-width:100%;border-collapse:collapse;margin:14px 0}.editor td,.editor th{border:1px solid rgba(120,170,185,.35);padding:9px;text-align:left;overflow-wrap:anywhere;word-break:break-word}.editor th{background:rgba(67,194,229,.08)}.editor img,.editor video,.editor iframe{max-width:100%;height:auto;box-sizing:border-box}
+.ff-image-resize-handle{
+  position:fixed;width:14px;height:14px;margin:-7px 0 0 -7px;
+  border:2px solid #061923;border-radius:4px;background:#43c2e5;
+  box-shadow:0 0 0 1px rgba(67,194,229,.55),0 3px 12px rgba(0,0,0,.35);
+  cursor:nwse-resize;z-index:10050;display:none;touch-action:none;
+}
+.editor img.ff-selected-image{outline:2px solid #43c2e5;outline-offset:2px;cursor:default}
+@media(max-width:700px){.ff-image-resize-handle{width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:5px}.editor img.ff-selected-image{outline-width:2px}}
+.editor iframe{width:100%;min-width:0}.editor.source-mode{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap}
 .editor-shell.is-fullscreen{position:fixed;inset:0;z-index:9999;background:#04151e;border-radius:0;display:flex;flex-direction:column}.editor-shell.is-fullscreen .word-ribbon{position:sticky;top:0;z-index:2}.editor-shell.is-fullscreen .editor{flex:1;overflow:auto}
 @media(max-width:900px){.word-ribbon{top:0}.word-tabs{padding:0 5px}.word-tab{padding:0 12px}.editor-status{max-width:190px}.word-panel{min-height:72px}.word-group{padding-left:6px;padding-right:6px}.format-select{width:116px}.font-select{width:110px}}
 @media(max-width:650px){.word-ribbon{top:0}.word-tabs{min-height:38px}.word-tab{height:38px;font-size:10px;padding:0 13px}.editor-status{display:none}.word-panel{min-height:74px;overflow-x:auto;padding:5px 4px}.word-group{padding-left:6px;padding-right:6px}.word-command{min-width:40px;height:51px}.word-icon{width:31px;height:31px}.word-select{height:31px;font-size:10px}.format-select{width:110px}.font-select{width:105px}.size-select{width:68px}.editor{font-size:16px;line-height:1.75;padding:14px}.editor h1{font-size:28px}.editor h2{font-size:23px}.editor h3{font-size:19px}.editor table{display:block;overflow-x:auto}.editor .content-columns{grid-template-columns:1fr!important}}
@@ -478,10 +486,26 @@ html,body{overflow-x:hidden}
   .size-select{width:65px!important}
   .editor{padding:12px!important;font-size:16px}
 }
+
+/* Final Site Content CMS ribbon contract: one active panel + one horizontal touch rail. */
+.word-ribbon .word-panel{display:none!important;width:100%;max-width:100%;min-width:0;overflow-x:auto!important;overflow-y:hidden!important;align-items:stretch;flex-wrap:nowrap!important;-webkit-overflow-scrolling:touch;touch-action:pan-x;overscroll-behavior-x:contain}
+.word-ribbon .word-panel.active{display:flex!important}
+.word-ribbon .word-panel[aria-hidden="true"]{display:none!important}
+.word-ribbon .word-panel[aria-hidden="false"]{display:flex!important}
+.word-ribbon .word-panel>*{flex:0 0 auto!important}
+.word-ribbon .word-group{flex:0 0 auto!important;width:max-content!important;max-width:none!important;min-width:max-content!important;flex-wrap:nowrap!important}
+.word-ribbon .word-group-row{flex:0 0 auto!important;width:max-content!important;max-width:none!important;flex-wrap:nowrap!important}
+.word-ribbon .word-command,.word-ribbon .word-icon,.word-ribbon .word-select,.word-ribbon .word-color{flex:0 0 auto!important}
+@media(max-width:700px){
+  .word-ribbon .word-panel{min-height:68px!important;padding:5px 4px!important;scrollbar-width:thin}
+  .word-ribbon .word-group{padding-left:5px!important;padding-right:5px!important}
+  .word-ribbon .word-group-row{gap:3px!important}
+}
+
 </style>@endpush
 @push('head')<meta name="csrf-token" content="{{ csrf_token() }}">@endpush
 @push('scripts')<script>
-const editor=document.getElementById('editor'),source=document.getElementById('content-source'),form=document.getElementById('content-form'),mediaInput=document.getElementById('media-input'),galleryInput=document.getElementById('gallery-input'),videoInput=document.getElementById('video-input'),galleryBatchInput=document.getElementById('gallery-batch-input'),galleryStatus=document.getElementById('gallery-upload-status');
+const editor=document.getElementById('editor'),source=document.getElementById('content-source'),form=document.getElementById('content-form'),mediaInput=document.getElementById('media-input'),galleryInput=document.getElementById('gallery-input'),galleryBatchInput=document.getElementById('gallery-batch-input'),galleryStatus=document.getElementById('gallery-upload-status');
 
 
 let savedEditorRange=null;
@@ -492,7 +516,77 @@ function exec(cmd,value=null){restoreEditorSelection();editor.focus();document.e
 document.getElementById('insert-link').onclick=()=>{const url=prompt('URL');if(url)exec('createLink',url)};document.getElementById('insert-button').onclick=()=>{const text=prompt('Button text','Learn More');if(!text)return;const url=prompt('Button URL','/');if(!url)return;const style=prompt('Button style: primary or outline','primary')==='outline'?'cta-outline':'';exec('insertHTML',`<a class="content-cta ${style}" href="${safeAttr(url)}">${safeText(text)}</a> <span>&nbsp;</span>`)};
 document.getElementById('insert-columns').onclick=()=>{const count=Math.min(3,Math.max(2,parseInt(prompt('Number of columns (2 or 3)','2')||'2',10)));const cols=Array.from({length:count},(_,i)=>`<div class="content-column"><h3>Column ${i+1}</h3><p>Click here to edit this content.</p></div>`).join('');exec('insertHTML',`<div class="content-columns cols-${count}">${cols}</div><p></p>`)};
 function safeText(v){return String(v).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]))}function safeAttr(v){return String(v).replace(/[<>"']/g,ch=>({'<':'%3C','>':'%3E','"':'%22',"'":'%27'}[ch]))}
-function alignSelectedImage(cls){const sel=window.getSelection();let node=sel&&sel.anchorNode;while(node&&node!==editor&&node.nodeType===3)node=node.parentElement;while(node&&node!==editor&&node.tagName!=='IMG')node=node.parentElement;if(!node||node===editor||node.tagName!=='IMG'){alert('Select an image first.');return}node.classList.remove('align-left','align-center','align-right');node.classList.add(cls);sync()}
+function alignSelectedImage(cls){let node=window.ffGetSelectedEditorImage?.()||null;if(!node){const sel=window.getSelection();node=sel&&sel.anchorNode;while(node&&node!==editor&&node.nodeType===3)node=node.parentElement;while(node&&node!==editor&&node.tagName!=='IMG')node=node.parentElement}if(!node||node===editor||node.tagName!=='IMG'){alert('Select an image first.');return}node.classList.remove('align-left','align-center','align-right');node.classList.add(cls);sync()}
+
+(function(){
+  const shell=editor?.closest('.editor-shell');
+  if(!editor||!shell)return;
+  const handle=document.createElement('div');
+  handle.className='ff-image-resize-handle';
+  handle.setAttribute('aria-label','Resize image');
+  handle.setAttribute('role','button');
+  shell.appendChild(handle);
+  let selectedImage=null;
+  let drag=null;
+
+  function clearImageSelection(){
+    if(selectedImage)selectedImage.classList.remove('ff-selected-image');
+    selectedImage=null;
+    handle.style.display='none';
+  }
+  function positionHandle(){
+    if(!selectedImage||!editor.contains(selectedImage)){clearImageSelection();return;}
+    const rect=selectedImage.getBoundingClientRect();
+    if(!rect.width||!rect.height){clearImageSelection();return;}
+    handle.style.left=rect.right+'px';
+    handle.style.top=rect.bottom+'px';
+    handle.style.display='block';
+  }
+  function selectImage(img){
+    if(selectedImage&&selectedImage!==img)selectedImage.classList.remove('ff-selected-image');
+    selectedImage=img;
+    selectedImage.classList.add('ff-selected-image');
+    positionHandle();
+  }
+
+  editor.addEventListener('click',e=>{
+    const img=e.target?.closest?.('img');
+    if(img&&editor.contains(img)){selectImage(img);return;}
+    if(!handle.contains(e.target))clearImageSelection();
+  });
+  editor.addEventListener('keydown',e=>{if(e.key==='Escape')clearImageSelection()});
+
+  handle.addEventListener('pointerdown',e=>{
+    if(!selectedImage)return;
+    e.preventDefault();e.stopPropagation();
+    const rect=selectedImage.getBoundingClientRect();
+    drag={pointerId:e.pointerId,startX:e.clientX,startWidth:rect.width};
+    handle.setPointerCapture?.(e.pointerId);
+  });
+  handle.addEventListener('pointermove',e=>{
+    if(!drag||e.pointerId!==drag.pointerId||!selectedImage)return;
+    e.preventDefault();
+    const editorRect=editor.getBoundingClientRect();
+    const minWidth=Math.max(80,Math.min(120,editorRect.width-24));
+    const maxWidth=Math.max(minWidth,editorRect.width-24);
+    const next=Math.max(minWidth,Math.min(maxWidth,drag.startWidth+(e.clientX-drag.startX)));
+    selectedImage.style.width=Math.round(next)+'px';
+    selectedImage.style.maxWidth='100%';
+    selectedImage.style.height='auto';
+    positionHandle();
+  });
+  const finishDrag=()=>{
+    if(!drag)return;
+    drag=null;
+    if(selectedImage){sync();positionHandle();}
+  };
+  handle.addEventListener('pointerup',finishDrag);
+  handle.addEventListener('pointercancel',finishDrag);
+  window.addEventListener('scroll',positionHandle,{passive:true});
+  window.addEventListener('resize',positionHandle,{passive:true});
+  editor.addEventListener('input',()=>{if(selectedImage)setTimeout(positionHandle,0)});
+  window.ffGetSelectedEditorImage=()=>selectedImage;
+})();
 document.getElementById('image-align-left').onclick=()=>alignSelectedImage('align-left');document.getElementById('image-align-center').onclick=()=>alignSelectedImage('align-center');document.getElementById('image-align-right').onclick=()=>alignSelectedImage('align-right');
 document.getElementById('insert-table').onclick=()=>{const rows=Math.min(20,Math.max(2,parseInt(prompt('Number of rows','3')||'3',10)));const cols=Math.min(10,Math.max(1,parseInt(prompt('Number of columns','3')||'3',10)));let h='<table><thead><tr>'+Array.from({length:cols},(_,i)=>'<th>Header '+(i+1)+'</th>').join('')+'</tr></thead><tbody>'+Array.from({length:rows-1},()=>'<tr>'+Array.from({length:cols},()=>'<td>Cell</td>').join('')+'</tr>').join('')+'</tbody></table><p></p>';exec('insertHTML',h)};
 let sourceMode=false;document.getElementById('toggle-source').onclick=()=>{if(!sourceMode){sourceMode=true;source.value=editor.innerHTML;editor.textContent=source.value;editor.classList.add('source-mode');document.getElementById('toggle-source').classList.add('active')}else{sourceMode=false;editor.innerHTML=editor.textContent;editor.classList.remove('source-mode');document.getElementById('toggle-source').classList.remove('active');sync()}};
@@ -500,8 +594,20 @@ document.getElementById('preview-content').onclick=()=>{if(sourceMode)document.g
 document.getElementById('toggle-fullscreen').onclick=()=>{document.querySelector('.editor-shell').classList.toggle('is-fullscreen');document.querySelector('.editor-shell').classList.contains('is-fullscreen')?document.getElementById('toggle-fullscreen').innerHTML='<i class="fa-solid fa-compress"></i>':document.getElementById('toggle-fullscreen').innerHTML='<i class="fa-solid fa-expand"></i>'};
 async function upload(file){const fd=new FormData();fd.append('media',file);const res=await fetch('{{ route('admin.site-content.media') }}',{method:'POST',headers:{'X-CSRF-TOKEN':document.querySelector('meta[name=csrf-token]').content,'Accept':'application/json'},body:fd});if(!res.ok)throw new Error('Upload failed for '+file.name);return res.json()}
 const safeName=n=>n.replaceAll('"','');
-document.getElementById('upload-image').onclick=()=>mediaInput.click();mediaInput.onchange=async()=>{if(!mediaInput.files[0])return;try{const d=await upload(mediaInput.files[0]);exec('insertHTML',`<img src="${d.url}" alt="${safeName(d.name)}" loading="lazy">`)}catch(e){alert(e.message)}mediaInput.value=''};
-document.getElementById('upload-video').onclick=()=>videoInput.click();videoInput.onchange=async()=>{if(!videoInput.files[0])return;try{const d=await upload(videoInput.files[0]);exec('insertHTML',`<video controls preload="metadata" src="${d.url}"></video>`)}catch(e){alert(e.message)}videoInput.value=''};
+document.getElementById('upload-media').onclick=()=>mediaInput.click();
+mediaInput.onchange=async()=>{
+  const files=[...mediaInput.files];
+  if(!files.length)return;
+  try{
+    const uploads=await Promise.all(files.map(upload));
+    const html=uploads.map(d=>d.mime?.startsWith('video/')
+      ? `<video controls preload="metadata" src="${d.url}"></video>`
+      : `<img src="${d.url}" alt="${safeName(d.name)}" loading="lazy">`
+    ).join('<p><br></p>');
+    exec('insertHTML',html);
+  }catch(e){alert(e.message)}
+  mediaInput.value='';
+};
 document.getElementById('insert-youtube').onclick=()=>{const url=prompt('YouTube URL');if(!url)return;const m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([^?&/]+)/);if(m)exec('insertHTML',`<iframe src="https://www.youtube.com/embed/${m[1]}" title="YouTube" allowfullscreen loading="lazy"></iframe>`)};
 document.getElementById('insert-facebook').onclick=()=>{const url=prompt('Facebook video URL');if(url)exec('insertHTML',`<iframe src="https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false" title="Facebook" allowfullscreen loading="lazy"></iframe>`)};
 document.getElementById('insert-gallery').onclick=()=>galleryInput.click();galleryInput.onchange=async()=>{const files=[...galleryInput.files];if(!files.length)return;try{const uploads=await Promise.all(files.map(upload));exec('insertHTML','<div class="media-gallery">'+uploads.map(d=>`<img src="${d.url}" alt="${safeName(d.name)}" loading="lazy">`).join('')+'</div>')}catch(e){alert(e.message)}galleryInput.value=''};
@@ -547,9 +653,24 @@ editor.addEventListener('focus',()=>{saveEditorSelection();updateEditorToolbarSt
 document.addEventListener('selectionchange',()=>{const sel=window.getSelection();if(sel&&sel.rangeCount&&editor.contains(sel.anchorNode)){savedEditorRange=sel.getRangeAt(0).cloneRange();updateEditorToolbarState()}});
 document.querySelectorAll('[data-editor-tab]').forEach(tab=>tab.addEventListener('click',()=>{
   const name=tab.dataset.editorTab;
-  document.querySelectorAll('[data-editor-tab]').forEach(t=>{const active=t.dataset.editorTab===name;t.classList.toggle('active',active);t.setAttribute('aria-selected',active?'true':'false')});
-  document.querySelectorAll('[data-editor-panel]').forEach(p=>p.classList.toggle('active',p.dataset.editorPanel===name));
-}));
+  document.querySelectorAll('[data-editor-tab]').forEach(t=>{
+    const active=t.dataset.editorTab===name;
+    t.classList.toggle('active',active);
+    t.setAttribute('aria-selected',active?'true':'false');
+  });
+  document.querySelectorAll('[data-editor-panel]').forEach(p=>{
+    const active=p.dataset.editorPanel===name;
+    p.classList.toggle('active',active);
+    p.style.display=active?'flex':'none';
+    p.setAttribute('aria-hidden',active?'false':'true');
+  });
+});
+document.querySelectorAll('[data-editor-panel]').forEach(p=>{
+  const active=p.dataset.editorPanel==='home';
+  p.classList.toggle('active',active);
+  p.style.display=active?'flex':'none';
+  p.setAttribute('aria-hidden',active?'false':'true');
+});
 document.querySelectorAll('.word-ribbon button,.word-ribbon select,.word-ribbon input[type=color]').forEach(control=>{
   const preserve=()=>saveEditorSelection();
   control.addEventListener('pointerdown',preserve,true);
