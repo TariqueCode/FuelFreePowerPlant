@@ -3156,84 +3156,111 @@ main.shell{
 @media(min-width:651px) and (max-width:1099px){.home-v3 .home-section-management .member-card{grid-template-columns:minmax(110px,38%) minmax(0,62%)!important}.home-v3 .home-section-management .member-body{padding:13px!important}}
 @media(max-width:420px){.home-v3 .home-section-management .management-grid{gap:8px!important}.home-v3 .home-section-management .member-card{border-radius:12px!important}.home-v3 .home-section-management .member-body{padding:8px!important}.home-v3 .home-section-management .member-contacts{margin-top:7px!important;gap:3px!important}.home-v3 .home-section-management .member-message{margin-top:7px!important}.home-v3 .home-section-management .member-more{margin-top:7px!important;min-height:32px!important}}
 /* === FFP management profile horizontal card composition — DESKTOP ONLY === */
-@media (min-width: 1100px) {
+ (min-width:1100px) {
     .home-v3 .home-section-management .management-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 20px !important;
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:20px !important;
+        align-items:start !important;
     }
     .home-v3 .home-section-management .member-card {
-        display: grid !important;
-        grid-template-columns: minmax(0, 40%) minmax(0, 60%) !important;
-        grid-template-rows: 1fr !important;
-        height: auto !important;
-        min-width: 0 !important;
-        overflow: hidden !important;
+        display:grid !important;
+        grid-template-columns:minmax(0,40%) minmax(0,60%) !important;
+        grid-template-rows:auto !important;
+        height:auto !important;
+        min-height:0 !important;
+        align-items:start !important;
+        overflow:hidden !important;
     }
     .home-v3 .home-section-management .member-photo {
-        grid-column: 1 !important;
-        grid-row: 1 !important;
-        width: 100% !important;
-        height: 100% !important;
-        aspect-ratio: 4 / 5 !important;
-        min-height: 0 !important;
+        grid-column:1 !important;
+        grid-row:1 !important;
+        width:100% !important;
+        height:auto !important;
+        aspect-ratio:4 / 5 !important;
+        align-self:start !important;
+        overflow:hidden !important;
     }
     .home-v3 .home-section-management .member-photo img {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: cover !important;
+        display:block !important;
+        width:100% !important;
+        height:100% !important;
+        object-fit:cover !important;
     }
     .home-v3 .home-section-management .member-body {
-        grid-column: 2 !important;
-        grid-row: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        min-width: 0 !important;
-        padding: 22px !important;
+        grid-column:2 !important;
+        grid-row:1 !important;
+        min-width:0 !important;
+        min-height:0 !important;
+        height:auto !important;
+        align-self:stretch !important;
+        display:flex !important;
+        flex-direction:column !important;
+        justify-content:center !important;
+        padding:24px !important;
     }
     .home-v3 .home-section-management .member-body h3 {
-        margin: 0 !important;
-        font-size: 18px !important;
-        line-height: 1.3 !important;
+        margin:0 !important;
+        font-size:21px !important;
+        line-height:1.25 !important;
     }
     .home-v3 .home-section-management .member-role {
-        margin-top: 5px !important;
-        font-size: 9px !important;
+        margin:6px 0 0 !important;
+        font-size:10px !important;
+        line-height:1.4 !important;
     }
     .home-v3 .home-section-management .member-contacts {
-        margin-top: 12px !important;
-        padding: 0 !important;
-        border: 0 !important;
-        gap: 5px !important;
+        display:grid !important;
+        gap:7px !important;
+        margin:14px 0 0 !important;
+        padding:0 !important;
+        border:0 !important;
     }
     .home-v3 .home-section-management .member-contact {
-        font-size: 9px !important;
+        display:flex !important;
+        align-items:center !important;
+        gap:9px !important;
+        font-size:11px !important;
+        line-height:1.45 !important;
     }
     .home-v3 .home-section-management .member-contact i {
-        display: none !important;
+        display:inline-flex !important;
+        width:15px !important;
+        flex:0 0 15px !important;
+        justify-content:center !important;
+        color:var(--cyan) !important;
+        font-size:11px !important;
+    }
+    .home-v3 .home-section-management .member-contact span {
+        min-width:0 !important;
+        max-width:100% !important;
+        overflow:hidden !important;
+        text-overflow:ellipsis !important;
+        white-space:nowrap !important;
     }
     .home-v3 .home-section-management .member-message {
-        margin-top: 12px !important;
-        padding: 0 !important;
-        border: 0 !important;
-        font-size: 10px !important;
-        line-height: 1.55 !important;
-        -webkit-line-clamp: 3 !important;
-        line-clamp: 3 !important;
+        margin:15px 0 0 !important;
+        padding:0 !important;
+        border:0 !important;
+        font-size:12px !important;
+        line-height:1.6 !important;
+        text-transform:none !important;
+        -webkit-line-clamp:3 !important;
+        line-clamp:3 !important;
+        overflow:hidden !important;
     }
     .home-v3 .home-section-management .member-message:before {
-        content: none !important;
-        display: none !important;
+        content:none !important;
+        display:none !important;
     }
     .home-v3 .home-section-management .member-more {
-        width: auto !important;
-        align-self: flex-start !important;
-        margin-top: 14px !important;
-        min-height: 36px !important;
-        padding: 8px 15px !important;
+        width:auto !important;
+        align-self:flex-start !important;
+        min-height:40px !important;
+        margin:16px 0 0 !important;
+        padding:9px 16px !important;
+        font-size:10px !important;
     }
 }
-</style>
 <main class="shell home-v3">
 <div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
 @foreach($home['section_order'] as $section)
