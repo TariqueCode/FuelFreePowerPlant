@@ -1,0 +1,56 @@
+name: Fix CMS editor patch structure
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Repair editor script structure
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          p=Path('resources/views/partials/mail-editor.blade.php')
+          s=p.read_text()
+          bad='''\n<script>\n(function(){\n  const root=document.querySelector('[data-editor="{{ $editorId }}"]');'''
+          good='''\n(function(){\n  const root=document.querySelector('[data-editor="{{ $editorId }}"]');'''
+          if bad in s:
+              s=s.replace(bad,good,1)
+          bad_tail='''\n</script>\n\n</script>\n@endpush'''
+          good_tail='''\n</script>\n@endpush'''
+          if bad_tail in s:
+              s=s.replace(bad_tail,good_tail,1)
+          assert '<script>\n(function(){\n  const root=document.querySelector(\'[data-editor="{{ $editorId }}"]\')' not in s
+          assert s.count('</script>') >= 1
+          p.write_text(s)
+          e=Path('.editorconfig')
+          es=e.read_text()
+          es=''.join(line for line in es.splitlines(True) if 'CMS editor mobile patch trigger' not in line and 'CMS editor final patch retry' not in line and 'CMS editor final patch workflow fix' not in line)
+          e.write_text(es)
+          PY
+      - name: Validate source
+        run: |
+          php -r '$s=file_get_contents("resources/views/partials/mail-editor.blade.php"); if (substr_count($s,"<script>") !== substr_count($s,"</script>")) { fwrite(STDERR,"Unbalanced script tags\n"); exit(1); }'
+          grep -q 'ff-media-upload-btn' resources/views/partials/mail-editor.blade.php
+          grep -q 'ff-image-resize-handle' resources/views/partials/mail-editor.blade.php
+      - name: Commit and remove temporary workflow
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add resources/views/partials/mail-editor.blade.php .editorconfig
+          git rm -f .github/workflows/cms-editor-fix.yml
+          git commit -m 'Fix CMS editor script structure and cleanup'
+          git push origin HEAD:main
+      - name: Trigger production deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          curl -fsSL -X POST -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" https://api.github.com/repos/${{ github.repository }}/actions/workflows/deploy.yml/dispatches -d '{"ref":"main"}'
