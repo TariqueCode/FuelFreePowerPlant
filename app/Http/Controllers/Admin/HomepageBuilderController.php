@@ -22,7 +22,7 @@ class HomepageBuilderController extends Controller
             'management' => SiteContentItem::query()->where('type', 'management')->where('status', 'published')->count(),
             'news' => SiteContentItem::query()->whereIn('type', ['news', 'announcement'])->where('status', 'published')->count(),
             'gallery' => SiteContentItem::query()->where('type', 'gallery')->where('status', 'published')->count(),
-            'sliders' => \App\Models\SiteSlider::query()->where('is_published', true)->count(),
+            'sliders' => \\App\\Models\\SiteSlider::query()->where('is_published', true)->count(),
         ];
 
         $managementFolders = ManagementProfileFolder::query()
@@ -47,10 +47,11 @@ class HomepageBuilderController extends Controller
             'settings' => ['nullable', 'array'],
             'settings.*.limit' => ['nullable', 'integer', 'min:1', 'max:100'],
             'settings.*.mode' => ['nullable', 'in:latest,selected'],
-            'settings.*.ids' => ['nullable', 'array', 'max:100'],
+            'settings.news.ids' => ['nullable', 'array', 'max:100'],
+            'settings.gallery.ids' => ['nullable', 'array', 'max:100'],
             'settings.*.ids.*' => ['integer', 'distinct'],
             'settings.management.folder_id' => ['required', 'integer', 'exists:management_profile_folders,id'],
-            'settings.management.ids' => ['required', 'array', 'min:1', 'max:100'],
+            'settings.management.ids' => ['required', 'array', 'min:1'],
             'settings.management.ids.*' => ['required', 'integer', 'distinct'],
             'settings.welcome.eyebrow' => ['nullable', 'string', 'max:120'],
             'settings.welcome.signoff' => ['nullable', 'string', 'max:240'],
@@ -123,7 +124,7 @@ class HomepageBuilderController extends Controller
             if ($key === 'management') {
                 $settings['folder_id'] = $managementFolderId;
                 $settings['mode'] = 'selected';
-                $settings['ids'] = array_values(array_slice($validIds['management'], 0, 100));
+                $settings['ids'] = $validIds['management'];
                 unset($settings['limit']);
             } elseif (in_array($key, ['news','gallery'], true) && $request->has("settings.{$key}.limit")) {
                 $settings['limit'] = max(1, min(100, (int) $request->input("settings.{$key}.limit")));
