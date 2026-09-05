@@ -29,7 +29,7 @@ class ManagementController extends Controller
     {
         $folder=ManagementProfileFolder::query()->where('slug',$folderSlug)->where('status','published')->firstOrFail();
         $members=$folder->profiles()->published()->orderBy('sort_order')->orderBy('title')->get();
-        return view('management.folder',compact('folder','members'));
+        return view('management.folder-profile',compact('folder','members'));
     }
 
     public function vcard(SiteContentItem $member): Response
