@@ -35,15 +35,11 @@ class HomeController
             fn ($section) => [$section->key => $normalizeSectionSettings($section->settings)]
         );
 
-        // Keep every homepage section layout constrained to the three layouts
-        // exposed by the Admin Homepage Builder. Invalid/stale values must never
-        // become CSS class names on the public site.
         $sectionSettings = $sectionSettings->map(function (array $settings): array {
             $layout = $settings['layout'] ?? 'left';
             $settings['layout'] = in_array($layout, ['left', 'center', 'right'], true)
                 ? $layout
                 : 'left';
-
             return $settings;
         });
         $sectionOrder = $configuredSections->pluck('key')->all();
@@ -101,7 +97,6 @@ class HomeController
         $welcomeRemaining = $welcomeShowFull ? '' : implode(' ', array_slice($welcomeWords, $welcomePreviewWords, $welcomeMoreWords));
         $welcomeHasMore = $welcomeRemaining !== '';
 
-
         $content['news'] = $applySelection(
             SiteContentItem::published()->whereIn('type',['news','announcement'])->orderBy('sort_order')->latest('published_at'),
             $newsSettings,
@@ -112,15 +107,9 @@ class HomeController
             ->orderBy('sort_order')
             ->orderBy('title');
 
-        // The homepage management showcase is controlled by the admin Homepage
-        // Builder just like the other content sections: the configured limit is
-        // respected, and explicit selections keep their configured order.
         if (($managementSettings['mode'] ?? 'latest') === 'selected') {
             $homeManagement = $applySelection($managementQuery, $managementSettings, $managementLimit);
         } else {
-            // Fetch from a fresh builder and trim the collection explicitly. This
-            // keeps the admin-selected limit authoritative even if another query
-            // layer has mutated a reusable builder.
             $homeManagement = SiteContentItem::published()
                 ->where('type', 'management')
                 ->orderBy('sort_order')
@@ -131,7 +120,6 @@ class HomeController
                 ->values();
         }
 
-        // Explicit welcome selections take priority; the homepage management list fills any gap.
         $welcomeManagement = $welcomeManagement
             ->concat($homeManagement)
             ->unique('id')
@@ -143,6 +131,11 @@ class HomeController
             $gallerySettings,
             $galleryLimit
         );
-        return response(view('home-v3',compact('homePage','content','brand','gallery','sliders','home','homeManagement','welcomeManagement','welcomeEyebrow','welcomeTitle','welcomeContent','welcomeSignoff','welcomePreviewWords','welcomeMoreWords','welcomeShowFull','welcomeLayout','welcomePreview','welcomeRemaining','welcomeHasMore','sectionSettings'))->render());
+
+        return response(view('home-v3',compact('homePage','content','brand','gallery','sliders','home','homeManagement','welcomeManagement','welcomeEyebrow','welcomeTitle','welcomeContent','welcomeSignoff','welcomePreviewWords','welcomeMoreWords','welcomeShowFull','welcomeLayout','welcomePreview','welcomeRemaining','welcomeHasMore','sectionSettings'))->render())
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0')
+            ->header('X-FFP-Homepage-Source', 'home-v3-board-of-directors');
     }
 }
