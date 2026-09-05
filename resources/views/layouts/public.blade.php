@@ -41,6 +41,42 @@
                 .home-profile-modal .home-profile-links { grid-template-columns:1fr!important;width:100%;max-width:100%;margin-inline:auto; }
                 .home-profile-modal .home-profile-links > .home-profile-link.primary { grid-column:1/-1!important;width:100%;min-height:44px;margin-inline:auto; }
             }
+
+            /* Desktop homepage only: wider two-column leadership cards with exact 4:5 portraits. */
+            @media (min-width: 992px) {
+                .home-section-management .management-grid {
+                    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+                    gap:24px !important;
+                    width:100% !important;
+                    max-width:none !important;
+                }
+                .home-section-management .member-card {
+                    display:grid !important;
+                    grid-template-columns:minmax(0,40%) minmax(0,1fr) !important;
+                    min-width:0 !important;
+                    min-height:312px !important;
+                    height:auto !important;
+                    align-items:stretch !important;
+                }
+                .home-section-management .member-photo {
+                    width:100% !important;
+                    height:auto !important;
+                    min-height:0 !important;
+                    aspect-ratio:4 / 5 !important;
+                    align-self:start !important;
+                }
+                .home-section-management .member-photo img {
+                    width:100% !important;
+                    height:100% !important;
+                    aspect-ratio:4 / 5 !important;
+                    object-fit:cover !important;
+                }
+                .home-section-management .member-body {
+                    min-width:0 !important;
+                    min-height:312px !important;
+                    padding:22px !important;
+                }
+            }
         </style>
     @endif
     @stack('head')
