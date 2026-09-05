@@ -1,0 +1,45 @@
+name: Final Management Card Layout Patch
+
+on:
+  workflow_run:
+    workflows: ["Application Quality"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply final management card CSS before closing style tag
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('resources/views/home-v3.blade.php')
+          s = p.read_text(encoding='utf-8')
+          marker = '/* FINAL BOARD OF DIRECTORS CARD GEOMETRY REPAIR */'
+          if marker in s:
+              raise SystemExit('Final card repair already present')
+          css = r'''\n/* FINAL BOARD OF DIRECTORS CARD GEOMETRY REPAIR */\n@media(min-width:651px){\n  .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:20px !important;align-items:start !important;}\n  .home-section-management .member-card{display:grid !important;grid-template-columns:minmax(0,40%) minmax(0,60%) !important;grid-template-rows:auto !important;align-items:stretch !important;align-self:start !important;width:100% !important;height:auto !important;min-height:0 !important;aspect-ratio:2 / 1 !important;overflow:hidden !important;}\n  .home-section-management .member-photo{width:100% !important;height:100% !important;aspect-ratio:4 / 5 !important;min-height:0 !important;align-self:stretch !important;flex:none !important;}\n  .home-section-management .member-photo img{width:100% !important;height:100% !important;object-fit:cover !important;object-position:center center !important;display:block !important;}\n  .home-section-management .member-body{min-width:0 !important;min-height:0 !important;height:100% !important;display:flex !important;flex-direction:column !important;justify-content:center !important;align-self:stretch !important;padding:20px 22px !important;overflow:hidden !important;}\n  .home-section-management .member-body h3{margin:0 !important;font-size:clamp(17px,1.45vw,23px) !important;line-height:1.2 !important;text-transform:none !important;letter-spacing:-.02em !important;}\n  .home-section-management .member-role{margin-top:6px !important;font-size:9px !important;line-height:1.35 !important;text-transform:uppercase !important;}\n  .home-section-management .member-contacts{margin-top:12px !important;padding-top:0 !important;border-top:0 !important;gap:6px !important;}\n  .home-section-management .member-contact{display:flex !important;align-items:center !important;gap:8px !important;font-size:9px !important;line-height:1.35 !important;text-transform:none !important;}\n  .home-section-management .member-contact i{display:inline-flex !important;visibility:visible !important;opacity:1 !important;flex:0 0 13px !important;width:13px !important;justify-content:center !important;color:var(--cyan) !important;text-align:center !important;}\n  .home-section-management .member-contact span{min-width:0 !important;overflow:hidden !important;text-overflow:ellipsis !important;white-space:nowrap !important;}\n  .home-section-management .member-message{margin-top:12px !important;padding-top:0 !important;border-top:0 !important;color:#9ab7bf !important;font-size:9.5px !important;line-height:1.5 !important;font-weight:500 !important;text-transform:none !important;letter-spacing:normal !important;display:-webkit-box !important;-webkit-box-orient:vertical !important;-webkit-line-clamp:3 !important;overflow:hidden !important;}\n  .home-section-management .member-message:before{content:none !important;display:none !important;}\n  .home-section-management .member-more{align-self:flex-start !important;width:auto !important;min-width:160px !important;min-height:38px !important;margin-top:13px !important;padding:9px 16px !important;justify-content:center !important;font-size:9px !important;}\n}\n@media(min-width:651px) and (max-width:1099px){\n  .home-section-management .member-card{grid-template-columns:minmax(0,42%) minmax(0,58%) !important;aspect-ratio:1.9 / 1 !important;}\n  .home-section-management .member-body{padding:16px !important;}\n  .home-section-management .member-body h3{font-size:15px !important;}\n  .home-section-management .member-contact{font-size:8px !important;}\n  .home-section-management .member-message{font-size:8.5px !important;}\n}\n@media(max-width:650px){\n  .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:10px !important;}\n  .home-section-management .member-card{display:flex !important;flex-direction:column !important;aspect-ratio:auto !important;height:100% !important;overflow:hidden !important;}\n  .home-section-management .member-photo{width:100% !important;height:auto !important;aspect-ratio:1 / 1 !important;}\n  .home-section-management .member-body{height:auto !important;padding:11px !important;justify-content:flex-start !important;overflow:visible !important;text-align:left !important;}\n  .home-section-management .member-body h3{text-align:center !important;font-size:11px !important;}\n  .home-section-management .member-role{text-align:center !important;font-size:7px !important;}\n  .home-section-management .member-contacts{margin-top:9px !important;gap:5px !important;}\n  .home-section-management .member-contact{font-size:7px !important;justify-content:flex-start !important;}\n  .home-section-management .member-contact i{display:inline-flex !important;visibility:visible !important;}\n  .home-section-management .member-message{margin-top:9px !important;font-size:7px !important;line-height:1.5 !important;text-align:left !important;text-transform:none !important;letter-spacing:normal !important;-webkit-line-clamp:3 !important;}\n  .home-section-management .member-more{width:100% !important;min-height:34px !important;margin-top:10px !important;padding:8px 7px !important;font-size:7px !important;}\n}\n@media(max-width:380px){\n  .home-section-management .management-grid{gap:8px !important;}\n  .home-section-management .member-body{padding:9px !important;}\n  .home-section-management .member-body h3{font-size:10px !important;}\n  .home-section-management .member-role,.home-section-management .member-contact{font-size:6.5px !important;}\n  .home-section-management .member-message{font-size:6.5px !important;}\n  .home-section-management .member-more{font-size:6.5px !important;}\n}\n'''
+          if '</style>' not in s:
+              raise SystemExit('closing style tag not found')
+          p.write_text(s.replace('</style>', css + '</style>', 1), encoding='utf-8')
+
+      - name: Commit final repair and remove temporary runners
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add resources/views/home-v3.blade.php
+          git rm -f .github/workflows/final-management-card-layout-patch.yml .github/workflows/one-time-management-card-fix.yml management-card-repair-trigger.txt 2>/dev/null || true
+          git commit -m 'fix: finalize management card geometry and contact icons'
+          git push origin HEAD:main
