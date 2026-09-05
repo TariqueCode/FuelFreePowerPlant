@@ -35,3 +35,5 @@ jobs:
           git add resources/views/home-v3.blade.php
           git commit -m "fix: finalize management card image ratio and text styling"
           git push
+
+# One-time repair runner; removed after the generated fix commit.
