@@ -22,6 +22,8 @@
         <span class="ff-sep"></span>
         <button type="button" data-action="link" title="Insert link"><i class="fa-solid fa-link"></i></button><button type="button" data-action="image" title="Insert image URL"><i class="fa-regular fa-image"></i></button><button type="button" data-action="table" title="Insert table"><i class="fa-solid fa-table"></i></button>
 @if($editorMode === 'cms')
+<button type="button" data-action="media" class="ff-media-upload-btn" title="Upload images or videos"><i class="fa-solid fa-photo-film"></i></button>
+<input type="file" class="ff-media-upload-input" accept="image/*,video/mp4,video/webm,video/quicktime" multiple hidden>
 <button type="button" data-action="image-settings" title="Image settings"><i class="fa-solid fa-expand"></i></button>
 <button type="button" data-action="table-row" title="Add table row"><i class="fa-solid fa-table-rows"></i></button>
 <button type="button" data-action="table-column" title="Add table column"><i class="fa-solid fa-table-columns"></i></button>
@@ -82,6 +84,20 @@
  .ff-editor-toolbar .ff-color-control{min-width:58px!important;padding:0 7px!important}
  .ff-editor-body{min-height:240px;padding:12px;font-size:13px}
 }
+
+@media(max-width:760px){
+  .ff-mail-editor[data-mode="cms"]{overflow:hidden!important;}
+  .ff-mail-editor[data-mode="cms"] .ff-editor-toolbar{display:flex!important;flex-wrap:nowrap!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important;width:100%!important;max-width:100%!important;min-width:0!important;gap:4px!important;touch-action:pan-x!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-x:contain!important;scrollbar-width:none!important;}
+  .ff-mail-editor[data-mode="cms"] .ff-editor-toolbar::-webkit-scrollbar{display:none!important}
+  .ff-mail-editor[data-mode="cms"] .ff-editor-toolbar>*{flex:0 0 auto!important;white-space:nowrap!important;}
+  .ff-mail-editor[data-mode="cms"] .ff-editor-toolbar .ff-sep{flex:0 0 1px!important;width:1px!important;}
+  .ff-mail-editor[data-mode="cms"] .ff-editor-body{width:100%!important;max-width:100%!important;min-width:0!important;overflow-x:auto!important;overflow-y:auto!important;}
+  .ff-mail-editor[data-mode="cms"] .ff-editor-toolbar [data-action="image"]{display:none!important;}
+}
+.ff-media-upload-btn.is-loading{opacity:.55;pointer-events:none}
+.ff-editor-body img.ff-resizable-selected{outline:2px solid #22b8d5;outline-offset:3px}
+.ff-image-resize-handle{position:fixed;width:12px;height:12px;border-radius:50%;background:#22b8d5;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35);z-index:10050;display:none;touch-action:none}
+
 </style>
 @endpush
 @push('scripts')
@@ -211,5 +227,30 @@
  updateToolbarState();
  update();
 })();
+
+<script>
+(function(){
+  const root=document.querySelector('[data-editor="{{ $editorId }}"]');
+  if(!root || root.dataset.mode!=='cms') return;
+  const editor=root.querySelector('.ff-editor-body'),toolbar=root.querySelector('.ff-editor-toolbar'),mediaBtn=root.querySelector('[data-action="media"]'),mediaInput=root.querySelector('.ff-media-upload-input');
+  if(!editor||!toolbar||!mediaBtn||!mediaInput)return;
+  const forceSingleRail=()=>{if(window.matchMedia('(max-width:760px)').matches){toolbar.style.flexWrap='nowrap';toolbar.style.flexDirection='row';toolbar.style.overflowX='auto';toolbar.style.overflowY='hidden';[...toolbar.children].forEach(el=>{el.style.flex='0 0 auto';el.style.whiteSpace='nowrap';});}else{toolbar.style.removeProperty('flex-wrap');toolbar.style.removeProperty('flex-direction');toolbar.style.removeProperty('overflow-x');[...toolbar.children].forEach(el=>{el.style.removeProperty('flex');el.style.removeProperty('white-space');});}};
+  forceSingleRail();window.addEventListener('resize',forceSingleRail,{passive:true});
+  const csrf=document.querySelector('meta[name="csrf-token"]')?.content||'',route='{{ route('admin.site-content.media') }}';
+  const upload=async(file)=>{const fd=new FormData();fd.append('media',file);const res=await fetch(route,{method:'POST',headers:{'X-CSRF-TOKEN':csrf,'Accept':'application/json'},body:fd,credentials:'same-origin'});if(!res.ok)throw new Error('Media upload failed');const data=await res.json();if(!data.url)throw new Error('Media URL missing');return data;};
+  const insertAtSelection=node=>{editor.focus();const sel=getSelection();if(sel&&sel.rangeCount&&editor.contains(sel.anchorNode)){const range=sel.getRangeAt(0);range.deleteContents();range.insertNode(node);range.setStartAfter(node);range.collapse(true);sel.removeAllRanges();sel.addRange(range);}else editor.appendChild(node);editor.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'insertMedia'}));};
+  mediaBtn.addEventListener('click',()=>mediaInput.click());
+  mediaInput.addEventListener('change',async()=>{const files=[...mediaInput.files];if(!files.length)return;mediaBtn.classList.add('is-loading');try{for(const file of files){const type=file.type||'';if(!/^image\/(jpeg|png|webp|gif|svg\+xml)$/.test(type)&&!/^video\/(mp4|webm|quicktime)$/.test(type))continue;const data=await upload(file);let node;if(type.startsWith('video/')){node=document.createElement('video');node.src=data.url;node.controls=true;node.playsInline=true;node.style.maxWidth='100%';node.style.height='auto';node.setAttribute('data-uploaded-media','video');}else{node=document.createElement('img');node.src=data.url;node.alt=data.name||'';node.style.maxWidth='100%';node.style.height='auto';node.setAttribute('data-uploaded-media','image');}insertAtSelection(node);}}catch(err){console.error(err);alert('Unable to upload one or more media files. Please try again.');}finally{mediaBtn.classList.remove('is-loading');mediaInput.value='';}});
+  let selected=null;const handle=document.createElement('div');handle.className='ff-image-resize-handle';document.body.appendChild(handle);
+  const positionHandle=()=>{if(!selected||!document.body.contains(selected)){handle.style.display='none';return;}const r=selected.getBoundingClientRect();handle.style.display='block';handle.style.left=(r.right-6)+'px';handle.style.top=(r.bottom-6)+'px';};
+  const selectImage=img=>{if(selected)selected.classList.remove('ff-resizable-selected');selected=img;img.classList.add('ff-resizable-selected');positionHandle();};
+  editor.addEventListener('click',e=>{const img=e.target.closest('img');if(img&&editor.contains(img))selectImage(img);else if(selected){selected.classList.remove('ff-resizable-selected');selected=null;handle.style.display='none';}});
+  let drag=null;const startResize=e=>{if(!selected)return;e.preventDefault();e.stopPropagation();const r=selected.getBoundingClientRect();drag={startX:e.clientX,startW:r.width};handle.setPointerCapture?.(e.pointerId);};
+  const moveResize=e=>{if(!drag||!selected)return;const max=Math.max(80,editor.clientWidth-28);const width=Math.max(80,Math.min(max,drag.startW+(e.clientX-drag.startX)));selected.style.width=Math.round(width)+'px';selected.style.maxWidth='100%';selected.style.height='auto';positionHandle();};
+  const endResize=()=>{if(!drag)return;drag=null;editor.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'formatResize'}));};
+  handle.addEventListener('pointerdown',startResize);handle.addEventListener('pointermove',moveResize);handle.addEventListener('pointerup',endResize);handle.addEventListener('pointercancel',endResize);editor.addEventListener('scroll',positionHandle,{passive:true});window.addEventListener('scroll',positionHandle,{passive:true});window.addEventListener('resize',positionHandle,{passive:true});
+})();
+</script>
+
 </script>
 @endpush
