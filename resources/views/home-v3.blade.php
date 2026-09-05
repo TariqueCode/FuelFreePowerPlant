@@ -3155,106 +3155,82 @@ main.shell{
 @media(max-width:650px){.home-v3 .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}.home-v3 .home-section-management .member-card{display:flex!important;flex-direction:column!important;grid-template-columns:none!important;grid-template-rows:none!important;border-radius:14px!important}.home-v3 .home-section-management .member-photo{width:100%!important;height:auto!important;aspect-ratio:1/1!important;flex:0 0 auto!important}.home-v3 .home-section-management .member-body{width:100%!important;height:auto!important;display:flex!important;flex:0 0 auto!important;padding:10px!important}.home-v3 .home-section-management .member-body h3{font-size:clamp(10px,3.1vw,13px)!important;text-align:center!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.home-v3 .home-section-management .member-role{font-size:clamp(7px,2vw,9px)!important;text-align:center!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}.home-v3 .home-section-management .member-contacts{display:grid!important;gap:4px!important;margin-top:9px!important}.home-v3 .home-section-management .member-contact{font-size:clamp(7px,1.9vw,9px)!important;text-align:left!important}.home-v3 .home-section-management .member-contact span{white-space:nowrap!important}.home-v3 .home-section-management .member-message{margin-top:9px!important;font-size:clamp(7.5px,2vw,9px)!important;line-height:1.5!important;-webkit-line-clamp:3!important;line-clamp:3!important}.home-v3 .home-section-management .member-more{width:100%!important;min-height:34px!important;margin-top:9px!important;align-self:stretch!important;padding:7px!important;font-size:clamp(7px,1.9vw,9px)!important}}
 @media(min-width:651px) and (max-width:1099px){.home-v3 .home-section-management .member-card{grid-template-columns:minmax(110px,38%) minmax(0,62%)!important}.home-v3 .home-section-management .member-body{padding:13px!important}}
 @media(max-width:420px){.home-v3 .home-section-management .management-grid{gap:8px!important}.home-v3 .home-section-management .member-card{border-radius:12px!important}.home-v3 .home-section-management .member-body{padding:8px!important}.home-v3 .home-section-management .member-contacts{margin-top:7px!important;gap:3px!important}.home-v3 .home-section-management .member-message{margin-top:7px!important}.home-v3 .home-section-management .member-more{margin-top:7px!important;min-height:32px!important}}
-/* === FFP management profile horizontal card composition === */
- (min-width: 651px) {
-    .home-section-management .management-grid {
+/* === FFP management profile horizontal card composition — DESKTOP ONLY === */
+@media (min-width: 1100px) {
+    .home-v3 .home-section-management .management-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 18px !important;
+        gap: 20px !important;
     }
-    .home-section-management .member-card {
+    .home-v3 .home-section-management .member-card {
         display: grid !important;
         grid-template-columns: minmax(0, 40%) minmax(0, 60%) !important;
-        align-items: stretch;
-        min-width: 0;
-        height: 100%;
+        grid-template-rows: 1fr !important;
+        height: auto !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
     }
-    .home-section-management .member-photo {
-        width: 100%;
-        height: 100%;
+    .home-v3 .home-section-management .member-photo {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        width: 100% !important;
+        height: 100% !important;
         aspect-ratio: 4 / 5 !important;
-        min-height: 0;
+        min-height: 0 !important;
     }
-    .home-section-management .member-body {
+    .home-v3 .home-section-management .member-photo img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+    }
+    .home-v3 .home-section-management .member-body {
+        grid-column: 2 !important;
+        grid-row: 1 !important;
         display: flex !important;
-        flex-direction: column;
+        flex-direction: column !important;
         justify-content: center !important;
-        min-width: 0;
+        min-width: 0 !important;
         padding: 22px !important;
     }
-    .home-section-management .member-body h3 {
-        margin: 0;
-        font-size: 17px !important;
-        line-height: 1.3;
+    .home-v3 .home-section-management .member-body h3 {
+        margin: 0 !important;
+        font-size: 18px !important;
+        line-height: 1.3 !important;
     }
-    .home-section-management .member-role {
-        margin-top: 6px;
+    .home-v3 .home-section-management .member-role {
+        margin-top: 5px !important;
         font-size: 9px !important;
     }
-    .home-section-management .member-contacts {
+    .home-v3 .home-section-management .member-contacts {
         margin-top: 12px !important;
-        padding-top: 0 !important;
-        border-top: 0 !important;
-        gap: 6px !important;
+        padding: 0 !important;
+        border: 0 !important;
+        gap: 5px !important;
     }
-    .home-section-management .member-contact {
+    .home-v3 .home-section-management .member-contact {
         font-size: 9px !important;
     }
-    .home-section-management .member-contact i {
+    .home-v3 .home-section-management .member-contact i {
         display: none !important;
     }
-    .home-section-management .member-message {
-        margin-top: 13px !important;
-        padding-top: 0 !important;
-        border-top: 0 !important;
+    .home-v3 .home-section-management .member-message {
+        margin-top: 12px !important;
+        padding: 0 !important;
+        border: 0 !important;
         font-size: 10px !important;
-        line-height: 1.6 !important;
+        line-height: 1.55 !important;
         -webkit-line-clamp: 3 !important;
+        line-clamp: 3 !important;
     }
-    .home-section-management .member-message:before {
+    .home-v3 .home-section-management .member-message:before {
         content: none !important;
         display: none !important;
     }
-    .home-section-management .member-more {
+    .home-v3 .home-section-management .member-more {
         width: auto !important;
-        align-self: flex-start;
-        margin-top: 15px !important;
-        min-height: 36px;
-        padding-inline: 15px;
-    }
-}
- (min-width: 651px) and (max-width: 1099px) {
-    .home-section-management .member-card {
-        grid-template-columns: minmax(0, 38%) minmax(0, 62%) !important;
-    }
-    .home-section-management .member-body {
-        padding: 17px !important;
-    }
-    .home-section-management .member-body h3 {
-        font-size: 14px !important;
-    }
-}
- (max-width: 650px) {
-    .home-section-management .management-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 9px !important;
-    }
-    .home-section-management .member-card {
-        display: flex !important;
-        flex-direction: column !important;
-    }
-    .home-section-management .member-photo {
-        aspect-ratio: 1 / 1 !important;
-    }
-    .home-section-management .member-body {
-        text-align: center;
-        padding: 13px !important;
-    }
-    .home-section-management .member-message,
-    .home-section-management .member-contacts {
-        text-align: left;
-    }
-    .home-section-management .member-more {
-        align-self: center;
+        align-self: flex-start !important;
+        margin-top: 14px !important;
+        min-height: 36px !important;
+        padding: 8px 15px !important;
     }
 }
 </style>
