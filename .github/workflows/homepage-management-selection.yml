@@ -10,13 +10,15 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Patch homepage builder view
+      - name: Patch homepage management backend
+        run: python3 .github/scripts/patch_homepage_management_controllers.py
+      - name: Patch homepage management view
         run: python3 .github/scripts/patch_homepage_management_v2.py
       - name: Commit patch
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add app/Http/Controllers/Admin/HomepageBuilderController.php app/Http/Controllers/HomeController.php resources/views/admin/homepage-builder/index.blade.php .github/scripts/patch_homepage_management.py .github/scripts/patch_homepage_management_v2.py
+          git add app/Http/Controllers/Admin/HomepageBuilderController.php app/Http/Controllers/HomeController.php resources/views/admin/homepage-builder/index.blade.php .github/scripts/patch_homepage_management.py .github/scripts/patch_homepage_management_v2.py .github/scripts/patch_homepage_management_controllers.py
           git diff --cached --quiet && exit 0
           git commit -m 'Apply homepage management selection patch'
           git push
