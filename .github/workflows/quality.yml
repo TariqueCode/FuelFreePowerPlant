@@ -43,7 +43,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          while IFS= read -r -d '' file; do echo "Linting $file"; done < <(find app/Models app/Services app/Support -type f -name '*.php' -print0)
           while IFS= read -r -d '' file; do echo "Linting $file"; php -l "$file"; done < <(find app/Models app/Services app/Support -type f -name '*.php' -print0)
 
       - name: Lint Cleanup command
