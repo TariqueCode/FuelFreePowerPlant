@@ -6,6 +6,7 @@ use App\Models\ManagementProfileFolder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Schema;
 
 class NavigationMenuItem extends Model
 {
@@ -25,7 +26,7 @@ class NavigationMenuItem extends Model
     public function setRouteNameAttribute($value): void
     {
         $this->attributes['route_name'] = $value;
-        if ($value !== 'management') return;
+        if ($value !== 'management' || !Schema::hasTable('management_profile_folders')) return;
         $folder = ManagementProfileFolder::query()->where('status','published')->orderBy('sort_order')->orderBy('id')->first();
         if (!$folder) return;
         $this->attributes['url'] = '/'.$folder->slug;
@@ -36,7 +37,7 @@ class NavigationMenuItem extends Model
 
     public function displayLabel(): string
     {
-        if ($this->route_name === 'management') {
+        if ($this->route_name === 'management' && Schema::hasTable('management_profile_folders')) {
             $folder = ManagementProfileFolder::query()->where('status','published')->orderBy('sort_order')->orderBy('id')->first();
             if ($folder) return $folder->name;
         }
