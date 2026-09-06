@@ -10,23 +10,16 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/js/app.js',
                 'resources/css/new-design.css',
+                'resources/css/new-shell.css',
                 'resources/js/new-design.js',
             ],
             refresh: true,
             fonts: [
-                bunny('Instrument Sans', {
-                    weights: [400, 500, 600],
-                }),
-                bunny('Space Grotesk', {
-                    weights: [500, 600, 700],
-                }),
+                bunny('Instrument Sans', { weights: [400, 500, 600] }),
+                bunny('Space Grotesk', { weights: [500, 600, 700] }),
             ],
         }),
         tailwindcss(),
     ],
-    server: {
-        watch: {
-            ignored: ['**/storage/framework/views/**'],
-        },
-    },
+    server: { watch: { ignored: ['**/storage/framework/views/**'] } },
 });
