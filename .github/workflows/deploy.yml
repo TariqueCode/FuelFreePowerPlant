@@ -38,6 +38,7 @@ jobs:
       - name: Prepare SQLite database
         shell: bash
         run: |
+          set -euo pipefail
           mkdir -p database
           touch database/database.sqlite
           php artisan migrate --force
@@ -65,8 +66,14 @@ jobs:
           DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_APP_PATH: ${{ secrets.DEPLOY_APP_PATH }}
         run: |
           set -euo pipefail
+
+          : "${DEPLOY_HOST:?Missing DEPLOY_HOST secret}"
+          : "${DEPLOY_PORT:?Missing DEPLOY_PORT secret}"
+          : "${DEPLOY_USER:?Missing DEPLOY_USER secret}"
+          : "${DEPLOY_SSH_KEY:?Missing DEPLOY_SSH_KEY secret}"
 
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
@@ -80,11 +87,15 @@ jobs:
             -p "$DEPLOY_PORT" \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
-            "$DEPLOY_USER@$DEPLOY_HOST" 'bash -s' <<'REMOTE'
+            "$DEPLOY_USER@$DEPLOY_HOST" 'bash -s' -- "$DEPLOY_APP_PATH" <<'REMOTE'
           set -euo pipefail
 
-          cd /home/fuelfree/public_html
+          CONFIGURED_APP_PATH="$1"
+          APP_PATH="${CONFIGURED_APP_PATH:-/home/fuelfree/Live}"
+          test -d "$APP_PATH" || { echo "ERROR: Production application path does not exist: $APP_PATH"; exit 1; }
+          cd "$APP_PATH"
 
+          echo "==> Production application path: $APP_PATH"
           echo "==> Syncing application code"
           git fetch origin main
           git reset --hard origin/main
@@ -127,7 +138,7 @@ jobs:
 
           echo "==> Checking production PHP runtime"
           php -r 'if (PHP_VERSION_ID < 80400) { fwrite(STDERR, "ERROR: FuelFree PowerPlant requires PHP 8.4+ on production. Current: ".PHP_VERSION."\\n"); exit(1); }'
-          for ext in fileinfo mbstring; do
+          for ext in fileinfo mbstring pdo_sqlite; do
               if ! php -m | grep -qi "^$ext$"; then
                   echo "ERROR: Required PHP extension is missing: $ext"
                   exit 1
@@ -148,7 +159,18 @@ jobs:
               echo "WARNING: npm is not available; keeping existing public/build assets."
           fi
 
-          echo "==> Running database migrations"
+          echo "==> Preparing persistent SQLite database"
+          mkdir -p database
+          touch database/database.sqlite
+          chmod 664 database/database.sqlite || true
+
+          # Temporary production database mode: use SQLite while the MySQL
+          # service is unavailable. Remove this export when MySQL is restored
+          # and the production database has been migrated to MySQL.
+          export DB_CONNECTION=sqlite
+          export DB_DATABASE="$(pwd)/database/database.sqlite"
+
+          echo "==> Running database migrations on SQLite"
           php artisan migrate --force
 
           echo "==> Ensuring public storage link"
@@ -161,14 +183,14 @@ jobs:
           php artisan view:cache
 
           echo "==> Ensuring Laravel scheduler cron"
-          CRON_LINE='* * * * * cd /home/fuelfree/public_html && php artisan schedule:run >> /dev/null 2>&1'
+          CRON_LINE="* * * * * cd $APP_PATH && php artisan schedule:run >> /dev/null 2>&1"
           if command -v crontab >/dev/null 2>&1; then
               (crontab -l 2>/dev/null | grep -Fv 'php artisan schedule:run' || true; echo "$CRON_LINE") | crontab -
           else
               echo "WARNING: crontab is not available; configure the Laravel scheduler cron manually."
           fi
 
-          echo "==> Deployment complete"
+          echo "==> Deployment complete (SQLite temporary mode)"
           REMOTE
 
           rm -f ~/.ssh/deploy_key
