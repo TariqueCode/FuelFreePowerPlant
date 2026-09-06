@@ -1,0 +1,205 @@
+name: Apply Homepage Board Desktop Cards
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply homepage Board of Directors desktop layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('resources/css/app.css')
+          s=p.read_text(encoding='utf-8')
+          marker='/* HOMEPAGE BOARD DESKTOP: horizontal 4:5 profile cards. */'
+          if marker not in s:
+              css=r'''
+          /* HOMEPAGE BOARD DESKTOP: horizontal 4:5 profile cards. */
+          @media (min-width: 851px) {
+              .home-v3 .home-section-management .member-card {
+                  display: grid !important;
+                  grid-template-columns: minmax(190px, 40%) minmax(0, 60%) !important;
+                  align-items: stretch !important;
+                  min-height: 420px !important;
+                  overflow: hidden !important;
+              }
+
+              .home-v3 .home-section-management .member-card > .member-photo,
+              .home-v3 .home-section-management .member-card > .member-image,
+              .home-v3 .home-section-management .member-card > :first-child {
+                  width: 100% !important;
+                  height: 100% !important;
+                  min-height: 420px !important;
+                  aspect-ratio: 4 / 5 !important;
+                  align-self: stretch !important;
+                  overflow: hidden !important;
+              }
+
+              .home-v3 .home-section-management .member-card > .member-photo img,
+              .home-v3 .home-section-management .member-card > .member-image img,
+              .home-v3 .home-section-management .member-card > :first-child img {
+                  width: 100% !important;
+                  height: 100% !important;
+                  object-fit: cover !important;
+                  display: block !important;
+              }
+
+              .home-v3 .home-section-management .member-body {
+                  min-width: 0 !important;
+                  min-height: 0 !important;
+                  height: 100% !important;
+                  padding: 30px 28px 28px !important;
+                  display: flex !important;
+                  flex-direction: column !important;
+                  justify-content: flex-start !important;
+                  overflow: hidden !important;
+              }
+
+              .home-v3 .home-section-management .member-body h3,
+              .home-v3 .home-section-management .member-card h3 {
+                  font-size: clamp(21px, 1.7vw, 28px) !important;
+                  line-height: 1.2 !important;
+                  margin-bottom: 7px !important;
+              }
+
+              .home-v3 .home-section-management .member-role {
+                  font-size: 12px !important;
+                  line-height: 1.5 !important;
+                  margin-bottom: 15px !important;
+              }
+
+              .home-v3 .home-section-management .member-contact {
+                  font-size: 12px !important;
+                  line-height: 1.55 !important;
+                  display: flex !important;
+                  align-items: center !important;
+                  gap: 9px !important;
+                  overflow-wrap: anywhere !important;
+                  word-break: break-word !important;
+              }
+
+              .home-v3 .home-section-management .member-contact i {
+                  flex: 0 0 30px !important;
+                  width: 30px !important;
+                  height: 30px !important;
+                  display: inline-grid !important;
+                  place-items: center !important;
+                  border-radius: 9px !important;
+              }
+
+              .home-v3 .home-section-management .member-message {
+                  margin: 16px 0 14px !important;
+                  font-size: 13px !important;
+                  line-height: 1.75 !important;
+                  text-transform: none !important;
+                  letter-spacing: normal !important;
+                  white-space: normal !important;
+                  overflow: hidden !important;
+                  display: -webkit-box !important;
+                  -webkit-box-orient: vertical !important;
+                  -webkit-line-clamp: 4 !important;
+              }
+
+              .home-v3 .home-section-management .member-more {
+                  align-self: flex-start !important;
+                  min-height: 44px !important;
+                  padding: 10px 15px !important;
+                  margin-top: auto !important;
+                  font-size: 12px !important;
+                  line-height: 1.4 !important;
+                  display: inline-flex !important;
+                  align-items: center !important;
+                  justify-content: center !important;
+                  gap: 8px !important;
+                  text-transform: none !important;
+              }
+          }
+
+          @media (min-width: 851px) and (max-width: 1100px) {
+              .home-v3 .home-section-management .member-card {
+                  grid-template-columns: minmax(155px, 40%) minmax(0, 60%) !important;
+                  min-height: 370px !important;
+              }
+
+              .home-v3 .home-section-management .member-card > .member-photo,
+              .home-v3 .home-section-management .member-card > .member-image,
+              .home-v3 .home-section-management .member-card > :first-child {
+                  min-height: 370px !important;
+              }
+
+              .home-v3 .home-section-management .member-body {
+                  padding: 23px 20px 20px !important;
+              }
+
+              .home-v3 .home-section-management .member-body h3,
+              .home-v3 .home-section-management .member-card h3 {
+                  font-size: 20px !important;
+              }
+
+              .home-v3 .home-section-management .member-contact {
+                  font-size: 10px !important;
+              }
+
+              .home-v3 .home-section-management .member-message {
+                  font-size: 11px !important;
+              }
+          }
+
+          @media (min-width: 1600px) {
+              .home-v3 .home-section-management .member-card {
+                  min-height: 470px !important;
+              }
+
+              .home-v3 .home-section-management .member-card > .member-photo,
+              .home-v3 .home-section-management .member-card > .member-image,
+              .home-v3 .home-section-management .member-card > :first-child {
+                  min-height: 470px !important;
+              }
+
+              .home-v3 .home-section-management .member-body {
+                  padding: 34px 32px 30px !important;
+              }
+          }
+          '''
+              s=s.rstrip()+"\n\n"+css.strip()+"\n"
+              p.write_text(s,encoding='utf-8')
+          PY
+      - name: Validate
+        run: |
+          set -euo pipefail
+          grep -n "HOMEPAGE BOARD DESKTOP" resources/css/app.css
+          git diff --check
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add resources/css/app.css
+          git diff --cached --quiet && exit 0
+          git commit -m "feat: redesign homepage Board of Directors desktop cards"
+          git push origin main
+      - name: Cleanup workflow
+        if: always()
+        run: |
+          git fetch origin main
+          git checkout main
+          git pull --rebase origin main
+          rm -f .github/workflows/apply-home-board-desktop.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -u .github/workflows/apply-home-board-desktop.yml
+          git diff --cached --quiet || git commit -m "chore: remove temporary homepage board workflow"
+          git push origin main || true
