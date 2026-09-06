@@ -12,26 +12,203 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Apply
+      - name: Apply robust viewer
         shell: python
         run: |
           from pathlib import Path
-          css_path=Path('resources/css/app.css')
-          view_path=Path('resources/views/home-v3.blade.php')
-          css_marker='/* PROFILE VIEWER V3 FINAL */'
-          css='''\n\n/* PROFILE VIEWER V3 FINAL */\n@media (min-width:851px){\n.home-v3 .home-profile-panel{width:min(1180px,calc(100vw - 56px))!important;height:min(760px,88vh)!important;max-height:min(760px,88vh)!important;grid-template-columns:minmax(380px,42%) minmax(0,58%)!important;border-radius:26px!important;overflow:hidden!important;background:linear-gradient(145deg,#082633,#041923 58%,#021119)!important;box-shadow:0 40px 120px rgba(0,0,0,.72)!important}\n.home-v3 .home-profile-photo{padding:42px 34px 30px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:16px!important;background:linear-gradient(180deg,#061923,#03131d)!important;border-right:1px solid rgba(72,216,241,.16)!important}\n.home-v3 .home-profile-photo img{width:100%!important;max-height:468px!important;aspect-ratio:4/5!important;object-fit:cover!important;object-position:center top!important;border-radius:18px!important}\n.home-v3 .home-profile-desktop-identity{display:flex!important;flex-direction:column!important;min-width:0!important}\n.home-v3 .home-profile-desktop-identity[hidden]{display:none!important}\n.home-v3 .home-profile-desktop-identity h2{margin:0!important;color:#effbfc!important;font-size:clamp(27px,2.1vw,34px)!important;line-height:1.15!important;letter-spacing:-.035em!important}\n.home-v3 .desktop-role{margin-top:7px!important;color:#55d4ed!important;font-size:12px!important;font-weight:800!important;letter-spacing:.16em!important;text-transform:uppercase!important}\n.home-v3 .desktop-rule{width:52px!important;height:3px!important;margin:14px 0 12px!important;border-radius:99px!important;background:#43d1f0!important}\n.home-v3 .desktop-contact{display:flex!important;align-items:center!important;gap:10px!important;margin-top:7px!important;color:#d7e9ef!important;font-size:13px!important;line-height:1.45!important;overflow-wrap:anywhere!important}\n.home-v3 .desktop-contact i{width:34px!important;height:34px!important;flex:0 0 34px!important;display:grid!important;place-items:center!important;border:1px solid rgba(72,216,241,.22)!important;border-radius:10px!important;background:rgba(72,216,241,.07)!important;color:#55dff2!important}\n.home-v3 .desktop-add-contact{width:100%!important;min-height:50px!important;margin-top:16px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;border-radius:13px!important;background:linear-gradient(135deg,#42cfe9,#1590b1)!important;color:#021017!important;font-size:13px!important;font-weight:850!important}\n.home-v3 .home-profile-head{min-height:70px!important;padding:20px 26px 12px!important;justify-content:flex-end!important}\n.home-v3 .home-profile-head>div{display:none!important}\n.home-v3 .home-profile-close{width:50px!important;height:50px!important;flex:0 0 50px!important;border-radius:14px!important}\n.home-v3 .home-profile-divider{margin:0 26px!important}\n.home-v3 .home-profile-scroll{padding:22px 26px 28px!important;overflow-y:auto!important}\n.home-v3 .home-profile-section-title{margin:0 0 20px!important;color:#effbfc!important;font-size:clamp(25px,2.2vw,35px)!important;line-height:1.18!important;letter-spacing:-.025em!important;font-weight:850!important}\n.home-v3 .home-profile-section-title:after{content:'';display:block;width:52px;height:4px;margin-top:16px;border-radius:99px;background:#43d1f0}\n.home-v3 .home-profile-message,.home-v3 .home-profile-message p{max-width:none!important;color:#d7e9ef!important;font-size:17px!important;line-height:1.82!important;text-transform:none!important}\n.home-v3 .home-profile-message p{margin:0 0 18px!important}\n.home-v3 .home-profile-footer{display:none!important}\n}\n@media (min-width:851px) and (max-width:1100px){.home-v3 .home-profile-panel{grid-template-columns:310px minmax(0,1fr)!important}.home-v3 .home-profile-photo{padding:30px 24px!important}.home-v3 .home-profile-scroll{padding:20px 22px!important}.home-v3 .home-profile-message,.home-v3 .home-profile-message p{font-size:15px!important;line-height:1.75!important}}\n'''
-          if css_marker not in css_path.read_text(encoding='utf-8'):
-              css_path.write_text(css_path.read_text(encoding='utf-8').rstrip()+css,encoding='utf-8')
-          marker='<!-- PROFILE VIEWER V3 SCRIPT -->'
-          js='''\n\n<!-- PROFILE VIEWER V3 SCRIPT -->\n<script>\n(()=>{const m=document.getElementById('homeProfileModal'),p=document.getElementById('homeProfilePhoto'),t=document.getElementById('homeProfileTitle'),r=document.getElementById('homeProfileRole'),mt=document.getElementById('homeProfileMessageTitle');if(!m||!p||!t||!r||!mt)return;let box=p.querySelector('.home-profile-desktop-identity');if(!box){box=document.createElement('div');box.className='home-profile-desktop-identity';box.hidden=true;p.appendChild(box)}const esc=s=>String(s??'').replace(/[&<>\"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#039;'}[x]));const apply=()=>{if(!window.matchMedia('(min-width:851px)').matches){box.hidden=true;return}const card=[...document.querySelectorAll('.home-section-management .member-card')].find(c=>c.querySelector('.home-profile-data')?.dataset?.name===t.textContent.trim());const d=card?.querySelector('.home-profile-data')?.dataset;if(!d)return;let html='<h2>'+esc(d.name)+'</h2><div class=\"desktop-role\">'+esc(d.role||'Leadership')+'</div><div class=\"desktop-rule\"></div>';if(d.phone)html+='<a class=\"desktop-contact\" href=\"tel:'+esc(d.phone.replace(/[^0-9+]/g,''))+'\"><i class=\"fa-solid fa-phone\"></i><span>'+esc(d.phone)+'</span></a>';if(d.email)html+='<a class=\"desktop-contact\" href=\"mailto:'+esc(d.email)+'\"><i class=\"fa-solid fa-envelope\"></i><span>'+esc(d.email)+'</span></a>';if(d.vcard)html+='<a class=\"desktop-add-contact\" href=\"'+esc(d.vcard)+'\"><i class=\"fa-solid fa-user-plus\"></i><span>Add to Contacts</span></a>';box.innerHTML=html;box.hidden=false;mt.textContent='MESSAGE FROM '+String(d.role||'Leadership').toUpperCase()};document.addEventListener('click',e=>{if(e.target.closest('.home-section-management .member-more'))setTimeout(apply,30)},true);new MutationObserver(()=>{if(m.classList.contains('open'))apply()}).observe(m,{subtree:true,childList:true,characterData:true});window.addEventListener('resize',apply,{passive:true})})();\n</script>\n'''
-          if marker not in view_path.read_text(encoding='utf-8'):
-              view_path.write_text(view_path.read_text(encoding='utf-8').rstrip()+js,encoding='utf-8')
+          import re
+
+          view_path = Path('resources/views/home-v3.blade.php')
+          text = view_path.read_text(encoding='utf-8')
+
+          marker = '/* PROFILE VIEWER V4 INLINE */'
+          if marker not in text:
+              css = r'''
+
+<style>
+/* PROFILE VIEWER V4 INLINE */
+@media (min-width:1100px){
+  html body main.shell.home-v3 .home-profile-modal{
+    position:fixed!important;inset:0!important;z-index:99999!important;
+    display:none!important;align-items:center!important;justify-content:center!important;
+    padding:28px!important;background:rgba(0,8,13,.82)!important;backdrop-filter:blur(7px)!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal.open{display:flex!important}
+  html body main.shell.home-v3 .home-profile-modal .home-profile-panel{
+    position:relative!important;width:min(1180px,calc(100vw - 56px))!important;
+    height:min(760px,88vh)!important;max-height:760px!important;min-height:620px!important;
+    display:grid!important;grid-template-columns:minmax(390px,42%) minmax(0,58%)!important;
+    padding:0!important;overflow:hidden!important;border:1px solid rgba(92,220,240,.2)!important;
+    border-radius:26px!important;background:linear-gradient(145deg,#082633 0%,#041923 58%,#021119 100%)!important;
+    box-shadow:0 40px 120px rgba(0,0,0,.78)!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .home-profile-photo{
+    grid-column:1!important;grid-row:1!important;min-width:0!important;
+    padding:38px 34px 30px!important;display:flex!important;flex-direction:column!important;
+    align-items:stretch!important;justify-content:flex-start!important;gap:18px!important;
+    overflow:hidden!important;background:linear-gradient(180deg,#061923,#03131d)!important;
+    border-right:1px solid rgba(72,216,241,.16)!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .home-profile-photo img{
+    display:block!important;width:100%!important;height:auto!important;max-height:455px!important;
+    aspect-ratio:4/5!important;object-fit:cover!important;object-position:center top!important;
+    border-radius:18px!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .home-profile-desktop-identity{
+    display:flex!important;flex-direction:column!important;min-width:0!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .home-profile-desktop-identity[hidden]{display:none!important}
+  html body main.shell.home-v3 .home-profile-modal .home-profile-desktop-identity h2{
+    margin:0!important;color:#effbfc!important;font-size:clamp(27px,2.15vw,34px)!important;
+    line-height:1.12!important;letter-spacing:-.035em!important;font-weight:850!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .desktop-role{
+    margin-top:7px!important;color:#55d4ed!important;font-size:12px!important;font-weight:800!important;
+    line-height:1.4!important;letter-spacing:.15em!important;text-transform:uppercase!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .desktop-rule{
+    width:52px!important;height:3px!important;margin:13px 0 10px!important;border-radius:99px!important;background:#43d1f0!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .desktop-contact{
+    display:flex!important;align-items:center!important;gap:10px!important;margin-top:7px!important;
+    color:#d7e9ef!important;font-size:13px!important;line-height:1.4!important;overflow-wrap:anywhere!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .desktop-contact i{
+    width:32px!important;height:32px!important;flex:0 0 32px!important;display:grid!important;place-items:center!important;
+    border:1px solid rgba(72,216,241,.22)!important;border-radius:9px!important;background:rgba(72,216,241,.07)!important;color:#55dff2!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .desktop-add-contact{
+    width:100%!important;min-height:48px!important;margin-top:14px!important;display:flex!important;
+    align-items:center!important;justify-content:center!important;gap:9px!important;border-radius:12px!important;
+    background:linear-gradient(135deg,#42cfe9,#1590b1)!important;color:#021017!important;font-size:13px!important;font-weight:850!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .home-profile-info{
+    grid-column:2!important;grid-row:1!important;min-width:0!important;min-height:0!important;
+    display:flex!important;flex-direction:column!important;overflow:hidden!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .home-profile-head{
+    flex:0 0 auto!important;min-height:72px!important;padding:20px 26px 12px!important;
+    display:flex!important;align-items:center!important;justify-content:flex-end!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .home-profile-head>div{display:none!important}
+  html body main.shell.home-v3 .home-profile-modal .home-profile-close{
+    width:48px!important;height:48px!important;flex:0 0 48px!important;border-radius:14px!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .home-profile-divider{flex:0 0 auto!important;margin:0 26px!important}
+  html body main.shell.home-v3 .home-profile-modal .home-profile-scroll{
+    flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow-y:auto!important;overflow-x:hidden!important;
+    padding:26px 28px 34px!important;scrollbar-width:thin!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .home-profile-section-title{
+    margin:0 0 22px!important;color:#effbfc!important;font-size:clamp(26px,2.25vw,36px)!important;
+    line-height:1.15!important;letter-spacing:-.025em!important;font-weight:850!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .home-profile-section-title:after{
+    content:'';display:block;width:54px;height:4px;margin-top:15px;border-radius:99px;background:#43d1f0!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .home-profile-message,
+  html body main.shell.home-v3 .home-profile-modal .home-profile-message p{
+    max-width:none!important;color:#d7e9ef!important;font-size:17px!important;line-height:1.82!important;text-transform:none!important;
+  }
+  html body main.shell.home-v3 .home-profile-modal .home-profile-message p{margin:0 0 18px!important}
+  html body main.shell.home-v3 .home-profile-modal .home-profile-footer{display:none!important}
+}
+</style>
+'''
+              text = text.rstrip() + css
+
+          script_marker = '<!-- PROFILE VIEWER V3 SCRIPT -->'
+          pattern = re.compile(r'\n?<!-- PROFILE VIEWER V3 SCRIPT -->.*?</script>\s*$', re.S)
+          js = r'''
+
+<!-- PROFILE VIEWER V4 SCRIPT -->
+<script>
+(()=>{
+  const modal=document.getElementById('homeProfileModal');
+  const photo=document.getElementById('homeProfilePhoto');
+  const title=document.getElementById('homeProfileTitle');
+  const messageTitle=document.getElementById('homeProfileMessageTitle');
+  if(!modal||!photo)return;
+
+  let identity=photo.querySelector('.home-profile-desktop-identity');
+  if(!identity){
+    identity=document.createElement('div');
+    identity.className='home-profile-desktop-identity';
+    identity.hidden=true;
+    photo.appendChild(identity);
+  }
+
+  const esc=(value)=>String(value??'').replace(/[&<>"']/g,(ch)=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+  }[ch]));
+
+  const render=(card)=>{
+    if(!window.matchMedia('(min-width:1100px)').matches){identity.hidden=true;return;}
+    const data=card?.querySelector('.home-profile-data')?.dataset;
+    if(!data?.name)return;
+
+    let html='<h2>'+esc(data.name)+'</h2>';
+    html+='<div class="desktop-role">'+esc(data.role||'Leadership')+'</div>';
+    html+='<div class="desktop-rule"></div>';
+    if(data.phone){
+      html+='<a class="desktop-contact" href="tel:'+esc(data.phone.replace(/[^0-9+]/g,''))+'"><i class="fa-solid fa-phone"></i><span>'+esc(data.phone)+'</span></a>';
+    }
+    if(data.email){
+      html+='<a class="desktop-contact" href="mailto:'+esc(data.email)+'"><i class="fa-solid fa-envelope"></i><span>'+esc(data.email)+'</span></a>';
+    }
+    if(data.vcard){
+      html+='<a class="desktop-add-contact" href="'+esc(data.vcard)+'"><i class="fa-solid fa-user-plus"></i><span>Add to Contacts</span></a>';
+    }
+    identity.innerHTML=html;
+    identity.hidden=false;
+    if(messageTitle)messageTitle.textContent='MESSAGE FROM '+String(data.role||'Leadership').toUpperCase();
+  };
+
+  const renderFromTitle=()=>{
+    const wanted=(title?.textContent||'').trim().toLowerCase();
+    if(!wanted)return;
+    const card=[...document.querySelectorAll('.home-section-management .member-card')].find((item)=>
+      (item.querySelector('.home-profile-data')?.dataset?.name||'').trim().toLowerCase()===wanted
+    );
+    if(card)render(card);
+  };
+
+  const queue=(card)=>[40,120,250,500,900].forEach((delay)=>setTimeout(()=>render(card),delay));
+
+  document.addEventListener('click',(event)=>{
+    const more=event.target.closest('.home-section-management .member-more');
+    if(!more)return;
+    const card=more.closest('.member-card');
+    if(card)queue(card);
+    setTimeout(renderFromTitle,1100);
+  },true);
+
+  new MutationObserver((records)=>{
+    for(const record of records){
+      if(record.type==='attributes'&&record.attributeName==='class'&&modal.classList.contains('open')){
+        setTimeout(renderFromTitle,40);
+        setTimeout(renderFromTitle,180);
+      }
+    }
+  }).observe(modal,{attributes:true,attributeFilter:['class']});
+
+  window.addEventListener('resize',()=>{if(modal.classList.contains('open'))renderFromTitle()},{passive:true});
+})();
+</script>
+'''
+          if pattern.search(text):
+              text = pattern.sub(js.rstrip(), text)
+          else:
+              text = text.rstrip() + js
+
+          view_path.write_text(text, encoding='utf-8')
       - name: Check
         run: git diff --check
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add resources/css/app.css resources/views/home-v3.blade.php
-          git commit -m "feat: implement reference desktop profile viewer"
+          git add resources/views/home-v3.blade.php .github/workflows/apply-profile-v3.yml
+          git diff --cached --check
+          git commit -m "fix: force homepage desktop profile viewer layout"
           git push origin main
