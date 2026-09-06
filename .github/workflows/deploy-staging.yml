@@ -94,6 +94,14 @@ jobs:
           php artisan package:discover --ansi
           npm install --no-audit --no-fund
           npm run build
+
+          echo "==> Preparing persistent SQLite database"
+          mkdir -p database
+          touch database/database.sqlite
+          chmod 664 database/database.sqlite || true
+          export DB_CONNECTION=sqlite
+          export DB_DATABASE="$(pwd)/database/database.sqlite"
+
           php artisan migrate --force
           php artisan storage:link --force
           php artisan optimize:clear
