@@ -24,13 +24,30 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('admin/profile-builder')->name('admin.profile-builder.')
                 ->group(function (): void {
                     Route::get('/', [ManagementController::class, 'index'])->name('index');
+                });
+
+            Route::middleware(['web', 'auth', 'permission:website.manage'])
+                ->prefix('admin/profile-builder')->name('admin.profile-builder.')
+                ->group(function (): void {
                     Route::get('/create', [ManagementController::class, 'create'])->name('create');
                     Route::get('/{member}/edit', [ManagementController::class, 'edit'])->name('edit');
                     Route::post('/', [ManagementController::class, 'store'])->name('store');
                     Route::patch('/{member}', [ManagementController::class, 'update'])->name('update');
-                    Route::patch('/{member}/toggle', [ManagementController::class, 'toggle'])->name('toggle');
                     Route::delete('/{member}', [ManagementController::class, 'destroy'])->name('destroy');
                     Route::post('/reorder', [ManagementController::class, 'reorder'])->name('reorder');
+
+                    Route::get('/folders/create', [ManagementController::class, 'folderCreate'])->name('folders.create');
+                    Route::post('/folders', [ManagementController::class, 'folderStore'])->name('folders.store');
+                    Route::get('/folders/{folder}/edit', [ManagementController::class, 'folderEdit'])->name('folders.edit');
+                    Route::patch('/folders/{folder}', [ManagementController::class, 'folderUpdate'])->name('folders.update');
+                    Route::delete('/folders/{folder}', [ManagementController::class, 'folderDestroy'])->name('folders.destroy');
+                    Route::post('/folders/reorder', [ManagementController::class, 'folderReorder'])->name('folders.reorder');
+                });
+
+            Route::middleware(['web', 'auth', 'permission:website.publish'])
+                ->prefix('admin/profile-builder')->name('admin.profile-builder.')
+                ->group(function (): void {
+                    Route::patch('/{member}/toggle', [ManagementController::class, 'toggle'])->name('toggle');
                 });
 
             Route::middleware(['web', 'auth', 'permission:cms.view'])
@@ -69,6 +86,13 @@ return Application::configure(basePath: dirname(__DIR__))
                     Route::delete('/{item}', [NavigationMenuController::class, 'destroy'])->name('destroy');
                     Route::post('/reorder', [NavigationMenuController::class, 'reorder'])->name('reorder');
                 });
+
+            // Published profile folders use their configured slug as a first-class public page.
+            // This catch-all is intentionally registered after the application routes so it
+            // cannot shadow existing static, authentication, admin, or management routes.
+            Route::get('/{folderSlug}', [\App\Http\Controllers\ManagementController::class, 'folder'])
+                ->where('folderSlug', '[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*')
+                ->name('management.folder');
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
