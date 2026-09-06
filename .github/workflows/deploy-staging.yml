@@ -1,6 +1,9 @@
 name: Deploy New Design to Staging
 
 on:
+  push:
+    branches:
+      - new-design
   workflow_dispatch:
 
 concurrency:
