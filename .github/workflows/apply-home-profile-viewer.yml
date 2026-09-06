@@ -1,0 +1,223 @@
+name: Apply Homepage Desktop Profile Viewer
+
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-home-profile-viewer.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply desktop profile viewer polish
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('resources/css/app.css')
+          css = r'''
+
+/* Homepage desktop profile viewer — reference-inspired two-column presentation. */
+@media (min-width: 851px) {
+  .home-profile-modal {
+    padding: 34px !important;
+    background: rgba(1, 8, 13, .82) !important;
+    backdrop-filter: blur(18px) !important;
+  }
+
+  .home-profile-modal .home-profile-panel,
+  .home-profile-modal .home-profile-content,
+  .home-profile-modal .home-profile-inner {
+    width: min(1180px, calc(100vw - 68px)) !important;
+    max-width: 1180px !important;
+    max-height: min(86vh, 900px) !important;
+    margin: auto !important;
+    border: 1px solid rgba(67, 209, 240, .34) !important;
+    border-radius: 26px !important;
+    background: linear-gradient(135deg, rgba(4, 28, 39, .98), rgba(2, 15, 23, .99)) !important;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, .48), inset 0 1px 0 rgba(255,255,255,.035) !important;
+    overflow: hidden !important;
+  }
+
+  /* The modal may use the panel itself as the two-column container. */
+  .home-profile-modal .home-profile-body,
+  .home-profile-modal .home-profile-layout {
+    display: grid !important;
+    grid-template-columns: 390px minmax(0, 1fr) !important;
+    min-height: min(760px, 82vh) !important;
+  }
+
+  .home-profile-modal .home-profile-photo,
+  .home-profile-modal .home-profile-media {
+    min-height: 100% !important;
+    padding: 44px 34px 34px !important;
+    border-right: 1px solid rgba(67, 209, 240, .18) !important;
+    background: linear-gradient(180deg, rgba(3, 24, 34, .95), rgba(2, 16, 24, .98)) !important;
+  }
+
+  .home-profile-modal .home-profile-photo img,
+  .home-profile-modal .home-profile-media img {
+    width: 100% !important;
+    aspect-ratio: 4 / 5 !important;
+    height: auto !important;
+    max-height: 474px !important;
+    object-fit: cover !important;
+    object-position: center top !important;
+    display: block !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(67, 209, 240, .34) !important;
+    box-shadow: 0 18px 45px rgba(0,0,0,.28) !important;
+  }
+
+  .home-profile-modal .home-profile-info {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 52px 58px 38px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+
+  .home-profile-modal .home-profile-title {
+    margin: 0 0 8px !important;
+    font-size: clamp(29px, 2.35vw, 38px) !important;
+    line-height: 1.16 !important;
+    letter-spacing: -.035em !important;
+    font-weight: 850 !important;
+  }
+
+  .home-profile-modal .home-profile-role {
+    color: #43d1f0 !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    font-weight: 800 !important;
+    letter-spacing: .16em !important;
+    text-transform: uppercase !important;
+  }
+
+  .home-profile-modal .home-profile-contact,
+  .home-profile-modal .home-profile-contact-mobile {
+    font-size: 14px !important;
+    line-height: 1.65 !important;
+  }
+
+  .home-profile-modal .home-profile-scroll {
+    min-height: 0 !important;
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    padding-right: 20px !important;
+    margin-top: 22px !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(67,209,240,.55) transparent !important;
+  }
+
+  .home-profile-modal .home-profile-scroll::-webkit-scrollbar {
+    width: 8px !important;
+  }
+  .home-profile-modal .home-profile-scroll::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+  .home-profile-modal .home-profile-scroll::-webkit-scrollbar-thumb {
+    background: rgba(67,209,240,.48) !important;
+    border-radius: 99px !important;
+  }
+
+  .home-profile-modal .home-profile-message,
+  .home-profile-modal .home-profile-scroll p {
+    color: #d7e9ef !important;
+    font-size: 17px !important;
+    line-height: 1.82 !important;
+    letter-spacing: .005em !important;
+    text-transform: none !important;
+  }
+
+  .home-profile-modal .home-profile-message::first-letter {
+    color: #43d1f0 !important;
+  }
+
+  .home-profile-modal .home-profile-footer {
+    flex: 0 0 auto !important;
+    margin-top: 22px !important;
+    padding-top: 20px !important;
+    border-top: 1px solid rgba(67,209,240,.16) !important;
+    font-size: 13px !important;
+  }
+
+  .home-profile-modal .home-profile-links {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+
+  .home-profile-modal .home-profile-links > .home-profile-link {
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+    padding: 10px 15px !important;
+    border: 1px solid rgba(67,209,240,.24) !important;
+    border-radius: 11px !important;
+    background: rgba(67,209,240,.055) !important;
+  }
+
+  .home-profile-modal .home-profile-close,
+  .home-profile-modal button[aria-label*="Close"],
+  .home-profile-modal button[aria-label*="close"] {
+    width: 52px !important;
+    height: 52px !important;
+    border: 1px solid rgba(67,209,240,.25) !important;
+    border-radius: 14px !important;
+    background: rgba(67,209,240,.06) !important;
+    color: #effcff !important;
+  }
+
+  /* Hide decorative/kicker text immediately before the modal title. */
+  .home-profile-modal .home-profile-head > :not(.home-profile-title):not(.home-profile-role):not(button),
+  .home-profile-modal .home-profile-heading > :not(.home-profile-title):not(.home-profile-role):not(button) {
+    display: none !important;
+  }
+}
+
+@media (min-width: 851px) and (max-width: 1100px) {
+  .home-profile-modal { padding: 22px !important; }
+  .home-profile-modal .home-profile-body,
+  .home-profile-modal .home-profile-layout { grid-template-columns: 320px minmax(0,1fr) !important; }
+  .home-profile-modal .home-profile-photo,
+  .home-profile-modal .home-profile-media { padding: 30px 24px 26px !important; }
+  .home-profile-modal .home-profile-info { padding: 38px 40px 30px !important; }
+  .home-profile-modal .home-profile-message,
+  .home-profile-modal .home-profile-scroll p { font-size: 15px !important; line-height: 1.75 !important; }
+}
+'''
+          current = path.read_text(encoding='utf-8')
+          marker = '/* Homepage desktop profile viewer — reference-inspired two-column presentation. */'
+          if marker not in current:
+              path.write_text(current.rstrip() + css + '\n', encoding='utf-8')
+
+      - name: Validate
+        run: git diff --check
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add resources/css/app.css .github/workflows/apply-home-profile-viewer.yml
+          git commit -m "feat: refine homepage desktop profile viewer" || true
+          git push origin main
+
+      - name: Remove temporary workflow
+        if: success()
+        shell: bash
+        run: |
+          git rm .github/workflows/apply-home-profile-viewer.yml
+          git commit -m "chore: remove temporary profile viewer workflow"
+          git push origin main
