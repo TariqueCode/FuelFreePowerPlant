@@ -1,0 +1,33 @@
+name: Inspect Profile Viewer
+on:
+  push:
+    paths:
+      - '.github/workflows/inspect-profile-viewer.yml'
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect modal markup
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+          text = Path('resources/views/home.blade.php').read_text(encoding='utf-8')
+          for needle in ['welcome-profile-modal','welcome-profile-modal-title','welcome-profile-modal-role','welcome-profile-modal-scroll','welcome-profile-name','welcome-profile-message','Add to Contacts']:
+              print(f'\n=== {needle} ===')
+              for m in re.finditer(re.escape(needle), text):
+                  s=max(0,m.start()-1500); e=min(len(text),m.end()+3000)
+                  print(text[s:e])
+                  break
+      - name: Cleanup
+        if: always()
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/inspect-profile-viewer.yml
+          git commit -m "chore: remove profile viewer inspection workflow" || true
+          git push origin main
