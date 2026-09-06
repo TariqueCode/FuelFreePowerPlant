@@ -7,11 +7,12 @@ use App\Models\HomepageSection;
 use App\Models\SiteContentItem;
 use App\Models\SiteSlider;
 use App\Models\SystemSetting;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class HomeController
 {
-    public function __invoke(): Response
+    public function __invoke(Request $request): Response
     {
         $homePage=CmsPage::query()->where('slug','home')->where('is_published',true)->first();
         $content=SiteContentItem::published()->whereIn('type',['news','announcement'])->orderBy('sort_order')->latest('published_at')->get()->groupBy(fn ($item) => in_array($item->type, ['news','announcement'], true) ? 'news' : $item->type);
@@ -31,6 +32,7 @@ class HomeController
             }
             return [];
         };
+
         $sectionSettings = $configuredSections->mapWithKeys(
             fn ($section) => [$section->key => $normalizeSectionSettings($section->settings)]
         );
@@ -80,7 +82,7 @@ class HomeController
         $welcomeSettings = $sectionSettings['welcome'] ?? [];
         $welcomeManagementIds = array_values(array_unique(array_filter(array_map('intval', (array) ($welcomeSettings['management_ids'] ?? [])))));
         $welcomeManagement = $welcomeManagementIds
-            ? SiteContentItem::published()->where('type','management')->whereIn('id', $welcomeManagementIds)->get()->sortBy(fn ($item) => array_search((int) $item->id, $welcomeManagementIds, true))->take(2)->values()
+            ? SiteContentItem::published()->where('type','management')->whereIn('id',$welcomeManagementIds)->get()->sortBy(fn ($item) => array_search((int) $item->id, $welcomeManagementIds, true))->take(2)->values()
             : collect();
         $welcomeEyebrow = trim((string) ($welcomeSettings['eyebrow'] ?? ''));
         $welcomeTitle = trim((string) ($welcomeSettings['title'] ?? ($homePage?->title ?? 'Building a stronger energy future.')));
@@ -132,6 +134,17 @@ class HomeController
             $gallerySettings,
             $galleryLimit
         );
+
+        $isNewDesignHost = $request->getHost() === 'staging.fuelfreepowerplant.com'
+            || $request->boolean('new_design_preview');
+
+        if ($isNewDesignHost) {
+            return response(view('home-new-design', compact('brand','content','gallery','sliders','projects','homeManagement','welcomeManagement'))->render())
+                ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0')
+                ->header('X-FFP-Homepage-Source', 'new-design-staging');
+        }
 
         return response(view('home-v3',compact('homePage','content','brand','gallery','sliders','home','homeManagement','welcomeManagement','welcomeEyebrow','welcomeTitle','welcomeContent','welcomeSignoff','welcomePreviewWords','welcomeMoreWords','welcomeShowFull','welcomeLayout','welcomePreview','welcomeRemaining','welcomeHasMore','sectionSettings'))->render())
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
