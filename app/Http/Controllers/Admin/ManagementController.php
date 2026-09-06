@@ -68,7 +68,7 @@ class ManagementController extends Controller
             $item=new NavigationMenuItem();$item->menu='main';$item->group=(string)(NavigationMenuItem::query()->where('menu','main')->value('group')??'main');$item->parent_id=null;$item->target='_self';$item->icon='fa-solid fa-users';$item->is_visible=true;$item->sort_order=(int)(NavigationMenuItem::query()->where('menu','main')->max('sort_order')??-1)+1;$item->area='public';
         }
         if(!$item)return;
-        $item->label=$folder->name;$item->label_override=null;$item->url='/'.$folder->slug;$item->route_name=null;$item->source_key=$key;$item->source_type='external_link';$item->permission_key=null;$item->area='public';$item->save();
+        $item->label=$folder->name;$item->label_override=null;$item->url='/'.$folder->slug;$item->route_name=null;$item->source_key=$key;$item->source_type='external_link';$item->permission_key=null;$item->area='public';$item->is_visible=$folder->status==='published';$item->save();
         app(PublicNavigationService::class)->clear('main');
     }
 
