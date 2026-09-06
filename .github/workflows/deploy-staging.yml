@@ -1,0 +1,102 @@
+name: Deploy New Design to Staging
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: new-design-staging
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, sqlite3, pdo_sqlite, dom, xml, xmlwriter, fileinfo, ctype
+          coverage: none
+      - name: Validate PHP syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do php -l "$file" >/dev/null; done < <(find app config routes database -type f -name '*.php' -print0)
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+      - name: Prepare test environment
+        run: cp .env.example .env
+      - name: Prepare SQLite database
+        shell: bash
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+          php artisan migrate --force
+      - name: Generate test application key
+        run: php artisan key:generate --force
+      - name: Run package discovery
+        run: php artisan package:discover --ansi
+      - name: Check Composer platform requirements
+        run: composer check-platform-reqs --lock
+      - name: Build frontend assets
+        run: |
+          npm install --no-audit --no-fund
+          npm run build
+      - name: Run tests
+        run: php artisan test
+
+  deploy:
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to configured staging path
+        env:
+          DEPLOY_HOST: ${{ secrets.STAGING_DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.STAGING_DEPLOY_PORT }}
+          DEPLOY_USER: ${{ secrets.STAGING_DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.STAGING_DEPLOY_SSH_KEY }}
+          STAGING_APP_PATH: ${{ secrets.STAGING_APP_PATH }}
+        run: |
+          set -euo pipefail
+          : "${DEPLOY_HOST:?Missing STAGING_DEPLOY_HOST secret}"
+          : "${DEPLOY_PORT:?Missing STAGING_DEPLOY_PORT secret}"
+          : "${DEPLOY_USER:?Missing STAGING_DEPLOY_USER secret}"
+          : "${DEPLOY_SSH_KEY:?Missing STAGING_DEPLOY_SSH_KEY secret}"
+          : "${STAGING_APP_PATH:?Missing STAGING_APP_PATH secret}"
+
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+          ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" 'bash -s' -- "$STAGING_APP_PATH" <<'REMOTE'
+          set -euo pipefail
+          STAGING_APP_PATH="$1"
+          test -d "$STAGING_APP_PATH"
+          cd "$STAGING_APP_PATH"
+
+          git fetch origin new-design
+          git reset --hard origin/new-design
+
+          if command -v composer >/dev/null 2>&1; then COMPOSER_BIN="$(command -v composer)"; else COMPOSER_BIN="$HOME/.local/bin/composer"; fi
+          test -x "$COMPOSER_BIN"
+          "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts
+
+          php artisan package:discover --ansi
+          npm install --no-audit --no-fund
+          npm run build
+          php artisan migrate --force
+          php artisan storage:link --force
+          php artisan optimize:clear
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          REMOTE
+
+          rm -f ~/.ssh/deploy_key
