@@ -44,6 +44,17 @@ class AppServiceProvider extends ServiceProvider
         $router->patch('/admin/profile-builder/{member}/toggle',[AdminManagementController::class,'toggle'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.toggle');
         $router->post('/admin/profile-builder/reorder',[AdminManagementController::class,'reorder'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.reorder');
 
+        // Canonical aliases for the navigation builder. Blade precompilation maps
+        // legacy admin.navigation.* references to these names, so these routes must
+        // exist before any navigation-builder form or redirect is evaluated.
+        $navigationController=\App\Http\Controllers\Admin\NavigationMenuController::class;
+        $router->get('/admin/menu-builder',[$navigationController,'index'])->middleware(['auth','permission:website.view'])->name('admin.menu-builder.index');
+        $router->get('/admin/menu-builder/{item}',[$navigationController,'show'])->middleware(['auth','permission:website.view'])->name('admin.menu-builder.show');
+        $router->post('/admin/menu-builder',[$navigationController,'store'])->middleware(['auth','permission:website.manage'])->name('admin.menu-builder.store');
+        $router->patch('/admin/menu-builder/{item}',[$navigationController,'update'])->middleware(['auth','permission:website.manage'])->name('admin.menu-builder.update');
+        $router->delete('/admin/menu-builder/{item}',[$navigationController,'destroy'])->middleware(['auth','permission:website.manage'])->name('admin.menu-builder.destroy');
+        $router->post('/admin/menu-builder/reorder',[$navigationController,'reorder'])->middleware(['auth','permission:website.manage'])->name('admin.menu-builder.reorder');
+
         // Register only after the normal route set is booted. Fallback routing
         // cannot intercept valid endpoints such as /career or /contact.
         $this->app->booted(function () use ($router): void {

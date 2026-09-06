@@ -89,13 +89,6 @@ jobs:
           git fetch origin main
           git reset --hard origin/main
 
-          echo "==> Rendering homepage desktop profile viewer patch"
-          if [ -x .github/scripts/render-profile-viewer-v4.sh ]; then
-              bash .github/scripts/render-profile-viewer-v4.sh
-          else
-              echo "WARNING: profile viewer render patch script not found."
-          fi
-
           echo "==> Locating Composer"
           if command -v composer >/dev/null 2>&1; then
               COMPOSER_BIN="$(command -v composer)"
