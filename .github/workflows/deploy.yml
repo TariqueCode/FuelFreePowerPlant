@@ -51,6 +51,7 @@ jobs:
         run: |
           npm install --no-audit --no-fund
           npm run build
+          test -f public/build/manifest.json
       - name: Run tests
         run: php artisan test
 
@@ -75,6 +76,8 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
 
           ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+          trap 'rm -f ~/.ssh/deploy_key' EXIT
 
           ssh -i ~/.ssh/deploy_key \
             -p "$DEPLOY_PORT" \
@@ -127,9 +130,17 @@ jobs:
 
           echo "==> Checking production PHP runtime"
           php -r 'if (PHP_VERSION_ID < 80400) { fwrite(STDERR, "ERROR: FuelFree PowerPlant requires PHP 8.4+ on production. Current: ".PHP_VERSION."\\n"); exit(1); }'
-          for ext in fileinfo mbstring; do
+          for ext in ctype fileinfo mbstring openssl pdo tokenizer xml; do
               if ! php -m | grep -qi "^$ext$"; then
                   echo "ERROR: Required PHP extension is missing: $ext"
+                  exit 1
+              fi
+          done
+
+          echo "==> Checking required deployment tools"
+          for tool in git php curl npm; do
+              if ! command -v "$tool" >/dev/null 2>&1; then
+                  echo "ERROR: Required deployment tool is missing: $tool"
                   exit 1
               fi
           done
@@ -140,16 +151,19 @@ jobs:
           echo "==> Refreshing Laravel package discovery"
           php artisan package:discover --ansi
 
-          if command -v npm >/dev/null 2>&1; then
-              echo "==> Building frontend assets"
-              npm install --no-audit --no-fund
-              npm run build
-          else
-              echo "WARNING: npm is not available; keeping existing public/build assets."
+          echo "==> Building frontend assets"
+          npm install --no-audit --no-fund
+          npm run build
+          if [ ! -f public/build/manifest.json ]; then
+              echo "ERROR: Frontend build completed without public/build/manifest.json"
+              exit 1
           fi
 
           echo "==> Running database migrations"
           php artisan migrate --force
+
+          echo "==> Verifying database connectivity"
+          php artisan migrate:status >/dev/null
 
           echo "==> Ensuring public storage link"
           php artisan storage:link --force
@@ -160,6 +174,17 @@ jobs:
           php artisan route:cache
           php artisan view:cache
 
+          echo "==> Verifying Laravel application boot"
+          php artisan about >/dev/null
+
+          echo "==> Verifying public HTTP response"
+          APP_URL="$(php artisan tinker --execute='echo config("app.url");' 2>/dev/null | tail -n 1)"
+          if [ -z "$APP_URL" ]; then
+              echo "ERROR: Could not determine APP_URL from the production configuration."
+              exit 1
+          fi
+          curl -fsS --max-time 20 --retry 2 --retry-delay 2 "$APP_URL" >/dev/null
+
           echo "==> Ensuring Laravel scheduler cron"
           CRON_LINE='* * * * * cd /home/fuelfree/public_html && php artisan schedule:run >> /dev/null 2>&1'
           if command -v crontab >/dev/null 2>&1; then
@@ -168,7 +193,5 @@ jobs:
               echo "WARNING: crontab is not available; configure the Laravel scheduler cron manually."
           fi
 
-          echo "==> Deployment complete"
+          echo "==> Deployment and post-deployment verification complete"
           REMOTE
-
-          rm -f ~/.ssh/deploy_key
