@@ -1,0 +1,74 @@
+name: Apply Home Board 1x4 Desktop Layout
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply home-only 1x4 profile layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('resources/views/home.blade.php')
+          s = p.read_text(encoding='utf-8')
+          marker = 'HOME BOARD 1X4 DESKTOP — MOBILE STYLE'
+          if marker not in s:
+              css = r'''\n/* HOME BOARD 1X4 DESKTOP — MOBILE STYLE */\n@media (min-width:901px){\n  .ff-home-board-grid{\n    display:grid!important;\n    grid-template-columns:repeat(4,minmax(0,1fr))!important;\n    gap:13px!important;\n    align-items:stretch!important;\n    width:100%!important;\n  }\n  .ff-home-board-grid > .ff-home-board-card{\n    min-width:0!important;\n    width:auto!important;\n    max-width:none!important;\n  }\n}\n@media (max-width:900px){\n  .ff-home-board-grid{\n    display:grid!important;\n    grid-template-columns:repeat(2,minmax(0,1fr))!important;\n  }\n}\n@media (max-width:520px){\n  .ff-home-board-grid{grid-template-columns:1fr!important;}\n}\n'''
+              pos = s.find('</style>')
+              if pos < 0:
+                  raise SystemExit('home style closing tag not found')
+              s = s[:pos] + css + s[pos:]
+              js = r'''\n<script>\n(function(){\n  function normalize(v){return (v||'').replace(/\\s+/g,' ').trim().toLowerCase();}\n  function syncHomeBoard(){\n    var isDesktop = window.matchMedia('(min-width:901px)').matches;\n    var heading = Array.from(document.querySelectorAll('h1,h2,h3,h4,h5')).find(function(el){\n      return normalize(el.textContent) === 'board of directors';\n    });\n    if(!heading) return;\n    var scope = heading.closest('section') || heading.parentElement;\n    if(!scope) return;\n    var actions = Array.from(scope.querySelectorAll('a,button')).filter(function(el){\n      return /view full message/i.test(normalize(el.textContent));\n    });\n    var cards = [];\n    actions.forEach(function(action){\n      var card = action.closest('article,li,[class*="profile-card"],[class*="profile_card"],[class*="management-card"],[class*="board-card"],[class*="card"]') || action.parentElement;\n      if(card && cards.indexOf(card) < 0) cards.push(card);\n    });\n    if(cards.length < 2) return;\n    var grid = cards[0].parentElement;\n    while(grid && grid !== scope && !cards.every(function(card){return grid.contains(card);})) grid = grid.parentElement;\n    if(!grid || grid === scope) return;\n    if(isDesktop){\n      grid.classList.add('ff-home-board-grid');\n      cards.forEach(function(card){card.classList.add('ff-home-board-card');});\n    }else{\n      grid.classList.remove('ff-home-board-grid');\n      cards.forEach(function(card){card.classList.remove('ff-home-board-card');});\n    }\n  }\n  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',syncHomeBoard);\n  else syncHomeBoard();\n  window.addEventListener('resize',syncHomeBoard,{passive:true});\n})();\n</script>\n'''
+              body_pos = s.lower().rfind('</body>')
+              if body_pos >= 0:
+                  s = s[:body_pos] + js + s[body_pos:]
+              else:
+                  s += js
+              p.write_text(s, encoding='utf-8')
+          else:
+              print('Home 1x4 layout already present.')
+          PY
+
+      - name: Validate source
+        run: |
+          set -euo pipefail
+          grep -n "HOME BOARD 1X4 DESKTOP" resources/views/home.blade.php
+          grep -n "ff-home-board-grid" resources/views/home.blade.php
+          git diff --check
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add resources/views/home.blade.php
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "feat: make home board four-column desktop grid"
+          git push origin main
+
+      - name: Cleanup temporary workflow
+        if: always()
+        run: |
+          git fetch origin main
+          git checkout main
+          git pull --rebase origin main
+          rm -f .github/workflows/ff-home-1x4.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -u .github/workflows/ff-home-1x4.yml
+          git diff --cached --quiet || git commit -m "chore: remove temporary home 1x4 workflow"
+          git push origin main || true
