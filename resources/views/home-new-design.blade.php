@@ -3,7 +3,6 @@
     $companyName = $brand['name'] ?? 'Fuel Free Power Plant Limited';
     $tagline = $brand['tagline'] ?? 'Advanced energy technology for a stronger future.';
     $newsItems = collect($content['news'] ?? [])->take(3);
-    $projects = collect($content['future-project'] ?? [])->take(2);
 @endphp
 
 <!doctype html>
@@ -31,7 +30,7 @@
                 <span class="new-brand-name">FuelFree <small>POWER PLANT LIMITED</small></span>
             </a>
 
-            <nav class="new-nav-links" data-new-nav-links aria-label="Primary navigation">
+            <nav id="primary-navigation" class="new-nav-links" data-new-nav-links aria-label="Primary navigation">
                 <a href="#technology">Technology</a>
                 <a href="#solutions">Solutions</a>
                 <a href="#projects">Projects</a>
