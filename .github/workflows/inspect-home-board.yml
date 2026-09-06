@@ -1,0 +1,31 @@
+name: Inspect Homepage Board Markup
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  inspect:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Inspect
+        run: |
+          set -euo pipefail
+          echo '--- profile/card references ---'
+          grep -nE 'home-profile|member-card|member-body|Board of Directors|management' resources/views/home.blade.php | head -n 160 || true
+      - name: Cleanup
+        if: always()
+        run: |
+          git fetch origin main
+          git checkout main
+          git pull --rebase origin main
+          rm -f .github/workflows/inspect-home-board.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -u .github/workflows/inspect-home-board.yml
+          git diff --cached --quiet || git commit -m "chore: remove homepage markup inspection workflow"
+          git push origin main || true
