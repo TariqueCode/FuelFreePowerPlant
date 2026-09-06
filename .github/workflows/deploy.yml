@@ -38,6 +38,7 @@ jobs:
       - name: Prepare SQLite database
         shell: bash
         run: |
+          set -euo pipefail
           mkdir -p database
           touch database/database.sqlite
           php artisan migrate --force
@@ -127,7 +128,7 @@ jobs:
 
           echo "==> Checking production PHP runtime"
           php -r 'if (PHP_VERSION_ID < 80400) { fwrite(STDERR, "ERROR: FuelFree PowerPlant requires PHP 8.4+ on production. Current: ".PHP_VERSION."\\n"); exit(1); }'
-          for ext in fileinfo mbstring; do
+          for ext in fileinfo mbstring pdo_sqlite; do
               if ! php -m | grep -qi "^$ext$"; then
                   echo "ERROR: Required PHP extension is missing: $ext"
                   exit 1
@@ -148,7 +149,18 @@ jobs:
               echo "WARNING: npm is not available; keeping existing public/build assets."
           fi
 
-          echo "==> Running database migrations"
+          echo "==> Preparing persistent SQLite database"
+          mkdir -p database
+          touch database/database.sqlite
+          chmod 664 database/database.sqlite || true
+
+          # Temporary production database mode: use SQLite while the MySQL
+          # service is unavailable. Remove this export when MySQL is restored
+          # and the production database has been migrated to MySQL.
+          export DB_CONNECTION=sqlite
+          export DB_DATABASE="$(pwd)/database/database.sqlite"
+
+          echo "==> Running database migrations on SQLite"
           php artisan migrate --force
 
           echo "==> Ensuring public storage link"
@@ -168,7 +180,7 @@ jobs:
               echo "WARNING: crontab is not available; configure the Laravel scheduler cron manually."
           fi
 
-          echo "==> Deployment complete"
+          echo "==> Deployment complete (SQLite temporary mode)"
           REMOTE
 
           rm -f ~/.ssh/deploy_key
