@@ -11,6 +11,13 @@
 @media(max-width:700px){.rename-btn{padding:5px 7px}.inline-label-edit{margin-top:7px}.inline-label-edit input[name="label"]{flex-basis:100%}}
 </style>
 @endif
+@php
+    $typeLabel = match($item->source_type) {
+        'folder' => 'Folder',
+        'external_link' => 'Custom link',
+        default => 'Live source',
+    };
+@endphp
 <div class="menu-row" draggable="false" data-id="{{ $item->id }}" data-kind="{{ $item->source_type }}">
     @if($item->children->isNotEmpty())
         <button type="button" class="tree-toggle" aria-expanded="true" aria-label="Collapse {{ $item->displayLabel() }}">⌄</button>
@@ -20,8 +27,8 @@
     <span class="drag" title="Drag to reorder" aria-label="Drag to reorder" role="button" tabindex="0">☷</span>
     <div class="menu-main">
         <strong class="drag" title="Drag {{ $item->displayLabel() }} to reorder">{{ $item->displayLabel() }}</strong>
-        <em>{{ $item->source_type === 'folder' ? 'Folder' : 'Live source' }}</em>
-        <small>{{ $item->route_name ?: ($item->url ?: 'Structural node') }} · {{ $item->is_visible ? 'Visible' : 'Hidden' }}@if($item->permission_key) · {{ $item->permission_key }}@endif</small>
+        <em>{{ $typeLabel }}</em>
+        <small>{{ $typeLabel }} · {{ $item->is_visible ? 'Visible' : 'Hidden' }}@if($item->permission_key) · {{ $item->permission_key }}@endif</small>
         <div class="inline-label-edit" id="rename-{{ $item->id }}" hidden>
             <form method="POST" action="{{ route('admin.navigation.update', $item) }}">
                 @csrf @method('PATCH')
