@@ -519,6 +519,40 @@ main{padding:72px 0 88px}
     .body{min-height:255px}
     .contact-list{margin-top:auto}
 }
+
+/* DESKTOP PROFILE CARDS: horizontal 4:5 identity layout. */
+@media (min-width: 851px) {
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; align-items: stretch; }
+    .card { min-height: 430px; display: grid; grid-template-columns: minmax(190px, 40%) minmax(0, 60%); flex-direction: row; }
+    .photo { aspect-ratio: 4 / 5; width: 100%; height: 100%; min-height: 100%; align-self: stretch; }
+    .photo img { width: 100%; height: 100%; object-fit: cover; }
+    .body { min-width: 0; min-height: 0; height: 100%; padding: 30px 28px 28px; display: flex; flex-direction: column; justify-content: flex-start; }
+    .body h2 { font-size: clamp(21px, 1.65vw, 28px); line-height: 1.18; }
+    .role { margin-top: 8px; font-size: 12px; line-height: 1.45; }
+    .bio { margin: 18px 0 16px; font-size: 13px; line-height: 1.72; }
+    .bio-preview { -webkit-line-clamp: 4; max-height: 90px; }
+    .contact-list { margin-top: auto; padding: 16px 0; gap: 9px; }
+    .contact { font-size: 12px; gap: 10px; }
+    .contact i { flex-basis: 30px; width: 30px; height: 30px; border-radius: 9px; }
+    .actions { margin-top: 14px; grid-template-columns: 1fr; }
+    .action { min-height: 44px; padding: 11px 14px; font-size: 12px; }
+    .action.primary { justify-content: center; }
+    .bio-more { font-size: 11px; }
+    .body { overflow: hidden; }
+}
+@media (min-width: 851px) and (max-width: 1100px) {
+    .grid { gap: 18px; }
+    .card { grid-template-columns: minmax(160px, 40%) minmax(0, 60%); min-height: 380px; }
+    .body { padding: 23px 20px 20px; }
+    .body h2 { font-size: 20px; }
+    .bio { font-size: 11px; }
+    .contact { font-size: 10px; }
+}
+@media (min-width: 1600px) {
+    .card { min-height: 470px; }
+    .body { padding: 34px 32px 30px; }
+}
+
 </style>
 <main class="shell">
     <section class="hero"><span class="eyebrow">Leadership &amp; Management</span><h1>Board of Directors</h1><p>Meet the people responsible for guiding {{ $name }}.</p></section>
