@@ -23,38 +23,24 @@ class HomeController
 
         $configuredSections = HomepageSection::query()->ordered()->get();
         $normalizeSectionSettings = static function ($value): array {
-            if (is_array($value)) {
-                return $value;
-            }
+            if (is_array($value)) return $value;
             if (is_string($value) && trim($value) !== '') {
                 $decoded = json_decode($value, true);
                 return is_array($decoded) ? $decoded : [];
             }
             return [];
         };
-
-        $sectionSettings = $configuredSections->mapWithKeys(
-            fn ($section) => [$section->key => $normalizeSectionSettings($section->settings)]
-        );
-
+        $sectionSettings = $configuredSections->mapWithKeys(fn ($section) => [$section->key => $normalizeSectionSettings($section->settings)]);
         $sectionSettings = $sectionSettings->map(function (array $settings): array {
             $layout = $settings['layout'] ?? 'left';
-            $settings['layout'] = in_array($layout, ['left', 'center', 'right'], true)
-                ? $layout
-                : 'left';
+            $settings['layout'] = in_array($layout, ['left', 'center', 'right'], true) ? $layout : 'left';
             return $settings;
         });
         $sectionOrder = $configuredSections->pluck('key')->all();
         $enabledSections = $configuredSections->where('is_enabled', true)->pluck('key')->flip();
         $home = [
-            'slider' => isset($enabledSections['hero']),
-            'welcome' => isset($enabledSections['welcome']),
-            'statistics' => false,
-            'projects' => false,
-            'management' => isset($enabledSections['management']),
-            'news' => isset($enabledSections['news']),
-            'gallery' => isset($enabledSections['gallery']),
-            'cta' => isset($enabledSections['cta']),
+            'slider' => isset($enabledSections['hero']), 'welcome' => isset($enabledSections['welcome']), 'statistics' => false, 'projects' => false,
+            'management' => isset($enabledSections['management']), 'news' => isset($enabledSections['news']), 'gallery' => isset($enabledSections['gallery']), 'cta' => isset($enabledSections['cta']),
             'section_order' => array_values(array_filter($sectionOrder, fn ($key) => ! in_array($key, ['statistics','projects'], true))) ?: ['hero','welcome','management','news','gallery','cta'],
         ];
 
@@ -68,9 +54,7 @@ class HomeController
         $applySelection = static function ($query, array $settings, int $limit) use ($resolveIds) {
             if (($settings['mode'] ?? 'latest') === 'selected') {
                 $ids = $resolveIds($settings);
-                if (!$ids) {
-                    return $query->whereRaw('1 = 0')->take($limit)->get();
-                }
+                if (!$ids) return $query->whereRaw('1 = 0')->take($limit)->get();
                 $position = array_flip($ids);
                 return $query->whereIn('id', $ids)->get()->sortBy(fn ($item) => $position[(int) $item->id] ?? PHP_INT_MAX)->take($limit)->values();
             }
@@ -88,9 +72,7 @@ class HomeController
         $welcomeTitle = trim((string) ($welcomeSettings['title'] ?? ($homePage?->title ?? 'Building a stronger energy future.')));
         $welcomeContent = trim((string) ($welcomeSettings['content'] ?? ''));
         $welcomeSignoff = trim((string) ($welcomeSettings['signoff'] ?? ''));
-        if ($welcomeContent === '') {
-            $welcomeContent = trim(strip_tags((string) ($homePage?->content ?? '')));
-        }
+        if ($welcomeContent === '') $welcomeContent = trim(strip_tags((string) ($homePage?->content ?? '')));
         $welcomePreviewWords = max(20, min(500, (int) ($welcomeSettings['preview_words'] ?? 180)));
         $welcomeMoreWords = max(20, min(2000, (int) ($welcomeSettings['more_words'] ?? 900)));
         $welcomeShowFull = (bool) ($welcomeSettings['show_full'] ?? false);
@@ -101,55 +83,25 @@ class HomeController
         $welcomeRemaining = $welcomeShowFull ? '' : implode(' ', array_slice($welcomeWords, $welcomePreviewWords, $welcomeMoreWords));
         $welcomeHasMore = $welcomeRemaining !== '';
 
-        $content['news'] = $applySelection(
-            SiteContentItem::published()->whereIn('type',['news','announcement'])->orderBy('sort_order')->latest('published_at'),
-            $newsSettings,
-            $newsLimit
-        );
-        $managementQuery = SiteContentItem::published()
-            ->where('type','management')
-            ->orderBy('sort_order')
-            ->orderBy('title');
-
+        $content['news'] = $applySelection(SiteContentItem::published()->whereIn('type',['news','announcement'])->orderBy('sort_order')->latest('published_at'), $newsSettings, $newsLimit);
+        $managementQuery = SiteContentItem::published()->where('type','management')->orderBy('sort_order')->orderBy('title');
         if ($managementFolderId > 0 && $managementSelectedIds) {
             $position = array_flip($managementSelectedIds);
-            $homeManagement = $managementQuery
-                ->where('management_profile_folder_id', $managementFolderId)
-                ->whereIn('id', $managementSelectedIds)
-                ->get()
-                ->sortBy(fn ($item) => $position[(int) $item->id] ?? PHP_INT_MAX)
-                ->values();
-        } else {
-            $homeManagement = collect();
-        }
+            $homeManagement = $managementQuery->where('management_profile_folder_id', $managementFolderId)->whereIn('id', $managementSelectedIds)->get()->sortBy(fn ($item) => $position[(int) $item->id] ?? PHP_INT_MAX)->values();
+        } else $homeManagement = collect();
+        $welcomeManagement = $welcomeManagement->concat($homeManagement)->unique('id')->take($managementLimit)->values();
+        $gallery = $applySelection(SiteContentItem::published()->where('type','gallery')->whereNotNull('image_path')->withCount('galleryMedia')->orderBy('sort_order')->latest('published_at'), $gallerySettings, $galleryLimit);
+        $projects = SiteContentItem::published()->whereIn('type', ['future-project', 'plants'])->orderBy('sort_order')->latest('published_at')->take(2)->get();
 
-        $welcomeManagement = $welcomeManagement
-            ->concat($homeManagement)
-            ->unique('id')
-            ->take($managementLimit)
-            ->values();
-
-        $gallery = $applySelection(
-            SiteContentItem::published()->where('type','gallery')->whereNotNull('image_path')->withCount('galleryMedia')->orderBy('sort_order')->latest('published_at'),
-            $gallerySettings,
-            $galleryLimit
-        );
-
-        $isNewDesignHost = $request->getHost() === 'staging.fuelfreepowerplant.com'
-            || $request->boolean('new_design_preview');
-
+        $isNewDesignHost = $request->getHost() === 'staging.fuelfreepowerplant.com' || $request->boolean('new_design_preview');
         if ($isNewDesignHost) {
             return response(view('home-new-design', compact('brand','content','gallery','sliders','projects','homeManagement','welcomeManagement'))->render())
-                ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
-                ->header('Pragma', 'no-cache')
-                ->header('Expires', '0')
+                ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')->header('Pragma', 'no-cache')->header('Expires', '0')
                 ->header('X-FFP-Homepage-Source', 'new-design-staging');
         }
 
         return response(view('home-v3',compact('homePage','content','brand','gallery','sliders','home','homeManagement','welcomeManagement','welcomeEyebrow','welcomeTitle','welcomeContent','welcomeSignoff','welcomePreviewWords','welcomeMoreWords','welcomeShowFull','welcomeLayout','welcomePreview','welcomeRemaining','welcomeHasMore','sectionSettings'))->render())
-            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
-            ->header('Pragma', 'no-cache')
-            ->header('Expires', '0')
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')->header('Pragma', 'no-cache')->header('Expires', '0')
             ->header('X-FFP-Homepage-Source', 'home-v3-board-of-directors');
     }
 }
