@@ -52,6 +52,13 @@ jobs:
           npm install --no-audit --no-fund
           npm run build
           test -f public/build/manifest.json
+      - name: Upload frontend build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: public/build
+          if-no-files-found: error
+          retention-days: 3
       - name: Run tests
         run: php artisan test
 
@@ -60,6 +67,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Download frontend build artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: frontend-build
+          path: frontend-build
+
+      - name: Verify frontend build artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f frontend-build/manifest.json
+          tar -C frontend-build -czf frontend-build.tar.gz .
+          test -s frontend-build.tar.gz
+
       - name: Deploy on cPanel server
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
@@ -76,8 +97,14 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
 
           ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          trap 'rm -f ~/.ssh/deploy_key frontend-build.tar.gz' EXIT
 
-          trap 'rm -f ~/.ssh/deploy_key' EXIT
+          scp -i ~/.ssh/deploy_key \
+            -P "$DEPLOY_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            frontend-build.tar.gz \
+            "$DEPLOY_USER@$DEPLOY_HOST:/tmp/fuelfree-frontend-build.tar.gz"
 
           ssh -i ~/.ssh/deploy_key \
             -p "$DEPLOY_PORT" \
@@ -103,18 +130,14 @@ jobs:
               echo "==> Composer not found; installing Composer locally"
               mkdir -p "$HOME/.local/bin"
               COMPOSER_INSTALLER="/tmp/composer-setup.php"
-
               curl -fsSL https://getcomposer.org/installer -o "$COMPOSER_INSTALLER"
-
               EXPECTED_CHECKSUM="$(curl -fsSL https://composer.github.io/installer.sig)"
               ACTUAL_CHECKSUM="$(php -r "echo hash_file('sha384', '$COMPOSER_INSTALLER');")"
-
               if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
                   echo "ERROR: Composer installer checksum verification failed."
                   rm -f "$COMPOSER_INSTALLER"
                   exit 1
               fi
-
               php "$COMPOSER_INSTALLER" --install-dir="$HOME/.local/bin" --filename=composer
               rm -f "$COMPOSER_INSTALLER"
               COMPOSER_BIN="$HOME/.local/bin/composer"
@@ -138,7 +161,7 @@ jobs:
           done
 
           echo "==> Checking required deployment tools"
-          for tool in git php curl npm; do
+          for tool in git php curl; do
               if ! command -v "$tool" >/dev/null 2>&1; then
                   echo "ERROR: Required deployment tool is missing: $tool"
                   exit 1
@@ -151,13 +174,15 @@ jobs:
           echo "==> Refreshing Laravel package discovery"
           php artisan package:discover --ansi
 
-          echo "==> Building frontend assets"
-          npm install --no-audit --no-fund
-          npm run build
-          if [ ! -f public/build/manifest.json ]; then
-              echo "ERROR: Frontend build completed without public/build/manifest.json"
-              exit 1
-          fi
+          echo "==> Installing verified frontend build"
+          test -f /tmp/fuelfree-frontend-build.tar.gz
+          rm -rf public/build.new
+          mkdir -p public/build.new
+          tar -xzf /tmp/fuelfree-frontend-build.tar.gz -C public/build.new
+          test -f public/build.new/manifest.json
+          rm -rf public/build
+          mv public/build.new public/build
+          rm -f /tmp/fuelfree-frontend-build.tar.gz
 
           echo "==> Running database migrations"
           php artisan migrate --force
