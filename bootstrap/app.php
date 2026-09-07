@@ -51,7 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     Route::patch('/{page}/toggle', [CmsController::class, 'togglePublication'])->name('toggle');
                 });
 
-            Route::middleware(['web', 'auth', 'permission:cms.view'])
+            Route::middleware(['web', 'auth', 'permission:website.view'])
                 ->prefix('admin/page-builder')->name('admin.page-builder.')
                 ->group(function (): void {
                     Route::get('/', [CmsController::class, 'index'])->name('index');
@@ -95,7 +95,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
-            'webmail.auth' => WebmailAuth::class,
             'webmail.auth' => WebmailAuth::class,
         ]);
     })
