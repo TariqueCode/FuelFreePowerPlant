@@ -4,7 +4,7 @@
   const template = document.getElementById('ff-global-cms-editor-template');
   const sections = document.getElementById('npb-sections');
   const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-  const uploadUrl = @json(route('admin.cms.media'));
+  const uploadUrl = @json(route('admin.site-content.media'));
   if (!template || !sections) return;
   const states = new WeakMap(); const allStates = new Set();
   const escAttr = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
