@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\CmsPage;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
@@ -12,6 +13,8 @@ use Tests\TestCase;
 
 class PageBuilderEditorTest extends TestCase
 {
+    use RefreshDatabase;
+
     private function user(): User
     {
         $permissions = collect([
@@ -48,22 +51,21 @@ class PageBuilderEditorTest extends TestCase
             ->assertSee('Table', false);
     }
 
-    public function test_page_builder_saves_rich_text_editor_content(): void
+    public function test_page_builder_saves_canonical_rich_text_editor_content(): void
     {
         $response = $this->actingAs($this->user())->post(route('admin.cms.store'), [
             'title' => 'Global Editor QA',
             'slug' => 'global-editor-qa',
             'excerpt' => 'Editor persistence check.',
-            'builder_blocks' => json_encode([
-                ['type' => 'rich_text', 'title' => 'Formatted content', 'content' => '<p><strong>Bold</strong> editor content.</p>', 'tone' => 'dark', 'align' => 'left', 'visible' => true],
-            ]),
+            'content' => '<p><strong>Bold</strong> editor content.</p>',
             'is_published' => '0',
         ]);
 
         $response->assertRedirect(route('admin.cms.index'));
         $this->assertDatabaseHas('cms_pages', ['slug' => 'global-editor-qa']);
-        $page = \App\Models\CmsPage::where('slug', 'global-editor-qa')->firstOrFail();
-        $this->assertSame('<p><strong>Bold</strong> editor content.</p>', $page->builder_blocks[0]['content']);
+        $page = CmsPage::where('slug', 'global-editor-qa')->firstOrFail();
+        $this->assertSame('<p><strong>Bold</strong> editor content.</p>', $page->content);
+        $this->assertSame([], $page->builder_blocks);
         $this->assertTrue($page->use_global_framework);
         $this->assertTrue($page->use_global_header);
         $this->assertTrue($page->use_global_footer);
