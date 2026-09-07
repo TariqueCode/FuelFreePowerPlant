@@ -70,10 +70,8 @@ jobs:
 
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-
           ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
 
           ssh -i ~/.ssh/deploy_key \
@@ -100,18 +98,14 @@ jobs:
               echo "==> Composer not found; installing Composer locally"
               mkdir -p "$HOME/.local/bin"
               COMPOSER_INSTALLER="/tmp/composer-setup.php"
-
               curl -fsSL https://getcomposer.org/installer -o "$COMPOSER_INSTALLER"
-
               EXPECTED_CHECKSUM="$(curl -fsSL https://composer.github.io/installer.sig)"
               ACTUAL_CHECKSUM="$(php -r "echo hash_file('sha384', '$COMPOSER_INSTALLER');")"
-
               if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
                   echo "ERROR: Composer installer checksum verification failed."
                   rm -f "$COMPOSER_INSTALLER"
                   exit 1
               fi
-
               php "$COMPOSER_INSTALLER" --install-dir="$HOME/.local/bin" --filename=composer
               rm -f "$COMPOSER_INSTALLER"
               COMPOSER_BIN="$HOME/.local/bin/composer"
@@ -127,28 +121,33 @@ jobs:
 
           echo "==> Checking production PHP runtime"
           php -r 'if (PHP_VERSION_ID < 80400) { fwrite(STDERR, "ERROR: FuelFree PowerPlant requires PHP 8.4+ on production. Current: ".PHP_VERSION."\\n"); exit(1); }'
-          for ext in fileinfo mbstring sqlite3 pdo_sqlite; do
+          for ext in fileinfo mbstring; do
               if ! php -m | grep -qi "^$ext$"; then
                   echo "ERROR: Required PHP extension is missing: $ext"
                   exit 1
               fi
           done
 
-          echo "==> Enabling temporary SQLite recovery mode"
-          mkdir -p database
-          touch database/database.sqlite
-          chmod 660 database/database.sqlite
-          if [ ! -f .env ]; then
-              cp .env.example .env
-          fi
-          php -r '$p=".env"; $e=file_get_contents($p); $e=preg_replace("/^DB_CONNECTION=.*/m", "DB_CONNECTION=sqlite", $e); $e=preg_replace("/^DB_DATABASE=.*/m", "DB_DATABASE=/home/fuelfree/public_html/database/database.sqlite", $e); $e=preg_replace("/^DB_HOST=.*/m", "# DB_HOST=", $e); $e=preg_replace("/^DB_PORT=.*/m", "# DB_PORT=", $e); $e=preg_replace("/^DB_USERNAME=.*/m", "# DB_USERNAME=", $e); $e=preg_replace("/^DB_PASSWORD=.*/m", "# DB_PASSWORD=", $e); $e=preg_replace("/^SESSION_DRIVER=.*/m", "SESSION_DRIVER=file", $e); $e=preg_replace("/^CACHE_STORE=.*/m", "CACHE_STORE=file", $e); $e=preg_replace("/^QUEUE_CONNECTION=.*/m", "QUEUE_CONNECTION=sync", $e); file_put_contents($p,$e);'
+          echo "==> Verifying runtime files"
+          test -f .env
+          test -f artisan
 
           echo "==> Installing PHP dependencies"
           "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts
 
-          echo "==> Preparing empty SQLite schema"
+          echo "==> Refreshing Laravel caches before database checks"
           php artisan optimize:clear
+
+          echo "==> Checking production database connectivity"
+          if ! php artisan db:show >/tmp/fuelfree-db-check.log 2>&1; then
+              cat /tmp/fuelfree-db-check.log
+              echo "ERROR: Production database is unavailable. Deployment stopped before migrations/caches."
+              exit 1
+          fi
+
+          echo "==> Running production migrations"
           php artisan migrate --force
+          php artisan migrate:status
 
           echo "==> Refreshing Laravel package discovery"
           php artisan package:discover --ansi
@@ -181,7 +180,7 @@ jobs:
           echo "==> Verifying Laravel application boot"
           php artisan about >/dev/null
 
-          echo "==> Temporary SQLite deployment complete"
+          echo "==> Deployment complete"
           REMOTE
 
           rm -f ~/.ssh/deploy_key
