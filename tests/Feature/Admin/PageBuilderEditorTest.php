@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class PageBuilderEditorTest extends TestCase
 {
-    use RefreshDatabase;
-
     private function user(): User
     {
         $permissions = collect([
@@ -52,9 +50,7 @@ class PageBuilderEditorTest extends TestCase
 
     public function test_page_builder_saves_rich_text_editor_content(): void
     {
-        $user = $this->user();
-
-        $response = $this->actingAs($user)->post(route('admin.cms.store'), [
+        $response = $this->actingAs($this->user())->post(route('admin.cms.store'), [
             'title' => 'Global Editor QA',
             'slug' => 'global-editor-qa',
             'excerpt' => 'Editor persistence check.',
@@ -76,13 +72,12 @@ class PageBuilderEditorTest extends TestCase
     public function test_global_editor_media_upload_endpoint_accepts_image(): void
     {
         Storage::fake('public');
-        $user = $this->user();
 
-        $response = $this->actingAs($user)->post(route('admin.site-content.media'), [
+        $response = $this->actingAs($this->user())->post(route('admin.site-content.media'), [
             'media' => UploadedFile::fake()->image('editor-image.jpg', 640, 480),
         ]);
 
         $response->assertOk()->assertJsonStructure(['url', 'mime', 'name']);
-        Storage::disk('public')->assertExists('site-content/media/'.$response->json('name'));
+        $this->assertCount(1, Storage::disk('public')->allFiles('site-content/media'));
     }
 }
