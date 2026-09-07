@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CmsPage;
 use App\Models\SiteContentItem;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -36,8 +36,7 @@ class CmsController extends Controller
                 return $page;
             });
 
-        $allPages = $pageBuilder
-            ->concat($websitePages)
+        $allPages = $pageBuilder->concat($websitePages)
             ->sortByDesc(fn ($page) => $page->updated_at?->timestamp ?? 0)
             ->values();
 
@@ -62,9 +61,10 @@ class CmsController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validatePage($request);
-        $this->guardPublishing($request, $data['is_published'] ?? false);
+        $this->guardPublishing($request, $data['is_published']);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title']);
         CmsPage::create($data);
+
         return redirect()->route('admin.page-builder.index')->with('status', 'Page created successfully.');
     }
 
@@ -76,9 +76,10 @@ class CmsController extends Controller
     public function update(Request $request, CmsPage $page): RedirectResponse
     {
         $data = $this->validatePage($request);
-        $this->guardPublishing($request, $data['is_published'] ?? false);
+        $this->guardPublishing($request, $data['is_published']);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title'], $page->id);
         $page->update($data);
+
         return redirect()->route('admin.page-builder.index')->with('status', 'Page updated successfully.');
     }
 
@@ -87,6 +88,7 @@ class CmsController extends Controller
         abort_unless($request->user()->hasPermission('cms.publish'), 403, 'Publishing pages requires publishing permission.');
         $page->is_published = ! $page->is_published;
         $page->save();
+
         return redirect()->route('admin.page-builder.index')->with('status', $page->is_published ? 'Page activated successfully.' : 'Page deactivated successfully.');
     }
 
@@ -102,7 +104,11 @@ class CmsController extends Controller
         $copy->title = Str::limit($page->title.' Copy', 180, '');
         $copy->slug = $this->uniqueSlug($page->slug.'-copy');
         $copy->is_published = false;
+        $copy->use_global_framework = true;
+        $copy->use_global_header = true;
+        $copy->use_global_footer = true;
         $copy->save();
+
         return redirect()->route('admin.page-builder.edit', $copy)->with('status', 'Draft copy created.');
     }
 
@@ -113,31 +119,69 @@ class CmsController extends Controller
             $decoded = json_decode($rawBlocks, true);
             $request->merge(['builder_blocks' => is_array($decoded) ? $decoded : []]);
         }
-        return $request->validate([
+
+        $data = $request->validate([
             'title' => ['required', 'string', 'max:180'],
             'slug' => ['nullable', 'string', 'max:180', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
             'excerpt' => ['nullable', 'string', 'max:1000'],
             'content' => ['nullable', 'string'],
             'template' => ['nullable', 'string', 'max:80'],
             'builder_blocks' => ['nullable', 'array'],
+            'builder_blocks.*' => ['array'],
             'builder_blocks.*.type' => ['required', 'string', 'max:40'],
+            'builder_blocks.*.eyebrow' => ['nullable', 'string', 'max:120'],
             'builder_blocks.*.title' => ['nullable', 'string', 'max:180'],
-            'builder_blocks.*.content' => ['nullable', 'string'],
-            'builder_blocks.*.image' => ['nullable', 'string', 'max:1000'],
-            'builder_blocks.*.url' => ['nullable', 'string', 'max:1000'],
+            'builder_blocks.*.content' => ['nullable', 'string', 'max:20000'],
+            'builder_blocks.*.image' => ['nullable', 'string', 'max:2000'],
+            'builder_blocks.*.image_alt' => ['nullable', 'string', 'max:255'],
+            'builder_blocks.*.url' => ['nullable', 'string', 'max:2000'],
+            'builder_blocks.*.button_text' => ['nullable', 'string', 'max:120'],
+            'builder_blocks.*.button_url' => ['nullable', 'string', 'max:2000'],
+            'builder_blocks.*.layout' => ['nullable', 'string', 'max:40'],
+            'builder_blocks.*.tone' => ['nullable', 'string', 'max:30'],
+            'builder_blocks.*.align' => ['nullable', 'string', 'max:30'],
+            'builder_blocks.*.columns' => ['nullable', 'integer', 'between:2,4'],
             'builder_blocks.*.visible' => ['nullable', 'boolean'],
+            'builder_blocks.*.items' => ['nullable', 'array', 'max:12'],
+            'builder_blocks.*.items.*' => ['array'],
+            'builder_blocks.*.items.*.title' => ['nullable', 'string', 'max:180'],
+            'builder_blocks.*.items.*.content' => ['nullable', 'string', 'max:2000'],
+            'builder_blocks.*.items.*.value' => ['nullable', 'string', 'max:80'],
+            'builder_blocks.*.items.*.label' => ['nullable', 'string', 'max:180'],
+            'builder_blocks.*.items.*.image' => ['nullable', 'string', 'max:2000'],
+            'builder_blocks.*.items.*.url' => ['nullable', 'string', 'max:2000'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:1000'],
             'is_published' => ['nullable', 'boolean'],
-            'use_global_framework' => ['nullable', 'boolean'],
-            'use_global_header' => ['nullable', 'boolean'],
-            'use_global_footer' => ['nullable', 'boolean'],
-        ]) + [
-            'is_published' => $request->boolean('is_published'),
-            'use_global_framework' => $request->boolean('use_global_framework'),
-            'use_global_header' => $request->boolean('use_global_header'),
-            'use_global_footer' => $request->boolean('use_global_footer'),
-        ];
+        ]);
+
+        // Framework-first by design: page content inherits the live global shell.
+        $data['use_global_framework'] = true;
+        $data['use_global_header'] = true;
+        $data['use_global_footer'] = true;
+        $data['is_published'] = $request->boolean('is_published');
+        $data['builder_blocks'] = $this->normalizeBlocks($data['builder_blocks'] ?? []);
+
+        return $data;
+    }
+
+    private function normalizeBlocks(array $blocks): array
+    {
+        $allowedTypes = ['hero', 'rich_text', 'image', 'split', 'cards', 'stats', 'cta', 'video', 'divider'];
+
+        return collect($blocks)
+            ->filter(fn ($block) => is_array($block) && in_array($block['type'] ?? null, $allowedTypes, true))
+            ->map(function (array $block): array {
+                $block['visible'] = array_key_exists('visible', $block) ? (bool) $block['visible'] : true;
+                $block['tone'] = in_array($block['tone'] ?? null, ['dark', 'accent', 'light'], true) ? $block['tone'] : 'dark';
+                $block['align'] = in_array($block['align'] ?? null, ['left', 'center', 'right'], true) ? $block['align'] : 'left';
+                if (isset($block['items']) && is_array($block['items'])) {
+                    $block['items'] = array_values(array_filter($block['items'], 'is_array'));
+                }
+                return $block;
+            })
+            ->values()
+            ->all();
     }
 
     private function guardPublishing(Request $request, bool $publishing): void
