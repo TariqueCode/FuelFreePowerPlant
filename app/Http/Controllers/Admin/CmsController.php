@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CmsPage;
-use App\Models\SiteContentItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -15,40 +14,10 @@ class CmsController extends Controller
 {
     public function index(Request $request): View
     {
-        $pageBuilder = CmsPage::query()->get()->map(function (CmsPage $page) {
-            $page->content_source = 'Page Builder';
-            $page->edit_url = route('admin.page-builder.edit', $page);
-            $page->toggle_url = route('admin.page-builder.toggle', $page);
-            $page->delete_url = route('admin.page-builder.destroy', $page);
-            $page->duplicate_url = route('admin.page-builder.duplicate', $page);
-            return $page;
-        });
-
-        $websitePages = SiteContentItem::query()
-            ->whereIn('type', ['company', 'plants', 'future-project', 'solution'])
-            ->get()
-            ->map(function (SiteContentItem $page) {
-                $page->content_source = 'Website Content';
-                $page->edit_url = route('admin.site-content.edit', $page);
-                $page->toggle_url = route('admin.site-content.page.toggle', $page);
-                $page->delete_url = route('admin.site-content.destroy', $page);
-                $page->duplicate_url = null;
-                return $page;
-            });
-
-        $allPages = $pageBuilder->concat($websitePages)
-            ->sortByDesc(fn ($page) => $page->updated_at?->timestamp ?? 0)
-            ->values();
-
+        $allPages = CmsPage::query()->latest('updated_at')->get()->values();
         $perPage = 15;
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $pages = new LengthAwarePaginator(
-            $allPages->forPage($currentPage, $perPage)->values(),
-            $allPages->count(),
-            $perPage,
-            $currentPage,
-            ['path' => $request->url(), 'query' => $request->query()]
-        );
+        $pages = new LengthAwarePaginator($allPages->forPage($currentPage, $perPage)->values(), $allPages->count(), $perPage, $currentPage, ['path' => $request->url(), 'query' => $request->query()]);
 
         return view('admin.cms.index', ['pages' => $pages]);
     }
@@ -64,8 +33,7 @@ class CmsController extends Controller
         $this->guardPublishing($request, $data['is_published']);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title']);
         CmsPage::create($data);
-
-        return redirect()->route('admin.page-builder.index')->with('status', 'Page created successfully.');
+        return redirect()->route('admin.cms.index')->with('status', 'Page created successfully.');
     }
 
     public function edit(CmsPage $page): View
@@ -79,17 +47,14 @@ class CmsController extends Controller
         $this->guardPublishing($request, $data['is_published']);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title'], $page->id);
         $page->update($data);
-
-        return redirect()->route('admin.page-builder.index')->with('status', 'Page updated successfully.');
+        return redirect()->route('admin.cms.index')->with('status', 'Page updated successfully.');
     }
 
     public function togglePublication(Request $request, CmsPage $page): RedirectResponse
     {
         abort_unless($request->user()->hasPermission('cms.publish'), 403, 'Publishing pages requires publishing permission.');
-        $page->is_published = ! $page->is_published;
-        $page->save();
-
-        return redirect()->route('admin.page-builder.index')->with('status', $page->is_published ? 'Page activated successfully.' : 'Page deactivated successfully.');
+        $page->update(['is_published' => ! $page->is_published]);
+        return redirect()->route('admin.cms.index')->with('status', $page->is_published ? 'Page published successfully.' : 'Page unpublished successfully.');
     }
 
     public function destroy(CmsPage $page): RedirectResponse
@@ -108,8 +73,7 @@ class CmsController extends Controller
         $copy->use_global_header = true;
         $copy->use_global_footer = true;
         $copy->save();
-
-        return redirect()->route('admin.page-builder.edit', $copy)->with('status', 'Draft copy created.');
+        return redirect()->route('admin.cms.edit', $copy)->with('status', 'Draft copy created.');
     }
 
     private function validatePage(Request $request): array
@@ -155,33 +119,24 @@ class CmsController extends Controller
             'is_published' => ['nullable', 'boolean'],
         ]);
 
-        // Framework-first by design: page content inherits the live global shell.
         $data['use_global_framework'] = true;
         $data['use_global_header'] = true;
         $data['use_global_footer'] = true;
         $data['is_published'] = $request->boolean('is_published');
         $data['builder_blocks'] = $this->normalizeBlocks($data['builder_blocks'] ?? []);
-
         return $data;
     }
 
     private function normalizeBlocks(array $blocks): array
     {
         $allowedTypes = ['hero', 'rich_text', 'image', 'split', 'cards', 'stats', 'cta', 'video', 'divider'];
-
-        return collect($blocks)
-            ->filter(fn ($block) => is_array($block) && in_array($block['type'] ?? null, $allowedTypes, true))
-            ->map(function (array $block): array {
-                $block['visible'] = array_key_exists('visible', $block) ? (bool) $block['visible'] : true;
-                $block['tone'] = in_array($block['tone'] ?? null, ['dark', 'accent', 'light'], true) ? $block['tone'] : 'dark';
-                $block['align'] = in_array($block['align'] ?? null, ['left', 'center', 'right'], true) ? $block['align'] : 'left';
-                if (isset($block['items']) && is_array($block['items'])) {
-                    $block['items'] = array_values(array_filter($block['items'], 'is_array'));
-                }
-                return $block;
-            })
-            ->values()
-            ->all();
+        return collect($blocks)->filter(fn ($block) => is_array($block) && in_array($block['type'] ?? null, $allowedTypes, true))->map(function (array $block): array {
+            $block['visible'] = array_key_exists('visible', $block) ? (bool) $block['visible'] : true;
+            $block['tone'] = in_array($block['tone'] ?? null, ['dark', 'accent', 'light'], true) ? $block['tone'] : 'dark';
+            $block['align'] = in_array($block['align'] ?? null, ['left', 'center', 'right'], true) ? $block['align'] : 'left';
+            if (isset($block['items']) && is_array($block['items'])) $block['items'] = array_values(array_filter($block['items'], 'is_array'));
+            return $block;
+        })->values()->all();
     }
 
     private function guardPublishing(Request $request, bool $publishing): void
@@ -195,9 +150,7 @@ class CmsController extends Controller
         abort_if($base === '', 422, 'A valid page slug could not be generated.');
         $slug = $base;
         $counter = 2;
-        while (CmsPage::where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
-            $slug = $base.'-'.$counter++;
-        }
+        while (CmsPage::where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) $slug = $base.'-'.$counter++;
         return $slug;
     }
 }
