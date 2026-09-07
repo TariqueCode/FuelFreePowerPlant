@@ -41,7 +41,7 @@ class ContentPagesIndexTest extends TestCase
         return $user;
     }
 
-    public function test_content_pages_uses_card_management_with_only_publish_and_delete_actions(): void
+    public function test_content_pages_uses_card_management_with_edit_publish_and_delete_actions(): void
     {
         $user = $this->adminUser();
 
@@ -62,19 +62,19 @@ class ContentPagesIndexTest extends TestCase
             'status' => 'published',
         ]);
 
-        $response = $this->actingAs($user)->get(route('admin.page-builder.index'));
+        $response = $this->actingAs($user)->get(route('admin.cms.index'));
 
         $response->assertOk()
             ->assertSee('Future Projects')
             ->assertSee('About Us')
-            ->assertSee(route('admin.page-builder.edit', $cms), false)
+            ->assertSee(route('admin.cms.edit', $cms), false)
             ->assertSee(route('admin.site-content.edit', $company), false)
-            ->assertSee(route('admin.page-builder.toggle', $cms), false)
+            ->assertSee(route('admin.cms.toggle', $cms), false)
             ->assertSee(route('admin.site-content.page.toggle', $company), false)
-            ->assertSee(route('admin.page-builder.destroy', $cms), false)
+            ->assertSee(route('admin.cms.destroy', $cms), false)
             ->assertSee(route('admin.site-content.destroy', $company), false)
-            ->assertDontSee('Duplicate')
-            ->assertDontSee('> Edit <');
+            ->assertSee('Edit')
+            ->assertDontSee('Duplicate');
     }
 
     public function test_legacy_resources_surface_is_removed(): void
@@ -94,7 +94,7 @@ class ContentPagesIndexTest extends TestCase
             ->assertNotFound();
 
         $this->actingAs($user)
-            ->get(route('admin.page-builder.index'))
+            ->get(route('admin.cms.index'))
             ->assertOk()
             ->assertDontSee('Resources CMS')
             ->assertDontSee('Resources');
