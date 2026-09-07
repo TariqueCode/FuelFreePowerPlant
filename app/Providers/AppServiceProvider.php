@@ -50,8 +50,14 @@ class AppServiceProvider extends ServiceProvider
             $router->fallback([PublicManagementController::class,'folderFallback'])->name('management.folder');
         });
 
-        if(!Schema::hasTable('system_settings')) return;
-        $settings=Cache::rememberForever('fuelfree.system_settings',fn()=>SystemSetting::query()->pluck('value','key')->all());
+        // System settings are optional during first boot/recovery. Never let an
+        // unavailable database prevent Artisan package discovery or application boot.
+        try {
+            if(!Schema::hasTable('system_settings')) return;
+            $settings=Cache::rememberForever('fuelfree.system_settings',fn()=>SystemSetting::query()->pluck('value','key')->all());
+        } catch (\Throwable $e) {
+            return;
+        }
         if(array_key_exists('company.name',$settings))config(['fuelfree.company.name'=>$settings['company.name']]);
         if(array_key_exists('company.domain',$settings))config(['fuelfree.company.domain'=>$settings['company.domain']]);
         if(array_key_exists('company.tagline',$settings))config(['fuelfree.company.tagline'=>$settings['company.tagline']]);
