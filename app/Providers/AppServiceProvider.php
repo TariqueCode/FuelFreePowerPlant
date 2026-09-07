@@ -51,7 +51,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // System settings are optional during first boot/recovery. Never let an
-        // unavailable database prevent Artisan package discovery or application boot.
+        // unavailable database prevent Artisan commands or application boot.
         try {
             if(!Schema::hasTable('system_settings')) return;
             $settings=Cache::rememberForever('fuelfree.system_settings',fn()=>SystemSetting::query()->pluck('value','key')->all());
