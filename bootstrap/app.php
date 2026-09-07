@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\ManagementController;
 use App\Http\Controllers\Admin\NavigationMenuController;
 use App\Http\Middleware\HomeAnnouncementPopup;
@@ -31,42 +30,6 @@ return Application::configure(basePath: dirname(__DIR__))
                     Route::patch('/{member}/toggle', [ManagementController::class, 'toggle'])->name('toggle');
                     Route::delete('/{member}', [ManagementController::class, 'destroy'])->name('destroy');
                     Route::post('/reorder', [ManagementController::class, 'reorder'])->name('reorder');
-                });
-
-            Route::middleware(['web', 'auth', 'permission:cms.view'])
-                ->prefix('admin/cms')->name('admin.cms.')
-                ->group(function (): void {
-                    Route::get('/', [CmsController::class, 'index'])->name('index');
-                    Route::get('/create', [CmsController::class, 'create'])->name('create');
-                    Route::get('/{page}/edit', [CmsController::class, 'edit'])->name('edit');
-                    Route::post('/', [CmsController::class, 'store'])->name('store');
-                    Route::patch('/{page}', [CmsController::class, 'update'])->name('update');
-                    Route::delete('/{page}', [CmsController::class, 'destroy'])->name('destroy');
-                    Route::post('/{page}/duplicate', [CmsController::class, 'duplicate'])->name('duplicate');
-                });
-
-            Route::middleware(['web', 'auth', 'permission:cms.publish'])
-                ->prefix('admin/cms')->name('admin.cms.')
-                ->group(function (): void {
-                    Route::patch('/{page}/toggle', [CmsController::class, 'togglePublication'])->name('toggle');
-                });
-
-            Route::middleware(['web', 'auth', 'permission:website.view'])
-                ->prefix('admin/page-builder')->name('admin.page-builder.')
-                ->group(function (): void {
-                    Route::get('/', [CmsController::class, 'index'])->name('index');
-                    Route::get('/create', [CmsController::class, 'create'])->name('create');
-                    Route::get('/{page}/edit', [CmsController::class, 'edit'])->name('edit');
-                    Route::post('/', [CmsController::class, 'store'])->name('store');
-                    Route::patch('/{page}', [CmsController::class, 'update'])->name('update');
-                    Route::delete('/{page}', [CmsController::class, 'destroy'])->name('destroy');
-                    Route::post('/{page}/duplicate', [CmsController::class, 'duplicate'])->name('duplicate');
-                });
-
-            Route::middleware(['web', 'auth', 'permission:cms.publish'])
-                ->prefix('admin/page-builder')->name('admin.page-builder.')
-                ->group(function (): void {
-                    Route::patch('/{page}/toggle', [CmsController::class, 'togglePublication'])->name('toggle');
                 });
 
             Route::middleware(['web', 'auth', 'permission:website.view'])
