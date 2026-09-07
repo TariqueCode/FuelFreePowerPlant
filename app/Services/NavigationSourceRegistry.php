@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\CmsPage;
 use App\Models\NavigationMenuItem;
-use App\Models\SiteContentItem;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route as RouteFacade;
@@ -17,7 +16,7 @@ class NavigationSourceRegistry
         'career.store', 'career.chunks', 'contact.store', 'cms.page', 'gallery.show',
         'news.show', 'projects.show', 'documents.shared-download', 'webmail.redirect',
         'resources.index', 'resources.show', 'resources.download',
-        'site.plants', 'site.future-project', 'sustainability',
+        'site.plants', 'site.future-project', 'site.solutions', 'sustainability',
     ];
 
     private const BUILDER_ROUTE_ALIASES = [
@@ -46,26 +45,7 @@ class NavigationSourceRegistry
                 ])
             : collect();
 
-        $companyPages = $area === 'public'
-            ? SiteContentItem::query()
-                ->where('type', 'company')
-                ->where('status', 'published')
-                ->where('slug', '!=', 'about-us')
-                ->orderBy('title')
-                ->get(['id', 'title', 'slug'])
-                ->map(fn (SiteContentItem $page): array => [
-                    'key' => 'site_content:'.$page->id,
-                    'type' => 'site_content',
-                    'label' => (string) $page->title,
-                    'url' => route('company.page', ['slug' => $page->slug]),
-                    'route_name' => 'company.page',
-                    'area' => 'public',
-                    'permission' => null,
-                    'meta' => ['site_content_id' => $page->id, 'slug' => $page->slug, 'type' => $page->type],
-                ])
-            : collect();
-
-        return $routes->concat($cms)->concat($companyPages)
+        return $routes->concat($cms)
             ->reject(fn (array $source): bool => $used->contains($source['key']))
             ->reject(fn (array $source): bool => ! $this->isUsableNavigationLabel($source['label']))
             ->sortBy(fn (array $source): string => mb_strtolower($source['label']))->values();
@@ -113,19 +93,6 @@ class NavigationSourceRegistry
             }
         }
 
-        if (Str::startsWith($key, 'site_content:') && $area === 'public') {
-            $id = (int) Str::after($key, 'site_content:');
-            $page = SiteContentItem::query()
-                ->whereKey($id)
-                ->where('type', 'company')
-                ->where('status', 'published')
-                ->first();
-            if ($page && $page->slug !== 'about-us' && $this->isUsableNavigationLabel((string) $page->title)) {
-                return ['key' => $key, 'type' => 'site_content', 'label' => (string) $page->title,
-                    'url' => route('company.page', ['slug' => $page->slug]), 'route_name' => 'company.page', 'area' => $area, 'permission' => null,
-                    'meta' => ['site_content_id' => $page->id, 'slug' => $page->slug, 'type' => $page->type]];
-            }
-        }
         return null;
     }
 
