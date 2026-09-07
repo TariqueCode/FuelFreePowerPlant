@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CmsPage;
+use App\Models\SiteContentItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -14,10 +15,40 @@ class CmsController extends Controller
 {
     public function index(Request $request): View
     {
-        $allPages = CmsPage::query()->latest('updated_at')->get()->values();
+        $pageBuilder = CmsPage::query()->get()->map(function (CmsPage $page) {
+            $page->content_source = 'Page Builder';
+            $page->edit_url = route('admin.page-builder.edit', $page);
+            $page->toggle_url = route('admin.page-builder.toggle', $page);
+            $page->delete_url = route('admin.page-builder.destroy', $page);
+            $page->duplicate_url = route('admin.page-builder.duplicate', $page);
+            return $page;
+        });
+
+        $websitePages = SiteContentItem::query()
+            ->whereIn('type', ['company', 'plants', 'future-project', 'solution'])
+            ->get()
+            ->map(function (SiteContentItem $page) {
+                $page->content_source = 'Website Content';
+                $page->edit_url = route('admin.site-content.edit', $page);
+                $page->toggle_url = route('admin.site-content.page.toggle', $page);
+                $page->delete_url = route('admin.site-content.destroy', $page);
+                $page->duplicate_url = null;
+                return $page;
+            });
+
+        $allPages = $pageBuilder->concat($websitePages)
+            ->sortByDesc(fn ($page) => $page->updated_at?->timestamp ?? 0)
+            ->values();
+
         $perPage = 15;
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $pages = new LengthAwarePaginator($allPages->forPage($currentPage, $perPage)->values(), $allPages->count(), $perPage, $currentPage, ['path' => $request->url(), 'query' => $request->query()]);
+        $pages = new LengthAwarePaginator(
+            $allPages->forPage($currentPage, $perPage)->values(),
+            $allPages->count(),
+            $perPage,
+            $currentPage,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
 
         return view('admin.cms.index', ['pages' => $pages]);
     }
@@ -33,7 +64,7 @@ class CmsController extends Controller
         $this->guardPublishing($request, $data['is_published']);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title']);
         CmsPage::create($data);
-        return redirect()->route('admin.cms.index')->with('status', 'Page created successfully.');
+        return redirect()->route('admin.page-builder.index')->with('status', 'Page created successfully.');
     }
 
     public function edit(CmsPage $page): View
@@ -47,14 +78,14 @@ class CmsController extends Controller
         $this->guardPublishing($request, $data['is_published']);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title'], $page->id);
         $page->update($data);
-        return redirect()->route('admin.cms.index')->with('status', 'Page updated successfully.');
+        return redirect()->route('admin.page-builder.index')->with('status', 'Page updated successfully.');
     }
 
     public function togglePublication(Request $request, CmsPage $page): RedirectResponse
     {
         abort_unless($request->user()->hasPermission('cms.publish'), 403, 'Publishing pages requires publishing permission.');
         $page->update(['is_published' => ! $page->is_published]);
-        return redirect()->route('admin.cms.index')->with('status', $page->is_published ? 'Page published successfully.' : 'Page unpublished successfully.');
+        return redirect()->route('admin.page-builder.index')->with('status', $page->is_published ? 'Page published successfully.' : 'Page unpublished successfully.');
     }
 
     public function destroy(CmsPage $page): RedirectResponse
@@ -73,7 +104,7 @@ class CmsController extends Controller
         $copy->use_global_header = true;
         $copy->use_global_footer = true;
         $copy->save();
-        return redirect()->route('admin.cms.edit', $copy)->with('status', 'Draft copy created.');
+        return redirect()->route('admin.page-builder.edit', $copy)->with('status', 'Draft copy created.');
     }
 
     private function validatePage(Request $request): array
