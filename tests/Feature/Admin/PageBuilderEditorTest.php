@@ -31,9 +31,20 @@ class PageBuilderEditorTest extends TestCase
         return $user;
     }
 
+    private function diagnose(string $label, $response): void
+    {
+        $route = request()->route();
+        file_put_contents(
+            base_path('feature-diagnostic.log'),
+            "\n=== {$label} ===\nstatus=".$response->status()."\nroute=".($route?->getName() ?? 'none')."\naction=".($route?->getActionName() ?? 'none')."\nbody=".substr($response->getContent(), 0, 12000)."\n",
+            FILE_APPEND
+        );
+    }
+
     public function test_page_builder_exposes_global_cms_editor_tool_surface(): void
     {
         $response = $this->actingAs($this->user())->get(route('admin.cms.create'));
+        $this->diagnose(__FUNCTION__, $response);
 
         $response->assertOk()
             ->assertSee('Global CMS Editor', false)
@@ -60,6 +71,7 @@ class PageBuilderEditorTest extends TestCase
             'content' => '<p><strong>Bold</strong> editor content.</p>',
             'is_published' => '0',
         ]);
+        $this->diagnose(__FUNCTION__, $response);
 
         $response->assertRedirect(route('admin.cms.index'));
         $this->assertDatabaseHas('cms_pages', ['slug' => 'global-editor-qa']);
@@ -78,6 +90,7 @@ class PageBuilderEditorTest extends TestCase
         $response = $this->actingAs($this->user())->post(route('admin.site-content.media'), [
             'media' => UploadedFile::fake()->image('editor-image.jpg', 640, 480),
         ]);
+        $this->diagnose(__FUNCTION__, $response);
 
         $response->assertOk()->assertJsonStructure(['url', 'mime', 'name']);
         $this->assertCount(1, Storage::disk('public')->allFiles('site-content/media'));
