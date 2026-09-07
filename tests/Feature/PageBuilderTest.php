@@ -15,6 +15,7 @@ class PageBuilderTest extends TestCase
         $page = CmsPage::create([
             'title' => 'Builder QA Page',
             'slug' => 'builder-qa-page',
+            'content' => 'Builder QA content',
             'excerpt' => 'A page-builder rendering check.',
             'is_published' => true,
             'builder_blocks' => [
@@ -42,6 +43,7 @@ class PageBuilderTest extends TestCase
         $page = CmsPage::create([
             'title' => 'Draft Page',
             'slug' => 'draft-page',
+            'content' => 'Draft content',
             'is_published' => false,
             'builder_blocks' => [],
         ]);
