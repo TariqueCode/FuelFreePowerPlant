@@ -108,6 +108,7 @@ class NavigationSourceRegistry
         if ($this->isNavigationBuilderRoute($name)) return false;
         if (str_contains($uri, '{') || in_array($name, self::EXCLUDED_ROUTE_NAMES, true)) return false;
         if ($uri === 'resources' || Str::startsWith($uri, 'resources/')) return false;
+        if (Str::startsWith($uri, 'admin/site-content')) return false;
         $middleware = collect($route->gatherMiddleware())->map(fn ($value): string => (string) $value);
         if ($area === 'public') {
             if ($route->getDomain() !== null) return false;
