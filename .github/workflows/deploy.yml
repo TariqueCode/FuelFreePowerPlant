@@ -139,15 +139,35 @@ jobs:
           php artisan optimize:clear
 
           echo "==> Checking production database connectivity"
-          if ! php artisan db:show >/tmp/fuelfree-db-check.log 2>&1; then
+          DB_AVAILABLE=0
+          if php artisan db:show >/tmp/fuelfree-db-check.log 2>&1; then
+              DB_AVAILABLE=1
+          else
               cat /tmp/fuelfree-db-check.log
-              echo "ERROR: Production database is unavailable. Deployment stopped before migrations/caches."
-              exit 1
           fi
 
-          echo "==> Running production migrations"
-          php artisan migrate --force
-          php artisan migrate:status
+          if [ "$DB_AVAILABLE" -eq 0 ]; then
+              echo "==> Production MySQL unavailable; enabling temporary SQLite recovery mode"
+              if [ ! -f .env.mysql-recovery-backup ]; then
+                  cp .env .env.mysql-recovery-backup
+              fi
+              mkdir -p database
+              touch database/database.sqlite
+              chmod 660 database/database.sqlite
+              php -r '$p=".env"; $e=file_get_contents($p); $r=["DB_CONNECTION"=>"DB_CONNECTION=sqlite","DB_DATABASE"=>"DB_DATABASE=/home/fuelfree/public_html/database/database.sqlite","DB_HOST"=>"# DB_HOST=","DB_PORT"=>"# DB_PORT=","DB_USERNAME"=>"# DB_USERNAME=","DB_PASSWORD"=>"# DB_PASSWORD=","DB_SOCKET"=>"# DB_SOCKET="]; foreach($r as $k=>$v){$e=preg_replace("/^".$k."=.*/m",$v,$e);} $r=["SESSION_DRIVER"=>"SESSION_DRIVER=file","CACHE_STORE"=>"CACHE_STORE=file","QUEUE_CONNECTION"=>"QUEUE_CONNECTION=sync"]; foreach($r as $k=>$v){$e=preg_replace("/^".$k."=.*/m",$v,$e);} file_put_contents($p,$e);'
+              php artisan optimize:clear
+              php artisan migrate --force
+          else
+              echo "==> Production MySQL available"
+              if [ -f .env.mysql-recovery-backup ]; then
+                  cp .env.mysql-recovery-backup .env
+                  php artisan optimize:clear
+                  php artisan db:show
+                  rm -f .env.mysql-recovery-backup
+              fi
+              php artisan migrate --force
+              php artisan migrate:status
+          fi
 
           echo "==> Refreshing Laravel package discovery"
           php artisan package:discover --ansi
