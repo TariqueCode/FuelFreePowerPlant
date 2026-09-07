@@ -34,11 +34,7 @@ class PageBuilderEditorTest extends TestCase
     private function diagnose(string $label, $response): void
     {
         $route = request()->route();
-        file_put_contents(
-            base_path('feature-diagnostic.log'),
-            "\n=== {$label} ===\nstatus=".$response->status()."\nroute=".($route?->getName() ?? 'none')."\naction=".($route?->getActionName() ?? 'none')."\nbody=".substr($response->getContent(), 0, 12000)."\n",
-            FILE_APPEND
-        );
+        fwrite(STDERR, "\n=== {$label} ===\nstatus=".$response->status()."\nroute=".($route?->getName() ?? 'none')."\naction=".($route?->getActionName() ?? 'none')."\nbody=".substr($response->getContent(), 0, 16000)."\n=== END ===\n");
     }
 
     public function test_page_builder_exposes_global_cms_editor_tool_surface(): void
