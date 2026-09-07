@@ -34,7 +34,8 @@ class PageBuilderEditorTest extends TestCase
     private function diagnose(string $label, $response): void
     {
         $route = request()->route();
-        fwrite(STDERR, "\n=== {$label} ===\nstatus=".$response->status()."\nroute=".($route?->getName() ?? 'none')."\naction=".($route?->getActionName() ?? 'none')."\nbody=".substr($response->getContent(), 0, 16000)."\n=== END ===\n");
+        $exceptions = collect($response->exceptions ?? [])->map(fn ($e) => get_class($e).' :: '.$e->getMessage().' @ '.$e->getFile().':'.$e->getLine())->implode("\n");
+        fwrite(STDERR, "\n=== {$label} ===\nstatus=".$response->status()."\nroute=".($route?->getName() ?? 'none')."\naction=".($route?->getActionName() ?? 'none')."\nexceptions=".($exceptions ?: 'none')."\nbody=".substr($response->getContent(), 0, 16000)."\n=== END ===\n");
     }
 
     public function test_page_builder_exposes_global_cms_editor_tool_surface(): void
