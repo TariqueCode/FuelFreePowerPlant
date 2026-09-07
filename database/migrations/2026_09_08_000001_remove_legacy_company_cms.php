@@ -10,6 +10,8 @@ return new class extends Migration
     {
         if (!Schema::hasTable('site_content_items')) return;
 
+        $legacyIds = DB::table('site_content_items')->where('type', 'company')->pluck('id');
+
         // Preserve legacy About Us content in the canonical Page Builder before
         // permanently removing the obsolete Company CMS records.
         if (Schema::hasTable('cms_pages')) {
@@ -28,18 +30,14 @@ return new class extends Migration
             }
         }
 
-        if (Schema::hasTable('navigation_menu_items')) {
-            DB::table('navigation_menu_items')->where(function ($query) {
+        if (Schema::hasTable('navigation_menu_items') && $legacyIds->isNotEmpty()) {
+            DB::table('navigation_menu_items')->where(function ($query) use ($legacyIds) {
                 $query->where('route_name', 'company.page')
-                    ->orWhere('source_key', 'like', 'site_content:%')
-                    ->orWhere(function ($nested) {
-                        $nested->where('source_type', 'site_content')
-                            ->where('url', 'like', '/company/%');
-                    });
+                    ->orWhereIn('source_key', $legacyIds->map(fn ($id) => 'site_content:'.$id)->all());
             })->delete();
         }
 
-        DB::table('site_content_items')->where('type', 'company')->delete();
+        DB::table('site_content_items')->whereIn('id', $legacyIds)->delete();
     }
 
     public function down(): void
