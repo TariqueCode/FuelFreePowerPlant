@@ -20,6 +20,16 @@ class DashboardNavigationService
 
         $valid = $items->filter(function (NavigationMenuItem $item) use ($registry): bool {
             if ($item->source_type === 'folder') return true;
+
+            // Manually entered links are valid dashboard destinations without a
+            // registry source. This keeps the dashboard navigation consistent
+            // with NavigationMenuController, which explicitly supports URL items.
+            if ($item->source_type === 'external_link') {
+                if (trim((string) $item->url) === '') return false;
+                if ($item->permission_key && ! auth()->user()->hasPermission($item->permission_key)) return false;
+                return true;
+            }
+
             if (! $item->source_key) return false;
             $source = $registry->resolveAny($item->source_key, 'dashboard');
             if (! $source) return false;
