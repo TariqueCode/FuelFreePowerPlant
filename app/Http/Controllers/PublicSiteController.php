@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CmsPage;
 use App\Models\SiteContentItem;
 use App\Models\SystemSetting;
 use Illuminate\View\View;
@@ -16,8 +17,8 @@ class PublicSiteController
 
     public function showCompanyPage(string $slug): View
     {
-        $item=SiteContentItem::query()->where('type','company')->where('status','published')->where('slug',$slug)->firstOrFail();
-        return view('site.company-page',['item'=>$item,'brand'=>$this->brand()]);
+        $page = CmsPage::query()->where('is_published', true)->where('slug', $slug)->firstOrFail();
+        return view('site.company-page',['item'=>$page,'brand'=>$this->brand()]);
     }
 
     public function show(string $section): View
@@ -26,7 +27,7 @@ class PublicSiteController
         $brand=$this->brand();
         if($section==='gallery'){$galleries=SiteContentItem::query()->where('type','gallery')->where('status','published')->withCount('galleryMedia')->orderBy('sort_order')->latest('created_at')->get();return view('gallery.index',compact('galleries','brand'));}
         if($section==='about-us'){
-            $aboutItem=SiteContentItem::published()->where('type','company')->where('slug','about-us')->firstOrFail();
+            $aboutItem=CmsPage::query()->where('slug','about-us')->where('is_published',true)->firstOrFail();
             return view('site.company-page',['item'=>$aboutItem,'brand'=>$brand,'backRoute'=>route('home'),'backLabel'=>'Back to Home']);
         }
         $items=collect();
@@ -40,19 +41,9 @@ class PublicSiteController
 
     public function showGallery(string $key): View
     {
-        $item=SiteContentItem::query()
-            ->where('type','gallery')
-            ->where(function($q) use ($key) {
-                $q->where('slug', $key);
-                if (ctype_digit($key)) {
-                    $q->orWhere('id', (int) $key);
-                }
-            })
-            ->firstOrFail();
-
+        $item=SiteContentItem::query()->where('type','gallery')->where(function($q) use ($key){$q->where('slug',$key);if(ctype_digit($key))$q->orWhere('id',(int)$key);})->firstOrFail();
         abort_unless($item->status==='published',404);
-        $brand=$this->brand();
-        $item->load('galleryMedia');
+        $brand=$this->brand();$item->load('galleryMedia');
         return view('gallery.show',compact('item','brand'));
     }
 }
