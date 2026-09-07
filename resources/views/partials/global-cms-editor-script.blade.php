@@ -1,14 +1,14 @@
 @push('scripts')
 <script>
 (() => {
+  if (window.__FF_GLOBAL_CMS_EDITOR__) return;
+  window.__FF_GLOBAL_CMS_EDITOR__ = true;
   const template = document.getElementById('ff-global-cms-editor-template');
   const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
   const uploadUrl = @json(route('admin.site-content.media'));
   if (!template) return;
-
-  const states = new WeakMap();
-  const allStates = new Set();
-  const escAttr = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  const states = new WeakMap(); const allStates = new Set();
+  const escAttr = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   const safeUrl = v => /^(javascript|data|vbscript):/i.test(String(v ?? '').trim()) ? '#' : String(v ?? '').trim() || '#';
   const blockOf = ed => { const s=window.getSelection(); let n=s?.anchorNode; if(!n||!ed.contains(n))return null; if(n.nodeType===3)n=n.parentElement; while(n&&n!==ed){if(/^(P|DIV|H[1-6]|BLOCKQUOTE|PRE|LI)$/.test(n.tagName))return n;n=n.parentElement} return null; };
   const saveSelection = st => {const s=window.getSelection();if(s?.rangeCount&&st.ed.contains(s.anchorNode))st.range=s.getRangeAt(0).cloneRange()};
@@ -19,15 +19,11 @@
   const exec = (st,cmd,value=null) => {restoreSelection(st);st.ed.focus();try{document.execCommand('styleWithCSS',false,true)}catch(e){}try{document.execCommand(cmd,false,value)}catch(e){}sync(st);buttons(st)};
   const insert = (st,html) => {restoreSelection(st);st.ed.focus();try{document.execCommand('insertHTML',false,html)}catch(e){st.ed.insertAdjacentHTML('beforeend',html)}sync(st)};
   const upload = async file => {const fd=new FormData();fd.append('media',file);const r=await fetch(uploadUrl,{method:'POST',headers:{'X-CSRF-TOKEN':csrf,'Accept':'application/json'},body:fd});if(!r.ok)throw new Error('Media upload failed for '+file.name);return r.json()};
-
   function init(root,textarea){
     if(states.has(textarea))return;
-    const st={root,ed:root.querySelector('.ff-editable'),textarea,range:null,source:false,selected:null};
-    if(!st.ed)return;
+    const st={root,ed:root.querySelector('.ff-editable'),textarea,range:null,source:false,selected:null}; if(!st.ed)return;
     states.set(textarea,st);allStates.add(st);st.ed.innerHTML=textarea.value||'';textarea.style.display='none';
-
-    // Preserve the current text selection before toolbar controls steal focus.
-    root.querySelectorAll('button, select, input[type="color"]').forEach(control=>control.addEventListener('mousedown',()=>saveSelection(st)));
+    root.querySelectorAll('button,select,input[type="color"]').forEach(c=>c.addEventListener('mousedown',()=>saveSelection(st)));
     root.querySelectorAll('[data-tab]').forEach(tab=>tab.addEventListener('click',()=>{root.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===tab));root.querySelectorAll('[data-panel]').forEach(p=>{const on=p.dataset.panel===tab.dataset.tab;p.classList.toggle('active',on);p.style.display=on?'flex':'none'});restoreSelection(st)}));
     root.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>exec(st,b.dataset.action)));
     root.querySelector('[data-format]')?.addEventListener('change',e=>exec(st,'formatBlock',e.target.value));root.querySelector('[data-font]')?.addEventListener('change',e=>exec(st,'fontName',e.target.value));root.querySelector('[data-size]')?.addEventListener('change',e=>exec(st,'fontSize',e.target.value));root.querySelector('[data-fore]')?.addEventListener('input',e=>exec(st,'foreColor',e.target.value));root.querySelector('[data-highlight]')?.addEventListener('input',e=>exec(st,'hiliteColor',e.target.value));
@@ -45,16 +41,12 @@
     root.querySelector('[data-view="preview"]')?.addEventListener('click',()=>{if(st.source)root.querySelector('[data-view="source"]').click();const w=window.open('','_blank','width=1100,height=800');if(!w)return;w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Content Preview</title><style>body{font:16px/1.75 Arial;max-width:900px;margin:40px auto;padding:0 20px;color:#17252d}img,video,iframe{max-width:100%;height:auto}table{width:100%;border-collapse:collapse}td,th{border:1px solid #ccc;padding:8px}</style></head><body>${st.ed.innerHTML}</body></html>`);w.document.close()});
     root.querySelector('[data-view="fullscreen"]')?.addEventListener('click',()=>{root.classList.toggle('ff-fullscreen');const i=root.querySelector('[data-view="fullscreen"] i');if(i)i.className=root.classList.contains('ff-fullscreen')?'fa-solid fa-compress':'fa-solid fa-expand'});
     st.ed.addEventListener('click',e=>{const img=e.target.closest?.('img');if(img&&st.ed.contains(img)){st.root.querySelectorAll('img.ff-selected').forEach(x=>x.classList.remove('ff-selected'));st.selected=img;img.classList.add('ff-selected');positionResize(st)}else{if(st.selected)st.selected.classList.remove('ff-selected');st.selected=null;hideResize(st)}});
-    ['input','keyup','mouseup','focus'].forEach(ev=>st.ed.addEventListener(ev,()=>{saveSelection(st);if(!st.source)sync(st);buttons(st)}));
-    status(st);buttons(st);
+    ['input','keyup','mouseup','focus'].forEach(ev=>st.ed.addEventListener(ev,()=>{saveSelection(st);if(!st.source)sync(st);buttons(st)})); status(st);buttons(st);
   }
   function hideResize(st){const h=st.root.querySelector('.ff-resize');if(h)h.style.display='none'}
   function positionResize(st){const h=st.root.querySelector('.ff-resize'),img=st.selected;if(!h||!img)return hideResize(st);const r=img.getBoundingClientRect();h.style.left=r.right+'px';h.style.top=r.bottom+'px';h.style.display='block'}
-
-  const enhance = () => document.querySelectorAll('textarea[data-global-cms-content]').forEach(textarea=>{if(states.has(textarea))return;const root=document.importNode(template.content,true).firstElementChild;textarea.parentElement.appendChild(root);init(root,textarea)});
-  enhance();
-  new MutationObserver(enhance).observe(document.body,{childList:true,subtree:true});
-  window.addEventListener('scroll',()=>allStates.forEach(st=>st.selected&&positionResize(st)),{passive:true});
+  function enhance(){document.querySelectorAll('.npb-section[data-type="rich_text"] textarea[data-field="content"],textarea[data-global-cms-content],textarea[data-cms-editor],textarea[name="content"]').forEach(textarea=>{if(states.has(textarea))return;const host=textarea.closest('.editor-shell')||textarea.parentElement;if(!host)return;const root=document.importNode(template.content,true).firstElementChild;if(host.classList.contains('editor-shell')){[...host.children].forEach(child=>{if(child!==textarea)child.remove()})}host.appendChild(root);init(root,textarea)})}
+  enhance(); new MutationObserver(enhance).observe(document.body,{childList:true,subtree:true}); window.addEventListener('scroll',()=>allStates.forEach(st=>st.selected&&positionResize(st)),{passive:true});
 })();
 </script>
 @endpush
