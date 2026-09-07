@@ -26,7 +26,7 @@ class CmsController extends Controller
         });
 
         $websitePages = SiteContentItem::query()
-            ->whereIn('type', ['company', 'plants', 'future-project', 'solution'])
+            ->whereIn('type', ['plants', 'future-project', 'solution'])
             ->get()
             ->map(function (SiteContentItem $page) {
                 $page->content_source = 'Website Content';
@@ -37,8 +37,7 @@ class CmsController extends Controller
                 return $page;
             });
 
-        $allPages = $pageBuilder
-            ->concat($websitePages)
+        $allPages = $pageBuilder->concat($websitePages)
             ->sortByDesc(fn ($page) => $page->updated_at?->timestamp ?? 0)
             ->values();
 
@@ -46,19 +45,14 @@ class CmsController extends Controller
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
         $pages = new LengthAwarePaginator(
             $allPages->forPage($currentPage, $perPage)->values(),
-            $allPages->count(),
-            $perPage,
-            $currentPage,
+            $allPages->count(), $perPage, $currentPage,
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
         return view('admin.cms.page-builder-index', ['pages' => $pages]);
     }
 
-    public function create(): View
-    {
-        return view('admin.cms.page-builder', ['page' => new CmsPage(), 'mode' => 'create']);
-    }
+    public function create(): View { return view('admin.cms.page-builder', ['page' => new CmsPage(), 'mode' => 'create']); }
 
     public function store(Request $request): RedirectResponse
     {
@@ -66,14 +60,10 @@ class CmsController extends Controller
         $this->guardPublishing($request, $data['is_published']);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title']);
         CmsPage::create($data);
-
         return redirect()->route('admin.cms.index')->with('status', 'Page created successfully.');
     }
 
-    public function edit(CmsPage $page): View
-    {
-        return view('admin.cms.page-builder', ['page' => $page, 'mode' => 'edit']);
-    }
+    public function edit(CmsPage $page): View { return view('admin.cms.page-builder', ['page' => $page, 'mode' => 'edit']); }
 
     public function update(Request $request, CmsPage $page): RedirectResponse
     {
@@ -81,7 +71,6 @@ class CmsController extends Controller
         $this->guardPublishing($request, $data['is_published']);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title'], $page->id);
         $page->update($data);
-
         return redirect()->route('admin.cms.index')->with('status', 'Page updated successfully.');
     }
 
@@ -89,15 +78,10 @@ class CmsController extends Controller
     {
         abort_unless($request->user()->hasPermission('cms.publish'), 403, 'Publishing pages requires publishing permission.');
         $page->update(['is_published' => !$page->is_published]);
-
         return redirect()->route('admin.cms.index')->with('status', $page->is_published ? 'Page published successfully.' : 'Page unpublished successfully.');
     }
 
-    public function destroy(CmsPage $page): RedirectResponse
-    {
-        $page->delete();
-        return back()->with('status', 'Page deleted successfully.');
-    }
+    public function destroy(CmsPage $page): RedirectResponse { $page->delete(); return back()->with('status', 'Page deleted successfully.'); }
 
     public function duplicate(CmsPage $page): RedirectResponse
     {
@@ -109,14 +93,10 @@ class CmsController extends Controller
         $copy->use_global_header = true;
         $copy->use_global_footer = true;
         $copy->save();
-
         return redirect()->route('admin.cms.edit', $copy)->with('status', 'Draft copy created.');
     }
 
-    public function uploadMedia(Request $request): JsonResponse
-    {
-        return app(SiteContentController::class)->uploadMedia($request);
-    }
+    public function uploadMedia(Request $request): JsonResponse { return app(SiteContentController::class)->uploadMedia($request); }
 
     private function validatePage(Request $request): array
     {
@@ -130,35 +110,23 @@ class CmsController extends Controller
             'meta_description' => ['nullable', 'string', 'max:1000'],
             'is_published' => ['nullable', 'boolean'],
         ]);
-
         $data['use_global_framework'] = true;
         $data['use_global_header'] = true;
         $data['use_global_footer'] = true;
         $data['is_published'] = $request->boolean('is_published');
-
-        // The legacy visual block-builder payload is intentionally no longer accepted.
-        // Page content is now one canonical Global CMS document.
         $data['builder_blocks'] = [];
-
         return $data;
     }
 
     private function guardPublishing(Request $request, bool $publishing): void
-    {
-        abort_unless(!$publishing || $request->user()->hasPermission('cms.publish'), 403, 'Publishing pages requires publishing permission.');
-    }
+    { abort_unless(!$publishing || $request->user()->hasPermission('cms.publish'), 403, 'Publishing pages requires publishing permission.'); }
 
     private function uniqueSlug(string $value, ?int $ignoreId = null): string
     {
         $base = Str::slug($value);
         abort_if($base === '', 422, 'A valid page slug could not be generated.');
-        $slug = $base;
-        $counter = 2;
-
-        while (CmsPage::where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
-            $slug = $base . '-' . $counter++;
-        }
-
+        $slug = $base; $counter = 2;
+        while (CmsPage::where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) $slug = $base . '-' . $counter++;
         return $slug;
     }
 }
