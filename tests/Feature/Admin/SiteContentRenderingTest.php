@@ -12,37 +12,28 @@ class SiteContentRenderingTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_news_and_notices_admin_page_renders_without_server_error(): void
+    private function websiteViewer(): User
     {
         $permission = Permission::firstOrCreate(['slug' => 'website.view'], ['name' => 'View website']);
-        $role = Role::create(['name' => 'Website Viewer', 'slug' => 'website-viewer', 'is_system' => false]);
+        $role = Role::create(['name' => 'Website Viewer', 'slug' => 'website-viewer-retired-cms', 'is_system' => false]);
         $role->permissions()->attach($permission);
 
         $user = User::factory()->create();
         $user->roles()->attach($role);
-
-        $this->actingAs($user)
-            ->get(route('admin.site-content.index', ['type' => 'news']))
-            ->assertOk()
-            ->assertSee('News &amp; Notices CMS', false)
-            ->assertSee('News &amp; Notices', false);
+        return $user;
     }
 
-    public function test_portal_uses_one_news_and_notices_navigation_entry(): void
+    public function test_retired_site_content_admin_page_is_not_available(): void
     {
-        $permission = Permission::firstOrCreate(['slug' => 'website.view'], ['name' => 'View website']);
-        $role = Role::create(['name' => 'Website Viewer Navigation', 'slug' => 'website-viewer-navigation', 'is_system' => false]);
-        $role->permissions()->attach($permission);
+        $this->actingAs($this->websiteViewer())
+            ->get('/admin/site-content?type=news')
+            ->assertNotFound();
+    }
 
-        $user = User::factory()->create();
-        $user->roles()->attach($role);
-
-        $response = $this->actingAs($user)
-            ->get(route('admin.site-content.index', ['type' => 'news']));
-
-        $response->assertOk()
-            ->assertSee('News &amp; Notices', false)
-            ->assertDontSee('>Notices<', false)
-            ->assertDontSee('>News &amp; Events<', false);
+    public function test_retired_site_content_news_mutation_is_not_available(): void
+    {
+        $this->actingAs($this->websiteViewer())
+            ->patch('/admin/site-content/news/1/toggle')
+            ->assertNotFound();
     }
 }
