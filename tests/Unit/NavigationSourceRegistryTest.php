@@ -12,6 +12,7 @@ use Tests\TestCase;
 class NavigationSourceRegistryTest extends TestCase
 {
     use RefreshDatabase;
+
     public function test_public_registry_contains_only_real_get_destinations(): void
     {
         Route::get('/__navigation-test', fn () => 'ok')->name('navigation.test');
@@ -49,6 +50,7 @@ class NavigationSourceRegistryTest extends TestCase
 
         $this->assertFalse($sources->contains('key', 'route:admin.navigation.internal'));
     }
+
     public function test_legacy_resources_are_never_available_as_navigation_sources(): void
     {
         $user = User::factory()->create();
@@ -73,26 +75,27 @@ class NavigationSourceRegistryTest extends TestCase
         );
     }
 
-
     public function test_published_about_page_builder_page_is_used_instead_of_generic_public_site_route(): void
     {
-        \App\Models\CmsPage::create([
-            'title' => 'About Us',
-            'slug' => 'about-us',
-            'content' => '<p>Builder content</p>',
-            'is_published' => true,
-        ]);
+        $page = \App\Models\CmsPage::query()->updateOrCreate(
+            ['slug' => 'about-us'],
+            [
+                'title' => 'About Us',
+                'content' => '<p>Builder content</p>',
+                'is_published' => true,
+            ]
+        );
 
         $registry = app(NavigationSourceRegistry::class);
-
         $sources = $registry->available('public', 'main');
 
         $this->assertFalse($sources->contains('key', 'route:site.about'));
-        $page = $sources->first(fn (array $source) => str_starts_with((string) ($source['key'] ?? ''), 'cms_page:'));
-        $this->assertNotNull($page);
-        $this->assertSame('About Us', $page['label']);
-        $this->assertSame(route('cms.page', ['slug' => 'about-us']), $page['url']);
-        $this->assertSame('cms.page', $page['route_name']);
+        $this->assertSame(1, $sources->where('key', 'cms_page:'.$page->id)->count());
+        $source = $sources->firstWhere('key', 'cms_page:'.$page->id);
+        $this->assertNotNull($source);
+        $this->assertSame('About Us', $source['label']);
+        $this->assertSame(route('cms.page', ['slug' => 'about-us']), $source['url']);
+        $this->assertSame('cms.page', $source['route_name']);
 
         $resolved = $registry->resolveAny('route:site.about', 'public');
         $this->assertNotNull($resolved);
@@ -101,23 +104,24 @@ class NavigationSourceRegistryTest extends TestCase
         $this->assertSame(route('cms.page', ['slug' => 'about-us']), $resolved['url']);
     }
 
-
     public function test_any_static_public_route_matching_a_published_page_builder_slug_becomes_cms_source(): void
     {
         Route::get('/our-technology', fn () => 'legacy')->name('site.technology');
 
-        \App\Models\CmsPage::create([
-            'title' => 'Our Technology',
-            'slug' => 'our-technology',
-            'content' => '<p>Builder content</p>',
-            'is_published' => true,
-        ]);
+        $page = \App\Models\CmsPage::query()->updateOrCreate(
+            ['slug' => 'our-technology'],
+            [
+                'title' => 'Our Technology',
+                'content' => '<p>Builder content</p>',
+                'is_published' => true,
+            ]
+        );
 
         $registry = app(NavigationSourceRegistry::class);
+        $sources = $registry->available('public', 'main');
 
-        $this->assertFalse(
-            $registry->available('public', 'main')->contains('key', 'route:site.technology')
-        );
+        $this->assertFalse($sources->contains('key', 'route:site.technology'));
+        $this->assertSame(1, $sources->where('key', 'cms_page:'.$page->id)->count());
 
         $source = $registry->resolveAny('route:site.technology', 'public');
         $this->assertNotNull($source);
@@ -126,17 +130,13 @@ class NavigationSourceRegistryTest extends TestCase
         $this->assertSame(route('cms.page', ['slug' => 'our-technology']), $source['url']);
     }
 
-
-
-    public function test_shared_public_site_controller_uses_destination_labels(): void
+    public function test_retired_solutions_route_is_not_a_public_navigation_source(): void
     {
         $registry = app(NavigationSourceRegistry::class);
 
-        $solutions = $registry->resolveAny('route:site.solutions', 'public');
+        $this->assertNull($registry->resolveAny('route:site.solutions', 'public'));
         $gallery = $registry->resolveAny('route:site.gallery', 'public');
 
-        $this->assertNotNull($solutions);
-        $this->assertSame('Solutions', $solutions['label']);
         $this->assertNotNull($gallery);
         $this->assertSame('Gallery', $gallery['label']);
     }
@@ -148,5 +148,4 @@ class NavigationSourceRegistryTest extends TestCase
         $this->assertNull($registry->resolveAny('route:webmail.host.login', 'public'));
         $this->assertNull($registry->resolveAny('route:webmail.host.inbox', 'public'));
     }
-
 }
