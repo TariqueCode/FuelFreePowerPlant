@@ -5,7 +5,6 @@ namespace Tests\Feature\Admin;
 use App\Models\CmsPage;
 use App\Models\Permission;
 use App\Models\Role;
-use App\Models\SiteContentItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -41,62 +40,58 @@ class ContentPagesIndexTest extends TestCase
         return $user;
     }
 
-    public function test_content_pages_uses_card_management_with_edit_publish_and_delete_actions(): void
+    public function test_page_builder_is_the_sole_authoritative_content_page_surface(): void
     {
         $user = $this->adminUser();
 
-        $cms = CmsPage::create([
-            'title' => 'Future Projects',
-            'slug' => 'future-projects',
-            'content' => '<p>Future projects content.</p>',
-            'is_published' => true,
-        ]);
+        $futureProjects = CmsPage::query()->updateOrCreate(
+            ['slug' => 'future-projects'],
+            [
+                'title' => 'Future Projects',
+                'content' => '<p>Future projects content.</p>',
+                'is_published' => true,
+            ]
+        );
 
-        SiteContentItem::query()->where('type', 'company')->where('slug', 'about-us')->delete();
-
-        $company = SiteContentItem::create([
-            'type' => 'company',
-            'title' => 'About Us',
-            'slug' => 'about-us',
-            'content' => '<p>About us content.</p>',
-            'status' => 'published',
-        ]);
+        $aboutUs = CmsPage::query()->updateOrCreate(
+            ['slug' => 'about-us'],
+            [
+                'title' => 'About Us',
+                'content' => '<p>About us content.</p>',
+                'is_published' => true,
+            ]
+        );
 
         $response = $this->actingAs($user)->get(route('admin.cms.index'));
 
         $response->assertOk()
             ->assertSee('Future Projects')
             ->assertSee('About Us')
-            ->assertSee(route('admin.cms.edit', $cms), false)
-            ->assertSee(route('admin.site-content.edit', $company), false)
-            ->assertSee(route('admin.cms.toggle', $cms), false)
-            ->assertSee(route('admin.site-content.page.toggle', $company), false)
-            ->assertSee(route('admin.cms.destroy', $cms), false)
-            ->assertSee(route('admin.site-content.destroy', $company), false)
-            ->assertSee('Edit')
-            ->assertDontSee('Duplicate');
+            ->assertSee(route('admin.cms.edit', $futureProjects), false)
+            ->assertSee(route('admin.cms.edit', $aboutUs), false)
+            ->assertSee(route('admin.cms.toggle', $futureProjects), false)
+            ->assertSee(route('admin.cms.toggle', $aboutUs), false)
+            ->assertSee(route('admin.cms.destroy', $futureProjects), false)
+            ->assertSee(route('admin.cms.destroy', $aboutUs), false)
+            ->assertSee(route('admin.cms.duplicate', $futureProjects), false)
+            ->assertDontSee('/admin/site-content/', false)
+            ->assertDontSee('Site Content', false);
     }
 
-    public function test_legacy_resources_surface_is_removed(): void
+    public function test_legacy_site_content_surface_is_removed(): void
     {
         $user = $this->adminUser();
 
-        $this->assertFalse(\Illuminate\Support\Facades\Route::has('resources.index'));
-        $this->assertFalse(\Illuminate\Support\Facades\Route::has('resources.show'));
-        $this->assertFalse(\Illuminate\Support\Facades\Route::has('resources.download'));
+        $this->assertFalse(\Illuminate\Support\Facades\Route::has('admin.site-content.index'));
+        $this->assertFalse(\Illuminate\Support\Facades\Route::has('admin.site-content.edit'));
+        $this->assertFalse(\Illuminate\Support\Facades\Route::has('admin.site-content.media'));
 
         $this->actingAs($user)
-            ->get('/resources')
+            ->get('/admin/site-content')
             ->assertNotFound();
 
         $this->actingAs($user)
-            ->get(route('admin.site-content.index', ['type' => 'resource']))
+            ->get('/admin/site-content?type=resource')
             ->assertNotFound();
-
-        $this->actingAs($user)
-            ->get(route('admin.cms.index'))
-            ->assertOk()
-            ->assertDontSee('Resources CMS')
-            ->assertDontSee('Resources');
     }
 }
