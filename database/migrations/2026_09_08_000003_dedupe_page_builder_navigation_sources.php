@@ -15,7 +15,7 @@ return new class extends Migration
 
         CmsPage::query()
             ->where('is_published', true)
-            ->get(['id', 'slug'])
+            ->get(['id', 'title', 'slug'])
             ->each(function (CmsPage $page): void {
                 $canonicalKey = 'cms_page:'.$page->id;
                 $canonicalUrl = '/pages/'.ltrim($page->slug, '/');
@@ -52,7 +52,7 @@ return new class extends Migration
                             'area' => 'public',
                             'permission_key' => null,
                             'route_name' => 'cms.page',
-                            'url' => '/pages/'.ltrim($page->slug, '/'),
+                            'url' => $canonicalUrl,
                             'label' => $page->title,
                         ]);
                     }
