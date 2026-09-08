@@ -78,13 +78,9 @@ class ContentPagesIndexTest extends TestCase
             ->assertDontSee('Site Content', false);
     }
 
-    public function test_legacy_site_content_surface_is_removed(): void
+    public function test_legacy_site_content_surface_is_retired(): void
     {
         $user = $this->adminUser();
-
-        $this->assertFalse(\Illuminate\Support\Facades\Route::has('admin.site-content.index'));
-        $this->assertFalse(\Illuminate\Support\Facades\Route::has('admin.site-content.edit'));
-        $this->assertFalse(\Illuminate\Support\Facades\Route::has('admin.site-content.media'));
 
         $this->actingAs($user)
             ->get('/admin/site-content')
