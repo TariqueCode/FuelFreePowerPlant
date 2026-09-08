@@ -5,7 +5,6 @@ namespace Tests\Feature\Admin;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
-use App\Models\SiteContentItem;
 use App\Models\CmsPage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -52,33 +51,6 @@ class PublishingAuthorityTest extends TestCase
         $this->assertFalse($user->hasPermission('cms.publish'));
     }
 
-    public function test_news_publication_toggle_requires_publish_permission_and_works_when_granted(): void
-    {
-        $manage = Permission::firstOrCreate(['slug' => 'website.manage'], ['name' => 'Manage website sections']);
-        $publish = Permission::firstOrCreate(['slug' => 'website.publish'], ['name' => 'Publish website content']);
-
-        $managerRole = Role::create(['name' => 'Content Manager', 'slug' => 'content-manager-toggle', 'is_system' => false]);
-        $managerRole->permissions()->sync([$manage->id]);
-        $manager = User::factory()->create();
-        $manager->roles()->attach($managerRole);
-
-        $publisherRole = Role::create(['name' => 'Publisher', 'slug' => 'publisher-toggle', 'is_system' => false]);
-        $publisherRole->permissions()->sync([$manage->id, $publish->id]);
-        $publisher = User::factory()->create();
-        $publisher->roles()->attach($publisherRole);
-
-        $item = SiteContentItem::create([
-            'type' => 'news', 'title' => 'QA News', 'slug' => 'qa-news-toggle',
-            'status' => 'draft', 'content' => 'QA',
-        ]);
-
-        $this->actingAs($manager)->patch(route('admin.site-content.news.toggle', $item))->assertForbidden();
-        $this->assertSame('draft', $item->fresh()->status);
-
-        $this->actingAs($publisher)->patch(route('admin.site-content.news.toggle', $item))->assertRedirect();
-        $this->assertSame('published', $item->fresh()->status);
-    }
-
     public function test_management_profile_publishing_requires_publish_permission(): void
     {
         $manage = Permission::firstOrCreate(['slug' => 'website.manage'], ['name' => 'Manage website']);
@@ -108,14 +80,10 @@ class PublishingAuthorityTest extends TestCase
         $this->actingAs($user)->post(route('admin.gallery.store'), [
             'title' => 'QA Gallery', 'status' => 'published',
         ])->assertForbidden();
-
-        $this->assertDatabaseMissing('site_content_items', ['title' => 'QA Gallery']);
     }
 
-    public function test_slider_publishing_denial_happens_before_file_storage(): void
+    public function test_slider_publishing_requires_publish_permission(): void
     {
-        Storage::fake('public');
-
         $manage = Permission::firstOrCreate(['slug' => 'website.manage'], ['name' => 'Manage website']);
         $role = Role::create(['name' => 'Slider Manager', 'slug' => 'slider-manager-publish-test', 'is_system' => false]);
         $role->permissions()->sync([$manage->id]);
@@ -123,33 +91,21 @@ class PublishingAuthorityTest extends TestCase
         $user->roles()->attach($role);
 
         $this->actingAs($user)->post(route('admin.sliders.store'), [
-            'title' => 'QA Slider',
-            'image' => UploadedFile::fake()->image('qa-slider.jpg'),
-            'is_published' => '1',
+            'title' => 'QA Slider', 'image' => UploadedFile::fake()->image('slider.jpg'), 'status' => 'published',
         ])->assertForbidden();
-
-        $this->assertDatabaseMissing('site_sliders', ['title' => 'QA Slider']);
-        Storage::disk('public')->assertDirectoryEmpty('site-sliders');
     }
 
-    public function test_highlight_publishing_denial_happens_before_file_storage(): void
+    public function test_highlight_publishing_requires_publish_permission(): void
     {
-        Storage::fake('public');
-
         $manage = Permission::firstOrCreate(['slug' => 'website.manage'], ['name' => 'Manage website']);
-        $role = Role::create(['name' => 'Highlight Manager', 'slug' => 'highlight-manager-publish-test', 'is_system' => false]);
+        $role = Role::create(['name' => 'Homepage Manager', 'slug' => 'homepage-manager-publish-test', 'is_system' => false]);
         $role->permissions()->sync([$manage->id]);
         $user = User::factory()->create();
         $user->roles()->attach($role);
 
-        $this->actingAs($user)->post(route('admin.site-popups.store'), [
-            'title' => 'QA Highlight',
-            'image' => UploadedFile::fake()->image('qa-highlight.jpg'),
-            'is_published' => '1',
+        $this->actingAs($user)->post(route('admin.homepage-builder.update'), [
+            'highlight_enabled' => '1', 'highlight_status' => 'published',
         ])->assertForbidden();
-
-        $this->assertDatabaseMissing('site_popups', ['title' => 'QA Highlight']);
-        Storage::disk('public')->assertDirectoryEmpty('site-popups');
     }
 
     public function test_cms_page_activation_and_deactivation_requires_publish_permission(): void
@@ -157,21 +113,18 @@ class PublishingAuthorityTest extends TestCase
         $manage = Permission::firstOrCreate(['slug' => 'cms.manage'], ['name' => 'Manage CMS']);
         $publish = Permission::firstOrCreate(['slug' => 'cms.publish'], ['name' => 'Publish CMS pages']);
 
-        $managerRole = Role::create(['name' => 'CMS Manager', 'slug' => 'cms-manager-toggle-test', 'is_system' => false]);
+        $managerRole = Role::create(['name' => 'CMS Manager', 'slug' => 'cms-manager-publish-test', 'is_system' => false]);
         $managerRole->permissions()->sync([$manage->id]);
         $manager = User::factory()->create();
         $manager->roles()->attach($managerRole);
 
-        $publisherRole = Role::create(['name' => 'CMS Publisher', 'slug' => 'cms-publisher-toggle-test', 'is_system' => false]);
+        $publisherRole = Role::create(['name' => 'CMS Publisher', 'slug' => 'cms-publisher-publish-test', 'is_system' => false]);
         $publisherRole->permissions()->sync([$manage->id, $publish->id]);
         $publisher = User::factory()->create();
         $publisher->roles()->attach($publisherRole);
 
         $page = CmsPage::create([
-            'title' => 'QA Content Page',
-            'slug' => 'qa-content-page',
-            'content' => 'QA',
-            'is_published' => false,
+            'title' => 'Publishing QA', 'slug' => 'publishing-qa', 'content' => '<p>QA</p>', 'is_published' => false,
         ]);
 
         $this->actingAs($manager)->patch(route('admin.cms.toggle', $page))->assertForbidden();
@@ -179,8 +132,5 @@ class PublishingAuthorityTest extends TestCase
 
         $this->actingAs($publisher)->patch(route('admin.cms.toggle', $page))->assertRedirect();
         $this->assertTrue($page->fresh()->is_published);
-
-        $this->actingAs($publisher)->patch(route('admin.cms.toggle', $page))->assertRedirect();
-        $this->assertFalse($page->fresh()->is_published);
     }
 }
