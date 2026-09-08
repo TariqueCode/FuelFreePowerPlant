@@ -131,8 +131,11 @@ jobs:
           npm install --no-audit --no-fund
           npm run build
 
-      - name: Verify canonical CMS routes
-        run: php artisan route:list --path=admin/cms -v
+      - name: Verify canonical Page Builder routes
+        run: php artisan route:list --path=admin/page-builder -v
+
+      - name: Verify Laravel route cache
+        run: php artisan route:cache --ansi
 
       - name: Run unit tests
         run: php artisan test tests/Unit
