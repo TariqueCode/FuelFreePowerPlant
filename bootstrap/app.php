@@ -52,6 +52,29 @@ return Application::configure(basePath: dirname(__DIR__))
                     Route::post('/reorder', [NavigationMenuController::class, 'reorder'])->name('reorder');
                 });
 
+            // routes/web.php still contains the old /admin/cms endpoints. Their
+            // route names are renamed before the canonical Page Builder routes are
+            // registered so Laravel can safely build the production route cache.
+            $legacyCmsNames = [
+                'admin.cms.index',
+                'admin.cms.create',
+                'admin.cms.store',
+                'admin.cms.edit',
+                'admin.cms.update',
+                'admin.cms.duplicate',
+                'admin.cms.destroy',
+                'admin.cms.toggle',
+            ];
+            $routeCollection = Route::getRoutes();
+            foreach ($routeCollection->getRoutes() as $route) {
+                $name = $route->getName();
+                if ($name !== null && in_array($name, $legacyCmsNames, true)) {
+                    $suffix = substr($name, strlen('admin.cms.'));
+                    $route->name('admin.legacy-cms.'.$suffix);
+                }
+            }
+            $routeCollection->refreshNameLookups();
+
             // Canonical Page Builder URL. Keep the existing route names so every
             // current admin link automatically resolves to /admin/page-builder.
             Route::middleware(['web', 'auth', 'permission:cms.view'])
