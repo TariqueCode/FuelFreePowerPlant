@@ -10,6 +10,12 @@ class PermissionMiddleware
 {
     public function handle(Request $request, Closure $next, string ...$permissions): Response
     {
+        // Retired Site Content mutations must behave as removed endpoints,
+        // regardless of the caller's legacy website permissions.
+        if ($request->isMethod('PATCH') && $request->is('admin/site-content/news/*/toggle')) {
+            abort(404);
+        }
+
         $user = $request->user();
 
         $allowed = $user && collect($permissions)->contains(

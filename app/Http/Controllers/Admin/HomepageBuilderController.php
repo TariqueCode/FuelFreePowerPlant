@@ -40,6 +40,11 @@ class HomepageBuilderController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
+        // Publishing is a privileged action and must be rejected before any
+        // unrelated homepage validation can turn the request into a redirect.
+        $publishingHighlight = strtolower((string) $request->input('highlight_status')) === 'published';
+        abort_unless(! $publishingHighlight || $request->user()->hasPermission('website.publish'), 403, 'Publishing homepage highlights requires publishing permission.');
+
         $data = $request->validate([
             'section_order' => ['required', 'array'],
             'section_order.*' => ['required', 'string', 'max:60'],

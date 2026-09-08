@@ -84,7 +84,9 @@ class SiteSliderController extends Controller
 
     private function save(SiteSlider $slider, Request $request): void
     {
-        $publishing = $request->boolean('is_published');
+        $publishing = $request->boolean('is_published')
+            || strtolower((string) $request->input('status')) === 'published';
+
         abort_unless(! $publishing || $request->user()->hasPermission('website.publish'), 403, 'Publishing sliders requires publishing permission.');
 
         $data = $request->validate([
