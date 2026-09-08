@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\ManagementController;
 use App\Http\Controllers\Admin\NavigationMenuController;
 use App\Http\Middleware\HomeAnnouncementPopup;
@@ -49,6 +50,31 @@ return Application::configure(basePath: dirname(__DIR__))
                     Route::patch('/{item}', [NavigationMenuController::class, 'update'])->name('update');
                     Route::delete('/{item}', [NavigationMenuController::class, 'destroy'])->name('destroy');
                     Route::post('/reorder', [NavigationMenuController::class, 'reorder'])->name('reorder');
+                });
+
+            // Canonical Page Builder URL. Keep the existing route names so every
+            // current admin link automatically resolves to /admin/page-builder.
+            Route::middleware(['web', 'auth', 'permission:cms.view'])
+                ->prefix('admin/page-builder')->name('admin.cms.')
+                ->group(function (): void {
+                    Route::get('/', [CmsController::class, 'index'])->name('index');
+                });
+
+            Route::middleware(['web', 'auth', 'permission:cms.manage'])
+                ->prefix('admin/page-builder')->name('admin.cms.')
+                ->group(function (): void {
+                    Route::get('/create', [CmsController::class, 'create'])->name('create');
+                    Route::post('/', [CmsController::class, 'store'])->name('store');
+                    Route::get('/{page}/edit', [CmsController::class, 'edit'])->name('edit');
+                    Route::patch('/{page}', [CmsController::class, 'update'])->name('update');
+                    Route::post('/{page}/duplicate', [CmsController::class, 'duplicate'])->name('duplicate');
+                    Route::delete('/{page}', [CmsController::class, 'destroy'])->name('destroy');
+                });
+
+            Route::middleware(['web', 'auth', 'permission:cms.publish'])
+                ->prefix('admin/page-builder')->name('admin.cms.')
+                ->group(function (): void {
+                    Route::patch('/{page}/toggle', [CmsController::class, 'togglePublication'])->name('toggle');
                 });
         },
     )
