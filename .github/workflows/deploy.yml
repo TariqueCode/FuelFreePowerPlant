@@ -121,7 +121,7 @@ jobs:
 
           echo "==> Checking production PHP runtime"
           php -r 'if (PHP_VERSION_ID < 80400) { fwrite(STDERR, "ERROR: FuelFree PowerPlant requires PHP 8.4+ on production. Current: ".PHP_VERSION."\\n"); exit(1); }'
-          for ext in fileinfo mbstring; do
+          for ext in fileinfo mbstring sqlite3 pdo_sqlite; do
               if ! php -m | grep -qi "^$ext$"; then
                   echo "ERROR: Required PHP extension is missing: $ext"
                   exit 1
@@ -135,39 +135,25 @@ jobs:
           echo "==> Installing PHP dependencies"
           "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts
 
-          echo "==> Refreshing Laravel caches before database checks"
+          echo "==> Protecting and selecting the production SQLite database"
+          if [ ! -s database/database.sqlite ]; then
+              echo "ERROR: Existing SQLite database/database.sqlite was not found or is empty. Refusing to create a new database."
+              exit 1
+          fi
+
+          if [ ! -f .env.sqlite-recovery-backup ]; then
+              cp .env .env.sqlite-recovery-backup
+          fi
+
+          php -r '$p=".env"; $e=file_get_contents($p); $r=["DB_CONNECTION"=>"DB_CONNECTION=sqlite","DB_DATABASE"=>"DB_DATABASE=/home/fuelfree/public_html/database/database.sqlite","DB_HOST"=>"# DB_HOST=","DB_PORT"=>"# DB_PORT=","DB_USERNAME"=>"# DB_USERNAME=","DB_PASSWORD"=>"# DB_PASSWORD=","DB_SOCKET"=>"# DB_SOCKET="]; foreach($r as $k=>$v){$e=preg_replace("/^".$k."=.*/m",$v,$e);} $r=["SESSION_DRIVER"=>"SESSION_DRIVER=file","CACHE_STORE"=>"CACHE_STORE=file","QUEUE_CONNECTION"=>"QUEUE_CONNECTION=sync"]; foreach($r as $k=>$v){$e=preg_replace("/^".$k."=.*/m",$v,$e);} file_put_contents($p,$e);'
+
+          echo "==> Clearing stale Laravel caches using SQLite"
           php artisan optimize:clear
 
-          echo "==> Checking production database connectivity"
-          DB_AVAILABLE=0
-          if php artisan db:show >/tmp/fuelfree-db-check.log 2>&1; then
-              DB_AVAILABLE=1
-          else
-              cat /tmp/fuelfree-db-check.log
-          fi
-
-          if [ "$DB_AVAILABLE" -eq 0 ]; then
-              echo "==> Production MySQL unavailable; enabling temporary SQLite recovery mode"
-              if [ ! -f .env.mysql-recovery-backup ]; then
-                  cp .env .env.mysql-recovery-backup
-              fi
-              mkdir -p database
-              touch database/database.sqlite
-              chmod 660 database/database.sqlite
-              php -r '$p=".env"; $e=file_get_contents($p); $r=["DB_CONNECTION"=>"DB_CONNECTION=sqlite","DB_DATABASE"=>"DB_DATABASE=/home/fuelfree/public_html/database/database.sqlite","DB_HOST"=>"# DB_HOST=","DB_PORT"=>"# DB_PORT=","DB_USERNAME"=>"# DB_USERNAME=","DB_PASSWORD"=>"# DB_PASSWORD=","DB_SOCKET"=>"# DB_SOCKET="]; foreach($r as $k=>$v){$e=preg_replace("/^".$k."=.*/m",$v,$e);} $r=["SESSION_DRIVER"=>"SESSION_DRIVER=file","CACHE_STORE"=>"CACHE_STORE=file","QUEUE_CONNECTION"=>"QUEUE_CONNECTION=sync"]; foreach($r as $k=>$v){$e=preg_replace("/^".$k."=.*/m",$v,$e);} file_put_contents($p,$e);'
-              php artisan optimize:clear
-              php artisan migrate --force
-          else
-              echo "==> Production MySQL available"
-              if [ -f .env.mysql-recovery-backup ]; then
-                  cp .env.mysql-recovery-backup .env
-                  php artisan optimize:clear
-                  php artisan db:show
-                  rm -f .env.mysql-recovery-backup
-              fi
-              php artisan migrate --force
-              php artisan migrate:status
-          fi
+          echo "==> Verifying recovered SQLite database"
+          php artisan db:show
+          php artisan migrate --force
+          php artisan migrate:status
 
           echo "==> Refreshing Laravel package discovery"
           php artisan package:discover --ansi
