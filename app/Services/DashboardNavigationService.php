@@ -5,16 +5,9 @@ namespace App\Services;
 use App\Models\NavigationMenuItem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Route as RouteFacade;
 
 class DashboardNavigationService
 {
-    private const BUILDER_ROUTE_ALIASES = [
-        'admin.management.index' => ['admin.profile-builder.index', 'Profile Builder'],
-        'admin.cms.index' => ['admin.page-builder.index', 'Page Builder'],
-        'admin.navigation.index' => ['admin.menu-builder.index', 'Menu Builder'],
-    ];
-
     public function tree(string $menu = 'dashboard'): Collection
     {
         $items = NavigationMenuItem::query()
@@ -37,23 +30,10 @@ class DashboardNavigationService
             }
 
             if (! $item->source_key) return false;
+
+            // NavigationSourceRegistry is the single source of truth for route
+            // aliases, canonical routes, permissions and usable destinations.
             $source = $registry->resolveAny($item->source_key, 'dashboard');
-
-            // The navigation database stores legacy builder source keys while
-            // the actual dashboard routes use their canonical builder names.
-            if (! $source && isset(self::BUILDER_ROUTE_ALIASES[$item->source_key])) {
-                [$routeName, $label] = self::BUILDER_ROUTE_ALIASES[$item->source_key];
-                $route = RouteFacade::getRoutes()->getByName($routeName);
-                if ($route) {
-                    $source = [
-                        'label' => $label,
-                        'url' => $route->uri() === '/' ? '/' : '/'.ltrim($route->uri(), '/'),
-                        'route_name' => $routeName,
-                        'permission' => $this->routePermission($route),
-                    ];
-                }
-            }
-
             if (! $source) return false;
 
             $permission = $source['permission'] ?? null;
@@ -93,37 +73,31 @@ class DashboardNavigationService
 
         $tree = $build();
 
-        // Settings is a system destination. Add it only when the database
-        // navigation does not already contain a Settings destination by route
-        // or label, preventing the duplicate entry seen during recovery.
+        // Settings remains available when its system destination has not yet
+        // been persisted by Menu Builder, but its route metadata comes from the
+        // canonical navigation registry rather than a second alias implementation.
         if (auth()->user()->hasPermission('settings.manage') && ! $this->containsSettings($tree)) {
-            $settings = new NavigationMenuItem([
-                'label' => 'Settings',
-                'url' => route('admin.settings'),
-                'route_name' => 'admin.settings',
-                'target' => '_self',
-                'icon' => 'fa-sliders',
-                'is_visible' => true,
-                'sort_order' => PHP_INT_MAX,
-                'source_key' => 'route:admin.settings',
-                'source_type' => 'route',
-                'area' => 'dashboard',
-                'permission_key' => 'settings.manage',
-            ]);
-            $settings->setRelation('children', collect());
-            $tree->push($settings);
+            $source = $registry->resolveAny('route:admin.settings', 'dashboard');
+            if ($source) {
+                $settings = new NavigationMenuItem([
+                    'label' => $source['label'],
+                    'url' => $source['url'],
+                    'route_name' => $source['route_name'],
+                    'target' => '_self',
+                    'icon' => 'fa-sliders',
+                    'is_visible' => true,
+                    'sort_order' => PHP_INT_MAX,
+                    'source_key' => $source['key'],
+                    'source_type' => $source['type'],
+                    'area' => 'dashboard',
+                    'permission_key' => $source['permission'],
+                ]);
+                $settings->setRelation('children', collect());
+                $tree->push($settings);
+            }
         }
 
         return $tree;
-    }
-
-    private function routePermission($route): ?string
-    {
-        $permission = collect($route->gatherMiddleware())
-            ->map(fn ($middleware): string => (string) $middleware)
-            ->first(fn (string $middleware): bool => Str::startsWith($middleware, 'permission:'));
-
-        return $permission ? Str::after($permission, 'permission:') : null;
     }
 
     private function containsSettings(Collection $items): bool
