@@ -38,16 +38,10 @@ $dashboardNavigation=app(\App\Services\DashboardNavigationService::class)->tree(
 @if(auth()->user()->hasPermission('website.view'))<div class="nav-label">CONTENT</div><a class="{{ request()->routeIs('admin.management.*')?'active':'' }}" href="{{ route('admin.management.index') }}"><span>Profile Builder</span></a>@endif
 @if(auth()->user()->hasPermission('website.view'))<a class="{{ request()->routeIs('admin.site-content.*') && request('type')==='news'?'active':'' }}" href="{{ route('admin.site-content.index',['type'=>'news']) }}"><span>News &amp; Notices</span></a>@endif
 @if(auth()->user()->hasPermission('website.view'))<a class="{{ request()->routeIs('admin.gallery.*')?'active':'' }}" href="{{ route('admin.gallery.index') }}"><span>Gallery</span></a>@endif
-
 @if($canCms)<a class="{{ request()->routeIs('admin.cms.*')?'active':'' }}" href="{{ route('admin.cms.index') }}"><span>Content Pages</span></a>@endif
 @if($canSocial)<a class="{{ request()->routeIs('admin.social-links.*')?'active':'' }}" href="{{ route('admin.social-links.index') }}"><span>Social Media</span></a>@endif
 @if(auth()->user()->hasPermission('website.view'))<div class="nav-label">STRUCTURE</div><a class="{{ request()->routeIs('admin.navigation.*')?'active':'' }}" href="{{ route('admin.navigation.index') }}"><span>Website Navigation</span></a>@endif
 @if($canDocs)<a class="{{ request()->routeIs('admin.documents*')?'active':'' }}" href="{{ route('admin.documents') }}"><span>Documents &amp; Media</span></a>@endif
-</div></div>
-@endif
-@if(auth()->user()->hasPermission('plants.view'))
-<div class="nav-group"><button type="button" class="nav-parent" aria-expanded="false"><span class="nav-icon"><i class="fa-solid fa-server"></i></span><span>Operations</span><i class="fa-solid fa-chevron-down nav-chevron"></i></button><div class="nav-sub">
-<a class="{{ request()->routeIs('admin.plants.*')?'active':'' }}" href="{{ route('admin.plants.index') }}"><span>{{ config('fuelfree.projects.label','Projects & Our Plans') }}</span></a>
 </div></div>
 @endif
 @if($canUsers)
@@ -64,10 +58,11 @@ $dashboardNavigation=app(\App\Services\DashboardNavigationService::class)->tree(
 @if(auth()->user()->hasPermission('inquiries.view'))<a class="{{ request()->routeIs('admin.inquiries.*')?'active':'' }}" href="{{ route('admin.inquiries.index') }}"><span>Website Inquiries</span></a>@endif
 </div></div>
 @endif
+@endif
 @if($canSettings)
 <a class="{{ request()->routeIs('admin.settings*')?'active':'' }}" href="{{ route('admin.settings') }}"><span class="nav-icon"><i class="fa-solid fa-sliders"></i></span><span>Settings</span></a>
 @endif
-@endif</nav></aside><main class="main"><header class="topbar"><button class="mobile-menu-toggle" id="mobile-menu-toggle" type="button" aria-label="Open navigation" aria-controls="admin-sidebar" aria-expanded="false"><i class="fa-solid fa-bars"></i></button><a class="topbar-brand" href="{{ route('admin.dashboard') }}">@if($dashboardLogo)<img src="{{ asset('storage/'.$dashboardLogo) }}" alt="{{ $dashboardName }}">@else<span class="brand-mark"><i class="fa-solid fa-bolt"></i></span>@endif<span class="topbar-title">{{ $dashboardName }}</span></a><a class="profile-trigger" href="{{ route('profile') }}" aria-label="My profile"><i class="fa-solid fa-user"></i></a></header><div class="content">@yield('content')</div></main></div><div class="mobile-drawer-backdrop" id="mobile-drawer-backdrop"></div>
+</nav></aside><main class="main"><header class="topbar"><button class="mobile-menu-toggle" id="mobile-menu-toggle" type="button" aria-label="Open navigation" aria-controls="admin-sidebar" aria-expanded="false"><i class="fa-solid fa-bars"></i></button><a class="topbar-brand" href="{{ route('admin.dashboard') }}">@if($dashboardLogo)<img src="{{ asset('storage/'.$dashboardLogo) }}" alt="{{ $dashboardName }}">@else<span class="brand-mark"><i class="fa-solid fa-bolt"></i></span>@endif<span class="topbar-title">{{ $dashboardName }}</span></a><a class="profile-trigger" href="{{ route('profile') }}" aria-label="My profile"><i class="fa-solid fa-user"></i></a></header><div class="content">@yield('content')</div></main></div><div class="mobile-drawer-backdrop" id="mobile-drawer-backdrop"></div>
 <script>(()=>{const toggle=document.getElementById('mobile-menu-toggle'),sidebar=document.querySelector('.sidebar'),backdrop=document.getElementById('mobile-drawer-backdrop');if(toggle&&sidebar&&backdrop){const close=()=>{sidebar.classList.remove('mobile-open');backdrop.classList.remove('open');toggle.setAttribute('aria-expanded','false');document.body.classList.remove('drawer-open')};toggle.addEventListener('click',()=>{const open=sidebar.classList.toggle('mobile-open');backdrop.classList.toggle('open',open);toggle.setAttribute('aria-expanded',String(open));document.body.classList.toggle('drawer-open',open)});backdrop.addEventListener('click',close);sidebar.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));window.addEventListener('keydown',e=>{if(e.key==='Escape')close()})}})();</script>
 <script>
 document.querySelectorAll('.nav-parent').forEach(button=>button.addEventListener('click',()=>{
