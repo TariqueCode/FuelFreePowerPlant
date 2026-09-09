@@ -30,7 +30,8 @@ class DashboardNavigationServiceTest extends TestCase
         $user = User::factory()->create();
         $user->roles()->attach($role);
 
-        $tree = $this->actingAs($user)->app->make(DashboardNavigationService::class)->tree();
+        $this->actingAs($user);
+        $tree = app(DashboardNavigationService::class)->tree();
 
         $this->assertTrue($tree->contains(fn (NavigationMenuItem $item): bool => $item->route_name === 'admin.settings'));
     }
@@ -63,7 +64,8 @@ class DashboardNavigationServiceTest extends TestCase
             'sort_order' => 1,
         ]);
 
-        $tree = $this->actingAs($user)->app->make(DashboardNavigationService::class)->tree();
+        $this->actingAs($user);
+        $tree = app(DashboardNavigationService::class)->tree();
 
         $this->assertFalse($tree->contains(fn (NavigationMenuItem $item): bool => $item->url === '/admin/plants'));
     }
