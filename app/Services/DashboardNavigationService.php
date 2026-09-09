@@ -119,10 +119,11 @@ class DashboardNavigationService
 
     private function routePermission($route): ?string
     {
-        return collect($route->gatherMiddleware())
+        $permission = collect($route->gatherMiddleware())
             ->map(fn ($middleware): string => (string) $middleware)
-            ->first(fn (string $middleware): bool => Str::startsWith($middleware, 'permission:'))
-            ?->after('permission:');
+            ->first(fn (string $middleware): bool => Str::startsWith($middleware, 'permission:'));
+
+        return $permission ? Str::after($permission, 'permission:') : null;
     }
 
     private function containsSettings(Collection $items): bool
