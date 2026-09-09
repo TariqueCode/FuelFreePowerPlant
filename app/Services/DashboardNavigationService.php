@@ -21,11 +21,10 @@ class DashboardNavigationService
         $valid = $items->filter(function (NavigationMenuItem $item) use ($registry): bool {
             if ($item->source_type === 'folder') return true;
 
-            // Manually entered links are valid dashboard destinations without a
-            // registry source. This keeps the dashboard navigation consistent
-            // with NavigationMenuController, which explicitly supports URL items.
             if ($item->source_type === 'external_link') {
-                if (trim((string) $item->url) === '') return false;
+                $url = trim((string) $item->url);
+                if ($url === '') return false;
+                if (Str::startsWith($url, ['/admin/site-content', '/admin/plants'])) return false;
                 if ($item->permission_key && ! auth()->user()->hasPermission($item->permission_key)) return false;
                 return true;
             }
@@ -42,8 +41,6 @@ class DashboardNavigationService
             $item->route_name = $source['route_name'];
             $item->permission_key = $permission;
 
-            // Profile Builder is an admin-only builder label. Its public
-            // destination remains the dynamically named management folder.
             if (Str::startsWith((string) $item->source_key, 'management_folder:') || $item->route_name === 'management') {
                 $item->label_override = 'Profile Builder';
             }
@@ -71,6 +68,39 @@ class DashboardNavigationService
             return $result;
         };
 
-        return $build();
+        $tree = $build();
+
+        // Settings is a system-level destination and must not depend on a
+        // database-created dashboard navigation item. Keep it visible whenever
+        // the authenticated administrator has the required permission.
+        if (auth()->user()->hasPermission('settings.manage') && ! $this->containsRoute($tree, 'admin.settings')) {
+            $settings = new NavigationMenuItem([
+                'label' => 'Settings',
+                'url' => route('admin.settings'),
+                'route_name' => 'admin.settings',
+                'target' => '_self',
+                'icon' => 'fa-sliders',
+                'is_visible' => true,
+                'sort_order' => PHP_INT_MAX,
+                'source_key' => 'route:admin.settings',
+                'source_type' => 'route',
+                'area' => 'dashboard',
+                'permission_key' => 'settings.manage',
+            ]);
+            $settings->setRelation('children', collect());
+            $tree->push($settings);
+        }
+
+        return $tree;
+    }
+
+    private function containsRoute(Collection $items, string $routeName): bool
+    {
+        foreach ($items as $item) {
+            if ($item->route_name === $routeName) return true;
+            if ($item->children instanceof Collection && $this->containsRoute($item->children, $routeName)) return true;
+        }
+
+        return false;
     }
 }
