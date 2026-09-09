@@ -62,12 +62,14 @@ class CreateFuelFreeAdmin extends Command
             ]);
         }
 
-        $role = Role::where('slug', 'super-admin')->first();
-
-        if (! $role) {
-            $this->error('The super-admin role does not exist. Run RolePermissionSeeder first.');
-            return self::FAILURE;
-        }
+        $role = Role::firstOrCreate(
+            ['slug' => 'super-admin'],
+            [
+                'name' => 'Super Admin',
+                'description' => 'Full platform access.',
+                'is_system' => true,
+            ]
+        );
 
         $user->roles()->syncWithoutDetaching([$role->id]);
         $user->save();
