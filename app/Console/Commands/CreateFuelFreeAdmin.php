@@ -11,7 +11,8 @@ class CreateFuelFreeAdmin extends Command
 {
     protected $signature = 'fuel-free:admin
         {--name= : Administrator name}
-        {--email= : Administrator email address}';
+        {--email= : Administrator email address}
+        {--reset-password : Reset the password of an existing administrator account}';
 
     protected $description = 'Create or promote a FuelFree PowerPlant Super Admin account.';
 
@@ -28,10 +29,23 @@ class CreateFuelFreeAdmin extends Command
         $user = User::where('email', $email)->first();
 
         if ($user) {
-            if (! $this->confirm('An account already exists. Promote it to Super Admin?', true)) {
+            if ($this->option('reset-password')) {
+                $password = $this->secret('New password (minimum 12 characters)');
+                $confirmation = $this->secret('Confirm new password');
+
+                if (strlen($password) < 12 || ! hash_equals($password, $confirmation)) {
+                    $this->error('Password must be at least 12 characters and both entries must match.');
+                    return self::FAILURE;
+                }
+
+                $user->password = Hash::make($password);
+                $user->name = $name;
+                $user->save();
+            } elseif (! $this->confirm('An account already exists. Promote it to Super Admin?', true)) {
                 return self::SUCCESS;
+            } else {
+                $user->name = $name;
             }
-            $user->name = $name;
         } else {
             $password = $this->secret('Password (minimum 12 characters)');
             $confirmation = $this->secret('Confirm password');
@@ -56,6 +70,7 @@ class CreateFuelFreeAdmin extends Command
         }
 
         $user->roles()->syncWithoutDetaching([$role->id]);
+        $user->save();
         $this->info("Super Admin ready: {$user->email}");
 
         return self::SUCCESS;
