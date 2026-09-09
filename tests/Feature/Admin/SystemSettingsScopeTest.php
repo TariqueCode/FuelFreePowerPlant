@@ -36,6 +36,24 @@ class SystemSettingsScopeTest extends TestCase
         $response->assertSeeText('Storage & upload policy');
     }
 
+    public function test_super_admin_can_open_settings_without_explicit_permission_sync(): void
+    {
+        $role = Role::create([
+            'name' => 'Super Admin',
+            'slug' => 'super-admin',
+            'is_system' => true,
+        ]);
+
+        $user = User::factory()->create();
+        $user->roles()->attach($role);
+
+        $this->assertTrue($user->hasPermission('settings.manage'));
+
+        $this->actingAs($user)
+            ->get(route('admin.settings'))
+            ->assertOk();
+    }
+
     public function test_mail_fields_cannot_create_mailbox_settings_from_system_settings(): void
     {
         $this->actingAs($this->admin())->post(route('admin.settings.update'), [
