@@ -5,9 +5,16 @@ namespace App\Services;
 use App\Models\NavigationMenuItem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Route as RouteFacade;
 
 class DashboardNavigationService
 {
+    private const BUILDER_ROUTE_ALIASES = [
+        'admin.management.index' => ['admin.profile-builder.index', 'Profile Builder'],
+        'admin.cms.index' => ['admin.page-builder.index', 'Page Builder'],
+        'admin.navigation.index' => ['admin.menu-builder.index', 'Menu Builder'],
+    ];
+
     public function tree(string $menu = 'dashboard'): Collection
     {
         $items = NavigationMenuItem::query()
@@ -31,6 +38,22 @@ class DashboardNavigationService
 
             if (! $item->source_key) return false;
             $source = $registry->resolveAny($item->source_key, 'dashboard');
+
+            // The navigation database stores legacy builder source keys while
+            // the actual dashboard routes use their canonical builder names.
+            if (! $source && isset(self::BUILDER_ROUTE_ALIASES[$item->source_key])) {
+                [$routeName, $label] = self::BUILDER_ROUTE_ALIASES[$item->source_key];
+                $route = RouteFacade::getRoutes()->getByName($routeName);
+                if ($route) {
+                    $source = [
+                        'label' => $label,
+                        'url' => $route->uri() === '/' ? '/' : '/'.ltrim($route->uri(), '/'),
+                        'route_name' => $routeName,
+                        'permission' => $this->routePermission($route),
+                    ];
+                }
+            }
+
             if (! $source) return false;
 
             $permission = $source['permission'] ?? null;
@@ -70,10 +93,10 @@ class DashboardNavigationService
 
         $tree = $build();
 
-        // Settings is a system-level destination and must not depend on a
-        // database-created dashboard navigation item. Keep it visible whenever
-        // the authenticated administrator has the required permission.
-        if (auth()->user()->hasPermission('settings.manage') && ! $this->containsRoute($tree, 'admin.settings')) {
+        // Settings is a system destination. Add it only when the database
+        // navigation does not already contain a Settings destination by route
+        // or label, preventing the duplicate entry seen during recovery.
+        if (auth()->user()->hasPermission('settings.manage') && ! $this->containsSettings($tree)) {
             $settings = new NavigationMenuItem([
                 'label' => 'Settings',
                 'url' => route('admin.settings'),
@@ -94,11 +117,19 @@ class DashboardNavigationService
         return $tree;
     }
 
-    private function containsRoute(Collection $items, string $routeName): bool
+    private function routePermission($route): ?string
+    {
+        return collect($route->gatherMiddleware())
+            ->map(fn ($middleware): string => (string) $middleware)
+            ->first(fn (string $middleware): bool => Str::startsWith($middleware, 'permission:'))
+            ?->after('permission:');
+    }
+
+    private function containsSettings(Collection $items): bool
     {
         foreach ($items as $item) {
-            if ($item->route_name === $routeName) return true;
-            if ($item->children instanceof Collection && $this->containsRoute($item->children, $routeName)) return true;
+            if ($item->route_name === 'admin.settings' || Str::lower(trim((string) $item->label)) === 'settings') return true;
+            if ($item->children instanceof Collection && $this->containsSettings($item->children)) return true;
         }
 
         return false;
