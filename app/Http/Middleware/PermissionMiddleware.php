@@ -18,9 +18,11 @@ class PermissionMiddleware
 
         $user = $request->user();
 
-        $allowed = $user && collect($permissions)->contains(
+        // Super Admin is the platform authority and must not be blocked by a
+        // stale or partially-synced permission_role pivot in production.
+        $allowed = $user && ($user->hasRole('super-admin') || collect($permissions)->contains(
             fn (string $permission) => $user->hasPermission($permission)
-        );
+        ));
 
         abort_unless($allowed, 403);
 
