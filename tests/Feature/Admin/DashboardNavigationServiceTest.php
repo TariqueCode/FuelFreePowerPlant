@@ -16,10 +16,10 @@ class DashboardNavigationServiceTest extends TestCase
 
     public function test_settings_is_available_without_a_database_navigation_record(): void
     {
-        $permission = Permission::create([
-            'name' => 'Manage settings',
-            'slug' => 'settings.manage',
-        ]);
+        $permission = Permission::firstOrCreate(
+            ['slug' => 'settings.manage'],
+            ['name' => 'Manage settings'],
+        );
         $role = Role::create([
             'name' => 'Settings QA',
             'slug' => 'settings-qa',
@@ -38,10 +38,10 @@ class DashboardNavigationServiceTest extends TestCase
 
     public function test_retired_external_dashboard_destinations_are_not_rendered(): void
     {
-        $permission = Permission::create([
-            'name' => 'View website',
-            'slug' => 'website.view',
-        ]);
+        $permission = Permission::firstOrCreate(
+            ['slug' => 'website.view'],
+            ['name' => 'View website'],
+        );
         $role = Role::create([
             'name' => 'Navigation QA',
             'slug' => 'navigation-qa',
