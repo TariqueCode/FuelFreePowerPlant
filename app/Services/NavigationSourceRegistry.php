@@ -16,13 +16,7 @@ class NavigationSourceRegistry
         'career.store', 'career.chunks', 'contact.store', 'cms.page', 'gallery.show',
         'news.show', 'projects.show', 'documents.shared-download', 'webmail.redirect',
         'resources.index', 'resources.show', 'resources.download',
-        'site.plants', 'site.future-project', 'site.solutions', 'sustainability',
-    ];
-
-    private const BUILDER_ROUTE_ALIASES = [
-        'admin.management.index' => ['admin.profile-builder.index', 'Profile Builder'],
-        'admin.cms.index' => ['admin.page-builder.index', 'Page Builder'],
-        'admin.navigation.index' => ['admin.menu-builder.index', 'Menu Builder'],
+        'sustainability',
     ];
 
     public function available(string $area = 'public', string $menu = 'main'): Collection
@@ -31,7 +25,6 @@ class NavigationSourceRegistry
         $used = $this->usedSourceKeys($menu);
         $routes = collect(RouteFacade::getRoutes()->getRoutes())
             ->filter(fn (Route $route): bool => $this->eligibleRoute($route, $area))
-            ->reject(fn (Route $route): bool => isset(self::BUILDER_ROUTE_ALIASES[$route->getName()]))
             ->reject(fn (Route $route): bool => $this->hasCanonicalCmsPage($route, $area))
             ->map(fn (Route $route): array => $this->routeSource($route, $area))
             ->filter(fn (array $source): bool => $source['permission'] === null || ! auth()->check() || auth()->user()->hasPermission($source['permission']));
@@ -61,17 +54,6 @@ class NavigationSourceRegistry
         if (! in_array($area, ['public', 'dashboard'], true)) return null;
         if (Str::startsWith($key, 'route:')) {
             $name = Str::after($key, 'route:');
-            if (isset(self::BUILDER_ROUTE_ALIASES[$name])) {
-                [$canonical, $label] = self::BUILDER_ROUTE_ALIASES[$name];
-                $route = collect(RouteFacade::getRoutes()->getRoutes())
-                    ->first(fn (Route $route): bool => $route->getName() === $canonical);
-                if ($route && $this->eligibleRoute($route, $area, true)) {
-                    $source = $this->routeSource($route, $area);
-                    $source['label'] = $label;
-                    return $source;
-                }
-                return null;
-            }
             $canonical = $this->canonicalCmsPageForRoute($name, $area);
             if ($canonical) return $canonical;
             $route = collect(RouteFacade::getRoutes()->getRoutes())->first(fn (Route $route): bool => $route->getName() === $name);
@@ -101,11 +83,11 @@ class NavigationSourceRegistry
         return NavigationMenuItem::query()->where('menu', $menu)->whereNotNull('source_key')->pluck('source_key');
     }
 
-    private function eligibleRoute(Route $route, string $area, bool $allowBuilder = false): bool
+    private function eligibleRoute(Route $route, string $area): bool
     {
         $name = $route->getName(); $uri = ltrim($route->uri(), '/');
         if (! $name || ! in_array($route->methods()[0] ?? null, ['GET', 'HEAD'], true)) return false;
-        if (! $allowBuilder && $this->isNavigationBuilderRoute($name)) return false;
+        if ($this->isNavigationBuilderRoute($name)) return false;
         if (str_contains($uri, '{') || in_array($name, self::EXCLUDED_ROUTE_NAMES, true)) return false;
         if ($uri === 'resources' || Str::startsWith($uri, 'resources/')) return false;
         if (Str::startsWith($uri, ['admin/site-content', 'admin/plants'])) return false;
@@ -156,9 +138,8 @@ class NavigationSourceRegistry
     {
         $friendly = [
             'home' => 'Home',
-            'site.plants' => (string) config('fuelfree.projects.label', 'Projects & Our Plans'),
-            'site.future-project' => 'Future Project', 'site.solutions' => 'Solutions', 'site.gallery' => 'Gallery',
-            'site.career' => 'Career', 'news.index' => 'News & Notices', 'sustainability' => 'Sustainability', 'contact' => 'Contact',
+            'site.gallery' => 'Gallery', 'site.career' => 'Career', 'news.index' => 'News & Notices',
+            'sustainability' => 'Sustainability', 'contact' => 'Contact',
         ];
         if (array_key_exists($name, $friendly)) return $friendly[$name];
         $action = (string) ($route->getActionName() ?? ''); $controller = Str::before(Str::afterLast($action, '\\'), '@');
