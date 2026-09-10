@@ -67,6 +67,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     Route::patch('/{page}', [CmsController::class, 'update'])->name('update');
                     Route::post('/{page}/duplicate', [CmsController::class, 'duplicate'])->name('duplicate');
                     Route::delete('/{page}', [CmsController::class, 'destroy'])->name('destroy');
+                    Route::post('/media', [CmsController::class, 'uploadMedia'])->name('media');
                 });
 
             Route::middleware(['web', 'auth', 'permission:cms.publish'])
