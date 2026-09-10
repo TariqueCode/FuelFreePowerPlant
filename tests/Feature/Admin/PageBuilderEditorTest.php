@@ -20,6 +20,7 @@ class PageBuilderEditorTest extends TestCase
         $permissions = collect([
             ['slug' => 'cms.view', 'name' => 'View CMS'],
             ['slug' => 'cms.manage', 'name' => 'Manage CMS'],
+            ['slug' => 'cms.publish', 'name' => 'Publish CMS'],
             ['slug' => 'website.manage', 'name' => 'Manage Website'],
         ])->map(fn (array $permission) => Permission::firstOrCreate(['slug' => $permission['slug']], ['name' => $permission['name']]));
 
@@ -69,6 +70,41 @@ class PageBuilderEditorTest extends TestCase
         $this->assertTrue($page->use_global_framework);
         $this->assertTrue($page->use_global_header);
         $this->assertTrue($page->use_global_footer);
+    }
+
+    public function test_page_builder_persists_structured_sections_without_falling_back_to_legacy_cms(): void
+    {
+        $blocks = [
+            ['type' => 'hero', 'title' => 'Our Technology', 'body' => 'Structured hero content.'],
+            ['type' => 'cards', 'title' => 'Capabilities', 'items' => [['title' => 'Engineering', 'body' => 'Reliable systems.']]],
+        ];
+
+        $response = $this->actingAs($this->user())->post(route('admin.page-builder.store'), [
+            'title' => 'Structured Page',
+            'slug' => 'structured-page',
+            'content' => '<p>Fallback content.</p>',
+            'builder_blocks' => json_encode($blocks),
+            'is_published' => '0',
+        ]);
+
+        $response->assertRedirect(route('admin.page-builder.index'));
+        $page = CmsPage::where('slug', 'structured-page')->firstOrFail();
+        $this->assertSame($blocks, $page->builder_blocks);
+        $this->assertSame('<p>Fallback content.</p>', $page->content);
+        $this->assertTrue($page->use_global_framework);
+    }
+
+    public function test_page_builder_rejects_invalid_section_payload(): void
+    {
+        $response = $this->actingAs($this->user())->from(route('admin.page-builder.create'))->post(route('admin.page-builder.store'), [
+            'title' => 'Invalid Sections',
+            'slug' => 'invalid-sections',
+            'builder_blocks' => '{not-valid-json',
+            'is_published' => '0',
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertDatabaseMissing('cms_pages', ['slug' => 'invalid-sections']);
     }
 
     public function test_global_editor_media_upload_endpoint_accepts_image(): void
