@@ -36,11 +36,11 @@ class DashboardNavigationServiceTest extends TestCase
         $this->assertTrue($tree->contains(fn (NavigationMenuItem $item): bool => $item->route_name === 'admin.settings'));
     }
 
-    public function test_legacy_builder_source_keys_resolve_to_canonical_dashboard_routes(): void
+    public function test_legacy_builder_source_keys_are_not_resolved(): void
     {
         $permission = Permission::firstOrCreate(
-            ['slug' => 'cms.view'],
-            ['name' => 'View CMS'],
+            ['slug' => 'website.view'],
+            ['name' => 'View website'],
         );
         $role = Role::create([
             'name' => 'Builder Navigation QA',
@@ -52,25 +52,27 @@ class DashboardNavigationServiceTest extends TestCase
         $user = User::factory()->create();
         $user->roles()->attach($role);
 
-        NavigationMenuItem::create([
-            'menu' => 'dashboard',
-            'area' => 'dashboard',
-            'label' => 'Legacy Page Builder',
-            'source_key' => 'route:admin.cms.index',
-            'source_type' => 'route',
-            'target' => '_self',
-            'is_visible' => true,
-            'sort_order' => 1,
-        ]);
+        foreach (['admin.cms.index', 'admin.management.index', 'admin.navigation.index'] as $legacyRoute) {
+            NavigationMenuItem::create([
+                'menu' => 'dashboard',
+                'area' => 'dashboard',
+                'label' => 'Legacy Builder',
+                'source_key' => 'route:'.$legacyRoute,
+                'source_type' => 'route',
+                'target' => '_self',
+                'is_visible' => true,
+                'sort_order' => 1,
+            ]);
+        }
 
         $this->actingAs($user);
         $tree = app(DashboardNavigationService::class)->tree();
 
-        $item = $tree->first(fn (NavigationMenuItem $item): bool => $item->source_key === 'route:admin.cms.index');
-
-        $this->assertNotNull($item);
-        $this->assertSame('Page Builder', $item->label);
-        $this->assertSame('admin.page-builder.index', $item->route_name);
+        $this->assertFalse($tree->contains(fn (NavigationMenuItem $item): bool => in_array(
+            $item->source_key,
+            ['route:admin.cms.index', 'route:admin.management.index', 'route:admin.navigation.index'],
+            true,
+        )));
     }
 
     public function test_retired_external_dashboard_destinations_are_not_rendered(): void
