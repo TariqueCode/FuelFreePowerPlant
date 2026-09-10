@@ -23,7 +23,7 @@
         <em>{{ $item->source_type === 'folder' ? 'Folder' : 'Live source' }}</em>
         <small>{{ $item->route_name ?: ($item->url ?: 'Structural node') }} · {{ $item->is_visible ? 'Visible' : 'Hidden' }}@if($item->permission_key) · {{ $item->permission_key }}@endif</small>
         <div class="inline-label-edit" id="rename-{{ $item->id }}" hidden>
-            <form method="POST" action="{{ route('admin.navigation.update', $item) }}">
+            <form method="POST" action="{{ route('admin.menu-builder.update', $item) }}">
                 @csrf @method('PATCH')
                 <input name="label" value="{{ $item->displayLabel() }}" maxlength="160" required aria-label="Navigation label">
                 <input type="hidden" name="parent_id" value="{{ $item->parent_id }}">
