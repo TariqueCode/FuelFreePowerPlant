@@ -5,7 +5,7 @@
   window.__FF_GLOBAL_CMS_EDITOR__ = true;
   const template = document.getElementById('ff-global-cms-editor-template');
   const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-  const uploadUrl = @json(route('admin.site-content.media'));
+  const uploadUrl = @json(route('admin.page-builder.media'));
   if (!template) return;
   const states = new WeakMap(); const allStates = new Set();
   const escAttr = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
