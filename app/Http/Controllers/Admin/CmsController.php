@@ -20,11 +20,11 @@ class CmsController extends Controller
         $pages = CmsPage::query()
             ->get()
             ->map(function (CmsPage $page) {
-                $page->content_source = 'Global CMS';
-                $page->edit_url = route('admin.cms.edit', $page);
-                $page->toggle_url = route('admin.cms.toggle', $page);
-                $page->delete_url = route('admin.cms.destroy', $page);
-                $page->duplicate_url = route('admin.cms.duplicate', $page);
+                $page->content_source = 'Page Builder';
+                $page->edit_url = route('admin.page-builder.edit', $page);
+                $page->toggle_url = route('admin.page-builder.toggle', $page);
+                $page->delete_url = route('admin.page-builder.destroy', $page);
+                $page->duplicate_url = route('admin.page-builder.duplicate', $page);
                 return $page;
             })
             ->sortByDesc(fn ($page) => $page->updated_at?->timestamp ?? 0)
@@ -55,7 +55,7 @@ class CmsController extends Controller
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title']);
         CmsPage::create($data);
 
-        return redirect()->route('admin.cms.index')->with('status', 'Page created successfully.');
+        return redirect()->route('admin.page-builder.index')->with('status', 'Page created successfully.');
     }
 
     public function edit(CmsPage $page): View
@@ -70,7 +70,7 @@ class CmsController extends Controller
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title'], $page->id);
         $page->update($data);
 
-        return redirect()->route('admin.cms.index')->with('status', 'Page updated successfully.');
+        return redirect()->route('admin.page-builder.index')->with('status', 'Page updated successfully.');
     }
 
     public function togglePublication(Request $request, CmsPage $page): RedirectResponse
@@ -78,7 +78,7 @@ class CmsController extends Controller
         abort_unless($request->user()->hasPermission('cms.publish'), 403, 'Publishing pages requires publishing permission.');
         $page->update(['is_published' => !$page->is_published]);
 
-        return redirect()->route('admin.cms.index')->with('status', $page->is_published ? 'Page published successfully.' : 'Page unpublished successfully.');
+        return redirect()->route('admin.page-builder.index')->with('status', $page->is_published ? 'Page published successfully.' : 'Page unpublished successfully.');
     }
 
     public function destroy(CmsPage $page): RedirectResponse
@@ -98,7 +98,7 @@ class CmsController extends Controller
         $copy->use_global_footer = true;
         $copy->save();
 
-        return redirect()->route('admin.cms.edit', $copy)->with('status', 'Draft copy created.');
+        return redirect()->route('admin.page-builder.edit', $copy)->with('status', 'Draft copy created.');
     }
 
     public function uploadMedia(Request $request): JsonResponse
