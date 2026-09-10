@@ -55,14 +55,24 @@ class SettingsController
             'uploads.content_media_max_mb'=>data_get($validated,'uploads.content_media_max_mb'),
         ];
 
+        $oldLogo=null;
         if($request->hasFile('company.logo')){
-            $old=SystemSetting::query()->where('key','company.logo_path')->value('value');
-            if($old) Storage::disk('public')->delete($old);
+            // Store the replacement first. If storage fails, the current global
+            // logo remains intact instead of leaving the site without branding.
+            $oldLogo=SystemSetting::query()->where('key','company.logo_path')->value('value');
             $data['company.logo_path']=$request->file('company.logo')->store('site/branding','public');
         }
+
         foreach($data as $key=>$value) SystemSetting::updateOrCreate(['key'=>$key],['value'=>(string)($value??''),'is_sensitive'=>false]);
+
+        if($oldLogo && isset($data['company.logo_path']) && $oldLogo !== $data['company.logo_path']){
+            Storage::disk('public')->delete($oldLogo);
+        }
+
         Cache::forget('fuelfree.system_settings');
         Cache::forget('fuelfree.documents_max_upload_mb');
+        Cache::forget('fuelfree.company');
+
         return back()->with('status','System settings saved successfully.');
     }
 }
