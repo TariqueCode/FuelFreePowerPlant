@@ -179,12 +179,23 @@ jobs:
           test -f .env
           test -f artisan
 
-          echo "==> Verifying production database configuration"
+          echo "==> Enforcing production MySQL configuration"
+          if grep -qE '^DB_CONNECTION=' .env; then
+              sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env
+          else
+              printf '\nDB_CONNECTION=mysql\n' >> .env
+          fi
           DB_DRIVER="$(grep -E '^DB_CONNECTION=' .env | head -n1 | cut -d= -f2- || true)"
           if [ "$DB_DRIVER" != "mysql" ]; then
-              echo "ERROR: Production DB_CONNECTION must be mysql. Refusing deployment to a different database driver."
+              echo "ERROR: Unable to enforce production DB_CONNECTION=mysql. Refusing deployment."
               exit 1
           fi
+          for key in DB_HOST DB_PORT DB_DATABASE DB_USERNAME DB_PASSWORD; do
+              if ! grep -qE "^${key}=" .env; then
+                  echo "ERROR: Required production database setting is missing: ${key}"
+                  exit 1
+              fi
+          done
 
           echo "==> Installing PHP dependencies"
           "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts
