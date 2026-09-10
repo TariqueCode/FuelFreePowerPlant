@@ -127,10 +127,10 @@ class PublishingAuthorityTest extends TestCase
             'title' => 'Publishing QA', 'slug' => 'publishing-qa', 'content' => '<p>QA</p>', 'is_published' => false,
         ]);
 
-        $this->actingAs($manager)->patch(route('admin.cms.toggle', $page))->assertForbidden();
+        $this->actingAs($manager)->patch(route('admin.page-builder.toggle', $page))->assertForbidden();
         $this->assertFalse($page->fresh()->is_published);
 
-        $this->actingAs($publisher)->patch(route('admin.cms.toggle', $page))->assertRedirect();
+        $this->actingAs($publisher)->patch(route('admin.page-builder.toggle', $page))->assertRedirect();
         $this->assertTrue($page->fresh()->is_published);
     }
 }
