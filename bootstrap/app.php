@@ -44,9 +44,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('admin/menu-builder')->name('admin.menu-builder.')
                 ->group(function (): void {
                     Route::post('/', [NavigationMenuController::class, 'store'])->name('store');
-                    // Legacy admin markup submits deletion as POST to /{item}.
-                    // Keep that compatibility path permission-protected and map it to destroy.
-                    Route::post('/{item}', [NavigationMenuController::class, 'destroy'])->name('legacy-destroy');
                     Route::patch('/{item}', [NavigationMenuController::class, 'update'])->name('update');
                     Route::delete('/{item}', [NavigationMenuController::class, 'destroy'])->name('destroy');
                     Route::post('/reorder', [NavigationMenuController::class, 'reorder'])->name('reorder');
