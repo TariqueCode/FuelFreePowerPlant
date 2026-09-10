@@ -24,15 +24,15 @@ class DashboardNavigationService
             if ($item->source_type === 'external_link') {
                 $url = trim((string) $item->url);
                 if ($url === '') return false;
-                if (Str::startsWith($url, ['/admin/site-content', '/admin/plants'])) return false;
+                if (Str::startsWith($url, ['/admin/site-content', '/admin/plants', '/plants', '/future-project', '/solutions'])) return false;
                 if ($item->permission_key && ! auth()->user()->hasPermission($item->permission_key)) return false;
                 return true;
             }
 
             if (! $item->source_key) return false;
 
-            // NavigationSourceRegistry is the single source of truth for route
-            // aliases, canonical routes, permissions and usable destinations.
+            // NavigationSourceRegistry is the single source of truth for
+            // canonical routes, permissions and usable destinations.
             $source = $registry->resolveAny($item->source_key, 'dashboard');
             if (! $source) return false;
 
@@ -75,7 +75,7 @@ class DashboardNavigationService
 
         // Settings remains available when its system destination has not yet
         // been persisted by Menu Builder, but its route metadata comes from the
-        // canonical navigation registry rather than a second alias implementation.
+        // canonical navigation registry rather than a second route implementation.
         if (auth()->user()->hasPermission('settings.manage') && ! $this->containsSettings($tree)) {
             $source = $registry->resolveAny('route:admin.settings', 'dashboard');
             if ($source) {
