@@ -89,7 +89,9 @@ class PageBuilderEditorTest extends TestCase
 
         $response->assertRedirect(route('admin.page-builder.index'));
         $page = CmsPage::where('slug', 'structured-page')->firstOrFail();
-        $this->assertSame($blocks, $page->builder_blocks);
+
+        // MySQL JSON normalizes object key order; compare structure, not object key insertion order.
+        $this->assertSame($this->normalizeJsonValue($blocks), $this->normalizeJsonValue($page->builder_blocks));
         $this->assertSame('<p>Fallback content.</p>', $page->content);
         $this->assertTrue($page->use_global_framework);
     }
@@ -117,5 +119,29 @@ class PageBuilderEditorTest extends TestCase
 
         $response->assertOk()->assertJsonStructure(['url', 'mime', 'name']);
         $this->assertCount(1, Storage::disk('public')->allFiles('site-content/media'));
+    }
+
+    /** @return array<int|string, mixed> */
+    private function normalizeJsonValue(mixed $value): mixed
+    {
+        if (!is_array($value)) {
+            return $value;
+        }
+
+        $normalized = [];
+        foreach ($value as $key => $child) {
+            $normalized[$key] = $this->normalizeJsonValue($child);
+        }
+
+        if ($this->isAssociative($normalized)) {
+            ksort($normalized);
+        }
+
+        return $normalized;
+    }
+
+    private function isAssociative(array $value): bool
+    {
+        return array_keys($value) !== range(0, count($value) - 1);
     }
 }
