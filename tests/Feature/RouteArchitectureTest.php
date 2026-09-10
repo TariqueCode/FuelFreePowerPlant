@@ -18,6 +18,12 @@ class RouteArchitectureTest extends TestCase
         $this->assertNull(Route::getRoutes()->getByName('admin.navigation.index'));
     }
 
+    public function test_canonical_menu_builder_does_not_expose_legacy_destroy_route(): void
+    {
+        $this->assertNotNull(Route::getRoutes()->getByName('admin.menu-builder.destroy'));
+        $this->assertNull(Route::getRoutes()->getByName('admin.menu-builder.legacy-destroy'));
+    }
+
     public function test_canonical_builder_route_names_are_unique(): void
     {
         $names = collect(Route::getRoutes()->getRoutes())
