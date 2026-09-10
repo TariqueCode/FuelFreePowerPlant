@@ -17,28 +17,18 @@ class CmsController extends Controller
 {
     public function index(Request $request): View
     {
-        $pages = CmsPage::query()
-            ->get()
-            ->map(function (CmsPage $page) {
-                $page->content_source = 'Page Builder';
-                $page->edit_url = route('admin.page-builder.edit', $page);
-                $page->toggle_url = route('admin.page-builder.toggle', $page);
-                $page->delete_url = route('admin.page-builder.destroy', $page);
-                $page->duplicate_url = route('admin.page-builder.duplicate', $page);
-                return $page;
-            })
-            ->sortByDesc(fn ($page) => $page->updated_at?->timestamp ?? 0)
-            ->values();
+        $pages = CmsPage::query()->get()->map(function (CmsPage $page) {
+            $page->content_source = 'Page Builder';
+            $page->edit_url = route('admin.page-builder.edit', $page);
+            $page->toggle_url = route('admin.page-builder.toggle', $page);
+            $page->delete_url = route('admin.page-builder.destroy', $page);
+            $page->duplicate_url = route('admin.page-builder.duplicate', $page);
+            return $page;
+        })->sortByDesc(fn ($page) => $page->updated_at?->timestamp ?? 0)->values();
 
         $perPage = 15;
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $pages = new LengthAwarePaginator(
-            $pages->forPage($currentPage, $perPage)->values(),
-            $pages->count(),
-            $perPage,
-            $currentPage,
-            ['path' => $request->url(), 'query' => $request->query()]
-        );
+        $pages = new LengthAwarePaginator($pages->forPage($currentPage, $perPage)->values(), $pages->count(), $perPage, $currentPage, ['path' => $request->url(), 'query' => $request->query()]);
 
         return view('admin.cms.page-builder-index', ['pages' => $pages]);
     }
@@ -54,7 +44,6 @@ class CmsController extends Controller
         $this->guardPublishing($request, $data['is_published']);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title']);
         CmsPage::create($data);
-
         return redirect()->route('admin.page-builder.index')->with('status', 'Page created successfully.');
     }
 
@@ -69,7 +58,6 @@ class CmsController extends Controller
         $this->guardPublishing($request, $data['is_published']);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title'], $page->id);
         $page->update($data);
-
         return redirect()->route('admin.page-builder.index')->with('status', 'Page updated successfully.');
     }
 
@@ -77,7 +65,6 @@ class CmsController extends Controller
     {
         abort_unless($request->user()->hasPermission('cms.publish'), 403, 'Publishing pages requires publishing permission.');
         $page->update(['is_published' => !$page->is_published]);
-
         return redirect()->route('admin.page-builder.index')->with('status', $page->is_published ? 'Page published successfully.' : 'Page unpublished successfully.');
     }
 
@@ -97,23 +84,15 @@ class CmsController extends Controller
         $copy->use_global_header = true;
         $copy->use_global_footer = true;
         $copy->save();
-
         return redirect()->route('admin.page-builder.edit', $copy)->with('status', 'Draft copy created.');
     }
 
     public function uploadMedia(Request $request): JsonResponse
     {
-        $data = $request->validate([
-            'media' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,gif,mp4,webm,mov', 'max:' . $this->maxUploadKb()],
-        ]);
+        $data = $request->validate(['media' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,gif,mp4,webm,mov', 'max:' . $this->maxUploadKb()]]);
         $file = $data['media'];
         $path = $file->store('site-content/media', 'public');
-
-        return response()->json([
-            'url' => Storage::disk('public')->url($path),
-            'mime' => $file->getMimeType(),
-            'name' => $file->getClientOriginalName(),
-        ]);
+        return response()->json(['url' => Storage::disk('public')->url($path), 'mime' => $file->getMimeType(), 'name' => $file->getClientOriginalName()]);
     }
 
     private function validatePage(Request $request): array
@@ -127,14 +106,22 @@ class CmsController extends Controller
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:1000'],
             'is_published' => ['nullable', 'boolean'],
+            'builder_blocks' => ['nullable', 'string'],
         ]);
+
+        $blocks = $request->input('builder_blocks');
+        if (is_string($blocks) && trim($blocks) !== '') {
+            $decoded = json_decode($blocks, true);
+            abort_if(json_last_error() !== JSON_ERROR_NONE || !is_array($decoded), 422, 'Page Builder sections contain invalid data.');
+            $data['builder_blocks'] = $decoded;
+        } else {
+            $data['builder_blocks'] = [];
+        }
 
         $data['use_global_framework'] = true;
         $data['use_global_header'] = true;
         $data['use_global_footer'] = true;
         $data['is_published'] = $request->boolean('is_published');
-        $data['builder_blocks'] = [];
-
         return $data;
     }
 
@@ -149,11 +136,7 @@ class CmsController extends Controller
         abort_if($base === '', 422, 'A valid page slug could not be generated.');
         $slug = $base;
         $counter = 2;
-
-        while (CmsPage::where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
-            $slug = $base . '-' . $counter++;
-        }
-
+        while (CmsPage::where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) $slug = $base . '-' . $counter++;
         return $slug;
     }
 
