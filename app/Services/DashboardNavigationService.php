@@ -31,8 +31,6 @@ class DashboardNavigationService
 
             if (! $item->source_key) return false;
 
-            // NavigationSourceRegistry is the single source of truth for
-            // canonical routes, permissions and usable destinations.
             $source = $registry->resolveAny($item->source_key, 'dashboard');
             if (! $source) return false;
 
@@ -73,40 +71,43 @@ class DashboardNavigationService
 
         $tree = $build();
 
-        // Settings remains available when its system destination has not yet
-        // been persisted by Menu Builder, but its route metadata comes from the
-        // canonical navigation registry rather than a second route implementation.
-        if (auth()->user()->hasPermission('settings.manage') && ! $this->containsSettings($tree)) {
-            $source = $registry->resolveAny('route:admin.settings', 'dashboard');
-            if ($source) {
-                $settings = new NavigationMenuItem([
-                    'label' => $source['label'],
-                    'url' => $source['url'],
-                    'route_name' => $source['route_name'],
-                    'target' => '_self',
-                    'icon' => 'fa-sliders',
-                    'is_visible' => true,
-                    'sort_order' => PHP_INT_MAX,
-                    'source_key' => $source['key'],
-                    'source_type' => $source['type'],
-                    'area' => 'dashboard',
-                    'permission_key' => $source['permission'],
-                ]);
-                $settings->setRelation('children', collect());
-                $tree->push($settings);
-            }
-        }
+        $this->appendCapabilitySource($tree, $registry, 'route:admin.settings', 'settings.manage', 'Settings', 'fa-sliders');
+        $this->appendCapabilitySource($tree, $registry, 'route:admin.users.index', 'users.view', 'Users', 'fa-users');
 
         return $tree;
     }
 
-    private function containsSettings(Collection $items): bool
+    private function appendCapabilitySource(Collection $tree, NavigationSourceRegistry $registry, string $sourceKey, string $permission, string $label, string $icon): void
     {
-        foreach ($items as $item) {
-            if ($item->route_name === 'admin.settings' || Str::lower(trim((string) $item->label)) === 'settings') return true;
-            if ($item->children instanceof Collection && $this->containsSettings($item->children)) return true;
-        }
+        if (! auth()->user()->hasPermission($permission) || $this->containsRoute($tree, $registry->resolveAny($sourceKey, 'dashboard')['route_name'] ?? null)) return;
 
+        $source = $registry->resolveAny($sourceKey, 'dashboard');
+        if (! $source) return;
+
+        $item = new NavigationMenuItem([
+            'label' => $label,
+            'url' => $source['url'],
+            'route_name' => $source['route_name'],
+            'target' => '_self',
+            'icon' => $icon,
+            'is_visible' => true,
+            'sort_order' => PHP_INT_MAX,
+            'source_key' => $source['key'],
+            'source_type' => $source['type'],
+            'area' => 'dashboard',
+            'permission_key' => $source['permission'] ?? $permission,
+        ]);
+        $item->setRelation('children', collect());
+        $tree->push($item);
+    }
+
+    private function containsRoute(Collection $items, ?string $routeName): bool
+    {
+        if (! $routeName) return false;
+        foreach ($items as $item) {
+            if ($item->route_name === $routeName) return true;
+            if ($item->children instanceof Collection && $this->containsRoute($item->children, $routeName)) return true;
+        }
         return false;
     }
 }
