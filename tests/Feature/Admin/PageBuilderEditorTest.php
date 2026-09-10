@@ -33,7 +33,7 @@ class PageBuilderEditorTest extends TestCase
 
     public function test_page_builder_exposes_global_cms_editor_tool_surface(): void
     {
-        $response = $this->actingAs($this->user())->get(route('admin.cms.create'));
+        $response = $this->actingAs($this->user())->get(route('admin.page-builder.create'));
 
         $response->assertOk()
             ->assertSee('Global CMS Editor', false)
@@ -53,7 +53,7 @@ class PageBuilderEditorTest extends TestCase
 
     public function test_page_builder_saves_canonical_rich_text_editor_content(): void
     {
-        $response = $this->actingAs($this->user())->post(route('admin.cms.store'), [
+        $response = $this->actingAs($this->user())->post(route('admin.page-builder.store'), [
             'title' => 'Global Editor QA',
             'slug' => 'global-editor-qa',
             'excerpt' => 'Editor persistence check.',
@@ -61,7 +61,7 @@ class PageBuilderEditorTest extends TestCase
             'is_published' => '0',
         ]);
 
-        $response->assertRedirect(route('admin.cms.index'));
+        $response->assertRedirect(route('admin.page-builder.index'));
         $this->assertDatabaseHas('cms_pages', ['slug' => 'global-editor-qa']);
         $page = CmsPage::where('slug', 'global-editor-qa')->firstOrFail();
         $this->assertSame('<p><strong>Bold</strong> editor content.</p>', $page->content);
@@ -75,7 +75,7 @@ class PageBuilderEditorTest extends TestCase
     {
         Storage::fake('public');
 
-        $response = $this->actingAs($this->user())->post(route('admin.site-content.media'), [
+        $response = $this->actingAs($this->user())->post(route('admin.page-builder.media'), [
             'media' => UploadedFile::fake()->image('editor-image.jpg', 640, 480),
         ]);
 
