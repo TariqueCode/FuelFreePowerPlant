@@ -49,9 +49,9 @@ return Application::configure(basePath: dirname(__DIR__))
                     Route::post('/reorder', [NavigationMenuController::class, 'reorder'])->name('reorder');
                 });
 
-            // Canonical Page Builder surface. Legacy route/source keys are resolved
-            // by NavigationSourceRegistry, while the application itself exposes only
-            // the canonical admin.page-builder.* route namespace.
+            // Canonical Page Builder surface. No legacy admin builder route names
+            // are exposed; persisted legacy navigation keys are retired instead of
+            // being reintroduced as runtime aliases.
             Route::middleware(['web', 'auth', 'permission:cms.view'])
                 ->prefix('admin/page-builder')->name('admin.page-builder.')
                 ->group(function (): void {
