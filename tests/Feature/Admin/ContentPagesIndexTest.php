@@ -24,7 +24,7 @@ class ContentPagesIndexTest extends TestCase
             ['website.publish', 'Publish website content'],
         ])->map(fn (array $permission) => Permission::firstOrCreate(
             ['slug' => $permission[0]],
-            ['name' => $permission[1]]
+            ['name' => $permission[1]],
         ));
 
         $role = Role::create([
@@ -50,7 +50,7 @@ class ContentPagesIndexTest extends TestCase
                 'title' => 'Future Projects',
                 'content' => '<p>Future projects content.</p>',
                 'is_published' => true,
-            ]
+            ],
         );
 
         $aboutUs = CmsPage::query()->updateOrCreate(
@@ -59,21 +59,21 @@ class ContentPagesIndexTest extends TestCase
                 'title' => 'About Us',
                 'content' => '<p>About us content.</p>',
                 'is_published' => true,
-            ]
+            ],
         );
 
-        $response = $this->actingAs($user)->get(route('admin.cms.index'));
+        $response = $this->actingAs($user)->get(route('admin.page-builder.index'));
 
         $response->assertOk()
             ->assertSee('Future Projects')
             ->assertSee('About Us')
-            ->assertSee(route('admin.cms.edit', $futureProjects), false)
-            ->assertSee(route('admin.cms.edit', $aboutUs), false)
-            ->assertSee(route('admin.cms.toggle', $futureProjects), false)
-            ->assertSee(route('admin.cms.toggle', $aboutUs), false)
-            ->assertSee(route('admin.cms.destroy', $futureProjects), false)
-            ->assertSee(route('admin.cms.destroy', $aboutUs), false)
-            ->assertSee(route('admin.cms.duplicate', $futureProjects), false)
+            ->assertSee(route('admin.page-builder.edit', $futureProjects), false)
+            ->assertSee(route('admin.page-builder.edit', $aboutUs), false)
+            ->assertSee(route('admin.page-builder.toggle', $futureProjects), false)
+            ->assertSee(route('admin.page-builder.toggle', $aboutUs), false)
+            ->assertSee(route('admin.page-builder.destroy', $futureProjects), false)
+            ->assertSee(route('admin.page-builder.destroy', $aboutUs), false)
+            ->assertSee(route('admin.page-builder.duplicate', $futureProjects), false)
             ->assertDontSee('/admin/site-content/', false)
             ->assertDontSee('Site Content', false);
     }
