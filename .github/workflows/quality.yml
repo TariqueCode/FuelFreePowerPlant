@@ -154,6 +154,9 @@ jobs:
       - name: Run unit tests on SQLite
         run: php artisan test tests/Unit
 
+      - name: Clear compiled views before feature suite
+        run: php artisan view:clear
+
       - name: Run feature tests on SQLite
         run: php artisan test tests/Feature
 
