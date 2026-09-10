@@ -52,11 +52,11 @@ jobs:
           set -euo pipefail
           cp .env.example .env
           sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env
-          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
-          sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env
-          sed -i 's/^DB_DATABASE=.*/DB_DATABASE=fuelfree_test/' .env
-          sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
-          sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
+          sed -i 's/^# DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+          sed -i 's/^# DB_PORT=.*/DB_PORT=3306/' .env
+          sed -i 's/^# DB_DATABASE=.*/DB_DATABASE=fuelfree_test/' .env
+          sed -i 's/^# DB_USERNAME=.*/DB_USERNAME=root/' .env
+          sed -i 's/^# DB_PASSWORD=.*/DB_PASSWORD=root/' .env
       - name: Wait for MySQL
         env:
           DB_CONNECTION: mysql
@@ -190,12 +190,24 @@ jobs:
               echo "ERROR: Unable to enforce production DB_CONNECTION=mysql. Refusing deployment."
               exit 1
           fi
-          for key in DB_HOST DB_PORT DB_DATABASE DB_USERNAME DB_PASSWORD; do
-              if ! grep -qE "^${key}=" .env; then
-                  echo "ERROR: Required production database setting is missing: ${key}"
+
+          # Laravel supports either DB_URL or the individual DB_* settings.
+          # Accept both forms so the persistent cPanel .env is not needlessly
+          # rewritten or exposed; only the driver is normalized above.
+          if grep -qE '^DB_URL=' .env; then
+              DB_URL_VALUE="$(grep -E '^DB_URL=' .env | head -n1 | cut -d= -f2- || true)"
+              if [ -z "$DB_URL_VALUE" ]; then
+                  echo "ERROR: DB_URL is present but empty."
                   exit 1
               fi
-          done
+          else
+              for key in DB_HOST DB_PORT DB_DATABASE DB_USERNAME DB_PASSWORD; do
+                  if ! grep -qE "^${key}=" .env; then
+                      echo "ERROR: Required production database setting is missing: ${key}"
+                      exit 1
+                  fi
+              done
+          fi
 
           echo "==> Installing PHP dependencies"
           "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts
