@@ -65,7 +65,7 @@ class NavigationSourceRegistry
                 [$canonical, $label] = self::BUILDER_ROUTE_ALIASES[$name];
                 $route = collect(RouteFacade::getRoutes()->getRoutes())
                     ->first(fn (Route $route): bool => $route->getName() === $canonical);
-                if ($route && $this->eligibleRoute($route, $area)) {
+                if ($route && $this->eligibleRoute($route, $area, true)) {
                     $source = $this->routeSource($route, $area);
                     $source['label'] = $label;
                     return $source;
@@ -101,11 +101,11 @@ class NavigationSourceRegistry
         return NavigationMenuItem::query()->where('menu', $menu)->whereNotNull('source_key')->pluck('source_key');
     }
 
-    private function eligibleRoute(Route $route, string $area): bool
+    private function eligibleRoute(Route $route, string $area, bool $allowBuilder = false): bool
     {
         $name = $route->getName(); $uri = ltrim($route->uri(), '/');
         if (! $name || ! in_array($route->methods()[0] ?? null, ['GET', 'HEAD'], true)) return false;
-        if ($this->isNavigationBuilderRoute($name)) return false;
+        if (! $allowBuilder && $this->isNavigationBuilderRoute($name)) return false;
         if (str_contains($uri, '{') || in_array($name, self::EXCLUDED_ROUTE_NAMES, true)) return false;
         if ($uri === 'resources' || Str::startsWith($uri, 'resources/')) return false;
         if (Str::startsWith($uri, ['admin/site-content', 'admin/plants'])) return false;
