@@ -13,6 +13,19 @@ concurrency:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: fuelfree_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,7 +37,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: mbstring, sqlite3, pdo_sqlite, dom, xml, xmlwriter, fileinfo, ctype
+          extensions: mbstring, sqlite3, pdo_sqlite, pdo_mysql, dom, xml, xmlwriter, fileinfo, ctype
           coverage: none
       - name: Validate PHP syntax
         shell: bash
@@ -33,14 +46,35 @@ jobs:
           while IFS= read -r -d '' file; do php -l "$file" >/dev/null; done < <(find app config routes database -type f -name '*.php' -print0)
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
-      - name: Prepare test environment
-        run: cp .env.example .env
-      - name: Prepare SQLite database
+      - name: Prepare MySQL test environment
         shell: bash
         run: |
-          mkdir -p database
-          touch database/database.sqlite
-          php artisan migrate --force
+          set -euo pipefail
+          cp .env.example .env
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=mysql/' .env
+          sed -i 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' .env
+          sed -i 's/^DB_PORT=.*/DB_PORT=3306/' .env
+          sed -i 's/^DB_DATABASE=.*/DB_DATABASE=fuelfree_test/' .env
+          sed -i 's/^DB_USERNAME=.*/DB_USERNAME=root/' .env
+          sed -i 's/^DB_PASSWORD=.*/DB_PASSWORD=root/' .env
+      - name: Wait for MySQL
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: fuelfree_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan db:show --database=mysql
+      - name: Migrate MySQL schema
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: fuelfree_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan migrate --force
       - name: Run Laravel package discovery
         run: php artisan package:discover --ansi
       - name: Generate test application key
@@ -51,8 +85,21 @@ jobs:
         run: |
           npm install --no-audit --no-fund
           npm run build
-      - name: Run tests
-        run: php artisan test
+      - name: Verify canonical Page Builder routes
+        run: php artisan route:list --path=admin/page-builder -v
+      - name: Verify Laravel route cache
+        run: php artisan route:cache --ansi
+      - name: Run full feature tests on MySQL
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: fuelfree_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan test tests/Feature
+      - name: Run unit tests
+        run: php artisan test tests/Unit
 
   deploy:
     needs: quality
@@ -121,7 +168,7 @@ jobs:
 
           echo "==> Checking production PHP runtime"
           php -r 'if (PHP_VERSION_ID < 80400) { fwrite(STDERR, "ERROR: FuelFree PowerPlant requires PHP 8.4+ on production. Current: ".PHP_VERSION."\\n"); exit(1); }'
-          for ext in fileinfo mbstring sqlite3 pdo_sqlite; do
+          for ext in fileinfo mbstring pdo_mysql; do
               if ! php -m | grep -qi "^$ext$"; then
                   echo "ERROR: Required PHP extension is missing: $ext"
                   exit 1
@@ -132,26 +179,23 @@ jobs:
           test -f .env
           test -f artisan
 
-          echo "==> Installing PHP dependencies"
-          "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts
-
-          echo "==> Protecting and selecting the production SQLite database"
-          if [ ! -s database/database.sqlite ]; then
-              echo "ERROR: Existing SQLite database/database.sqlite was not found or is empty. Refusing to create a new database."
+          echo "==> Verifying production database configuration"
+          DB_DRIVER="$(grep -E '^DB_CONNECTION=' .env | head -n1 | cut -d= -f2- || true)"
+          if [ "$DB_DRIVER" != "mysql" ]; then
+              echo "ERROR: Production DB_CONNECTION must be mysql. Refusing deployment to a different database driver."
               exit 1
           fi
 
-          if [ ! -f .env.sqlite-recovery-backup ]; then
-              cp .env .env.sqlite-recovery-backup
-          fi
+          echo "==> Installing PHP dependencies"
+          "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts
 
-          php -r '$p=".env"; $e=file_get_contents($p); $r=["DB_CONNECTION"=>"DB_CONNECTION=sqlite","DB_DATABASE"=>"DB_DATABASE=/home/fuelfree/public_html/database/database.sqlite","DB_HOST"=>"# DB_HOST=","DB_PORT"=>"# DB_PORT=","DB_USERNAME"=>"# DB_USERNAME=","DB_PASSWORD"=>"# DB_PASSWORD=","DB_SOCKET"=>"# DB_SOCKET="]; foreach($r as $k=>$v){$e=preg_replace("/^".$k."=.*/m",$v,$e);} $r=["SESSION_DRIVER"=>"SESSION_DRIVER=file","CACHE_STORE"=>"CACHE_STORE=file","QUEUE_CONNECTION"=>"QUEUE_CONNECTION=sync"]; foreach($r as $k=>$v){$e=preg_replace("/^".$k."=.*/m",$v,$e);} file_put_contents($p,$e);'
-
-          echo "==> Clearing stale Laravel caches using SQLite"
+          echo "==> Clearing stale Laravel caches before database operations"
           php artisan optimize:clear
 
-          echo "==> Verifying recovered SQLite database"
-          php artisan db:show
+          echo "==> Verifying production MySQL database"
+          php artisan db:show --database=mysql
+
+          echo "==> Applying safe incremental MySQL migrations"
           php artisan migrate --force
           php artisan migrate:status
 
