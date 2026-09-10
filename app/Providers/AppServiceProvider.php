@@ -17,14 +17,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Blade::precompiler(function (string $template): string {
-            // Keep legacy template references source-compatible while all runtime
-            // routing remains on the canonical builder endpoints.
-            $routeMap = [
-                'admin.management.' => 'admin.profile-builder.',
-                'admin.page-builder.' => 'admin.cms.',
-            ];
-            $template = str_replace(array_keys($routeMap), array_values($routeMap), $template);
-
+            // Presentation labels may be normalized here, but route names must
+            // never be rewritten. Canonical builders are the only runtime source.
             return str_replace(
                 [
                     'Advanced Menu Builder',
