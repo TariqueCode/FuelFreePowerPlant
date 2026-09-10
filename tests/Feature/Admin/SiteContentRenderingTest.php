@@ -32,8 +32,12 @@ class SiteContentRenderingTest extends TestCase
 
     public function test_retired_site_content_news_mutation_is_not_available(): void
     {
-        $this->actingAs($this->websiteViewer())
-            ->patch('/admin/site-content/news/1/toggle')
-            ->assertNotFound();
+        $response = $this->actingAs($this->websiteViewer())
+            ->patch('/admin/site-content/news/1/toggle');
+
+        // The legacy URI must never expose a successful endpoint. Depending on
+        // Laravel's method-matching fallback, an unregistered URI can resolve to
+        // either 404 (no matching route) or 405 (a different method is registered).
+        $this->assertContains($response->status(), [404, 405]);
     }
 }
