@@ -24,6 +24,13 @@ class RouteArchitectureTest extends TestCase
         $this->assertNull(Route::getRoutes()->getByName('admin.menu-builder.legacy-destroy'));
     }
 
+    public function test_retired_public_routes_are_not_registered(): void
+    {
+        $this->assertNull(Route::getRoutes()->getByName('site.plants'));
+        $this->assertNull(Route::getRoutes()->getByName('site.future-project'));
+        $this->assertNull(Route::getRoutes()->getByName('site.solutions'));
+    }
+
     public function test_canonical_builder_route_names_are_unique(): void
     {
         $names = collect(Route::getRoutes()->getRoutes())
