@@ -32,6 +32,20 @@ class RouteArchitectureTest extends TestCase
         $this->assertNull(Route::getRoutes()->getByName('site.solutions'));
     }
 
+    public function test_retired_admin_uris_are_not_registered(): void
+    {
+        $retiredPrefixes = ['admin/site-content', 'admin/plants'];
+        foreach (Route::getRoutes()->getRoutes() as $route) {
+            $uri = trim($route->uri(), '/');
+            foreach ($retiredPrefixes as $prefix) {
+                $this->assertFalse(
+                    $uri === $prefix || str_starts_with($uri, $prefix.'/'),
+                    "Retired admin URI [$uri] remains registered for route [{$route->getName()}].",
+                );
+            }
+        }
+    }
+
     public function test_retired_route_names_are_not_referenced_by_admin_views(): void
     {
         $forbidden = [
