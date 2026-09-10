@@ -202,6 +202,9 @@ jobs:
           DB_PASSWORD: root
         run: php artisan route:cache --ansi
 
+      - name: Clear compiled views before MySQL feature suite
+        run: php artisan view:clear
+
       - name: Run feature tests on MySQL
         env:
           DB_CONNECTION: mysql
