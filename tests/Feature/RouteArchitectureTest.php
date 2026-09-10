@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
@@ -29,6 +30,32 @@ class RouteArchitectureTest extends TestCase
         $this->assertNull(Route::getRoutes()->getByName('site.plants'));
         $this->assertNull(Route::getRoutes()->getByName('site.future-project'));
         $this->assertNull(Route::getRoutes()->getByName('site.solutions'));
+    }
+
+    public function test_retired_route_names_are_not_referenced_by_admin_views(): void
+    {
+        $forbidden = [
+            "route('admin.cms.",
+            'route("admin.cms.',
+            "route('admin.management.",
+            'route("admin.management.',
+            "route('admin.navigation.",
+            'route("admin.navigation.',
+            "route('admin.site-content.",
+            'route("admin.site-content.',
+            "route('admin.menu-builder.legacy-destroy'",
+        ];
+
+        foreach (File::allFiles(resource_path('views/admin')) as $file) {
+            $contents = $file->getContents();
+            foreach ($forbidden as $needle) {
+                $this->assertStringNotContainsString(
+                    $needle,
+                    $contents,
+                    "Retired route reference [$needle] remains in {$file->getRelativePathname()}.",
+                );
+            }
+        }
     }
 
     public function test_canonical_builder_route_names_are_unique(): void
