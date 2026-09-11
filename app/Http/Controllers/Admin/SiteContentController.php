@@ -13,14 +13,13 @@ use Illuminate\View\View;
 
 /**
  * Compatibility shell for legacy Site Content routes while Page Builder is
- * the canonical page-management surface. Only the media endpoint remains
- * functional because the global editor may still reference its legacy URL.
+ * the canonical page-management surface.
  */
 class SiteContentController extends Controller
 {
-    public function index(Request $request): View|RedirectResponse
+    public function index(Request $request): RedirectResponse
     {
-        abort(404);
+        return redirect()->route('admin.news_and_event');
     }
 
     public function create(Request $request): View|RedirectResponse
