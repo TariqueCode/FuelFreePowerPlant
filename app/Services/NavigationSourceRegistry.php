@@ -25,7 +25,7 @@ class NavigationSourceRegistry
         'admin.navigation.index' => ['admin.menu-builder.index', 'Menu Builder'],
         // Legacy Site Content is now a compatibility route. Existing dashboard
         // navigation items must resolve directly to the dedicated News & Event manager.
-        'admin.site-content.index' => ['admin.news_and_event', 'News & Event'],
+        'admin.site-content.index' => ['admin.news_and_event.index', 'News & Event'],
     ];
 
     public function available(string $area = 'public', string $menu = 'main'): Collection
@@ -161,7 +161,7 @@ class NavigationSourceRegistry
             'home' => 'Home',
             'site.plants' => (string) config('fuelfree.projects.label', 'Projects & Our Plans'),
             'site.future-project' => 'Future Project', 'site.solutions' => 'Solutions', 'site.gallery' => 'Gallery',
-            'site.career' => 'Career', 'news.index' => 'News & Notices', 'sustainability' => 'Sustainability', 'contact' => 'Contact',
+            'site.career' => 'Career', 'news.index' => 'News & Event', 'sustainability' => 'Sustainability', 'contact' => 'Contact',
         ];
         if (array_key_exists($name, $friendly)) return $friendly[$name];
         $action = (string) ($route->getActionName() ?? ''); $controller = Str::before(Str::afterLast($action, '\\'), '@');
