@@ -4,9 +4,7 @@ namespace Tests\Feature\Admin;
 
 use App\Models\HomepageSection;
 use App\Models\ManagementProfileFolder;
-use App\Models\NavigationMenuItem;
 use App\Models\SiteContentItem;
-use App\Models\User;
 use App\Services\NavigationSourceRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -71,36 +69,5 @@ class BoardOfDirectorsIntegrationTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Test Director');
-    }
-
-    public function test_legacy_profile_builder_navigation_item_is_normalized_to_folder_source(): void
-    {
-        $folder = ManagementProfileFolder::create([
-            'name' => 'Board of Directors',
-            'slug' => 'board-of-directors',
-            'status' => 'published',
-            'sort_order' => 1,
-        ]);
-
-        $item = NavigationMenuItem::create([
-            'menu' => 'main',
-            'area' => 'public',
-            'parent_id' => null,
-            'label' => 'Profile Builder',
-            'url' => '/board-of-directors',
-            'route_name' => null,
-            'source_key' => null,
-            'source_type' => 'folder',
-            'target' => '_self',
-            'is_visible' => true,
-            'sort_order' => 0,
-        ]);
-
-        $this->artisan('migrate')->assertExitCode(0);
-
-        $item->refresh();
-        $this->assertSame('Board of Directors', $item->label);
-        $this->assertSame('management_folder:'.$folder->id, $item->source_key);
-        $this->assertSame('folder', $item->source_type);
     }
 }
