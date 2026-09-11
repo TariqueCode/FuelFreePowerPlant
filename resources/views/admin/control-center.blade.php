@@ -5,11 +5,11 @@
 <section class="stats">
 <article><i class="fa-solid fa-globe"></i><small>Website content</small><strong>{{ $contentTotal }}</strong><span>{{ $published }} published · {{ $drafts }} drafts</span></article>
 <article><i class="fa-solid fa-panorama"></i><small>Homepage sliders</small><strong>{{ $sliders }}</strong><span>Rotating homepage slides</span></article>
-<article><i class="fa-solid fa-newspaper"></i><small>News &amp; notices</small><strong>{{ $news }}</strong><span>Public updates</span></article>
+<article><i class="fa-solid fa-newspaper"></i><small>News &amp; Event</small><strong>{{ $news }}</strong><span>Public updates</span></article>
 <article><i class="fa-solid fa-images"></i><small>Gallery albums</small><strong>{{ $gallery }}</strong><span>Public photo collections</span></article>
 </section>
 <section class="overview-grid">
-<article class="panel"><div class="panel-head"><div><span class="eyebrow">PUBLIC WEBSITE</span><h2>Content at a glance</h2></div><i class="fa-solid fa-layer-group"></i></div><div class="rows"><div><span>Company sections</span><strong>{{ $company }}</strong></div><div><span>News &amp; notices</span><strong>{{ $news }}</strong></div><div><span>Gallery albums</span><strong>{{ $gallery }}</strong></div><div><span>Homepage highlights</span><strong>{{ $popups }}</strong></div></div></article>
+<article class="panel"><div class="panel-head"><div><span class="eyebrow">PUBLIC WEBSITE</span><h2>Content at a glance</h2></div><i class="fa-solid fa-layer-group"></i></div><div class="rows"><div><span>Company sections</span><strong>{{ $company }}</strong></div><div><span>News &amp; Event</span><strong>{{ $news }}</strong></div><div><span>Gallery albums</span><strong>{{ $gallery }}</strong></div><div><span>Homepage highlights</span><strong>{{ $popups }}</strong></div></div></article>
 <article class="panel"><div class="panel-head"><div><span class="eyebrow">INBOX &amp; CAREER</span><h2>Items needing attention</h2></div><i class="fa-solid fa-inbox"></i></div><div class="rows"><div><span>Website inquiries</span><strong>{{ $inquiries }}</strong></div><div><span>Career applications</span><strong>{{ $applications }}</strong></div><div><span>New applications</span><strong>{{ $newApplications }}</strong></div><div><span>Published content</span><strong>{{ $published }}</strong></div></div></article>
 </section>
 @endsection
