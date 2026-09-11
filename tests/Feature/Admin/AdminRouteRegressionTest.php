@@ -30,6 +30,28 @@ class AdminRouteRegressionTest extends TestCase
         return $user;
     }
 
+    public function test_news_event_create_page_renders_with_canonical_index_link(): void
+    {
+        $user = $this->admin(['website.view', 'website.manage']);
+
+        $response = $this->actingAs($user)->get(route('admin.news_and_event.create'));
+
+        $response->assertOk();
+        $response->assertSee('Create News / Event');
+        $response->assertSee(route('admin.news_and_event.index'), false);
+        $response->assertDontSee("route('admin.news_and_event')", false);
+    }
+
+    public function test_legacy_news_event_url_redirects_to_the_canonical_path(): void
+    {
+        $user = $this->admin(['website.view']);
+
+        $response = $this->actingAs($user)->get('/admin/news_and_Event');
+
+        $response->assertRedirect('/admin/news-and-Event');
+        $response->assertStatus(301);
+    }
+
     public function test_news_event_store_redirects_to_the_canonical_index_route(): void
     {
         $user = $this->admin(['website.view', 'website.manage']);
