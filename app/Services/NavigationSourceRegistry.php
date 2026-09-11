@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\CmsPage;
+use App\Models\ManagementProfileFolder;
 use App\Models\NavigationMenuItem;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
@@ -23,8 +24,6 @@ class NavigationSourceRegistry
         'admin.management.index' => ['admin.profile-builder.index', 'Profile Builder'],
         'admin.cms.index' => ['admin.page-builder.index', 'Page Builder'],
         'admin.navigation.index' => ['admin.menu-builder.index', 'Menu Builder'],
-        // Legacy Site Content is now a compatibility route. Existing dashboard
-        // navigation items must resolve directly to the dedicated News & Event manager.
         'admin.site-content.index' => ['admin.news_and_event.index', 'News & Event'],
     ];
 
@@ -48,7 +47,21 @@ class NavigationSourceRegistry
                 ])
             : collect();
 
-        return $routes->concat($cms)
+        $folders = $area === 'public'
+            ? ManagementProfileFolder::query()->where('status', 'published')->orderBy('sort_order')->orderBy('id')->get(['id', 'name', 'slug'])
+                ->map(fn (ManagementProfileFolder $folder): array => [
+                    'key' => 'management_folder:'.$folder->id,
+                    'type' => 'folder',
+                    'label' => (string) $folder->name,
+                    'url' => '/'.ltrim((string) $folder->slug, '/'),
+                    'route_name' => null,
+                    'area' => 'public',
+                    'permission' => null,
+                    'meta' => ['folder_id' => $folder->id, 'slug' => $folder->slug],
+                ])
+            : collect();
+
+        return $routes->concat($cms)->concat($folders)
             ->reject(fn (array $source): bool => $used->contains($source['key']))
             ->reject(fn (array $source): bool => ! $this->isUsableNavigationLabel($source['label']))
             ->sortBy(fn (array $source): string => mb_strtolower($source['label']))->values();
@@ -62,6 +75,20 @@ class NavigationSourceRegistry
     public function resolveAny(string $key, string $area = 'public'): ?array
     {
         if (! in_array($area, ['public', 'dashboard'], true)) return null;
+
+        if (Str::startsWith($key, 'management_folder:') && $area === 'public') {
+            $id = (int) Str::after($key, 'management_folder:');
+            $folder = ManagementProfileFolder::query()->whereKey($id)->where('status', 'published')->first();
+            if ($folder && $this->isUsableNavigationLabel((string) $folder->name)) {
+                return [
+                    'key' => $key, 'type' => 'folder', 'label' => (string) $folder->name,
+                    'url' => '/'.ltrim((string) $folder->slug, '/'), 'route_name' => null, 'area' => 'public', 'permission' => null,
+                    'meta' => ['folder_id' => $folder->id, 'slug' => $folder->slug],
+                ];
+            }
+            return null;
+        }
+
         if (Str::startsWith($key, 'route:')) {
             $name = Str::after($key, 'route:');
             if (isset(self::BUILDER_ROUTE_ALIASES[$name])) {
@@ -112,7 +139,6 @@ class NavigationSourceRegistry
         if (str_contains($uri, '{') || in_array($name, self::EXCLUDED_ROUTE_NAMES, true)) return false;
         if ($uri === 'resources' || Str::startsWith($uri, 'resources/')) return false;
         if (Str::startsWith($uri, 'admin/site-content')) return false;
-        $middleware = collect($route->gatherMiddleware())->map(fn ($value): string => (string) $value);
         if ($area === 'public') {
             if ($route->getDomain() !== null) return false;
             return ! str_starts_with($uri, 'admin/') && ! $middleware->contains(fn (string $value): bool => $value === 'auth' || Str::startsWith($value, ['role:', 'permission:']));
@@ -137,7 +163,7 @@ class NavigationSourceRegistry
         if (! $page && $name === 'site.about') $page = CmsPage::query()->where('slug', 'about-us')->where('is_published', true)->first();
         if (! $page || ! $this->isUsableNavigationLabel((string) $page->title)) return null;
         return ['key' => 'cms_page:'.$page->id, 'type' => 'cms_page', 'label' => (string) $page->title,
-            'url' => route('cms.page', ['slug' => $page->slug]), 'route_name' => 'cms.page', 'area' => 'public', 'permission' => null,
+            'url' => route('cms.page', ['slug' => $page->slug]), 'route_name' => 'cms.page', 'area' => $area, 'permission' => null,
             'meta' => ['cms_page_id' => $page->id, 'slug' => $page->slug]];
     }
 
@@ -149,7 +175,8 @@ class NavigationSourceRegistry
     private function routeSource(Route $route, string $area): array
     {
         $name = (string) $route->getName();
-        $permission = collect($route->gatherMiddleware())->map(fn ($middleware): string => (string) $middleware)->first(fn (string $middleware): bool => Str::startsWith($middleware, 'permission:'));
+        $middleware = collect($route->gatherMiddleware())->map(fn ($value): string => (string) $value);
+        $permission = $middleware->first(fn (string $middleware): bool => Str::startsWith($middleware, 'permission:'));
         return ['key' => 'route:'.$name, 'type' => 'route', 'label' => $this->routeLabel($route, $name),
             'url' => $route->uri() === '/' ? '/' : '/'.ltrim($route->uri(), '/'), 'route_name' => $name, 'area' => $area,
             'permission' => $permission ? Str::after($permission, 'permission:') : null, 'meta' => []];
