@@ -6,6 +6,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\CmsPage;
+use App\Models\ManagementProfileFolder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -60,8 +61,10 @@ class PublishingAuthorityTest extends TestCase
         $role->permissions()->sync([$manage->id]);
         $user = User::factory()->create();
         $user->roles()->attach($role);
+        $folder = ManagementProfileFolder::create(['name' => 'QA Folder', 'slug' => 'qa-folder', 'status' => 'published', 'sort_order' => 1]);
 
         $this->actingAs($user)->post(route('admin.profile-builder.store'), [
+            'management_profile_folder_id' => $folder->id,
             'title' => 'QA Manager', 'designation' => 'Director', 'phone' => '01700000000',
             'status' => 'published',
         ])->assertForbidden();
