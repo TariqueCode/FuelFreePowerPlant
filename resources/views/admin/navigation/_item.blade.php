@@ -7,6 +7,17 @@
                 <span class="menu-card-name">{{ $item->displayLabel() }}</span>
             </div>
             <div class="item-actions">
+                @if($item->parent_id !== null)
+                    <form method="POST" action="{{ route('admin.menu-builder.update', $item) }}" class="promote-form" title="Move to top level">
+                        @csrf @method('PATCH')
+                        <input type="hidden" name="label" value="{{ $item->displayLabel() }}">
+                        <input type="hidden" name="parent_id" value="">
+                        <input type="hidden" name="target" value="{{ $item->target }}">
+                        <input type="hidden" name="icon" value="{{ $item->icon }}">
+                        <input type="hidden" name="is_visible" value="{{ $item->is_visible ? 1 : 0 }}">
+                        <button type="submit" class="move-btn promote-btn" aria-label="Move {{ $item->displayLabel() }} to top level"><i class="fa-solid fa-arrow-turn-up"></i></button>
+                    </form>
+                @endif
                 <button type="button" class="move-btn move-up" data-id="{{ $item->id }}" title="Move up" aria-label="Move {{ $item->displayLabel() }} up"><i class="fa-solid fa-arrow-up"></i></button>
                 <button type="button" class="move-btn move-down" data-id="{{ $item->id }}" title="Move down" aria-label="Move {{ $item->displayLabel() }} down"><i class="fa-solid fa-arrow-down"></i></button>
                 <button type="button" class="rename-btn" onclick="document.getElementById('rename-{{ $item->id }}').hidden=false; document.getElementById('rename-{{ $item->id }}').querySelector('input[name=label]').focus();" title="Rename navigation item"><i class="fa-solid fa-pen"></i></button>
@@ -16,6 +27,7 @@
             <span class="type-pill">{{ $item->source_type === 'folder' ? 'Folder' : ($item->source_type === 'external_link' ? 'Custom link' : 'Live source') }}</span>
             <span>{{ $item->is_visible ? 'Visible' : 'Hidden' }}</span>
             @if($item->permission_key)<span>{{ $item->permission_key }}</span>@endif
+            @if($item->parent_id !== null)<span class="parent-pill">Sub-menu</span>@endif
         </div>
         <small class="menu-card-url">{{ $item->route_name ?: ($item->url ?: 'Structural folder') }}</small>
         @if($item->source_type === 'folder')
