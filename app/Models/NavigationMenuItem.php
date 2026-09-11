@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class NavigationMenuItem extends Model
 {
@@ -26,10 +27,6 @@ class NavigationMenuItem extends Model
     public function setRouteNameAttribute($value): void
     {
         $this->attributes['route_name'] = $value;
-
-        // Legacy Management navigation entries are migrated to a real published
-        // profile folder. Keep this setter backwards-compatible without changing
-        // the item's type or label to the old Profile Builder destination.
         if ($value !== 'management' || ! Schema::hasTable('management_profile_folders')) return;
         $folder = ManagementProfileFolder::query()->where('status','published')->orderBy('sort_order')->orderBy('id')->first();
         if (!$folder) return;
