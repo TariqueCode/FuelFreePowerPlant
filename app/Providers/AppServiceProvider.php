@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\Admin\CmsController;
+use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\ManagementController as AdminManagementController;
+use App\Http\Controllers\Admin\ResilientDocumentController;
 use App\Http\Controllers\ManagementController as PublicManagementController;
 use App\Models\SystemSetting;
 use Illuminate\Support\Facades\Blade;
@@ -12,7 +15,10 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->app->bind(DocumentController::class, ResilientDocumentController::class);
+    }
 
     public function boot(): void
     {
@@ -84,6 +90,11 @@ class AppServiceProvider extends ServiceProvider
             ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.toggle');
         $router->post('/admin/profile-builder/reorder', [AdminManagementController::class, 'reorder'])
             ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.reorder');
+
+        // Canonical News & Event entry point. The legacy site-content URL
+        // redirects here; Page Builder remains the actual editor surface.
+        $router->get('/admin/news_and_Event', [CmsController::class, 'index'])
+            ->middleware(['auth', 'permission:website.view'])->name('admin.news_and_event');
 
         // Register only after the normal route set is booted. Fallback routing
         // cannot intercept valid endpoints such as /career or /contact.
