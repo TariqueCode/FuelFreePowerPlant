@@ -7,9 +7,11 @@ use App\Models\SiteSlider;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Throwable;
 
 class SiteSliderController extends Controller
 {
@@ -30,7 +32,16 @@ class SiteSliderController extends Controller
     {
         $slider = new SiteSlider();
 
-        $this->save($slider, $request);
+        try {
+            $this->save($slider, $request);
+        } catch (Throwable $e) {
+            Log::error('Slider creation failed.', [
+                'user_id' => $request->user()?->id,
+                'exception' => $e,
+            ]);
+
+            return back()->withInput()->with('error', 'The slider could not be saved. Please check the image and try again.');
+        }
 
         return redirect()->route('admin.sliders.index')->with('status', 'Slider image added successfully.');
     }
@@ -51,7 +62,17 @@ class SiteSliderController extends Controller
             );
         }
 
-        $this->save($slider, $request);
+        try {
+            $this->save($slider, $request);
+        } catch (Throwable $e) {
+            Log::error('Slider update failed.', [
+                'user_id' => $request->user()?->id,
+                'slider_id' => $slider->id,
+                'exception' => $e,
+            ]);
+
+            return back()->withInput()->with('error', 'The slider could not be saved. Please check the image and try again.');
+        }
 
         return redirect()->route('admin.sliders.index')->with('status', 'Slider image updated successfully.');
     }
@@ -105,47 +126,57 @@ class SiteSliderController extends Controller
             'ends_at.after_or_equal' => 'End time must be after or equal to the start time.',
         ]);
 
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
+        $newPath = null;
 
-            if (! $file->isValid()) {
-                throw new \RuntimeException('The image upload failed. Please choose the image again.');
+        try {
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+
+                if (! $file->isValid()) {
+                    throw new \RuntimeException('The image upload failed. Please choose the image again.');
+                }
+
+                $imageInfo = @getimagesize($file->getRealPath());
+                $extension = match ($imageInfo[2] ?? null) {
+                    IMAGETYPE_JPEG => 'jpg',
+                    IMAGETYPE_PNG => 'png',
+                    IMAGETYPE_WEBP => 'webp',
+                    default => null,
+                };
+
+                if (! $imageInfo || ! $extension) {
+                    throw new \RuntimeException('Slider image must be a valid JPG, PNG or WebP image.');
+                }
+
+                $newPath = 'site-sliders/'.Str::uuid().'.'.$extension;
+                $stored = Storage::disk('public')->putFileAs('site-sliders', $file, basename($newPath));
+
+                if (! $stored) {
+                    throw new \RuntimeException('The server could not save the image.');
+                }
+
+                $data['image_path'] = $stored;
             }
 
-            $imageInfo = @getimagesize($file->getRealPath());
-            $extension = match ($imageInfo[2] ?? null) {
-                IMAGETYPE_JPEG => 'jpg',
-                IMAGETYPE_PNG => 'png',
-                IMAGETYPE_WEBP => 'webp',
-                default => null,
-            };
+            unset($data['image']);
+            $data['is_published'] = $publishing;
 
-            if (! $imageInfo || ! $extension) {
-                throw new \RuntimeException('Slider image must be a valid JPG, PNG or WebP image.');
+            if (!$slider->exists) {
+                $data['sort_order'] = ((int) SiteSlider::query()->max('sort_order')) + 1;
             }
 
-            $path = 'site-sliders/'.Str::uuid().'.'.$extension;
-            $stored = Storage::disk('public')->putFileAs('site-sliders', $file, basename($path));
+            $oldPath = $slider->image_path;
+            $slider->fill($data)->save();
 
-            if (! $stored) {
-                throw new \RuntimeException('The server could not save the image.');
+            if ($newPath && $oldPath && $oldPath !== $newPath) {
+                Storage::disk('public')->delete($oldPath);
             }
-
-            if ($slider->image_path) {
-                Storage::disk('public')->delete($slider->image_path);
+        } catch (Throwable $e) {
+            if ($newPath) {
+                Storage::disk('public')->delete($newPath);
             }
-
-            $data['image_path'] = $stored;
+            throw $e;
         }
-
-        unset($data['image']);
-        $data['is_published'] = $publishing;
-
-        if (!$slider->exists) {
-            $data['sort_order'] = ((int) SiteSlider::query()->max('sort_order')) + 1;
-        }
-
-        $slider->fill($data)->save();
     }
 
     private function maxUploadKb(): int
