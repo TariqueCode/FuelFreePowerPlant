@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\ManagementController as AdminManagementController;
-use App\Http\Controllers\Admin\NewsEventController;
 use App\Http\Controllers\Admin\ResilientDocumentController;
 use App\Http\Controllers\ManagementController as PublicManagementController;
 use App\Models\SystemSetting;
@@ -27,38 +26,13 @@ class AppServiceProvider extends ServiceProvider
             $template = str_replace(array_keys($routeMap), array_values($routeMap), $template);
             return str_replace(
                 ['Advanced Menu Builder','Content Pages','Website Navigation','CONTENT MANAGEMENT','WEBSITE SECTIONS · MANAGEMENT','New CMS Page','Edit CMS Page','Add Management Member','Edit Management Profile','Add management member',"route('admin.site-content.index',['type'=>'news'])","request()->routeIs('admin.site-content.*') && request('type')==='news'"],
-                ['Menu Builder','Page Builder','Menu Builder','PAGE BUILDER','GLOBAL · PROFILE BUILDER','New Page','Edit Page','Add Profile','Edit Profile','Add profile',"route('admin.news_and_event')","request()->routeIs('admin.news_and_event*')"],
+                ['Menu Builder','Page Builder','Menu Builder','PAGE BUILDER','GLOBAL · PROFILE BUILDER','New Page','Edit Page','Add Profile','Edit Profile','Add profile',"route('admin.news_and_event.index')","request()->routeIs('admin.news_and_event*')"],
                 $template
             );
         });
 
-        $router = $this->app['router'];
-        $router->get('/admin/profile-builder', [AdminManagementController::class, 'index'])->middleware(['auth','permission:website.view'])->name('admin.profile-builder.index');
-        $router->get('/admin/profile-builder/folders/create', [AdminManagementController::class, 'folderCreate'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.folders.create');
-        $router->post('/admin/profile-builder/folders', [AdminManagementController::class, 'folderStore'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.folders.store');
-        $router->get('/admin/profile-builder/folders/{folder}/edit', [AdminManagementController::class, 'folderEdit'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.folders.edit');
-        $router->patch('/admin/profile-builder/folders/{folder}', [AdminManagementController::class, 'folderUpdate'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.folders.update');
-        $router->delete('/admin/profile-builder/folders/{folder}', [AdminManagementController::class, 'folderDestroy'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.folders.destroy');
-        $router->post('/admin/profile-builder/folders/reorder', [AdminManagementController::class, 'folderReorder'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.folders.reorder');
-        $router->get('/admin/profile-builder/create', [AdminManagementController::class, 'create'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.create');
-        $router->post('/admin/profile-builder', [AdminManagementController::class, 'store'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.store');
-        $router->get('/admin/profile-builder/{member}/edit', [AdminManagementController::class, 'edit'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.edit');
-        $router->patch('/admin/profile-builder/{member}', [AdminManagementController::class, 'update'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.update');
-        $router->delete('/admin/profile-builder/{member}', [AdminManagementController::class, 'destroy'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.destroy');
-        $router->patch('/admin/profile-builder/{member}/toggle', [AdminManagementController::class, 'toggle'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.toggle');
-        $router->post('/admin/profile-builder/reorder', [AdminManagementController::class, 'reorder'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.reorder');
-
-        // News & Event is a dedicated manager. It deliberately does not reuse Page Builder.
-        $router->get('/admin/news_and_Event', [NewsEventController::class, 'index'])->middleware(['auth','permission:website.view'])->name('admin.news_and_event');
-        $router->get('/admin/news_and_Event/create', [NewsEventController::class, 'create'])->middleware(['auth','permission:website.manage'])->name('admin.news_and_event.create');
-        $router->post('/admin/news_and_Event', [NewsEventController::class, 'store'])->middleware(['auth','permission:website.manage'])->name('admin.news_and_event.store');
-        $router->get('/admin/news_and_Event/{item}/edit', [NewsEventController::class, 'edit'])->middleware(['auth','permission:website.manage'])->name('admin.news_and_event.edit');
-        $router->patch('/admin/news_and_Event/{item}', [NewsEventController::class, 'update'])->middleware(['auth','permission:website.manage'])->name('admin.news_and_event.update');
-        $router->patch('/admin/news_and_Event/{item}/toggle', [NewsEventController::class, 'toggle'])->middleware(['auth','permission:website.manage'])->name('admin.news_and_event.toggle');
-        $router->delete('/admin/news_and_Event/{item}', [NewsEventController::class, 'destroy'])->middleware(['auth','permission:website.manage'])->name('admin.news_and_event.destroy');
-
-        $this->app->booted(function () use ($router): void {
-            $router->fallback([PublicManagementController::class, 'folderFallback'])->name('management.folder');
+        $this->app->booted(function () use ($this->app): void {
+            $this->app['router']->fallback([PublicManagementController::class, 'folderFallback'])->name('management.folder');
         });
 
         try {
