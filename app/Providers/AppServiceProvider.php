@@ -23,8 +23,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Blade::precompiler(function (string $template): string {
-            // Keep legacy template references source-compatible while all runtime
-            // routing remains on the canonical builder endpoints.
             $routeMap = [
                 'admin.management.' => 'admin.profile-builder.',
                 'admin.page-builder.' => 'admin.cms.',
@@ -33,28 +31,16 @@ class AppServiceProvider extends ServiceProvider
 
             return str_replace(
                 [
-                    'Advanced Menu Builder',
-                    'Content Pages',
-                    'Website Navigation',
-                    'CONTENT MANAGEMENT',
-                    'WEBSITE SECTIONS · MANAGEMENT',
-                    'New CMS Page',
-                    'Edit CMS Page',
-                    'Add Management Member',
-                    'Edit Management Profile',
-                    'Add management member',
+                    'Advanced Menu Builder', 'Content Pages', 'Website Navigation',
+                    'CONTENT MANAGEMENT', 'WEBSITE SECTIONS · MANAGEMENT',
+                    'New CMS Page', 'Edit CMS Page', 'Add Management Member',
+                    'Edit Management Profile', 'Add management member',
                 ],
                 [
-                    'Menu Builder',
-                    'Page Builder',
-                    'Menu Builder',
-                    'PAGE BUILDER',
-                    'GLOBAL · PROFILE BUILDER',
-                    'New Page',
-                    'Edit Page',
-                    'Add Profile',
-                    'Edit Profile',
-                    'Add profile',
+                    'Menu Builder', 'Page Builder', 'Menu Builder',
+                    'PAGE BUILDER', 'GLOBAL · PROFILE BUILDER',
+                    'New Page', 'Edit Page', 'Add Profile',
+                    'Edit Profile', 'Add profile',
                 ],
                 $template
             );
@@ -91,19 +77,18 @@ class AppServiceProvider extends ServiceProvider
         $router->post('/admin/profile-builder/reorder', [AdminManagementController::class, 'reorder'])
             ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.reorder');
 
-        // Canonical News & Event entry point. The legacy site-content URL
-        // redirects here; Page Builder remains the actual editor surface.
+        // Canonical News & Event entry point. Keep the old query URL as a
+        // compatibility redirect so bookmarks and existing admin links survive.
         $router->get('/admin/news_and_Event', [CmsController::class, 'index'])
             ->middleware(['auth', 'permission:website.view'])->name('admin.news_and_event');
+        $router->get('/admin/site-content', function () {
+            return redirect()->route('admin.news_and_event');
+        })->middleware(['auth', 'permission:website.view'])->name('admin.site-content.legacy');
 
-        // Register only after the normal route set is booted. Fallback routing
-        // cannot intercept valid endpoints such as /career or /contact.
         $this->app->booted(function () use ($router): void {
             $router->fallback([PublicManagementController::class, 'folderFallback'])->name('management.folder');
         });
 
-        // System settings are optional during first boot/recovery. Never let an
-        // unavailable database prevent Artisan commands or application boot.
         try {
             if (! Schema::hasTable('system_settings')) return;
             $settings = Cache::rememberForever('fuelfree.system_settings', fn () => SystemSetting::query()->pluck('value', 'key')->all());
