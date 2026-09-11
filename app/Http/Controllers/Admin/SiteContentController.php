@@ -19,7 +19,7 @@ class SiteContentController extends Controller
 {
     public function index(Request $request): RedirectResponse
     {
-        return redirect()->route('admin.news_and_event');
+        abort(404);
     }
 
     public function create(Request $request): View|RedirectResponse
