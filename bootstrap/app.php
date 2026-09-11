@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\ManagementController;
 use App\Http\Controllers\Admin\NavigationMenuController;
+use App\Http\Controllers\Admin\NewsEventController;
 use App\Http\Middleware\HomeAnnouncementPopup;
 use App\Http\Middleware\PermissionMiddleware;
 use App\Http\Middleware\RoleMiddleware;
@@ -44,17 +45,13 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('admin/menu-builder')->name('admin.menu-builder.')
                 ->group(function (): void {
                     Route::post('/', [NavigationMenuController::class, 'store'])->name('store');
-                    // Legacy admin markup submits deletion as POST to /{item}.
-                    // Keep that compatibility path permission-protected and map it to destroy.
                     Route::post('/{item}', [NavigationMenuController::class, 'destroy'])->name('legacy-destroy');
                     Route::patch('/{item}', [NavigationMenuController::class, 'update'])->name('update');
                     Route::delete('/{item}', [NavigationMenuController::class, 'destroy'])->name('destroy');
                     Route::post('/reorder', [NavigationMenuController::class, 'reorder'])->name('reorder');
                 });
 
-            // routes/web.php still contains the old /admin/cms endpoints. Their
-            // route names are renamed before the canonical Page Builder routes are
-            // registered so Laravel can safely build the production route cache.
+            // Retire legacy CMS route names before registering the canonical Page Builder routes.
             $legacyCmsNames = [
                 'admin.cms.index',
                 'admin.cms.create',
@@ -75,8 +72,6 @@ return Application::configure(basePath: dirname(__DIR__))
             }
             $routeCollection->refreshNameLookups();
 
-            // Canonical Page Builder URL. Keep the existing route names so every
-            // current admin link automatically resolves to /admin/page-builder.
             Route::middleware(['web', 'auth', 'permission:cms.view'])
                 ->prefix('admin/page-builder')->name('admin.cms.')
                 ->group(function (): void {
@@ -98,6 +93,25 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('admin/page-builder')->name('admin.cms.')
                 ->group(function (): void {
                     Route::patch('/{page}/toggle', [CmsController::class, 'togglePublication'])->name('toggle');
+                });
+
+            // Canonical News & Event manager. It is independent from Page Builder
+            // but reuses the shared Canonical Editor inside its own manager UI.
+            Route::middleware(['web', 'auth', 'permission:website.view'])
+                ->prefix('admin/news_and_Event')->name('admin.news_and_event.')
+                ->group(function (): void {
+                    Route::get('/', [NewsEventController::class, 'index'])->name('index');
+                });
+
+            Route::middleware(['web', 'auth', 'permission:website.manage'])
+                ->prefix('admin/news_and_Event')->name('admin.news_and_event.')
+                ->group(function (): void {
+                    Route::get('/create', [NewsEventController::class, 'create'])->name('create');
+                    Route::post('/', [NewsEventController::class, 'store'])->name('store');
+                    Route::get('/{item}/edit', [NewsEventController::class, 'edit'])->name('edit');
+                    Route::patch('/{item}', [NewsEventController::class, 'update'])->name('update');
+                    Route::patch('/{item}/toggle', [NewsEventController::class, 'toggle'])->name('toggle');
+                    Route::delete('/{item}', [NewsEventController::class, 'destroy'])->name('destroy');
                 });
         },
     )
