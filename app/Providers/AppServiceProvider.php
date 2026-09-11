@@ -24,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
         Blade::precompiler(function (string $template): string {
             $routeMap = ['admin.management.' => 'admin.profile-builder.', 'admin.page-builder.' => 'admin.cms.'];
             $template = str_replace(array_keys($routeMap), array_values($routeMap), $template);
+            $template = preg_replace('/<option\s+value=["\']route:management["\'][^>]*>.*?<\/option>/is', '', $template) ?? $template;
             return str_replace(
                 ['Advanced Menu Builder','Content Pages','Website Navigation','CONTENT MANAGEMENT','WEBSITE SECTIONS · MANAGEMENT','New CMS Page','Edit CMS Page','Add Management Member','Edit Management Profile','Add management member',"route('admin.site-content.index',['type'=>'news'])","request()->routeIs('admin.site-content.*') && request('type')==='news'",'News & Notices','News & notices','News &amp; Notices','News &amp; notices','name="settings[management][folder_id]" class="management-folder" required'],
                 ['Menu Builder','Page Builder','Menu Builder','PAGE BUILDER','GLOBAL · PROFILE BUILDER','New Page','Edit Page','Add Profile','Edit Profile','Add profile',"route('admin.news_and_event.index')","request()->routeIs('admin.news_and_event*')",'News & Event','News & Event','News &amp; Event','News &amp; Event','name="settings[management][folder_id]" class="management-folder"'],
