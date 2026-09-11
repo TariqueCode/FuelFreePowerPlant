@@ -87,6 +87,28 @@ class HomepageBuilderTest extends TestCase
         $this->assertSame([0, 1], HomepageSection::ordered()->pluck('sort_order')->all());
     }
 
+    public function test_save_can_update_homepage_visibility_without_management_configuration(): void
+    {
+        $user = $this->manager('Visibility Admin');
+        HomepageSection::query()->delete();
+        HomepageSection::create(['key' => 'hero', 'label' => 'Hero', 'is_enabled' => true, 'sort_order' => 0, 'settings' => ['layout' => 'left']]);
+        HomepageSection::create(['key' => 'management', 'label' => 'Board of Directors', 'is_enabled' => true, 'sort_order' => 1, 'settings' => []]);
+
+        $response = $this->actingAs($user)->post(route('admin.homepage-builder.update'), [
+            'section_order' => ['hero', 'management'],
+            'sections' => ['hero' => '1'],
+            'settings' => [
+                'hero' => ['layout' => 'left'],
+                'management' => ['layout' => 'left'],
+            ],
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('status', 'Homepage layout saved successfully.');
+        $this->assertTrue(HomepageSection::query()->where('key', 'hero')->value('is_enabled'));
+        $this->assertFalse(HomepageSection::query()->where('key', 'management')->value('is_enabled'));
+    }
+
     public function test_highlight_section_can_be_disabled_without_deleting_the_highlight_module(): void
     {
         $user = $this->manager('Website Manager');
