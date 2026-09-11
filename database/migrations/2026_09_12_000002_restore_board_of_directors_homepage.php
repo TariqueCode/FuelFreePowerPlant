@@ -1,17 +1,20 @@
 <?php
 
-use App\Models\HomepageSection;
-use App\Models\ManagementProfileFolder;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        $section = HomepageSection::query()->where('key', 'management')->first();
-        $folder = ManagementProfileFolder::query()
+        if (! Schema::hasTable('homepage_sections') || ! Schema::hasTable('management_profile_folders') || ! Schema::hasTable('site_content_items')) {
+            return;
+        }
+
+        $section = DB::table('homepage_sections')->where('key', 'management')->first();
+        $folder = DB::table('management_profile_folders')
             ->where('status', 'published')
-            ->with(['profiles' => fn ($query) => $query->where('status', 'published')->orderBy('sort_order')->orderBy('title')])
             ->orderBy('sort_order')
             ->orderBy('id')
             ->first();
@@ -20,16 +23,39 @@ return new class extends Migration
             return;
         }
 
-        $settings = is_array($section->settings) ? $section->settings : [];
-        $settings['folder_id'] = $folder->id;
+        $profiles = DB::table('site_content_items')
+            ->where('type', 'management')
+            ->where('management_profile_folder_id', $folder->id)
+            ->where('status', 'published')
+            ->orderBy('sort_order')
+            ->orderBy('title')
+            ->limit(4)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->values()
+            ->all();
+
+        $settings = [];
+        if (isset($section->settings) && is_string($section->settings) && trim($section->settings) !== '') {
+            $decoded = json_decode($section->settings, true);
+            if (is_array($decoded)) {
+                $settings = $decoded;
+            }
+        } elseif (isset($section->settings) && is_array($section->settings)) {
+            $settings = $section->settings;
+        }
+
+        $settings['folder_id'] = (int) $folder->id;
         $settings['mode'] = 'selected';
-        $settings['ids'] = $folder->profiles->take(4)->pluck('id')->map(fn ($id) => (int) $id)->values()->all();
+        $settings['ids'] = $profiles;
         $settings['limit'] = max(1, min(100, (int) ($settings['limit'] ?? 4)));
         $settings['layout'] = in_array(($settings['layout'] ?? 'left'), ['left', 'center', 'right'], true) ? $settings['layout'] : 'left';
 
-        $section->settings = $settings;
-        $section->is_enabled = true;
-        $section->save();
+        DB::table('homepage_sections')->where('id', $section->id)->update([
+            'settings' => json_encode($settings, JSON_UNESCAPED_SLASHES),
+            'is_enabled' => true,
+            'updated_at' => now(),
+        ]);
     }
 
     public function down(): void
