@@ -139,7 +139,11 @@ class NavigationSourceRegistry
         if (str_contains($uri, '{') || in_array($name, self::EXCLUDED_ROUTE_NAMES, true)) return false;
         if ($uri === 'resources' || Str::startsWith($uri, 'resources/')) return false;
         if (Str::startsWith($uri, 'admin/site-content')) return false;
+        $middleware = collect($route->gatherMiddleware())->map(fn ($value): string => (string) $value);
         if ($area === 'public') {
+            if ($name === 'site.about') {
+                return CmsPage::query()->where('slug', 'about-us')->where('is_published', true)->exists();
+            }
             if ($route->getDomain() !== null) return false;
             return ! str_starts_with($uri, 'admin/') && ! $middleware->contains(fn (string $value): bool => $value === 'auth' || Str::startsWith($value, ['role:', 'permission:']));
         }
