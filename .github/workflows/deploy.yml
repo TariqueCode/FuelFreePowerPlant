@@ -39,7 +39,16 @@ jobs:
         run: |
           mkdir -p database
           touch database/database.sqlite
-          php artisan migrate --force
+      - name: Migrate SQLite schema safely
+        shell: bash
+        run: |
+          set -euo pipefail
+          for range in '1,10' '11,20' '21,30' '31,40' '41,50' '51,70'; do
+            for file in $(find database/migrations -type f -name '*.php' | sort | sed -n "${range}p"); do
+              echo "Migrating $file"
+              php artisan migrate --force --path="$file"
+            done
+          done
       - name: Run Laravel package discovery
         run: php artisan package:discover --ansi
       - name: Generate test application key
@@ -111,8 +120,6 @@ jobs:
 
           test -f .env
           test -f artisan
-
-          echo "==> Installing PHP dependencies"
           "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts
 
           echo "==> Restoring any previous production MySQL environment"
@@ -124,7 +131,7 @@ jobs:
           echo "==> Clearing stale Laravel caches"
           "$PHP_BIN" artisan optimize:clear
 
-          echo "==> Verifying production MySQL directly (no Laravel diagnostics)"
+          echo "==> Verifying production MySQL directly"
           DB_CONNECTION_VALUE="$(sed -n 's/^DB_CONNECTION=//p' .env | head -n1)"
           DB_HOST_VALUE="$(sed -n 's/^DB_HOST=//p' .env | head -n1)"
           DB_PORT_VALUE="$(sed -n 's/^DB_PORT=//p' .env | head -n1)"
@@ -132,7 +139,7 @@ jobs:
           DB_USERNAME_VALUE="$(sed -n 's/^DB_USERNAME=//p' .env | head -n1)"
           DB_PASSWORD_VALUE="$(sed -n 's/^DB_PASSWORD=//p' .env | head -n1)"
           if [ "$DB_CONNECTION_VALUE" != "mysql" ]; then
-              echo "ERROR: Production .env must use DB_CONNECTION=mysql; refusing fallback/recovery mode."
+              echo "ERROR: Production .env must use DB_CONNECTION=mysql; refusing fallback mode."
               exit 1
           fi
           export FFP_DB_HOST="$DB_HOST_VALUE" FFP_DB_PORT="$DB_PORT_VALUE" FFP_DB_DATABASE="$DB_DATABASE_VALUE" FFP_DB_USERNAME="$DB_USERNAME_VALUE" FFP_DB_PASSWORD="$DB_PASSWORD_VALUE"
@@ -145,27 +152,21 @@ jobs:
           "$PHP_BIN" artisan package:discover --ansi
 
           if command -v npm >/dev/null 2>&1; then
-              echo "==> Building frontend assets"
               npm install --no-audit --no-fund
               npm run build
           fi
 
-          echo "==> Ensuring public storage link"
           "$PHP_BIN" artisan storage:link --force
-
-          echo "==> Rebuilding Laravel caches"
           "$PHP_BIN" artisan optimize:clear
           "$PHP_BIN" artisan config:cache
           "$PHP_BIN" artisan route:cache
           "$PHP_BIN" artisan view:cache
 
-          echo "==> Ensuring Laravel scheduler cron"
           CRON_LINE="* * * * * cd /home/fuelfree/public_html && $PHP_BIN artisan schedule:run >> /dev/null 2>&1"
           if command -v crontab >/dev/null 2>&1; then
               (crontab -l 2>/dev/null | grep -Fv 'artisan schedule:run' || true; echo "$CRON_LINE") | crontab -
           fi
 
-          echo "==> Verifying Laravel boot without artisan about"
           "$PHP_BIN" artisan route:list --path=admin/menu-builder >/dev/null
           echo "==> Deployment complete"
           REMOTE
