@@ -45,10 +45,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('admin/menu-builder')->name('admin.menu-builder.')
                 ->group(function (): void {
                     Route::post('/', [NavigationMenuController::class, 'store'])->name('store');
+                    // Keep the static reorder endpoint ahead of the dynamic item endpoint.
+                    Route::post('/reorder', [NavigationMenuController::class, 'reorder'])->name('reorder');
                     Route::post('/{item}', [NavigationMenuController::class, 'destroy'])->name('legacy-destroy');
                     Route::patch('/{item}', [NavigationMenuController::class, 'update'])->name('update');
                     Route::delete('/{item}', [NavigationMenuController::class, 'destroy'])->name('destroy');
-                    Route::post('/reorder', [NavigationMenuController::class, 'reorder'])->name('reorder');
                 });
 
             // Retire legacy CMS route names before registering the canonical Page Builder routes.
