@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\ManagementController as AdminManagementController;
 use App\Http\Controllers\Admin\ResilientDocumentController;
@@ -23,91 +22,45 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Blade::precompiler(function (string $template): string {
-            $routeMap = [
-                'admin.management.' => 'admin.profile-builder.',
-                'admin.page-builder.' => 'admin.cms.',
-            ];
+            $routeMap = ['admin.management.' => 'admin.profile-builder.', 'admin.page-builder.' => 'admin.cms.'];
             $template = str_replace(array_keys($routeMap), array_values($routeMap), $template);
-
             return str_replace(
-                [
-                    'Advanced Menu Builder', 'Content Pages', 'Website Navigation',
-                    'CONTENT MANAGEMENT', 'WEBSITE SECTIONS · MANAGEMENT',
-                    'New CMS Page', 'Edit CMS Page', 'Add Management Member',
-                    'Edit Management Profile', 'Add management member',
-                ],
-                [
-                    'Menu Builder', 'Page Builder', 'Menu Builder',
-                    'PAGE BUILDER', 'GLOBAL · PROFILE BUILDER',
-                    'New Page', 'Edit Page', 'Add Profile',
-                    'Edit Profile', 'Add profile',
-                ],
+                ['Advanced Menu Builder','Content Pages','Website Navigation','CONTENT MANAGEMENT','WEBSITE SECTIONS · MANAGEMENT','New CMS Page','Edit CMS Page','Add Management Member','Edit Management Profile','Add management member'],
+                ['Menu Builder','Page Builder','Menu Builder','PAGE BUILDER','GLOBAL · PROFILE BUILDER','New Page','Edit Page','Add Profile','Edit Profile','Add profile'],
                 $template
             );
         });
 
         $router = $this->app['router'];
-
-        $router->get('/admin/profile-builder', [AdminManagementController::class, 'index'])
-            ->middleware(['auth', 'permission:website.view'])->name('admin.profile-builder.index');
-        $router->get('/admin/profile-builder/folders/create', [AdminManagementController::class, 'folderCreate'])
-            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.folders.create');
-        $router->post('/admin/profile-builder/folders', [AdminManagementController::class, 'folderStore'])
-            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.folders.store');
-        $router->get('/admin/profile-builder/folders/{folder}/edit', [AdminManagementController::class, 'folderEdit'])
-            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.folders.edit');
-        $router->patch('/admin/profile-builder/folders/{folder}', [AdminManagementController::class, 'folderUpdate'])
-            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.folders.update');
-        $router->delete('/admin/profile-builder/folders/{folder}', [AdminManagementController::class, 'folderDestroy'])
-            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.folders.destroy');
-        $router->post('/admin/profile-builder/folders/reorder', [AdminManagementController::class, 'folderReorder'])
-            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.folders.reorder');
-        $router->get('/admin/profile-builder/create', [AdminManagementController::class, 'create'])
-            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.create');
-        $router->post('/admin/profile-builder', [AdminManagementController::class, 'store'])
-            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.store');
-        $router->get('/admin/profile-builder/{member}/edit', [AdminManagementController::class, 'edit'])
-            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.edit');
-        $router->patch('/admin/profile-builder/{member}', [AdminManagementController::class, 'update'])
-            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.update');
-        $router->delete('/admin/profile-builder/{member}', [AdminManagementController::class, 'destroy'])
-            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.destroy');
-        $router->patch('/admin/profile-builder/{member}/toggle', [AdminManagementController::class, 'toggle'])
-            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.toggle');
-        $router->post('/admin/profile-builder/reorder', [AdminManagementController::class, 'reorder'])
-            ->middleware(['auth', 'permission:website.manage'])->name('admin.profile-builder.reorder');
-
-        // Canonical News & Event entry point. Keep the old query URL as a
-        // compatibility redirect so bookmarks and existing admin links survive.
-        $router->get('/admin/news_and_Event', [CmsController::class, 'index'])
-            ->middleware(['auth', 'permission:website.view'])->name('admin.news_and_event');
-        $router->get('/admin/site-content', function () {
-            return redirect()->route('admin.news_and_event');
-        })->middleware(['auth', 'permission:website.view'])->name('admin.site-content.legacy');
+        $router->get('/admin/profile-builder', [AdminManagementController::class, 'index'])->middleware(['auth','permission:website.view'])->name('admin.profile-builder.index');
+        $router->get('/admin/profile-builder/folders/create', [AdminManagementController::class, 'folderCreate'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.folders.create');
+        $router->post('/admin/profile-builder/folders', [AdminManagementController::class, 'folderStore'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.folders.store');
+        $router->get('/admin/profile-builder/folders/{folder}/edit', [AdminManagementController::class, 'folderEdit'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.folders.edit');
+        $router->patch('/admin/profile-builder/folders/{folder}', [AdminManagementController::class, 'folderUpdate'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.folders.update');
+        $router->delete('/admin/profile-builder/folders/{folder}', [AdminManagementController::class, 'folderDestroy'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.folders.destroy');
+        $router->post('/admin/profile-builder/folders/reorder', [AdminManagementController::class, 'folderReorder'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.folders.reorder');
+        $router->get('/admin/profile-builder/create', [AdminManagementController::class, 'create'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.create');
+        $router->post('/admin/profile-builder', [AdminManagementController::class, 'store'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.store');
+        $router->get('/admin/profile-builder/{member}/edit', [AdminManagementController::class, 'edit'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.edit');
+        $router->patch('/admin/profile-builder/{member}', [AdminManagementController::class, 'update'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.update');
+        $router->delete('/admin/profile-builder/{member}', [AdminManagementController::class, 'destroy'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.destroy');
+        $router->patch('/admin/profile-builder/{member}/toggle', [AdminManagementController::class, 'toggle'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.toggle');
+        $router->post('/admin/profile-builder/reorder', [AdminManagementController::class, 'reorder'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.reorder');
 
         $this->app->booted(function () use ($router): void {
             $router->fallback([PublicManagementController::class, 'folderFallback'])->name('management.folder');
         });
 
         try {
-            if (! Schema::hasTable('system_settings')) return;
-            $settings = Cache::rememberForever('fuelfree.system_settings', fn () => SystemSetting::query()->pluck('value', 'key')->all());
-        } catch (\Throwable $e) {
-            return;
-        }
-
-        if (array_key_exists('company.name', $settings)) config(['fuelfree.company.name' => $settings['company.name']]);
-        if (array_key_exists('company.domain', $settings)) config(['fuelfree.company.domain' => $settings['company.domain']]);
-        if (array_key_exists('company.tagline', $settings)) config(['fuelfree.company.tagline' => $settings['company.tagline']]);
-        if (array_key_exists('company.timezone', $settings)) config(['fuelfree.company.timezone' => $settings['company.timezone']]);
-        if (array_key_exists('company.logo_path', $settings)) config(['fuelfree.company.logo_path' => $settings['company.logo_path']]);
-        if (array_key_exists('storage.quota_gib', $settings)) config(['fuelfree.storage.quota_bytes' => (int) round((float) $settings['storage.quota_gib'] * 1073741824)]);
-
-        foreach (['header', 'footer'] as $section) {
-            $prefix = $section.'.';
-            foreach ($settings as $key => $value) {
-                if (str_starts_with($key, $prefix)) config(["fuelfree.{$section}.".substr($key, strlen($prefix)) => $value]);
-            }
-        }
+            if (!Schema::hasTable('system_settings')) return;
+            $settings = Cache::rememberForever('fuelfree.system_settings', fn () => SystemSetting::query()->pluck('value','key')->all());
+        } catch (\Throwable $e) { return; }
+        if (array_key_exists('company.name',$settings)) config(['fuelfree.company.name'=>$settings['company.name']]);
+        if (array_key_exists('company.domain',$settings)) config(['fuelfree.company.domain'=>$settings['company.domain']]);
+        if (array_key_exists('company.tagline',$settings)) config(['fuelfree.company.tagline'=>$settings['company.tagline']]);
+        if (array_key_exists('company.timezone',$settings)) config(['fuelfree.company.timezone'=>$settings['company.timezone']]);
+        if (array_key_exists('company.logo_path',$settings)) config(['fuelfree.company.logo_path'=>$settings['company.logo_path']]);
+        if (array_key_exists('storage.quota_gib',$settings)) config(['fuelfree.storage.quota_bytes'=>(int)round((float)$settings['storage.quota_gib']*1073741824)]);
+        foreach (['header','footer'] as $section) { $prefix=$section.'.'; foreach ($settings as $key=>$value) if (str_starts_with($key,$prefix)) config(["fuelfree.{$section}.".substr($key,strlen($prefix))=>$value]); }
     }
 }
