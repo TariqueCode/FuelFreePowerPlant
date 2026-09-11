@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         then: function (): void {
             Route::middleware(['web', 'auth', 'permission:website.view'])->prefix('admin/profile-builder')->name('admin.profile-builder.')->group(function (): void {
                 Route::get('/', [ManagementController::class, 'index'])->name('index');
+                Route::get('/folders/{folder}', fn (\App\Models\ManagementProfileFolder $folder) => view('admin.management.folder-show', ['folder' => $folder->loadCount('profiles')->load(['profiles' => fn ($query) => $query->orderBy('sort_order')->orderBy('id')])]))->name('folders.show');
                 Route::get('/create', [ManagementController::class, 'create'])->name('create');
                 Route::get('/{member}/edit', [ManagementController::class, 'edit'])->name('edit');
             });
