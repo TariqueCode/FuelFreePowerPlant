@@ -17,6 +17,14 @@ class NavigationMenuItem extends Model
     protected static function booted(): void
     {
         static::saving(function (self $item): void {
+            // The tree reorderer uses temporary negative sort orders to move all
+            // submitted rows out of the way. Some production MySQL schemas use
+            // UNSIGNED for this column, so normalize those temporary values to a
+            // deterministic positive range before Eloquent writes them.
+            if ((int) $item->sort_order < 0) {
+                $item->sort_order = 1000000000 + (int) $item->getKey();
+            }
+
             if ($item->source_type === 'folder' || app()->runningInConsole()) return;
             $requestedLabel = trim((string) request()->input('label',''));
             if ($requestedLabel === '') return;
