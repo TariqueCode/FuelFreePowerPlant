@@ -35,7 +35,7 @@ class NewsEventController extends Controller
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title']);
         $data['published_at'] = $data['status'] === 'published' ? now() : null;
         SiteContentItem::create($data);
-        return redirect()->route('admin.news_and_event')->with('status', 'News & Event created successfully.');
+        return redirect()->route('admin.news_and_event.index')->with('status', 'News & Event created successfully.');
     }
 
     public function edit(SiteContentItem $item): View
@@ -51,7 +51,7 @@ class NewsEventController extends Controller
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title'], $item->id);
         $data['published_at'] = $data['status'] === 'published' ? ($item->published_at ?: now()) : null;
         $item->update($data);
-        return redirect()->route('admin.news_and_event')->with('status', 'News & Event updated successfully.');
+        return redirect()->route('admin.news_and_event.index')->with('status', 'News & Event updated successfully.');
     }
 
     public function toggle(SiteContentItem $item): RedirectResponse
