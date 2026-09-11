@@ -1,0 +1,106 @@
+<?php
+
+namespace Tests\Feature\Admin;
+
+use App\Models\HomepageSection;
+use App\Models\ManagementProfileFolder;
+use App\Models\NavigationMenuItem;
+use App\Models\SiteContentItem;
+use App\Models\User;
+use App\Services\NavigationSourceRegistry;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class BoardOfDirectorsIntegrationTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_profile_folder_resolves_as_board_of_directors_navigation_source(): void
+    {
+        $folder = ManagementProfileFolder::create([
+            'name' => 'Board of Directors',
+            'slug' => 'board-of-directors',
+            'status' => 'published',
+            'sort_order' => 1,
+        ]);
+
+        $source = app(NavigationSourceRegistry::class)->resolveAny('management_folder:'.$folder->id, 'public');
+
+        $this->assertSame('Board of Directors', $source['label']);
+        $this->assertSame('folder', $source['type']);
+        $this->assertSame('/board-of-directors', $source['url']);
+        $this->assertNull($source['route_name']);
+    }
+
+    public function test_homepage_management_section_uses_published_board_profiles_when_configured(): void
+    {
+        $folder = ManagementProfileFolder::create([
+            'name' => 'Board of Directors',
+            'slug' => 'board-of-directors',
+            'status' => 'published',
+            'sort_order' => 1,
+        ]);
+
+        $profile = SiteContentItem::create([
+            'type' => 'management',
+            'management_profile_folder_id' => $folder->id,
+            'title' => 'Test Director',
+            'slug' => 'test-director',
+            'designation' => 'Director',
+            'excerpt' => 'Director',
+            'phone' => '+880 1700000000',
+            'status' => 'published',
+            'published_at' => now(),
+            'sort_order' => 1,
+        ]);
+
+        HomepageSection::create([
+            'key' => 'management',
+            'is_enabled' => true,
+            'sort_order' => 3,
+            'settings' => [
+                'folder_id' => $folder->id,
+                'mode' => 'selected',
+                'ids' => [$profile->id],
+                'limit' => 4,
+                'layout' => 'left',
+            ],
+        ]);
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('Test Director');
+    }
+
+    public function test_legacy_profile_builder_navigation_item_is_normalized_to_folder_source(): void
+    {
+        $folder = ManagementProfileFolder::create([
+            'name' => 'Board of Directors',
+            'slug' => 'board-of-directors',
+            'status' => 'published',
+            'sort_order' => 1,
+        ]);
+
+        $item = NavigationMenuItem::create([
+            'menu' => 'main',
+            'area' => 'public',
+            'parent_id' => null,
+            'label' => 'Profile Builder',
+            'url' => '/board-of-directors',
+            'route_name' => null,
+            'source_key' => null,
+            'source_type' => 'folder',
+            'target' => '_self',
+            'is_visible' => true,
+            'sort_order' => 0,
+        ]);
+
+        $this->artisan('migrate')->assertExitCode(0);
+
+        $item->refresh();
+        $this->assertSame('Board of Directors', $item->label);
+        $this->assertSame('management_folder:'.$folder->id, $item->source_key);
+        $this->assertSame('folder', $item->source_type);
+    }
+}
