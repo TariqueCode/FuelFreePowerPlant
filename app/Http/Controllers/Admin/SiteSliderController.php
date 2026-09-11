@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class SiteSliderController extends Controller
@@ -91,7 +92,7 @@ class SiteSliderController extends Controller
 
         $data = $request->validate([
             'title' => ['nullable', 'string', 'max:255'],
-            'image' => [$slider->exists ? 'nullable' : 'required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:'.$this->maxUploadKb()],
+            'image' => [$slider->exists ? 'nullable' : 'required', 'file', 'max:'.$this->maxUploadKb()],
             'link_url' => ['nullable', 'url', 'max:1000'],
             'is_published' => ['nullable', 'boolean'],
             'starts_at' => ['nullable', 'date'],
@@ -99,7 +100,6 @@ class SiteSliderController extends Controller
         ], [
             'image.required' => 'Please choose a slider image before saving.',
             'image.file' => 'The selected image could not be uploaded. Please choose it again.',
-            'image.mimes' => 'Slider image must be JPG, JPEG, PNG or WebP.',
             'image.max' => 'Slider image exceeds the upload limit configured in Admin Settings.',
             'link_url.url' => 'Destination URL must be a valid URL, for example https://example.com.',
             'ends_at.after_or_equal' => 'End time must be after or equal to the start time.',
@@ -108,13 +108,26 @@ class SiteSliderController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
 
-            if (!$file->isValid()) {
+            if (! $file->isValid()) {
                 throw new \RuntimeException('The image upload failed. Please choose the image again.');
             }
 
-            $path = $file->store('site-sliders', 'public');
+            $imageInfo = @getimagesize($file->getRealPath());
+            $extension = match ($imageInfo[2] ?? null) {
+                IMAGETYPE_JPEG => 'jpg',
+                IMAGETYPE_PNG => 'png',
+                IMAGETYPE_WEBP => 'webp',
+                default => null,
+            };
 
-            if (!$path) {
+            if (! $imageInfo || ! $extension) {
+                throw new \RuntimeException('Slider image must be a valid JPG, PNG or WebP image.');
+            }
+
+            $path = 'site-sliders/'.Str::uuid().'.'.$extension;
+            $stored = Storage::disk('public')->putFileAs('site-sliders', $file, basename($path));
+
+            if (! $stored) {
                 throw new \RuntimeException('The server could not save the image.');
             }
 
@@ -122,7 +135,7 @@ class SiteSliderController extends Controller
                 Storage::disk('public')->delete($slider->image_path);
             }
 
-            $data['image_path'] = $path;
+            $data['image_path'] = $stored;
         }
 
         unset($data['image']);
