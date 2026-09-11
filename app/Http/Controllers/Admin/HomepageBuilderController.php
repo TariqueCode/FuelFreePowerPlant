@@ -39,18 +39,12 @@ class HomepageBuilderController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
-        // Publishing is a privileged action and must be rejected before any
-        // unrelated homepage validation can turn the request into a redirect.
         $publishingHighlight = strtolower((string) $request->input('highlight_status')) === 'published';
         abort_unless(! $publishingHighlight || $request->user()->hasPermission('website.publish'), 403, 'Publishing homepage highlights requires publishing permission.');
 
         $managementEnabled = $request->boolean('sections.management');
-        $managementFolderRules = $managementEnabled
-            ? ['required', 'integer', 'exists:management_profile_folders,id']
-            : ['nullable', 'integer', 'exists:management_profile_folders,id'];
-        $managementIdsRules = $managementEnabled
-            ? ['required', 'array', 'min:1']
-            : ['nullable', 'array'];
+        $managementFolderRules = ['nullable', 'integer', 'exists:management_profile_folders,id'];
+        $managementIdsRules = ['nullable', 'array'];
 
         $data = $request->validate([
             'section_order' => ['required', 'array'],
@@ -92,7 +86,7 @@ class HomepageBuilderController extends Controller
 
         $managementFolderId = null;
         $managementValidIds = [];
-        if ($managementEnabled) {
+        if ($managementEnabled && ($request->filled('settings.management.folder_id') || count($selectedIds['management']) > 0)) {
             $managementFolderId = (int) $request->input('settings.management.folder_id');
             $managementFolder = ManagementProfileFolder::query()->where('status', 'published')->find($managementFolderId);
             if (! $managementFolder) {
@@ -105,7 +99,7 @@ class HomepageBuilderController extends Controller
                 ->published()
                 ->whereIn('id', $selectedIds['management'])
                 ->pluck('id')->map(fn ($id) => (int) $id)->all();
-            if (count($managementValidIds) < 1) {
+            if (count($selectedIds['management']) > 0 && count($managementValidIds) < 1) {
                 return back()->withErrors(['settings.management.ids' => 'Select at least one published profile from the selected folder.']);
             }
         }
@@ -141,10 +135,12 @@ class HomepageBuilderController extends Controller
                 }
 
                 if ($key === 'management' && $managementEnabled) {
-                    $settings['folder_id'] = $managementFolderId;
-                    $settings['mode'] = 'selected';
-                    $settings['ids'] = $validIds['management'];
-                    unset($settings['limit']);
+                    if ($managementFolderId !== null) {
+                        $settings['folder_id'] = $managementFolderId;
+                        $settings['mode'] = 'selected';
+                        $settings['ids'] = $validIds['management'];
+                        unset($settings['limit']);
+                    }
                 } elseif (in_array($key, ['news','gallery'], true) && $request->has("settings.{$key}.limit")) {
                     $settings['limit'] = max(1, min(100, (int) $request->input("settings.{$key}.limit")));
                     $mode = $request->input("settings.{$key}.mode", $settings['mode'] ?? 'latest');
