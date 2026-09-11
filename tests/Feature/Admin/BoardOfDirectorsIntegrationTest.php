@@ -52,18 +52,20 @@ class BoardOfDirectorsIntegrationTest extends TestCase
             'sort_order' => 1,
         ]);
 
-        HomepageSection::create([
-            'key' => 'management',
-            'is_enabled' => true,
-            'sort_order' => 3,
-            'settings' => [
-                'folder_id' => $folder->id,
-                'mode' => 'selected',
-                'ids' => [$profile->id],
-                'limit' => 4,
-                'layout' => 'left',
-            ],
-        ]);
+        HomepageSection::query()->updateOrCreate(
+            ['key' => 'management'],
+            [
+                'is_enabled' => true,
+                'sort_order' => 3,
+                'settings' => [
+                    'folder_id' => $folder->id,
+                    'mode' => 'selected',
+                    'ids' => [$profile->id],
+                    'limit' => 4,
+                    'layout' => 'left',
+                ],
+            ]
+        );
 
         $response = $this->get('/');
 
