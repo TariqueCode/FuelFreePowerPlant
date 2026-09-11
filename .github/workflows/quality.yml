@@ -56,19 +56,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          while IFS= read -r -d '' file; do
-            echo "Linting $file"
-            php -l "$file"
-          done < <(find config routes -type f -name '*.php' -print0)
+          while IFS= read -r -d '' file; do echo "Linting $file"; php -l "$file"; done < <(find config routes -type f -name '*.php' -print0)
 
       - name: Lint database PHP
         shell: bash
         run: |
           set -euo pipefail
-          while IFS= read -r -d '' file; do
-            echo "Linting $file"
-            php -l "$file"
-          done < <(find database -type f -name '*.php' -print0)
+          while IFS= read -r -d '' file; do echo "Linting $file"; php -l "$file"; done < <(find database -type f -name '*.php' -print0)
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
@@ -134,11 +128,13 @@ jobs:
       - name: Verify canonical Page Builder routes
         run: php artisan route:list --path=admin/page-builder -v
 
-      - name: Verify Laravel route cache
-        run: php artisan route:cache --ansi
-
+      # Tests must run before route:cache because several registry tests add
+      # temporary routes to the in-memory route collection.
       - name: Run unit tests
         run: php artisan test tests/Unit
 
       - name: Run feature tests
         run: php artisan test tests/Feature
+
+      - name: Verify Laravel route cache
+        run: php artisan route:cache --ansi
