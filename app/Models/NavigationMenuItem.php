@@ -26,24 +26,32 @@ class NavigationMenuItem extends Model
     public function setRouteNameAttribute($value): void
     {
         $this->attributes['route_name'] = $value;
-        if ($value !== 'management' || !Schema::hasTable('management_profile_folders')) return;
+
+        // Legacy Management navigation entries are migrated to a real published
+        // profile folder. Keep this setter backwards-compatible without changing
+        // the item's type or label to the old Profile Builder destination.
+        if ($value !== 'management' || ! Schema::hasTable('management_profile_folders')) return;
         $folder = ManagementProfileFolder::query()->where('status','published')->orderBy('sort_order')->orderBy('id')->first();
         if (!$folder) return;
         $this->attributes['url'] = '/'.$folder->slug;
         $this->attributes['label'] = $folder->name;
-        $this->attributes['source_type'] = 'external_link';
+        $this->attributes['source_type'] = 'folder';
         $this->attributes['source_key'] = 'management_folder:'.$folder->id;
+        $this->attributes['route_name'] = null;
     }
 
     public function displayLabel(): string
     {
-        if (!app()->runningInConsole() && request()->is('admin/*') && str_starts_with((string)$this->source_key, 'management_folder:')) return 'Profile Builder';
-        if ($this->route_name === 'management' && !app()->runningInConsole() && request()->is('admin/*')) return 'Profile Builder';
+        if ($this->label_override !== null && trim((string)$this->label_override) !== '') return (string)$this->label_override;
+        if ($this->source_type === 'folder' && Str::startsWith((string)$this->source_key, 'management_folder:') && Schema::hasTable('management_profile_folders')) {
+            $id = (int) Str::after((string)$this->source_key, 'management_folder:');
+            $folder = ManagementProfileFolder::query()->whereKey($id)->where('status','published')->first();
+            if ($folder) return (string)$folder->name;
+        }
         if ($this->route_name === 'management' && Schema::hasTable('management_profile_folders')) {
             $folder = ManagementProfileFolder::query()->where('status','published')->orderBy('sort_order')->orderBy('id')->first();
-            if ($folder) return $folder->name;
+            if ($folder) return (string)$folder->name;
         }
-        if ($this->label_override !== null && trim((string)$this->label_override) !== '') return (string)$this->label_override;
         if ($this->route_name === 'site.plants' || trim((string)$this->url,'/') === 'plants') return (string)config('fuelfree.projects.label','Projects & Our Plans');
         return (string)$this->label;
     }
