@@ -23,6 +23,9 @@ class NavigationSourceRegistry
         'admin.management.index' => ['admin.profile-builder.index', 'Profile Builder'],
         'admin.cms.index' => ['admin.page-builder.index', 'Page Builder'],
         'admin.navigation.index' => ['admin.menu-builder.index', 'Menu Builder'],
+        // Legacy Site Content is now a compatibility route. Existing dashboard
+        // navigation items must resolve directly to the dedicated News & Event manager.
+        'admin.site-content.index' => ['admin.news_and_event', 'News & Event'],
     ];
 
     public function available(string $area = 'public', string $menu = 'main'): Collection
