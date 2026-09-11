@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
 class SiteSliderController extends Controller
@@ -35,6 +36,10 @@ class SiteSliderController extends Controller
         try {
             $this->save($slider, $request);
         } catch (Throwable $e) {
+            if ($e instanceof HttpExceptionInterface) {
+                throw $e;
+            }
+
             Log::error('Slider creation failed.', [
                 'user_id' => $request->user()?->id,
                 'exception' => $e,
@@ -65,6 +70,10 @@ class SiteSliderController extends Controller
         try {
             $this->save($slider, $request);
         } catch (Throwable $e) {
+            if ($e instanceof HttpExceptionInterface) {
+                throw $e;
+            }
+
             Log::error('Slider update failed.', [
                 'user_id' => $request->user()?->id,
                 'slider_id' => $slider->id,
