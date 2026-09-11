@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\ManagementController as AdminManagementController;
+use App\Http\Controllers\Admin\NewsEventController;
 use App\Http\Controllers\Admin\ResilientDocumentController;
 use App\Http\Controllers\ManagementController as PublicManagementController;
 use App\Models\SystemSetting;
@@ -46,6 +47,15 @@ class AppServiceProvider extends ServiceProvider
         $router->delete('/admin/profile-builder/{member}', [AdminManagementController::class, 'destroy'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.destroy');
         $router->patch('/admin/profile-builder/{member}/toggle', [AdminManagementController::class, 'toggle'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.toggle');
         $router->post('/admin/profile-builder/reorder', [AdminManagementController::class, 'reorder'])->middleware(['auth','permission:website.manage'])->name('admin.profile-builder.reorder');
+
+        // News & Event is a dedicated manager. It deliberately does not reuse Page Builder.
+        $router->get('/admin/news_and_Event', [NewsEventController::class, 'index'])->middleware(['auth','permission:website.view'])->name('admin.news_and_event');
+        $router->get('/admin/news_and_Event/create', [NewsEventController::class, 'create'])->middleware(['auth','permission:website.manage'])->name('admin.news_and_event.create');
+        $router->post('/admin/news_and_Event', [NewsEventController::class, 'store'])->middleware(['auth','permission:website.manage'])->name('admin.news_and_event.store');
+        $router->get('/admin/news_and_Event/{item}/edit', [NewsEventController::class, 'edit'])->middleware(['auth','permission:website.manage'])->name('admin.news_and_event.edit');
+        $router->patch('/admin/news_and_Event/{item}', [NewsEventController::class, 'update'])->middleware(['auth','permission:website.manage'])->name('admin.news_and_event.update');
+        $router->patch('/admin/news_and_Event/{item}/toggle', [NewsEventController::class, 'toggle'])->middleware(['auth','permission:website.manage'])->name('admin.news_and_event.toggle');
+        $router->delete('/admin/news_and_Event/{item}', [NewsEventController::class, 'destroy'])->middleware(['auth','permission:website.manage'])->name('admin.news_and_event.destroy');
 
         $this->app->booted(function () use ($router): void {
             $router->fallback([PublicManagementController::class, 'folderFallback'])->name('management.folder');
