@@ -29,8 +29,8 @@ class DashboardNavigationService
                 if ($item->permission_key && ! auth()->user()->hasPermission($item->permission_key)) return false;
 
                 // News & Event is the canonical dashboard destination. Existing
-                // external-link records may still carry the former News & Notices
-                // label, so normalize the rendered label by destination URL too.
+                // external-link records may still carry an older label, so
+                // normalize the rendered label by destination URL too.
                 $navigationUrl = trim((string) $item->url);
                 $navigationPath = parse_url($navigationUrl, PHP_URL_PATH) ?: $navigationUrl;
                 if (trim($navigationPath, '/') === 'admin/news_and_Event') {
@@ -54,9 +54,9 @@ class DashboardNavigationService
             $item->permission_key = $permission;
 
             // News & Event is now the canonical dashboard destination. Older
-            // dashboard records may still contain the former "News & Notices"
-            // label override, so clear it at render time rather than requiring
-            // a manual database migration for every existing navigation item.
+            // dashboard records may still contain the former label override,
+            // so clear it at render time rather than requiring a manual database
+            // migration for every existing navigation item.
             if ($item->source_key === 'route:admin.site-content.index'
                 || $item->route_name === 'admin.news_and_event.index'
                 || $item->route_name === 'admin.news_and_event') {
