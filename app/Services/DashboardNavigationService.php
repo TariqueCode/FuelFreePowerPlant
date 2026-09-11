@@ -27,6 +27,17 @@ class DashboardNavigationService
             if ($item->source_type === 'external_link') {
                 if (trim((string) $item->url) === '') return false;
                 if ($item->permission_key && ! auth()->user()->hasPermission($item->permission_key)) return false;
+
+                // News & Event is the canonical dashboard destination. Existing
+                // external-link records may still carry the former News & Notices
+                // label, so normalize the rendered label by destination URL too.
+                $navigationUrl = trim((string) $item->url);
+                $navigationPath = parse_url($navigationUrl, PHP_URL_PATH) ?: $navigationUrl;
+                if (trim($navigationPath, '/') === 'admin/news_and_Event') {
+                    $item->label_override = null;
+                    $item->label = 'News & Event';
+                }
+
                 return true;
             }
 
