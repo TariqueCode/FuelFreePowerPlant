@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\HomepageSection;
 use App\Models\SiteContentItem;
 use App\Models\ManagementProfileFolder;
-use App\Models\SystemSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -45,6 +44,14 @@ class HomepageBuilderController extends Controller
         $publishingHighlight = strtolower((string) $request->input('highlight_status')) === 'published';
         abort_unless(! $publishingHighlight || $request->user()->hasPermission('website.publish'), 403, 'Publishing homepage highlights requires publishing permission.');
 
+        $managementEnabled = $request->boolean('sections.management');
+        $managementFolderRules = $managementEnabled
+            ? ['required', 'integer', 'exists:management_profile_folders,id']
+            : ['nullable', 'integer', 'exists:management_profile_folders,id'];
+        $managementIdsRules = $managementEnabled
+            ? ['required', 'array', 'min:1']
+            : ['nullable', 'array'];
+
         $data = $request->validate([
             'section_order' => ['required', 'array'],
             'section_order.*' => ['required', 'string', 'max:60'],
@@ -55,9 +62,9 @@ class HomepageBuilderController extends Controller
             'settings.news.ids' => ['nullable', 'array', 'max:100'],
             'settings.gallery.ids' => ['nullable', 'array', 'max:100'],
             'settings.*.ids.*' => ['integer', 'distinct'],
-            'settings.management.folder_id' => ['required', 'integer', 'exists:management_profile_folders,id'],
-            'settings.management.ids' => ['required', 'array', 'min:1'],
-            'settings.management.ids.*' => ['required', 'integer', 'distinct'],
+            'settings.management.folder_id' => $managementFolderRules,
+            'settings.management.ids' => $managementIdsRules,
+            'settings.management.ids.*' => ['integer', 'distinct'],
             'settings.welcome.eyebrow' => ['nullable', 'string', 'max:120'],
             'settings.welcome.signoff' => ['nullable', 'string', 'max:240'],
             'settings.welcome.title' => ['nullable', 'string', 'max:240'],
@@ -82,20 +89,25 @@ class HomepageBuilderController extends Controller
         foreach (['management','news','gallery'] as $key) {
             $selectedIds[$key] = array_values(array_unique(array_map('intval', (array) $request->input("settings.{$key}.ids", []))));
         }
-        $managementFolderId = (int) $request->input('settings.management.folder_id');
-        $managementFolder = ManagementProfileFolder::query()->where('status', 'published')->find($managementFolderId);
-        if (! $managementFolder) {
-            return back()->withErrors(['settings.management.folder_id' => 'Choose a valid published profile folder.']);
-        }
 
-        $managementValidIds = SiteContentItem::query()
-            ->where('type', 'management')
-            ->where('management_profile_folder_id', $managementFolderId)
-            ->published()
-            ->whereIn('id', $selectedIds['management'])
-            ->pluck('id')->map(fn ($id) => (int) $id)->all();
-        if (count($managementValidIds) < 1) {
-            return back()->withErrors(['settings.management.ids' => 'Select at least one published profile from the selected folder.']);
+        $managementFolderId = null;
+        $managementValidIds = [];
+        if ($managementEnabled) {
+            $managementFolderId = (int) $request->input('settings.management.folder_id');
+            $managementFolder = ManagementProfileFolder::query()->where('status', 'published')->find($managementFolderId);
+            if (! $managementFolder) {
+                return back()->withErrors(['settings.management.folder_id' => 'Choose a valid published profile folder.']);
+            }
+
+            $managementValidIds = SiteContentItem::query()
+                ->where('type', 'management')
+                ->where('management_profile_folder_id', $managementFolderId)
+                ->published()
+                ->whereIn('id', $selectedIds['management'])
+                ->pluck('id')->map(fn ($id) => (int) $id)->all();
+            if (count($managementValidIds) < 1) {
+                return back()->withErrors(['settings.management.ids' => 'Select at least one published profile from the selected folder.']);
+            }
         }
 
         $validIds = [
@@ -104,50 +116,53 @@ class HomepageBuilderController extends Controller
             'gallery' => SiteContentItem::query()->where('type', 'gallery')->published()->whereIn('id', $selectedIds['gallery'])->pluck('id')->map(fn ($id) => (int) $id)->all(),
         ];
 
-        DB::transaction(function () use ($order, $request, $validIds, $managementFolderId) {
-        foreach ($order as $position => $key) {
-            $section = HomepageSection::query()->where('key', $key)->first();
-            $settings = is_array($section?->settings) ? $section->settings : [];
-            $settings['layout'] = in_array((string) $request->input("settings.{$key}.layout", $settings['layout'] ?? 'left'), ['left','center','right'], true) ? $request->input("settings.{$key}.layout", $settings['layout'] ?? 'left') : 'left';
-            if ($key === 'welcome' && $request->has('settings.welcome')) {
-                $welcome = (array) $request->input('settings.welcome', []);
-                $settings['eyebrow'] = trim((string) ($welcome['eyebrow'] ?? ''));
-                $settings['signoff'] = trim((string) ($welcome['signoff'] ?? ''));
-                $settings['title'] = trim((string) ($welcome['title'] ?? ''));
-                $settings['content'] = trim((string) ($welcome['content'] ?? ''));
-                $settings['preview_words'] = max(20, min(500, (int) ($welcome['preview_words'] ?? 180)));
-                $settings['more_words'] = max(20, min(2000, (int) ($welcome['more_words'] ?? 900)));
-                $settings['show_full'] = $request->boolean('settings.welcome.show_full');
-                $settings['layout'] = in_array(($welcome['layout'] ?? 'left'), ['left','center','right'], true) ? $welcome['layout'] : 'left';
-                $requestedManagementIds = array_values(array_unique(array_map('intval', (array) ($welcome['management_ids'] ?? []))));
-                $settings['management_ids'] = array_values(array_slice(
-                    SiteContentItem::query()->where('type','management')->published()->whereIn('id', $requestedManagementIds)->pluck('id')->map(fn ($id) => (int) $id)->all(),
-                    0,
-                    2
-                ));
-            }
-            if ($key === 'management') {
-                $settings['folder_id'] = $managementFolderId;
-                $settings['mode'] = 'selected';
-                $settings['ids'] = $validIds['management'];
-                unset($settings['limit']);
-            } elseif (in_array($key, ['news','gallery'], true) && $request->has("settings.{$key}.limit")) {
-                $settings['limit'] = max(1, min(100, (int) $request->input("settings.{$key}.limit")));
-                $mode = $request->input("settings.{$key}.mode", $settings['mode'] ?? 'latest');
-                $settings['mode'] = $mode;
-                if ($mode === 'selected') {
-                    $settings['ids'] = array_values(array_slice($validIds[$key] ?? [], 0, 100));
-                } else {
-                    unset($settings['ids']);
+        DB::transaction(function () use ($order, $request, $validIds, $managementFolderId, $managementEnabled) {
+            foreach ($order as $position => $key) {
+                $section = HomepageSection::query()->where('key', $key)->first();
+                $settings = is_array($section?->settings) ? $section->settings : [];
+                $settings['layout'] = in_array((string) $request->input("settings.{$key}.layout", $settings['layout'] ?? 'left'), ['left','center','right'], true) ? $request->input("settings.{$key}.layout", $settings['layout'] ?? 'left') : 'left';
+
+                if ($key === 'welcome' && $request->has('settings.welcome')) {
+                    $welcome = (array) $request->input('settings.welcome', []);
+                    $settings['eyebrow'] = trim((string) ($welcome['eyebrow'] ?? ''));
+                    $settings['signoff'] = trim((string) ($welcome['signoff'] ?? ''));
+                    $settings['title'] = trim((string) ($welcome['title'] ?? ''));
+                    $settings['content'] = trim((string) ($welcome['content'] ?? ''));
+                    $settings['preview_words'] = max(20, min(500, (int) ($welcome['preview_words'] ?? 180)));
+                    $settings['more_words'] = max(20, min(2000, (int) ($welcome['more_words'] ?? 900)));
+                    $settings['show_full'] = $request->boolean('settings.welcome.show_full');
+                    $settings['layout'] = in_array(($welcome['layout'] ?? 'left'), ['left','center','right'], true) ? $welcome['layout'] : 'left';
+                    $requestedManagementIds = array_values(array_unique(array_map('intval', (array) ($welcome['management_ids'] ?? []))));
+                    $settings['management_ids'] = array_values(array_slice(
+                        SiteContentItem::query()->where('type','management')->published()->whereIn('id', $requestedManagementIds)->pluck('id')->map(fn ($id) => (int) $id)->all(),
+                        0,
+                        2
+                    ));
+                }
+
+                if ($key === 'management' && $managementEnabled) {
+                    $settings['folder_id'] = $managementFolderId;
+                    $settings['mode'] = 'selected';
+                    $settings['ids'] = $validIds['management'];
+                    unset($settings['limit']);
+                } elseif (in_array($key, ['news','gallery'], true) && $request->has("settings.{$key}.limit")) {
+                    $settings['limit'] = max(1, min(100, (int) $request->input("settings.{$key}.limit")));
+                    $mode = $request->input("settings.{$key}.mode", $settings['mode'] ?? 'latest');
+                    $settings['mode'] = $mode;
+                    if ($mode === 'selected') {
+                        $settings['ids'] = array_values(array_slice($validIds[$key] ?? [], 0, 100));
+                    } else {
+                        unset($settings['ids']);
+                    }
+                }
+
+                if ($section) {
+                    $section->sort_order = $position;
+                    $section->is_enabled = $request->boolean("sections.{$key}");
+                    $section->settings = $settings;
+                    $section->save();
                 }
             }
-            if ($section) {
-                $section->sort_order = $position;
-                $section->is_enabled = $request->boolean("sections.{$key}");
-                $section->settings = $settings;
-                $section->save();
-            }
-        }
         });
 
         return back()->with('status', 'Homepage layout saved successfully.');
