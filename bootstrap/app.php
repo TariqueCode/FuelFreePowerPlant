@@ -27,11 +27,23 @@ return Application::configure(basePath: dirname(__DIR__))
                     Route::get('/', [ManagementController::class, 'index'])->name('index');
                     Route::get('/create', [ManagementController::class, 'create'])->name('create');
                     Route::get('/{member}/edit', [ManagementController::class, 'edit'])->name('edit');
+                });
+
+            Route::middleware(['web', 'auth', 'permission:website.manage'])
+                ->prefix('admin/profile-builder')->name('admin.profile-builder.')
+                ->group(function (): void {
                     Route::post('/', [ManagementController::class, 'store'])->name('store');
                     Route::patch('/{member}', [ManagementController::class, 'update'])->name('update');
                     Route::patch('/{member}/toggle', [ManagementController::class, 'toggle'])->name('toggle');
                     Route::delete('/{member}', [ManagementController::class, 'destroy'])->name('destroy');
                     Route::post('/reorder', [ManagementController::class, 'reorder'])->name('reorder');
+
+                    Route::get('/folders/create', [ManagementController::class, 'folderCreate'])->name('folders.create');
+                    Route::post('/folders', [ManagementController::class, 'folderStore'])->name('folders.store');
+                    Route::get('/folders/{folder}/edit', [ManagementController::class, 'folderEdit'])->name('folders.edit');
+                    Route::patch('/folders/{folder}', [ManagementController::class, 'folderUpdate'])->name('folders.update');
+                    Route::delete('/folders/{folder}', [ManagementController::class, 'folderDestroy'])->name('folders.destroy');
+                    Route::post('/folders/reorder', [ManagementController::class, 'folderReorder'])->name('folders.reorder');
                 });
 
             Route::middleware(['web', 'auth', 'permission:website.view'])
