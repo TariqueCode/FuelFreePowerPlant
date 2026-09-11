@@ -36,7 +36,6 @@ jobs:
       - name: Prepare test environment
         run: cp .env.example .env
       - name: Prepare SQLite database
-        shell: bash
         run: |
           mkdir -p database
           touch database/database.sqlite
@@ -57,7 +56,6 @@ jobs:
   deploy:
     needs: quality
     runs-on: ubuntu-latest
-
     steps:
       - name: Deploy on cPanel server
         env:
@@ -67,25 +65,28 @@ jobs:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
         run: |
           set -euo pipefail
-
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
 
-          ssh -i ~/.ssh/deploy_key \
-            -p "$DEPLOY_PORT" \
-            -o BatchMode=yes \
-            -o StrictHostKeyChecking=yes \
-            "$DEPLOY_USER@$DEPLOY_HOST" 'bash -s' <<'REMOTE'
+          ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" 'bash -s' <<'REMOTE'
           set -euo pipefail
-
           cd /home/fuelfree/public_html
 
           echo "==> Syncing application code"
           git fetch origin main
           git reset --hard origin/main
+
+          echo "==> Selecting PHP 8.4 CLI"
+          if [ -x /opt/cpanel/ea-php84/root/usr/bin/php ]; then
+              PHP_BIN=/opt/cpanel/ea-php84/root/usr/bin/php
+          else
+              PHP_BIN="$(command -v php)"
+          fi
+          "$PHP_BIN" -v
+          "$PHP_BIN" -r 'if (PHP_VERSION_ID < 80400) { fwrite(STDERR, "ERROR: PHP 8.4+ required.\n"); exit(1); }'
 
           echo "==> Locating Composer"
           if command -v composer >/dev/null 2>&1; then
@@ -95,111 +96,77 @@ jobs:
           elif [ -x "/opt/cpanel/composer/bin/composer" ]; then
               COMPOSER_BIN="/opt/cpanel/composer/bin/composer"
           else
-              echo "==> Composer not found; installing Composer locally"
-              mkdir -p "$HOME/.local/bin"
-              COMPOSER_INSTALLER="/tmp/composer-setup.php"
-              curl -fsSL https://getcomposer.org/installer -o "$COMPOSER_INSTALLER"
-              EXPECTED_CHECKSUM="$(curl -fsSL https://composer.github.io/installer.sig)"
-              ACTUAL_CHECKSUM="$(php -r "echo hash_file('sha384', '$COMPOSER_INSTALLER');")"
-              if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
-                  echo "ERROR: Composer installer checksum verification failed."
-                  rm -f "$COMPOSER_INSTALLER"
-                  exit 1
-              fi
-              php "$COMPOSER_INSTALLER" --install-dir="$HOME/.local/bin" --filename=composer
-              rm -f "$COMPOSER_INSTALLER"
-              COMPOSER_BIN="$HOME/.local/bin/composer"
-          fi
-
-          if [ ! -x "$COMPOSER_BIN" ]; then
-              echo "ERROR: Composer is not executable: $COMPOSER_BIN"
+              echo "ERROR: Composer is not installed on production."
               exit 1
           fi
-
-          echo "Using Composer: $COMPOSER_BIN"
           "$COMPOSER_BIN" --version
 
-          echo "==> Checking production PHP runtime"
-          php -r 'if (PHP_VERSION_ID < 80400) { fwrite(STDERR, "ERROR: FuelFree PowerPlant requires PHP 8.4+ on production. Current: ".PHP_VERSION."\\n"); exit(1); }'
-          for ext in fileinfo mbstring; do
-              if ! php -m | grep -qi "^$ext$"; then
+          echo "==> Verifying required PHP extensions"
+          for ext in pdo_mysql fileinfo mbstring; do
+              if ! "$PHP_BIN" -m | grep -qi "^$ext$"; then
                   echo "ERROR: Required PHP extension is missing: $ext"
                   exit 1
               fi
           done
 
-          echo "==> Verifying runtime files"
           test -f .env
           test -f artisan
 
           echo "==> Installing PHP dependencies"
           "$COMPOSER_BIN" install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts
 
-          echo "==> Refreshing Laravel caches before database checks"
-          php artisan optimize:clear
-
-          echo "==> Checking production database connectivity"
-          DB_AVAILABLE=0
-          if php artisan db:show >/tmp/fuelfree-db-check.log 2>&1; then
-              DB_AVAILABLE=1
-          else
-              cat /tmp/fuelfree-db-check.log
+          echo "==> Restoring any previous production MySQL environment"
+          if [ -f .env.mysql-recovery-backup ]; then
+              cp .env.mysql-recovery-backup .env
+              rm -f .env.mysql-recovery-backup
           fi
 
-          if [ "$DB_AVAILABLE" -eq 0 ]; then
-              echo "==> Production MySQL unavailable; enabling temporary SQLite recovery mode"
-              if [ ! -f .env.mysql-recovery-backup ]; then
-                  cp .env .env.mysql-recovery-backup
-              fi
-              mkdir -p database
-              touch database/database.sqlite
-              chmod 660 database/database.sqlite
-              php -r '$p=".env"; $e=file_get_contents($p); $r=["DB_CONNECTION"=>"DB_CONNECTION=sqlite","DB_DATABASE"=>"DB_DATABASE=/home/fuelfree/public_html/database/database.sqlite","DB_HOST"=>"# DB_HOST=","DB_PORT"=>"# DB_PORT=","DB_USERNAME"=>"# DB_USERNAME=","DB_PASSWORD"=>"# DB_PASSWORD=","DB_SOCKET"=>"# DB_SOCKET="]; foreach($r as $k=>$v){$e=preg_replace("/^".$k."=.*/m",$v,$e);} $r=["SESSION_DRIVER"=>"SESSION_DRIVER=file","CACHE_STORE"=>"CACHE_STORE=file","QUEUE_CONNECTION"=>"QUEUE_CONNECTION=sync"]; foreach($r as $k=>$v){$e=preg_replace("/^".$k."=.*/m",$v,$e);} file_put_contents($p,$e);'
-              php artisan optimize:clear
-              php artisan migrate --force
-          else
-              echo "==> Production MySQL available"
-              if [ -f .env.mysql-recovery-backup ]; then
-                  cp .env.mysql-recovery-backup .env
-                  php artisan optimize:clear
-                  php artisan db:show
-                  rm -f .env.mysql-recovery-backup
-              fi
-              php artisan migrate --force
-              php artisan migrate:status
-          fi
+          echo "==> Clearing stale Laravel caches"
+          "$PHP_BIN" artisan optimize:clear
 
-          echo "==> Refreshing Laravel package discovery"
-          php artisan package:discover --ansi
+          echo "==> Verifying production MySQL directly (no Laravel diagnostics)"
+          DB_CONNECTION_VALUE="$(sed -n 's/^DB_CONNECTION=//p' .env | head -n1)"
+          DB_HOST_VALUE="$(sed -n 's/^DB_HOST=//p' .env | head -n1)"
+          DB_PORT_VALUE="$(sed -n 's/^DB_PORT=//p' .env | head -n1)"
+          DB_DATABASE_VALUE="$(sed -n 's/^DB_DATABASE=//p' .env | head -n1)"
+          DB_USERNAME_VALUE="$(sed -n 's/^DB_USERNAME=//p' .env | head -n1)"
+          DB_PASSWORD_VALUE="$(sed -n 's/^DB_PASSWORD=//p' .env | head -n1)"
+          if [ "$DB_CONNECTION_VALUE" != "mysql" ]; then
+              echo "ERROR: Production .env must use DB_CONNECTION=mysql; refusing fallback/recovery mode."
+              exit 1
+          fi
+          export FFP_DB_HOST="$DB_HOST_VALUE" FFP_DB_PORT="$DB_PORT_VALUE" FFP_DB_DATABASE="$DB_DATABASE_VALUE" FFP_DB_USERNAME="$DB_USERNAME_VALUE" FFP_DB_PASSWORD="$DB_PASSWORD_VALUE"
+          "$PHP_BIN" -r '$dsn="mysql:host=".getenv("FFP_DB_HOST").";port=".getenv("FFP_DB_PORT").";dbname=".getenv("FFP_DB_DATABASE").";charset=utf8mb4"; try { $pdo=new PDO($dsn,getenv("FFP_DB_USERNAME"),getenv("FFP_DB_PASSWORD"),[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]); $pdo->query("SELECT 1"); echo "Production MySQL connection OK\n"; } catch (Throwable $e) { fwrite(STDERR,"ERROR: Production MySQL connection failed: ".$e->getMessage()."\n"); exit(1); }'
+
+          echo "==> Running production migrations"
+          "$PHP_BIN" artisan migrate --force
+
+          echo "==> Refreshing package discovery"
+          "$PHP_BIN" artisan package:discover --ansi
 
           if command -v npm >/dev/null 2>&1; then
               echo "==> Building frontend assets"
               npm install --no-audit --no-fund
               npm run build
-          else
-              echo "WARNING: npm is not available; keeping existing public/build assets."
           fi
 
           echo "==> Ensuring public storage link"
-          php artisan storage:link --force
+          "$PHP_BIN" artisan storage:link --force
 
-          echo "==> Clearing and rebuilding Laravel caches"
-          php artisan optimize:clear
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
+          echo "==> Rebuilding Laravel caches"
+          "$PHP_BIN" artisan optimize:clear
+          "$PHP_BIN" artisan config:cache
+          "$PHP_BIN" artisan route:cache
+          "$PHP_BIN" artisan view:cache
 
           echo "==> Ensuring Laravel scheduler cron"
-          CRON_LINE='* * * * * cd /home/fuelfree/public_html && php artisan schedule:run >> /dev/null 2>&1'
+          CRON_LINE="* * * * * cd /home/fuelfree/public_html && $PHP_BIN artisan schedule:run >> /dev/null 2>&1"
           if command -v crontab >/dev/null 2>&1; then
-              (crontab -l 2>/dev/null | grep -Fv 'php artisan schedule:run' || true; echo "$CRON_LINE") | crontab -
-          else
-              echo "WARNING: crontab is not available; configure the Laravel scheduler cron manually."
+              (crontab -l 2>/dev/null | grep -Fv 'artisan schedule:run' || true; echo "$CRON_LINE") | crontab -
           fi
 
-          echo "==> Verifying Laravel application boot"
-          php artisan about >/dev/null
-
+          echo "==> Verifying Laravel boot without artisan about"
+          "$PHP_BIN" artisan route:list --path=admin/menu-builder >/dev/null
           echo "==> Deployment complete"
           REMOTE
 
