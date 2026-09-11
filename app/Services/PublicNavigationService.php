@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\NavigationMenuItem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class PublicNavigationService
 {
@@ -16,8 +17,7 @@ class PublicNavigationService
             ->where('menu', $menu)
             ->where('is_visible', true)
             ->where(function ($query): void {
-                $query->whereNull('source_key')
-                    ->orWhere('source_key', '!=', '');
+                $query->whereNull('source_key')->orWhere('source_key', '!=', '');
             })
             ->orderBy('sort_order')->orderBy('id')
             ->pluck('id')->map(fn ($id): int => (int) $id)->all());
@@ -33,11 +33,13 @@ class PublicNavigationService
 
         $registry = app(NavigationSourceRegistry::class);
         $valid = $items->filter(function (NavigationMenuItem $item) use ($registry): bool {
-            if ($item->source_type === 'folder') return $item->source_key === null || $item->source_key === '';
+            if ($item->source_type === 'folder') {
+                if (Str::startsWith((string) $item->source_key, 'management_folder:')) {
+                    return $registry->resolveAny((string) $item->source_key, 'public') !== null;
+                }
+                return trim((string) $item->label) !== '';
+            }
 
-            // Manually entered links are intentionally independent of the live route
-            // registry. They are still constrained by the same trusted URL format at
-            // creation/update time in NavigationMenuController.
             if ($item->source_type === 'external_link') {
                 return trim((string) $item->url) !== '' && preg_match('~^(?:https?://|/(?!/)|#)~i', (string) $item->url) === 1;
             }
@@ -47,9 +49,6 @@ class PublicNavigationService
             $source = $registry->resolveAny($sourceKey, $item->area);
             if (! $source) return false;
 
-            // The destination stays synchronized with the live source, while the
-            // navigation label remains owned by the menu item. A label_override
-            // must never be replaced by the source registry's default label.
             if ($item->label_override !== null && trim((string) $item->label_override) !== '') {
                 $item->label = (string) $item->label_override;
             } elseif (trim((string) $item->label) === '') {
@@ -65,21 +64,17 @@ class PublicNavigationService
 
         $children = $valid->groupBy(fn (NavigationMenuItem $item) => $item->parent_id ?? 0);
         $building = [];
-
         $build = function (int $parentId = 0, int $depth = 0) use (&$build, $children, &$building): Collection {
             if ($depth > 20 || isset($building[$parentId])) return collect();
             $building[$parentId] = true;
-
             $result = $children->get($parentId, collect())
                 ->map(function (NavigationMenuItem $item) use (&$build, $depth): NavigationMenuItem {
                     $item->setRelation('children', $build((int) $item->id, $depth + 1));
                     return $item;
                 })->values();
-
             unset($building[$parentId]);
             return $result;
         };
-
         return $build();
     }
 
