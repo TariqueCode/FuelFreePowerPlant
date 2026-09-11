@@ -169,7 +169,7 @@
                 @elseif($section->key==='management')
                     <div class="management-config">
                         <div class="display-grid">
-                            <label><span>Profile folder</span><select name="settings[management][folder_id]" class="management-folder" required><option value="">Select a profile folder</option>@foreach($managementFolders as $folder)<option value="{{ $folder->id }}" @selected((int)($settings['folder_id'] ?? 0)===(int)$folder->id)>{{ $folder->name }} ({{ $folder->profiles->count() }} profiles)</option>@endforeach</select><small>Folders are managed in Profile Builder and reflected in the Menu Builder.</small></label>
+                            <label><span>Profile folder</span><select name="settings[management][folder_id]" class="management-folder"><option value="">Select a profile folder</option>@foreach($managementFolders as $folder)<option value="{{ $folder->id }}" @selected((int)($settings['folder_id'] ?? 0)===(int)$folder->id)>{{ $folder->name }} ({{ $folder->profiles->count() }} profiles)</option>@endforeach</select><small>Folders are managed in Profile Builder and reflected in the Menu Builder.</small></label>
                             <label><span>Section alignment</span><select name="settings[management][layout]"><option value="left" @selected($layout==='left')>Left</option><option value="center" @selected($layout==='center')>Center</option><option value="right" @selected($layout==='right')>Right</option></select></label>
                         </div>
                         <div class="selection-panel management-selection-panel" data-key="management" data-required="true">
@@ -261,7 +261,6 @@
     });
 
     let drag=null;
-    // Mobile/tablet: long-press the grip, then drag vertically to reorder.
     rows().forEach(row=>{
         const handle=row.querySelector('.drag-handle');
         if(!handle)return;
@@ -374,6 +373,10 @@
     const managementPanel=document.querySelector('.management-selection-panel');
     if(managementPanel){
         form.addEventListener('submit',e=>{
+            const managementVisibility=form.querySelector('input[name="sections[management]"]');
+            const managementEnabled=managementVisibility?.checked ?? false;
+            if(!managementEnabled)return;
+
             const settings=managementPanel.closest('.section-controls');
             const folder=settings?.querySelector('.management-folder');
             const selected=[...managementPanel.querySelectorAll('input[data-folder-profile]:checked')];
