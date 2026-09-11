@@ -31,8 +31,9 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
-        $this->app->booted(function () use ($this->app): void {
-            $this->app['router']->fallback([PublicManagementController::class, 'folderFallback'])->name('management.folder');
+        $router = $this->app['router'];
+        $this->app->booted(function () use ($router): void {
+            $router->fallback([PublicManagementController::class, 'folderFallback'])->name('management.folder');
         });
 
         try {
