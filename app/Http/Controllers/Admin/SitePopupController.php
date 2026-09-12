@@ -16,7 +16,6 @@ class SitePopupController extends Controller
     {
         $popups = SitePopup::latest()->paginate(20);
         $publishedCount = SitePopup::where('is_published', true)->count();
-
         return view('admin.site-popups.index', compact('popups', 'publishedCount'));
     }
 
@@ -29,7 +28,6 @@ class SitePopupController extends Controller
     {
         $popup = new SitePopup();
         $this->save($popup, $request);
-
         return redirect()->route('admin.site-popups.index')->with('status', 'Announcement banner created.');
     }
 
@@ -43,22 +41,16 @@ class SitePopupController extends Controller
         if ($request->boolean('toggle')) {
             abort_unless($request->user()->hasPermission('website.publish'), 403, 'Publishing highlights requires publishing permission.');
             $popup->update(['is_published' => !$popup->is_published]);
-
             return redirect()->route('admin.site-popups.index')->with('status', $popup->is_published ? 'Highlight activated.' : 'Highlight deactivated.');
         }
-
         $this->save($popup, $request);
-
         return redirect()->route('admin.site-popups.index')->with('status', 'Announcement banner updated.');
     }
 
     public function destroy(SitePopup $popup): RedirectResponse
     {
-        if ($popup->image_path) {
-            Storage::disk('public')->delete($popup->image_path);
-        }
+        if ($popup->image_path) Storage::disk('public')->delete($popup->image_path);
         $popup->delete();
-
         return back()->with('status', 'Announcement banner deleted.');
     }
 
@@ -80,24 +72,17 @@ class SitePopupController extends Controller
             $file = $request->file('image');
             $this->validateImageUpload($file);
 
-            if ($popup->image_path) {
-                Storage::disk('public')->delete($popup->image_path);
-            }
-
+            if ($popup->image_path) Storage::disk('public')->delete($popup->image_path);
             $extension = strtolower($file->getClientOriginalExtension());
             $path = 'site-popups/' . bin2hex(random_bytes(16)) . '.' . $extension;
             $stream = fopen($file->getRealPath(), 'rb');
-
             try {
                 if (! Storage::disk('public')->put($path, $stream)) {
                     throw ValidationException::withMessages(['image' => 'The banner image could not be saved. Please try again.']);
                 }
             } finally {
-                if (is_resource($stream)) {
-                    fclose($stream);
-                }
+                if (is_resource($stream)) fclose($stream);
             }
-
             $data['image_path'] = $path;
         } elseif (! $popup->exists) {
             throw ValidationException::withMessages(['image' => 'Please select a valid banner image.']);
@@ -111,11 +96,6 @@ class SitePopupController extends Controller
     {
         if (! $file || ! $file->isValid()) {
             throw ValidationException::withMessages(['image' => 'The banner image could not be uploaded. Please try again.']);
-        }
-
-        $maxBytes = $this->maxUploadKb() * 1024;
-        if (($file->getSize() ?? 0) > $maxBytes) {
-            throw ValidationException::withMessages(['image' => 'The banner image is too large. Maximum allowed size is ' . (int) ceil($maxBytes / 1024 / 1024) . ' MB.']);
         }
 
         $extension = strtolower($file->getClientOriginalExtension());
@@ -135,12 +115,5 @@ class SitePopupController extends Controller
         if (! $imageInfo || ! in_array($imageInfo[2] ?? null, $allowedTypes, true)) {
             throw ValidationException::withMessages(['image' => 'The selected file is not a supported image.']);
         }
-    }
-
-    private function maxUploadKb(): int
-    {
-        $mb = (int) \App\Models\SystemSetting::query()->where('key', 'uploads.popups_max_mb')->value('value');
-
-        return max(1, $mb ?: (int) config('fuelfree.upload.popups_max_mb', 50)) * 1024;
     }
 }
