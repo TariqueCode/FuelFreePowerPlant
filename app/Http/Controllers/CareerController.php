@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rules\File;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class CareerController extends Controller
 {
@@ -26,8 +26,7 @@ class CareerController extends Controller
             ->whereIn('type', ['career','careers','job'])
             ->orderBy('sort_order')->orderBy('title')->get();
 
-        $maxUploadMb = $this->maxUploadMb();
-        return view('career', compact('brand','page','maxUploadMb'));
+        return view('career', compact('brand','page'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -51,7 +50,7 @@ class CareerController extends Controller
     public function chunkUpload(Request $request)
     {
         $uploadsDir = 'private/career/.uploads';
-        $disk = \Illuminate\Support\Facades\Storage::disk('local');
+        $disk = Storage::disk('local');
         $disk->makeDirectory($uploadsDir);
         $uploadId = (string) $request->header('X-Upload-Id');
 
@@ -61,8 +60,6 @@ class CareerController extends Controller
                 'size' => ['required','integer','min:1'],
             ]);
 
-            $maxUploadMb = $this->maxUploadMb();
-            abort_if((int) $data['size'] > $maxUploadMb * 1024 * 1024, 422, 'The CV exceeds the configured upload limit of '.$maxUploadMb.' MB.');
             $extension = strtolower(pathinfo($data['filename'], PATHINFO_EXTENSION));
             abort_unless(in_array($extension, ['pdf','doc','docx'], true), 422, 'Please upload a PDF, DOC or DOCX file.');
             $uploadId = (string) str()->uuid();
@@ -87,8 +84,11 @@ class CareerController extends Controller
         $meta = json_decode($disk->get($metaPath), true, 512, JSON_THROW_ON_ERROR);
         $createdAt = (string) ($meta['created_at'] ?? '');
         if ($createdAt !== '') {
-            try { abort_if(now()->diffInMinutes(\Carbon\Carbon::parse($createdAt)) > 120, 410, 'Upload session expired. Please start again.'); }
-            catch (\Throwable $e) { abort(410, 'Upload session expired. Please start again.'); }
+            try {
+                abort_if(now()->diffInMinutes(\Carbon\Carbon::parse($createdAt)) > 120, 410, 'Upload session expired. Please start again.');
+            } catch (\Throwable $e) {
+                abort(410, 'Upload session expired. Please start again.');
+            }
         }
 
         if ($request->boolean('finalize')) {
@@ -96,14 +96,7 @@ class CareerController extends Controller
             abort_unless($currentSize === (int) $meta['size'], 422, 'The upload is incomplete.');
 
             $absolute = $disk->path($partPath);
-            $uploadedFile = new UploadedFile(
-                $absolute,
-                $meta['filename'],
-                null,
-                UPLOAD_ERR_OK,
-                true
-            );
-
+            $uploadedFile = new UploadedFile($absolute, $meta['filename'], null, UPLOAD_ERR_OK, true);
             $request->files->set('cv', $uploadedFile);
             $data = $this->validateApplication($request);
             unset($data['website']);
@@ -159,12 +152,6 @@ class CareerController extends Controller
         return response()->json(['ok' => true, 'uploaded' => $offset + $length]);
     }
 
-    private function maxUploadMb(): int
-    {
-        $mb = (int) SystemSetting::query()->where('key', 'uploads.career_max_mb')->value('value');
-        return $mb > 0 ? $mb : (int) config('fuelfree.upload.max_mb', 50);
-    }
-
     private function validateApplication(Request $request): array
     {
         return $request->validate([
@@ -176,7 +163,7 @@ class CareerController extends Controller
             'experience' => ['nullable','string','max:180'],
             'location' => ['nullable','string','max:180'],
             'message' => ['nullable','string','max:5000'],
-            'cv' => ['required', File::types(['pdf','doc','docx'])->max($this->maxUploadMb().'mb')],
+            'cv' => ['required', File::types(['pdf','doc','docx'])],
             'consent' => ['accepted'],
             'website' => ['nullable','string','max:0'],
         ]);
