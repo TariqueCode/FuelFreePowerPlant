@@ -13,29 +13,28 @@ class BoardOfDirectorsNavigationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_board_of_directors_is_a_canonical_folder_navigation_item(): void
+    public function test_board_of_directors_is_a_live_route_navigation_item(): void
     {
-        $folder = ManagementProfileFolder::query()->where('slug', 'board-of-directors')->firstOrFail();
-        $item = NavigationMenuItem::query()->where('menu', 'main')->where('source_key', 'management_folder:'.$folder->id)->firstOrFail();
+        $item = NavigationMenuItem::query()->where('menu', 'main')->where('source_key', 'route:management')->firstOrFail();
 
         $this->assertSame('Board of Directors', $item->displayLabel());
-        $this->assertSame('folder', $item->source_type);
-        $this->assertSame('/board-of-directors', $item->url);
-        $this->assertNull($item->route_name);
+        $this->assertSame('route', $item->source_type);
+        $this->assertSame('/management', $item->url);
+        $this->assertSame('management', $item->route_name);
     }
 
-    public function test_public_navigation_accepts_management_profile_folders(): void
+    public function test_public_navigation_exposes_management_as_board_of_directors(): void
     {
-        $folder = ManagementProfileFolder::query()->where('slug', 'board-of-directors')->firstOrFail();
         $tree = app(PublicNavigationService::class)->tree('main');
-        $item = $tree->firstWhere('source_key', 'management_folder:'.$folder->id);
+        $item = $tree->firstWhere('source_key', 'route:management');
 
         $this->assertNotNull($item);
         $this->assertSame('Board of Directors', $item->displayLabel());
-        $this->assertSame('/board-of-directors', $item->url);
+        $this->assertSame('/management', $item->url);
+        $this->assertSame('route', $item->source_type);
     }
 
-    public function test_homepage_management_section_uses_board_of_directors_folder(): void
+    public function test_homepage_management_section_still_uses_board_of_directors_profiles(): void
     {
         $folder = ManagementProfileFolder::query()->where('slug', 'board-of-directors')->firstOrFail();
         $section = HomepageSection::query()->where('key', 'management')->firstOrFail();
