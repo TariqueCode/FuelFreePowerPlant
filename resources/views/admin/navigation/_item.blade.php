@@ -24,13 +24,15 @@
             </div>
         </div>
         <div class="menu-card-meta">
-            <span class="type-pill">{{ $item->source_type === 'folder' ? 'Folder' : ($item->source_type === 'external_link' ? 'Custom link' : 'Live source') }}</span>
+            @php($isManagementFolder = $item->source_type === 'folder' && str_starts_with((string) $item->source_key, 'management_folder:'))
+            <span class="type-pill">{{ $isManagementFolder ? 'Menu' : ($item->source_type === 'folder' ? 'Folder' : ($item->source_type === 'external_link' ? 'Custom link' : 'Live source')) }}</span>
             <span>{{ $item->is_visible ? 'Visible' : 'Hidden' }}</span>
             @if($item->permission_key)<span>{{ $item->permission_key }}</span>@endif
             @if($item->parent_id !== null)<span class="parent-pill">Sub-menu</span>@endif
+            @if($item->children->isNotEmpty())<span class="parent-pill">Has sub-menu</span>@endif
         </div>
         <small class="menu-card-url">{{ $item->route_name ?: ($item->url ?: 'Structural folder') }}</small>
-        @if($item->source_type === 'folder')
+        @if($item->source_type === 'folder' && ! $isManagementFolder)
             <div class="nest-hint"><i class="fa-solid fa-folder-tree"></i> Drop items here with <kbd>Alt</kbd> to nest</div>
         @endif
         <div class="inline-label-edit" id="rename-{{ $item->id }}" hidden>
@@ -52,7 +54,7 @@
                 @include('admin.navigation._item', ['item' => $child])
             @endforeach
         </div>
-    @else
-        @if($item->source_type === 'folder')<div class="menu-children empty-drop-zone" data-parent-id="{{ $item->id }}"><span>Drop here to place inside {{ $item->displayLabel() }}</span></div>@endif
+    @elseif($item->source_type === 'folder' && ! $isManagementFolder)
+        <div class="menu-children empty-drop-zone" data-parent-id="{{ $item->id }}"><span>Drop here to place inside {{ $item->displayLabel() }}</span></div>
     @endif
 </div>
