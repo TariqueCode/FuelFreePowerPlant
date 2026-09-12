@@ -49,7 +49,9 @@ return new class extends Migration
         $settings['mode'] = 'selected';
         $settings['ids'] = $profiles;
         $settings['limit'] = max(1, min(100, (int) ($settings['limit'] ?? 4)));
-        $settings['layout'] = in_array(($settings['layout'] ?? 'left'), ['left', 'center', 'right'], true) ? $settings['layout'] : 'left';
+
+        $layout = $settings['layout'] ?? 'left';
+        $settings['layout'] = in_array($layout, ['left', 'center', 'right'], true) ? $layout : 'left';
 
         DB::table('homepage_sections')->where('id', $section->id)->update([
             'settings' => json_encode($settings, JSON_UNESCAPED_SLASHES),
