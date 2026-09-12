@@ -114,8 +114,8 @@
         const uploadButton = form.querySelector('button[type="submit"]');
         const modalActions = form.querySelector('.modal-actions');
         const maxBytes = {{ ((int) ($maxUploadMb ?? 50)) * 1024 * 1024 }};
-        // Keep every HTTP request comfortably below common cPanel/LiteSpeed body limits.
-        const chunkSize = 262144;
+        // 64 KiB keeps every upload request comfortably below restrictive cPanel/LiteSpeed limits.
+        const chunkSize = 65536;
 
         let status = form.querySelector('.chunk-upload-status');
         if (!status) {
@@ -201,8 +201,6 @@
                 });
                 const start = await jsonResponse(startResponse);
                 const uploadId = start.upload_id;
-                // Do not trust a server-provided larger chunk size: production web servers
-                // may enforce a lower request-body limit than PHP's upload settings.
                 const actualChunkSize = Math.min(chunkSize, Number(start.chunk_size) || chunkSize);
                 if (!uploadId) throw new Error('The server did not create an upload session.');
 
