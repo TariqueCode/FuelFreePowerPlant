@@ -13,14 +13,21 @@ class BoardOfDirectorsIntegrationTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function boardOfDirectorsFolder(): ManagementProfileFolder
+    {
+        return ManagementProfileFolder::query()->firstOrCreate(
+            ['slug' => 'board-of-directors'],
+            [
+                'name' => 'Board of Directors',
+                'status' => 'published',
+                'sort_order' => 1,
+            ]
+        );
+    }
+
     public function test_profile_folder_resolves_as_board_of_directors_navigation_source(): void
     {
-        $folder = ManagementProfileFolder::create([
-            'name' => 'Board of Directors',
-            'slug' => 'board-of-directors',
-            'status' => 'published',
-            'sort_order' => 1,
-        ]);
+        $folder = $this->boardOfDirectorsFolder();
 
         $source = app(NavigationSourceRegistry::class)->resolveAny('management_folder:'.$folder->id, 'public');
 
@@ -32,12 +39,7 @@ class BoardOfDirectorsIntegrationTest extends TestCase
 
     public function test_homepage_management_section_uses_published_board_profiles_when_configured(): void
     {
-        $folder = ManagementProfileFolder::create([
-            'name' => 'Board of Directors',
-            'slug' => 'board-of-directors',
-            'status' => 'published',
-            'sort_order' => 1,
-        ]);
+        $folder = $this->boardOfDirectorsFolder();
 
         $profile = SiteContentItem::create([
             'type' => 'management',
