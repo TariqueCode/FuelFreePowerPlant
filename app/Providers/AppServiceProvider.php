@@ -34,16 +34,24 @@ class AppServiceProvider extends ServiceProvider
 
         $router = $this->app['router'];
         $this->app->booted(function () use ($router): void {
-            // Backward-compatible URL for older Documents & Media links.
-            // The current builder uses /admin/documents?folder={id}; keep the
-            // legacy /admin/documents/folders/{id} URL functional instead of
-            // letting it fall through to a server error or the global fallback.
+            // Compatibility for old folder URLs. The current file manager uses
+            // /admin/documents?folder={id} as its canonical navigation path.
             $router->get('/admin/documents/folders/{folder}', function (int $folder) {
                 return redirect()->route('admin.documents', ['folder' => $folder]);
             })
                 ->whereNumber('folder')
                 ->middleware(['web', 'auth', 'permission:documents.view'])
                 ->name('admin.documents.folders.compat');
+
+            // POST aliases keep destructive actions away from DELETE method
+            // filtering/WAF rules commonly found on shared LiteSpeed hosting.
+            $manage = ['web', 'auth', 'permission:documents.manage'];
+            $router->post('/admin/documents/{document}/delete', [DocumentController::class, 'destroy'])
+                ->middleware($manage)->name('admin.documents.destroy.post');
+            $router->post('/admin/documents/{document}/unshare', [DocumentController::class, 'unshare'])
+                ->middleware($manage)->name('admin.documents.unshare.post');
+            $router->post('/admin/documents/folders/{folder}/delete', [DocumentController::class, 'destroyFolder'])
+                ->middleware($manage)->name('admin.documents.folders.destroy.post');
 
             $router->fallback([PublicManagementController::class, 'folderFallback'])->name('management.folder');
         });
