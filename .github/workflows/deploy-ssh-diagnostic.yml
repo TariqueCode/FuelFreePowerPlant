@@ -1,0 +1,38 @@
+name: Production SSH Diagnostic
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  ssh-diagnostic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test cPanel SSH command execution
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        shell: bash
+        run: |
+          set -u
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+          echo '==> SSH transport test'
+          if ! ssh -T -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20 "$DEPLOY_USER@$DEPLOY_HOST" 'printf "REMOTE_SSH_OK\\n"'; then
+            echo 'ERROR: SSH transport/authentication or remote command execution failed.'
+            exit 1
+          fi
+
+          echo '==> Remote shell diagnostics'
+          ssh -T -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20 "$DEPLOY_USER@$DEPLOY_HOST" 'set +e; printf "USER=%s\\n" "$USER"; printf "HOME=%s\\n" "$HOME"; printf "SHELL=%s\\n" "$SHELL"; printf "ARGV0=%s\\n" "$0"; printf "PWD=%s\\n" "$PWD"; printf "BASH=%s\\n" "$(command -v bash || true)"; printf "PHP84=%s\\n" "$(test -x /opt/alt/php84/usr/bin/php && echo yes || echo no)"; printf "PHP84_VERSION="; /opt/alt/php84/usr/bin/php -v 2>&1 | head -n1; printf "BASH_VERSION=%s\\n" "${BASH_VERSION:-unavailable}"; printf "ORIGINAL_COMMAND=%s\\n" "${SSH_ORIGINAL_COMMAND:-empty}"; printf "ID="; id 2>&1; printf "PUBLIC_HTML="; test -d /home/fuelfree/public_html && echo yes || echo no; printf "GIT="; test -x /usr/bin/git && echo yes || command -v git; printf "DONE\\n"'
+
+          rm -f ~/.ssh/deploy_key
