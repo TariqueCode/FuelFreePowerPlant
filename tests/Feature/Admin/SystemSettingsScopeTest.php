@@ -24,7 +24,7 @@ class SystemSettingsScopeTest extends TestCase
         return $user;
     }
 
-    public function test_system_settings_does_not_expose_homepage_or_mail_configuration(): void
+    public function test_system_settings_does_not_expose_homepage_mail_or_upload_configuration(): void
     {
         $response = $this->actingAs($this->admin())->get(route('admin.settings'));
 
@@ -32,11 +32,12 @@ class SystemSettingsScopeTest extends TestCase
         $response->assertDontSee('Homepage sections');
         $response->assertDontSee('Contact &amp; Career email login');
         $response->assertDontSee('Default upload limit');
-        $response->assertSeeText('Storage policy');
-        $response->assertSeeText('no application-level per-file size limit');
+        $response->assertDontSee('Storage policy');
+        $response->assertDontSee('Private storage quota');
+        $response->assertSeeText('Upload-size controls are intentionally not configurable here.');
     }
 
-    public function test_mail_fields_cannot_create_mailbox_settings_from_system_settings(): void
+    public function test_mail_and_upload_fields_cannot_create_mailbox_or_upload_settings_from_system_settings(): void
     {
         $this->actingAs($this->admin())->post(route('admin.settings.update'), [
             'company' => [
@@ -59,5 +60,8 @@ class SystemSettingsScopeTest extends TestCase
 
         $this->assertDatabaseMissing('system_settings', ['key' => 'mail.contact_account_id']);
         $this->assertDatabaseMissing('system_settings', ['key' => 'mail.career_account_id']);
+        $this->assertDatabaseMissing('system_settings', ['key' => 'uploads.career_max_mb']);
+        $this->assertDatabaseMissing('system_settings', ['key' => 'uploads.gallery_max_mb']);
+        $this->assertDatabaseMissing('system_settings', ['key' => 'uploads.content_media_max_mb']);
     }
 }
