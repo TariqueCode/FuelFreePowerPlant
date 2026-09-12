@@ -156,7 +156,52 @@ jobs:
               npm run build
           fi
 
+          echo "==> Ensuring Laravel public storage link"
+          STORAGE_TARGET="storage/app/public"
+          mkdir -p "$STORAGE_TARGET"
+          EXPECTED_TARGET="$(readlink -f "$STORAGE_TARGET")"
+
+          if [ -L public/storage ]; then
+              CURRENT_TARGET="$(readlink -f public/storage || true)"
+              if [ "$CURRENT_TARGET" != "$EXPECTED_TARGET" ]; then
+                  echo "Existing storage symlink points to '$CURRENT_TARGET'; recreating it."
+                  rm public/storage
+                  ln -s ../storage/app/public public/storage
+              fi
+          elif [ -e public/storage ]; then
+              BACKUP_DIR="storage/legacy-public-storage-backups/$(date +%Y%m%d-%H%M%S)"
+              echo "Legacy physical public/storage detected; preserving it at $BACKUP_DIR"
+              mkdir -p "$BACKUP_DIR"
+              cp -a public/storage/. "$STORAGE_TARGET/"
+              mv public/storage "$BACKUP_DIR/public-storage"
+              ln -s ../storage/app/public public/storage
+          else
+              ln -s ../storage/app/public public/storage
+          fi
+
           "$PHP_BIN" artisan storage:link --force
+
+          echo "==> Verifying storage link"
+          test -L public/storage
+          test "$(readlink -f public/storage)" = "$EXPECTED_TARGET"
+
+          echo "==> Verifying published slider files"
+          "$PHP_BIN" artisan tinker --execute='
+          $sliders = \App\Models\SiteSlider::where("is_published", true)->get();
+          foreach ($sliders as $slider) {
+              if (!$slider->image_path || !\Illuminate\Support\Facades\Storage::disk("public")->exists($slider->image_path)) {
+                  fwrite(STDERR, "ERROR: Published slider image is missing: ".($slider->image_path ?? "<empty>")."\n");
+                  exit(1);
+              }
+              $publicPath = public_path("storage/".$slider->image_path);
+              if (!is_file($publicPath)) {
+                  fwrite(STDERR, "ERROR: Published slider is not web-readable: ".$publicPath."\n");
+                  exit(1);
+              }
+          }
+          echo "Published slider file verification OK\n";
+          '
+
           "$PHP_BIN" artisan optimize:clear
           "$PHP_BIN" artisan config:cache
           "$PHP_BIN" artisan route:cache
