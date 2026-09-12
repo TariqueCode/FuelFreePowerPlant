@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Document;
 use App\Models\DocumentFolder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -35,6 +36,11 @@ class ResilientDocumentController extends DocumentController
         $usedPercent = $quotaBytes > 0 ? min(100, round(($usedBytes / $quotaBytes) * 100, 1)) : 0;
 
         return view('admin.documents.index', compact('folder', 'folders', 'allFolders', 'documents', 'search', 'usedBytes', 'availableBytes', 'quotaBytes', 'usedPercent'));
+    }
+
+    public function legacyFolderUrl(int $folder): RedirectResponse
+    {
+        return redirect()->route('admin.documents', ['folder' => $folder]);
     }
 
     protected function ensureQuotaAvailable(int $userId, int $additionalBytes): void
