@@ -69,7 +69,8 @@ class DocumentController extends Controller
             Storage::disk('local')->makeDirectory('.uploads');
             $metaPath=".uploads/{$uploadId}.json";
             $partPath=".uploads/{$uploadId}.part";
-            $chunkSize=262144;
+            // Keep each HTTP body far below restrictive LiteSpeed/cPanel request limits.
+            $chunkSize=65536;
             Storage::disk('local')->put($metaPath,json_encode(['user_id'=>$request->user()->id,'filename'=>$data['filename'],'size'=>(int)$data['size'],'folder_id'=>$data['folder_id'] ?? null,'chunk_size'=>$chunkSize,'created_at'=>now()->toIso8601String()]));
             return response()->json(['ok'=>true,'upload_id'=>$uploadId,'chunk_size'=>$chunkSize,'max_bytes'=>$maxBytes]);
         }
