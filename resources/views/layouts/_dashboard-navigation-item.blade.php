@@ -1,5 +1,6 @@
 @once
 <link rel="stylesheet" href="{{ asset('admin-premium.css') }}?v=1">
+<link rel="stylesheet" href="{{ asset('admin-dashboard.css') }}?v=1">
 <script src="{{ asset('admin-documents.js') }}?v=1" defer></script>
 @endonce
 <style>
