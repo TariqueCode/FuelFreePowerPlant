@@ -107,13 +107,15 @@
     const init = () => {
         const form = document.querySelector('#upload-modal form[action*="/admin/documents"]');
         const input = document.getElementById('file-upload-input');
-        if (!form || !input) return;
+        if (!form || !input || form.dataset.chunkUploaderReady === '1') return;
+        form.dataset.chunkUploaderReady = '1';
         input.removeAttribute('accept');
 
         const uploadButton = form.querySelector('button[type="submit"]');
         const modalActions = form.querySelector('.modal-actions');
         const maxBytes = {{ ((int) ($maxUploadMb ?? 50)) * 1024 * 1024 }};
-        const chunkSize = 524288;
+        // Keep every HTTP request comfortably below common cPanel/LiteSpeed body limits.
+        const chunkSize = 262144;
 
         let status = form.querySelector('.chunk-upload-status');
         if (!status) {
@@ -153,7 +155,7 @@
             for (let attempt = 1; attempt <= attempts; attempt++) {
                 try {
                     const response = await fetch(url, options);
-                    if (response.ok || ![408, 429, 500, 502, 503, 504].includes(response.status)) return response;
+                    if (response.ok || ![408, 413, 429, 500, 502, 503, 504].includes(response.status)) return response;
                     lastError = new Error('Temporary upload error (' + response.status + ').');
                 } catch (error) {
                     lastError = error;
@@ -167,8 +169,6 @@
             const file = input.files?.[0];
             if (!file) return;
 
-            // Every document uses the chunk endpoint. Each request is only 512 KiB,
-            // so a large file never has to pass through PHP/web-server request limits.
             event.preventDefault();
             if (file.size > maxBytes) {
                 alert('The selected file is larger than the configured '+{{ (int) ($maxUploadMb ?? 50) }}+' MB limit.');
@@ -179,6 +179,7 @@
             if (uploadButton) { uploadButton.disabled = true; uploadButton.textContent = 'Preparing…'; }
             input.disabled = true;
             status.hidden = false;
+            status.classList.remove('error');
             status.textContent = 'Preparing secure upload…';
 
             try {
@@ -227,8 +228,6 @@
                 }
 
                 status.textContent = 'Finalizing file…';
-                const finalize = new URLSearchParams();
-                finalize.set('finalize', '1');
                 const finalResponse = await requestWithRetry(endpoint, {
                     method: 'POST',
                     headers: {
@@ -237,7 +236,7 @@
                         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
                         'X-Upload-Id': uploadId
                     },
-                    body: finalize.toString()
+                    body: 'finalize=1'
                 });
                 await jsonResponse(finalResponse);
                 status.textContent = 'Upload complete. Refreshing…';
@@ -251,8 +250,9 @@
         });
     };
 
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
-    else init();
+    const boot = () => { init(); setTimeout(init, 150); };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
+    else boot();
 })();
 </script>
 <style>
