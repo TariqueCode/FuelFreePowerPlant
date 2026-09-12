@@ -85,4 +85,64 @@ class NavigationMenuReorderTest extends TestCase
         $this->assertDatabaseHas('navigation_menu_items', ['id' => $parent->id, 'parent_id' => null]);
         $this->assertDatabaseHas('navigation_menu_items', ['id' => $child->id, 'parent_id' => $parent->id]);
     }
+
+    public function test_nested_custom_link_can_be_promoted_to_top_level(): void
+    {
+        $user = $this->navigationAdmin();
+        $folder = NavigationMenuItem::create([
+            'menu' => 'main', 'parent_id' => null, 'label' => 'Company', 'url' => null,
+            'route_name' => null, 'target' => '_self', 'is_visible' => true, 'sort_order' => 0,
+            'source_key' => null, 'source_type' => 'folder', 'area' => 'public',
+        ]);
+        $child = NavigationMenuItem::create([
+            'menu' => 'main', 'parent_id' => $folder->id, 'label' => 'Partner Portal', 'url' => '/portal',
+            'route_name' => null, 'target' => '_blank', 'is_visible' => true, 'sort_order' => 0,
+            'source_key' => null, 'source_type' => 'external_link', 'area' => 'public',
+        ]);
+
+        $response = $this->actingAs($user)->patch(route('admin.menu-builder.update', $child), [
+            'label' => 'Partner Portal',
+            'url' => '/portal',
+            'parent_id' => null,
+            'target' => '_blank',
+            'icon' => '',
+            'is_visible' => 1,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('navigation_menu_items', [
+            'id' => $child->id,
+            'parent_id' => null,
+            'url' => '/portal',
+        ]);
+    }
+
+    public function test_nested_folder_can_be_promoted_to_top_level(): void
+    {
+        $user = $this->navigationAdmin();
+        $parent = NavigationMenuItem::create([
+            'menu' => 'main', 'parent_id' => null, 'label' => 'Company', 'url' => null,
+            'route_name' => null, 'target' => '_self', 'is_visible' => true, 'sort_order' => 0,
+            'source_key' => null, 'source_type' => 'folder', 'area' => 'public',
+        ]);
+        $childFolder = NavigationMenuItem::create([
+            'menu' => 'main', 'parent_id' => $parent->id, 'label' => 'Services', 'url' => null,
+            'route_name' => null, 'target' => '_self', 'is_visible' => true, 'sort_order' => 0,
+            'source_key' => null, 'source_type' => 'folder', 'area' => 'public',
+        ]);
+
+        $response = $this->actingAs($user)->patch(route('admin.menu-builder.update', $childFolder), [
+            'label' => 'Services',
+            'parent_id' => null,
+            'target' => '_self',
+            'icon' => '',
+            'is_visible' => 1,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('navigation_menu_items', [
+            'id' => $childFolder->id,
+            'parent_id' => null,
+        ]);
+    }
 }
