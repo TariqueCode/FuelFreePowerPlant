@@ -65,7 +65,6 @@ class DocumentController extends Controller
             Storage::disk('local')->makeDirectory('.uploads');
             $metaPath=".uploads/{$uploadId}.json";
             $partPath=".uploads/{$uploadId}.part";
-            // Keep each HTTP body far below restrictive LiteSpeed/cPanel request limits.
             $chunkSize=65536;
             Storage::disk('local')->put($metaPath,json_encode(['user_id'=>$request->user()->id,'filename'=>$data['filename'],'size'=>(int)$data['size'],'folder_id'=>$data['folder_id'] ?? null,'chunk_size'=>$chunkSize,'created_at'=>now()->toIso8601String()]));
             return response()->json(['ok'=>true,'upload_id'=>$uploadId,'chunk_size'=>$chunkSize]);
@@ -111,6 +110,43 @@ class DocumentController extends Controller
         fflush($handle);flock($handle,LOCK_UN);fclose($handle);
         abort_unless($written===$length,422,'The upload chunk was incomplete.');
         return response()->json(['ok'=>true,'uploaded'=>$offset+$length]);
+    }
+
+    public function renameFolder(Request $request, DocumentFolder $folder): RedirectResponse
+    {
+        $this->ownFolder($request,$folder);
+        $data=$request->validate(['name'=>['required','string','max:150']]);
+        $name=trim($data['name']);
+        abort_if($name===''||str_contains($name,'/')||str_contains($name,'\\'),422,'Invalid folder name.');
+        $folder->update(['name'=>$name]);
+        return back()->with('success','Folder renamed successfully.');
+    }
+
+    public function moveFolder(Request $request, DocumentFolder $folder): RedirectResponse
+    {
+        $this->ownFolder($request,$folder);
+        $data=$request->validate(['parent_id'=>['nullable','integer','exists:document_folders,id']]);
+        $parentId=$data['parent_id']??null;
+        if($parentId){$target=DocumentFolder::whereKey($parentId)->where('user_id',$request->user()->id)->firstOrFail();abort_if($target->id===$folder->id||$this->isDescendant($target,$folder),422,'Invalid folder destination.');}
+        $folder->update(['parent_id'=>$parentId]);
+        return back()->with('success','Folder moved successfully.');
+    }
+
+    public function copyFolder(Request $request, DocumentFolder $folder): RedirectResponse
+    {
+        $this->ownFolder($request,$folder);
+        $data=$request->validate(['parent_id'=>['nullable','integer','exists:document_folders,id']]);
+        $parentId=$data['parent_id']??null;
+        if($parentId)DocumentFolder::whereKey($parentId)->where('user_id',$request->user()->id)->firstOrFail();
+        $this->copyFolderTree($folder,$request->user()->id,$parentId);
+        return back()->with('success','Folder copied successfully.');
+    }
+
+    public function destroyFolder(Request $request, DocumentFolder $folder): RedirectResponse
+    {
+        $this->ownFolder($request,$folder);
+        $this->deleteFolderTree($folder);
+        return back()->with('success','Folder deleted permanently.');
     }
 
     public function rename(Request $request, Document $document): RedirectResponse { $this->ownDocument($request,$document); $data=$request->validate(['name'=>['required','string','max:255']]); $name=trim($data['name']); abort_if($name===''||str_contains($name,'/')||str_contains($name,'\\'),422,'Invalid file name.'); $extension=pathinfo($document->original_name,PATHINFO_EXTENSION); if($extension&&!str_ends_with(strtolower($name),'.'.strtolower($extension)))$name.='.'.$extension; $document->update(['original_name'=>$name]); return back()->with('success','File renamed successfully.'); }
