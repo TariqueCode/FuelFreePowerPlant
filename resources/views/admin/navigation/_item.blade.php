@@ -15,7 +15,7 @@
                         <input type="hidden" name="target" value="{{ $item->target }}">
                         <input type="hidden" name="icon" value="{{ $item->icon }}">
                         <input type="hidden" name="is_visible" value="{{ $item->is_visible ? 1 : 0 }}">
-                        <button type="submit" class="move-btn promote-btn" aria-label="Move {{ $item->displayLabel() }} to top level"><i class="fa-solid fa-arrow-turn-up"></i></button>
+                        <button type="submit" class="promote-btn" aria-label="Move {{ $item->displayLabel() }} to top level"><i class="fa-solid fa-arrow-turn-up"></i><span>Top-level</span></button>
                     </form>
                 @endif
                 <button type="button" class="move-btn move-up" data-id="{{ $item->id }}" title="Move up" aria-label="Move {{ $item->displayLabel() }} up"><i class="fa-solid fa-arrow-up"></i></button>
