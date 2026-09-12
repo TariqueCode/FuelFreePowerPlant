@@ -17,7 +17,7 @@ class NavigationSourceRegistry
         'career.store', 'career.chunks', 'contact.store', 'cms.page', 'gallery.show',
         'news.show', 'projects.show', 'documents.shared-download', 'webmail.redirect',
         'resources.index', 'resources.show', 'resources.download',
-        'site.plants', 'site.future-project', 'site.solutions', 'sustainability', 'management',
+        'site.plants', 'site.future-project', 'site.solutions', 'sustainability',
     ];
 
     private const BUILDER_ROUTE_ALIASES = [
@@ -50,13 +50,8 @@ class NavigationSourceRegistry
         $folders = $area === 'public'
             ? ManagementProfileFolder::query()->where('status', 'published')->orderBy('sort_order')->orderBy('id')->get(['id', 'name', 'slug'])
                 ->map(fn (ManagementProfileFolder $folder): array => [
-                    'key' => 'management_folder:'.$folder->id,
-                    'type' => 'folder',
-                    'label' => (string) $folder->name,
-                    'url' => '/'.ltrim((string) $folder->slug, '/'),
-                    'route_name' => null,
-                    'area' => 'public',
-                    'permission' => null,
+                    'key' => 'management_folder:'.$folder->id, 'type' => 'folder', 'label' => (string) $folder->name,
+                    'url' => '/'.ltrim((string) $folder->slug, '/'), 'route_name' => null, 'area' => 'public', 'permission' => null,
                     'meta' => ['folder_id' => $folder->id, 'slug' => $folder->slug],
                 ])
             : collect();
@@ -93,12 +88,9 @@ class NavigationSourceRegistry
             $name = Str::after($key, 'route:');
             if (isset(self::BUILDER_ROUTE_ALIASES[$name])) {
                 [$canonical, $label] = self::BUILDER_ROUTE_ALIASES[$name];
-                $route = collect(RouteFacade::getRoutes()->getRoutes())
-                    ->first(fn (Route $route): bool => $route->getName() === $canonical);
+                $route = collect(RouteFacade::getRoutes()->getRoutes())->first(fn (Route $route): bool => $route->getName() === $canonical);
                 if ($route && $this->eligibleRoute($route, $area)) {
-                    $source = $this->routeSource($route, $area);
-                    $source['label'] = $label;
-                    return $source;
+                    $source = $this->routeSource($route, $area); $source['label'] = $label; return $source;
                 }
                 return null;
             }
@@ -122,14 +114,10 @@ class NavigationSourceRegistry
                     'meta' => ['cms_page_id' => $page->id, 'slug' => $page->slug]];
             }
         }
-
         return null;
     }
 
-    private function usedSourceKeys(string $menu): Collection
-    {
-        return NavigationMenuItem::query()->where('menu', $menu)->whereNotNull('source_key')->pluck('source_key');
-    }
+    private function usedSourceKeys(string $menu): Collection { return NavigationMenuItem::query()->where('menu', $menu)->whereNotNull('source_key')->pluck('source_key'); }
 
     private function eligibleRoute(Route $route, string $area): bool
     {
@@ -141,9 +129,7 @@ class NavigationSourceRegistry
         if (Str::startsWith($uri, 'admin/site-content')) return false;
         $middleware = collect($route->gatherMiddleware())->map(fn ($value): string => (string) $value);
         if ($area === 'public') {
-            if ($name === 'site.about') {
-                return CmsPage::query()->where('slug', 'about-us')->where('is_published', true)->exists();
-            }
+            if ($name === 'site.about') return CmsPage::query()->where('slug', 'about-us')->where('is_published', true)->exists();
             if ($route->getDomain() !== null) return false;
             return ! str_starts_with($uri, 'admin/') && ! $middleware->contains(fn (string $value): bool => $value === 'auth' || Str::startsWith($value, ['role:', 'permission:']));
         }
@@ -151,10 +137,7 @@ class NavigationSourceRegistry
         return false;
     }
 
-    private function hasCanonicalCmsPage(Route $route, string $area): bool
-    {
-        return $this->canonicalCmsPageForRoute((string) $route->getName(), $area) !== null;
-    }
+    private function hasCanonicalCmsPage(Route $route, string $area): bool { return $this->canonicalCmsPageForRoute((string) $route->getName(), $area) !== null; }
 
     private function canonicalCmsPageForRoute(string $name, string $area): ?array
     {
@@ -171,46 +154,26 @@ class NavigationSourceRegistry
             'meta' => ['cms_page_id' => $page->id, 'slug' => $page->slug]];
     }
 
-    private function isNavigationBuilderRoute(string $name): bool
-    {
-        return Str::startsWith($name, ['admin.navigation.', 'admin.menu-builder.', 'admin.profile-builder.', 'admin.page-builder.']);
-    }
+    private function isNavigationBuilderRoute(string $name): bool { return Str::startsWith($name, ['admin.navigation.', 'admin.menu-builder.', 'admin.profile-builder.', 'admin.page-builder.']); }
 
     private function routeSource(Route $route, string $area): array
     {
-        $name = (string) $route->getName();
-        $middleware = collect($route->gatherMiddleware())->map(fn ($value): string => (string) $value);
+        $name = (string) $route->getName(); $middleware = collect($route->gatherMiddleware())->map(fn ($value): string => (string) $value);
         $permission = $middleware->first(fn (string $middleware): bool => Str::startsWith($middleware, 'permission:'));
-        return ['key' => 'route:'.$name, 'type' => 'route', 'label' => $this->routeLabel($route, $name),
-            'url' => $route->uri() === '/' ? '/' : '/'.ltrim($route->uri(), '/'), 'route_name' => $name, 'area' => $area,
-            'permission' => $permission ? Str::after($permission, 'permission:') : null, 'meta' => []];
+        return ['key' => 'route:'.$name, 'type' => 'route', 'label' => $this->routeLabel($route, $name), 'url' => $route->uri() === '/' ? '/' : '/'.ltrim($route->uri(), '/'), 'route_name' => $name, 'area' => $area, 'permission' => $permission ? Str::after($permission, 'permission:') : null, 'meta' => []];
     }
 
     private function routeLabel(Route $route, string $name): string
     {
-        $friendly = [
-            'home' => 'Home',
-            'site.plants' => (string) config('fuelfree.projects.label', 'Projects & Our Plans'),
-            'site.future-project' => 'Future Project', 'site.solutions' => 'Solutions', 'site.gallery' => 'Gallery',
-            'site.career' => 'Career', 'news.index' => 'News & Event', 'sustainability' => 'Sustainability', 'contact' => 'Contact',
-        ];
+        $friendly = ['home' => 'Home', 'management' => 'Board of Directors', 'site.plants' => (string) config('fuelfree.projects.label', 'Projects & Our Plans'), 'site.future-project' => 'Future Project', 'site.solutions' => 'Solutions', 'site.gallery' => 'Gallery', 'site.career' => 'Career', 'news.index' => 'News & Event', 'sustainability' => 'Sustainability', 'contact' => 'Contact'];
         if (array_key_exists($name, $friendly)) return $friendly[$name];
         $action = (string) ($route->getActionName() ?? ''); $controller = Str::before(Str::afterLast($action, '\\'), '@');
-        if ($controller === 'PublicSiteController') {
-            $section = $route->defaults['section'] ?? null;
-            if (is_string($section) && trim($section) !== '') return $this->humanizeNavigationLabel($section);
-            $segment = trim(ltrim($route->uri(), '/')); if ($segment !== '' && ! str_contains($segment, '/')) return $this->humanizeNavigationLabel($segment);
-        }
+        if ($controller === 'PublicSiteController') { $section = $route->defaults['section'] ?? null; if (is_string($section) && trim($section) !== '') return $this->humanizeNavigationLabel($section); $segment = trim(ltrim($route->uri(), '/')); if ($segment !== '' && ! str_contains($segment, '/')) return $this->humanizeNavigationLabel($segment); }
         $label = Str::headline(Str::replace(['admin.', '.index', '.'], ['admin ', '', ' '], $name));
         if ($controller && $controller !== 'Closure') { $method = Str::headline(Str::beforeLast($controller, 'Controller')); if ($method && $method !== 'Closure') $label = $method; }
         return $label;
     }
 
     private function humanizeNavigationLabel(string $value): string { return Str::headline(str_replace(['-', '_'], ' ', trim($value))); }
-
-    private function isUsableNavigationLabel(string $label): bool
-    {
-        $normalized = trim($label); if ($normalized === '') return false;
-        return ! Str::startsWith(Str::lower($normalized), 'generated::');
-    }
+    private function isUsableNavigationLabel(string $label): bool { $normalized = trim($label); if ($normalized === '') return false; return ! Str::startsWith(Str::lower($normalized), 'generated::'); }
 }
