@@ -38,9 +38,6 @@
             @if($item->children->isNotEmpty())<span class="parent-pill">Has sub-menu</span>@endif
         </div>
         <small class="menu-card-url">{{ $isLegacyBoardFolder ? 'management' : ($item->route_name ?: ($item->url ?: 'Structural folder')) }}</small>
-        @if($isFolder)
-            <div class="nest-hint"><i class="fa-solid fa-folder-tree"></i> Drop items here with <kbd>Alt</kbd> to nest</div>
-        @endif
         <div class="inline-label-edit" id="rename-{{ $item->id }}" hidden>
             <form method="POST" action="{{ route('admin.menu-builder.update', $item) }}">
                 @csrf @method('PATCH')
@@ -60,7 +57,5 @@
                 @include('admin.navigation._item', ['item' => $child])
             @endforeach
         </div>
-    @elseif($isFolder)
-        <div class="menu-children empty-drop-zone" data-parent-id="{{ $item->id }}"><span>Drop here to place inside {{ $item->displayLabel() }}</span></div>
     @endif
 </div>
