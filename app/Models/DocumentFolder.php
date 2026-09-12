@@ -10,6 +10,11 @@ class DocumentFolder extends Model
 {
     protected $fillable = ['user_id', 'parent_id', 'name'];
 
+    protected $casts = [
+        'user_id' => 'integer',
+        'parent_id' => 'integer',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
