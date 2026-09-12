@@ -12,6 +12,13 @@ class Document extends Model
         'path', 'mime_type', 'size', 'extension', 'share_token', 'share_enabled',
     ];
 
+    protected $casts = [
+        'user_id' => 'integer',
+        'folder_id' => 'integer',
+        'size' => 'integer',
+        'share_enabled' => 'boolean',
+    ];
+
     public function getShareUrlAttribute(): ?string
     {
         return $this->share_enabled && $this->share_token ? route('documents.shared-download', $this->share_token) : null;
