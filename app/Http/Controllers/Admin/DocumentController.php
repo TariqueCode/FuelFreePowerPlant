@@ -8,7 +8,6 @@ use App\Models\DocumentFolder;
 use App\Models\SystemSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -30,9 +29,7 @@ class DocumentController extends Controller
         $usedBytes = $this->usedBytes($user->id);
         $availableBytes = max(0, $quotaBytes - $usedBytes);
         $usedPercent = min(100, round(($usedBytes / max(1, $quotaBytes)) * 100, 1));
-        $maxUploadMb = (int) SystemSetting::query()->where('key', 'uploads.documents_max_mb')->value('value');
-        if ($maxUploadMb < 1) $maxUploadMb = (int) config('fuelfree.upload.max_mb', 50);
-        return view('admin.documents.index', compact('folder','folders','documents','allFolders','search','quotaBytes','usedBytes','availableBytes','usedPercent','maxUploadMb'));
+        return view('admin.documents.index', compact('folder','folders','documents','allFolders','search','quotaBytes','usedBytes','availableBytes','usedPercent'));
     }
 
     public function storeFolder(Request $request): RedirectResponse
@@ -61,9 +58,8 @@ class DocumentController extends Controller
 
     public function chunkUpload(Request $request): mixed
     {
-        $maxBytes=$this->maxUploadBytes();
         if (!$request->hasHeader('X-Upload-Id')) {
-            $data=$request->validate(['filename'=>['required','string','max:255'],'size'=>['required','integer','min:1','max:'.$maxBytes],'folder_id'=>['nullable','integer','exists:document_folders,id']]);
+            $data=$request->validate(['filename'=>['required','string','max:255'],'size'=>['required','integer','min:1'],'folder_id'=>['nullable','integer','exists:document_folders,id']]);
             if (!empty($data['folder_id'])) DocumentFolder::whereKey($data['folder_id'])->where('user_id',$request->user()->id)->firstOrFail();
             $uploadId=(string)Str::uuid();
             Storage::disk('local')->makeDirectory('.uploads');
@@ -72,7 +68,7 @@ class DocumentController extends Controller
             // Keep each HTTP body far below restrictive LiteSpeed/cPanel request limits.
             $chunkSize=65536;
             Storage::disk('local')->put($metaPath,json_encode(['user_id'=>$request->user()->id,'filename'=>$data['filename'],'size'=>(int)$data['size'],'folder_id'=>$data['folder_id'] ?? null,'chunk_size'=>$chunkSize,'created_at'=>now()->toIso8601String()]));
-            return response()->json(['ok'=>true,'upload_id'=>$uploadId,'chunk_size'=>$chunkSize,'max_bytes'=>$maxBytes]);
+            return response()->json(['ok'=>true,'upload_id'=>$uploadId,'chunk_size'=>$chunkSize]);
         }
         $uploadId=(string)$request->header('X-Upload-Id');
         abort_unless(preg_match('/^[0-9a-f-]{36}$/i',$uploadId),422,'Invalid upload session.');
@@ -136,7 +132,6 @@ class DocumentController extends Controller
         return back()->with('success','File deleted permanently.');
     }
 
-    private function maxUploadBytes(): int { $mb=(int)Cache::remember('fuelfree.documents_max_upload_mb',600,fn()=>(int)SystemSetting::query()->where('key','uploads.documents_max_mb')->value('value')); if($mb<1)$mb=(int)config('fuelfree.upload.max_mb',50); return $mb*1024*1024; }
     private function ownFolder(Request $request,DocumentFolder $folder): void { abort_unless($folder->user_id===$request->user()->id,403); }
     private function ownDocument(Request $request,Document $document): void { abort_unless($document->user_id===$request->user()->id,403); }
     private function isDescendant(DocumentFolder $candidate,DocumentFolder $ancestor): bool { while($candidate->parent_id){if((int)$candidate->parent_id===(int)$ancestor->id)return true;$candidate=$candidate->parent;} return false; }
