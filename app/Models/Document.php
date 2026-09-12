@@ -9,7 +9,7 @@ class Document extends Model
 {
     protected $fillable = [
         'user_id', 'folder_id', 'original_name', 'stored_name', 'disk',
-        'path', 'mime_type', 'size', 'extension', 'share_token', 'share_enabled',
+        'path', 'mime_type', 'size', 'extension', 'share_token', 'share_enabled', 'share_expires_at',
     ];
 
     protected $casts = [
@@ -17,6 +17,7 @@ class Document extends Model
         'folder_id' => 'integer',
         'size' => 'integer',
         'share_enabled' => 'boolean',
+        'share_expires_at' => 'datetime',
     ];
 
     public function getShareUrlAttribute(): ?string
