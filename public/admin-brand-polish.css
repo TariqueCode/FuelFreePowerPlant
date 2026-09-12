@@ -22,6 +22,10 @@ body:after{
   background:linear-gradient(180deg,rgba(3,20,12,.96),rgba(2,12,17,.95))!important;
   border-right-color:rgba(99,232,142,.17)!important;
 }
+.brand{isolation:isolate}
+.brand:before{
+  content:"";position:absolute;left:3px;top:2px;width:48px;height:48px;border:1px solid rgba(99,232,142,.11);border-radius:50%;box-shadow:0 0 0 7px rgba(99,232,142,.025),0 0 28px rgba(25,184,90,.06);pointer-events:none;animation:ff-brand-ring 7s ease-in-out infinite;
+}
 .brand-logo,.brand-mark{
   border-color:rgba(99,232,142,.25)!important;
   box-shadow:0 0 0 1px rgba(99,232,142,.08),0 0 26px rgba(25,184,90,.11),0 12px 30px rgba(0,0,0,.25)!important;
@@ -31,6 +35,7 @@ body:after{
 .nav>a:before,.nav-parent:before{background:linear-gradient(100deg,rgba(25,184,90,.13),transparent 62%)!important}
 .nav>a.active{box-shadow:inset 3px 0 0 var(--ff-brand-green-bright),0 8px 28px rgba(25,184,90,.08)!important;border-color:rgba(99,232,142,.17)!important}
 .nav>a.active .nav-icon,.nav>a:hover .nav-icon,.nav-group.open .nav-icon{color:var(--ff-brand-green-bright)!important}
+.topbar{box-shadow:0 12px 45px rgba(0,0,0,.18),0 1px 0 rgba(99,232,142,.05)!important}
 .content .card,.content .panel,.content .builder-card,.content .section-card,.content .form-card,.content .table-card,.content .stat-card,.content .hero,.content .toolbar,.content .filter-bar,.content .source-preview,.content .locked-source,.content .empty-state,.content .modal-content,.content fieldset{
   background:linear-gradient(145deg,rgba(6,31,19,.68),rgba(4,18,24,.82))!important;
   border-color:rgba(99,232,142,.13)!important;
@@ -54,4 +59,6 @@ body:after{
 @keyframes ff-glow-in{from{opacity:.84;transform:translateY(5px)}to{opacity:1;transform:none}}
 @keyframes ff-sheen{0%,55%,100%{left:-35%;opacity:0}65%{opacity:1}82%{left:125%;opacity:0}}
 @keyframes ff-orbit{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){body:after{animation:none!important}.metric-card:after,.quick-card:after{animation:none!important}}
+@keyframes ff-brand-ring{0%,100%{transform:scale(.96);opacity:.55}50%{transform:scale(1.08);opacity:1}}
+@media(max-width:900px){.brand:before{left:2px;top:1px;width:43px;height:43px}}
+@media(prefers-reduced-motion:reduce){body:after{animation:none!important}.brand:before{animation:none!important}.metric-card:after,.quick-card:after{animation:none!important}}
