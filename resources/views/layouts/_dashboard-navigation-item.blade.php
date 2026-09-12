@@ -108,6 +108,7 @@
         const form = document.querySelector('#upload-modal form[action*="/admin/documents"]');
         const input = document.getElementById('file-upload-input');
         if (!form || !input) return;
+        input.removeAttribute('accept');
 
         const uploadButton = form.querySelector('button[type="submit"]');
         const modalActions = form.querySelector('.modal-actions');
