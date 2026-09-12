@@ -31,7 +31,12 @@ class ResilientDocumentController extends DocumentController
             $usedBytes = (int) Document::where('user_id', $user->id)->sum('size');
         }
 
-        return view('admin.documents.index', compact('folder', 'folders', 'allFolders', 'documents', 'search', 'usedBytes'));
+        // Kept only for the existing storage-status presentation; it is no longer enforced.
+        $quotaBytes = (int) config('fuelfree.storage.quota_bytes', 50 * 1024 * 1024 * 1024);
+        $availableBytes = max(0, $quotaBytes - $usedBytes);
+        $usedPercent = $quotaBytes > 0 ? min(100, round(($usedBytes / $quotaBytes) * 100, 1)) : 0;
+
+        return view('admin.documents.index', compact('folder', 'folders', 'allFolders', 'documents', 'search', 'usedBytes', 'availableBytes', 'quotaBytes', 'usedPercent'));
     }
 
     public function legacyFolderUrl(int $folder)
@@ -137,10 +142,6 @@ class ResilientDocumentController extends DocumentController
         return response()->json(['ok' => true, 'uploaded' => $offset + $length]);
     }
 
-    /**
-     * Documents & Media has no application-level storage or per-file quota.
-     * Physical hosting/provider limits remain outside the application.
-     */
     protected function ensureQuotaAvailable(int $userId, int $additionalBytes): void
     {
         abort_if($additionalBytes < 0, 422, 'Invalid file size.');
