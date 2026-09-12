@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Http\Controllers\Admin\DocumentController;
+use App\Http\Controllers\Admin\FooterController;
 use App\Http\Controllers\Admin\ManagementController as AdminManagementController;
 use App\Http\Controllers\Admin\ResilientDocumentController;
 use App\Http\Controllers\ManagementController as PublicManagementController;
@@ -38,6 +39,15 @@ class AppServiceProvider extends ServiceProvider
                 ->whereNumber('folder')
                 ->middleware(['web', 'auth', 'permission:documents.view'])
                 ->name('admin.documents.folders.compat');
+
+            // Global footer manager. Keep this outside routes/web.php because this
+            // provider already owns production compatibility routes for shared hosting.
+            $router->get('/admin/footer', [FooterController::class, 'index'])
+                ->middleware(['web', 'auth', 'permission:website.view'])
+                ->name('admin.footer.index');
+            $router->post('/admin/footer', [FooterController::class, 'update'])
+                ->middleware(['web', 'auth', 'permission:website.manage'])
+                ->name('admin.footer.update');
 
             // POST aliases avoid DELETE-method filtering/WAF rules commonly found on shared LiteSpeed hosting.
             $manage = ['web', 'auth', 'permission:documents.manage'];
