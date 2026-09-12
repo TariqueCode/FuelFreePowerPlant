@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\ManagementProfileFolder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,10 +16,6 @@ class NavigationMenuItem extends Model
     protected static function booted(): void
     {
         static::saving(function (self $item): void {
-            // The tree reorderer uses temporary negative sort orders to move all
-            // submitted rows out of the way. Some production MySQL schemas use
-            // UNSIGNED for this column, so normalize those temporary values to a
-            // deterministic positive range before Eloquent writes them.
             if ((int) $item->sort_order < 0) {
                 $item->sort_order = 1000000000 + (int) $item->getKey();
             }
@@ -32,31 +27,9 @@ class NavigationMenuItem extends Model
         });
     }
 
-    public function setRouteNameAttribute($value): void
-    {
-        $this->attributes['route_name'] = $value;
-        if ($value !== 'management' || ! Schema::hasTable('management_profile_folders')) return;
-        $folder = ManagementProfileFolder::query()->where('status','published')->orderBy('sort_order')->orderBy('id')->first();
-        if (!$folder) return;
-        $this->attributes['url'] = '/'.$folder->slug;
-        $this->attributes['label'] = $folder->name;
-        $this->attributes['source_type'] = 'folder';
-        $this->attributes['source_key'] = 'management_folder:'.$folder->id;
-        $this->attributes['route_name'] = null;
-    }
-
     public function displayLabel(): string
     {
         if ($this->label_override !== null && trim((string)$this->label_override) !== '') return (string)$this->label_override;
-        if ($this->source_type === 'folder' && Str::startsWith((string)$this->source_key, 'management_folder:') && Schema::hasTable('management_profile_folders')) {
-            $id = (int) Str::after((string)$this->source_key, 'management_folder:');
-            $folder = ManagementProfileFolder::query()->whereKey($id)->where('status','published')->first();
-            if ($folder) return (string)$folder->name;
-        }
-        if ($this->route_name === 'management' && Schema::hasTable('management_profile_folders')) {
-            $folder = ManagementProfileFolder::query()->where('status','published')->orderBy('sort_order')->orderBy('id')->first();
-            if ($folder) return (string)$folder->name;
-        }
         if ($this->route_name === 'site.plants' || trim((string)$this->url,'/') === 'plants') return (string)config('fuelfree.projects.label','Projects & Our Plans');
         return (string)$this->label;
     }
