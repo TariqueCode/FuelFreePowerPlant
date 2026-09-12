@@ -55,8 +55,7 @@ class DocumentController extends Controller
         $fileSize = (int) $data['file']->getSize();
         abort_if($fileSize > $maxUploadBytes, 422, 'The selected file exceeds the configured upload limit of '.($maxUploadBytes / 1048576).' MB.');
         $this->ensureQuotaAvailable($user->id, $fileSize);
-        $allowed = ['pdf','doc','docx','xls','xlsx','csv','txt','zip','jpg','jpeg','png','webp','gif','mp4','webm','mov'];
-        abort_unless(in_array(strtolower($data['file']->getClientOriginalExtension()), $allowed, true), 422, 'This file type is not supported.'); $folderId = $data['folder_id'] ?? null;
+        $folderId = $data['folder_id'] ?? null;
         if ($folderId && ! DocumentFolder::whereKey($folderId)->where('user_id', $user->id)->exists()) abort(403); $file = $data['file']; $storedName = $file->hashName(); $path = $file->storeAs("private/{$user->id}", $storedName, 'local');
         Document::create(['user_id' => $user->id, 'folder_id' => $folderId, 'original_name' => $file->getClientOriginalName(), 'stored_name' => $storedName, 'disk' => 'local', 'path' => $path, 'mime_type' => $file->getMimeType(), 'size' => $file->getSize(), 'extension' => strtolower($file->getClientOriginalExtension())]); return back()->with('success', 'File uploaded securely.');
     }
@@ -112,8 +111,6 @@ class DocumentController extends Controller
             abort_if($fileSize > $maxUploadBytes, 422, 'The file exceeds the configured upload limit of '.($maxUploadBytes / 1048576).' MB.');
             $this->ensureQuotaAvailable($user->id, $fileSize);
             $extension = strtolower(pathinfo($meta['filename'], PATHINFO_EXTENSION));
-            $allowed = ['pdf','doc','docx','xls','xlsx','csv','txt','zip','jpg','jpeg','png','webp','gif','mp4','webm','mov'];
-            abort_if($extension === '' || !in_array($extension, $allowed, true), 422, 'This file type is not supported.');
             $storedName = (string) str()->uuid().($extension ? '.'.$extension : '');
             $finalPath = "private/{$user->id}/{$storedName}";
             Storage::disk('local')->move($partPath, $finalPath);
@@ -127,7 +124,7 @@ class DocumentController extends Controller
 
         $index = (int) $request->header('X-Chunk-Index', '-1');
         $offset = (int) $request->header('X-Chunk-Offset', '-1');
-        $length = (int) $request->header('Content-Length', '0');
+        $length = (int) ($request->header('X-Chunk-Length') ?: $request->header('Content-Length', '0'));
         $chunkSize = (int) $meta['chunk_size'];
         abort_if($index < 0 || $offset < 0 || $length < 1 || $length > $chunkSize, 422, 'Invalid upload chunk.');
         abort_if($offset + $length > (int) $meta['size'], 422, 'Upload chunk exceeds the declared file size.');
