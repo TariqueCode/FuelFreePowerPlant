@@ -21,6 +21,8 @@ class BoardOfDirectorsNavigationTest extends TestCase
         $this->assertSame('route', $item->source_type);
         $this->assertSame('/management', $item->url);
         $this->assertSame('management', $item->route_name);
+        $this->assertSame(0, $item->children()->count());
+        $this->assertSame(0, NavigationMenuItem::query()->where('menu', 'main')->where('source_type', 'folder')->where('source_key', 'like', 'management_folder:%')->count());
     }
 
     public function test_public_navigation_exposes_management_as_board_of_directors(): void
