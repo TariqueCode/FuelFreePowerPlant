@@ -24,7 +24,50 @@ $dashboardNavigation=app(\App\Services\DashboardNavigationService::class)->tree(
 .nav-group{margin:2px 0 4px}.nav-parent{width:100%;min-height:42px;display:flex;align-items:center;gap:11px;padding:9px 11px;border:1px solid transparent;border-radius:12px;background:transparent;color:var(--muted);cursor:pointer;text-align:left;font-size:12px}.nav-parent:hover,.nav-group.open>.nav-parent{background:rgba(67,194,229,.055);border-color:rgba(104,204,235,.07);color:#d9f1f5}.nav-parent>span:nth-child(2){flex:1}.nav-chevron{font-size:9px;transition:transform .18s}.nav-group.open .nav-chevron{transform:rotate(180deg)}.nav-sub{display:none;margin:2px 0 5px 33px;padding-left:8px;border-left:1px solid rgba(104,204,235,.11)}.nav-group.open .nav-sub{display:flex;flex-direction:column;gap:2px}.nav-sub a{padding:8px 9px;border-radius:8px;color:#7898a5;text-decoration:none;font-size:10px}.nav-sub a:hover,.nav-sub a.active{color:#eaf8fb;background:rgba(67,194,229,.07)}.nav-parent:focus-visible,.nav-sub a:focus-visible,.nav>a:focus-visible,.profile-trigger:focus-visible,.mobile-menu-toggle:focus-visible{outline:2px solid #61d8f1;outline-offset:2px}.nav-sub a{min-width:0;display:block}.nav-label{user-select:none}.nav-label{padding:9px 9px 3px;color:#4f7180;font-size:8px;font-weight:700;letter-spacing:.13em}
 @media(max-width:900px){.nav-group{display:block}.nav-sub{margin-left:27px}.nav-sub a{padding:10px 9px;font-size:11px}}
 @media(max-width:900px){.topbar{box-shadow:0 10px 30px rgba(0,0,0,.12)}.content{padding:22px clamp(14px,3vw,28px)}}\n@media(min-width:901px) and (max-width:1180px){.app{grid-template-columns:minmax(216px,230px) minmax(0,1fr)}.sidebar{padding-inline:10px}.content{padding-inline:24px}}
-@media(max-width:520px){.content{padding:18px 12px}.topbar{padding:0 12px}.topbar-brand img{width:34px;height:34px}.topbar-title{font-size:13px}}\n</style>@stack('head') @stack('styles')</head><body><div class="app"><aside class="sidebar" id="admin-sidebar"><div class="brand">@if($dashboardLogo)<img class="brand-logo" src="{{ asset('storage/'.$dashboardLogo) }}" alt="{{ $dashboardName }}">@else<span class="brand-mark"><i class="fa-solid fa-bolt"></i></span>@endif<div class="brand-text"><small>Administration</small><strong>{{ $dashboardName }}</strong></div></div><nav class="nav" aria-label="Dashboard navigation">@if($dashboardNavigation->isNotEmpty())
+@media(max-width:520px){.content{padding:18px 12px}.topbar{padding:0 12px}.topbar-brand img{width:34px;height:34px}.topbar-title{font-size:13px}}\n</style>
+<style>
+/* Accessibility: comfortable reading sizes across the administration area. */
+.nav>a,.nav-parent{font-size:15px!important;min-height:46px}
+.nav-sub a{font-size:13px!important;line-height:1.45}
+.nav-label{font-size:10px!important}
+.brand-text small{font-size:10px!important}
+.brand-text strong{font-size:15px!important}
+.nav-icon i{font-size:15px!important}
+.topbar-title{font-size:15px!important}
+.content{font-size:16px}
+.content .hero h1{font-size:clamp(28px,3vw,40px)!important;line-height:1.15}
+.content .hero p{font-size:17px!important;line-height:1.6}
+.content .hero .eyebrow{font-size:12px!important;letter-spacing:.12em}
+.content .notice,.content .error-notice{font-size:15px!important;line-height:1.5}
+.content label{font-size:14px!important;line-height:1.45}
+.content input,.content select,.content textarea{font-size:15px!important;min-height:44px}
+.content button{font-size:14px!important;min-height:42px}
+.content table{font-size:14px!important}
+.content th{font-size:13px!important}
+.content td{font-size:14px!important;line-height:1.5}
+.content small{font-size:12px!important}
+.content .menu-card-name{font-size:15px!important;line-height:1.35}
+.content .menu-card-meta,.content .menu-card-url{font-size:12px!important;line-height:1.45}
+.content .type-pill{font-size:12px!important;padding:4px 8px}
+.content .nest-hint,.content .tree-help span{font-size:12px!important;line-height:1.45}
+.content .card-head strong{font-size:17px!important}
+.content .card-head small{font-size:13px!important;line-height:1.4}
+.content .toolbar-copy strong{font-size:16px!important}
+.content .toolbar-copy small{font-size:12px!important}
+.content .save-indicator{font-size:13px!important}
+.content .save-tree{font-size:13px!important;min-height:42px}
+.content .mode-tabs a{font-size:14px!important;min-height:44px}
+.content .builder-form input,.content .builder-form select,.content .edit-box input,.content .edit-box select{font-size:15px!important;min-height:46px}
+.content .primary,.content .danger{font-size:14px!important;min-height:44px}
+.content .edit-card-title strong{font-size:15px!important}
+.content .edit-card-title small{font-size:12px!important}
+.content .source-preview,.content .locked-source{font-size:13px!important;line-height:1.45}
+.content .inline-label-edit input{font-size:14px!important;min-height:42px}
+.content .rename-save,.content .rename-cancel{font-size:13px!important;min-height:40px}
+.content .promote-btn{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;width:auto;min-width:92px;min-height:38px;padding:7px 10px;border:1px solid rgba(98,217,238,.25);border-radius:8px;background:rgba(98,217,238,.08);color:#dffaff;cursor:pointer;font-size:12px!important;font-weight:800}
+@media(max-width:700px){.nav>a,.nav-parent{font-size:16px!important}.nav-sub a{font-size:14px!important}.content{font-size:16px}.content .hero p{font-size:16px!important}.content .menu-card-name{font-size:16px!important}.content .menu-card-meta,.content .menu-card-url{font-size:13px!important}.content .menu-card-top{align-items:flex-start}.content .item-actions{flex-wrap:wrap;justify-content:flex-end}.content .promote-btn{font-size:13px!important;min-height:42px}.content .move-btn,.content .rename-btn{width:38px;height:38px}.content .menu-children{margin-left:12px;padding-left:10px}}
+@media(max-width:420px){.content .builder-card{padding:12px}.content .toolbar-actions{align-items:stretch;flex-direction:column}.content .save-tree{width:100%}.content .promote-btn span{display:inline}.content .item-actions{gap:5px}}
+</style>@stack('head') @stack('styles')</head><body><div class="app"><aside class="sidebar" id="admin-sidebar"><div class="brand">@if($dashboardLogo)<img class="brand-logo" src="{{ asset('storage/'.$dashboardLogo) }}" alt="{{ $dashboardName }}">@else<span class="brand-mark"><i class="fa-solid fa-bolt"></i></span>@endif<div class="brand-text"><small>Administration</small><strong>{{ $dashboardName }}</strong></div></div><nav class="nav" aria-label="Dashboard navigation">@if($dashboardNavigation->isNotEmpty())
 @foreach($dashboardNavigation as $item)
     @include('layouts._dashboard-navigation-item',['item'=>$item])
 @endforeach
