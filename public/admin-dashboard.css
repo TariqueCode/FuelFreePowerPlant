@@ -1,0 +1,11 @@
+/* FuelFree PowerPlant — dashboard command-center layer */
+.overview-hero{position:relative;overflow:hidden;border:1px solid rgba(100,224,192,.12);border-radius:22px;padding:26px 28px!important;margin-bottom:14px;background:radial-gradient(circle at 88% 12%,rgba(50,229,138,.12),transparent 28%),linear-gradient(135deg,rgba(7,29,37,.68),rgba(3,15,21,.42));box-shadow:0 22px 60px rgba(0,0,0,.18)}
+.overview-hero:before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 0 45%,rgba(85,217,239,.035) 50%,transparent 55%);transform:translateX(-30%);animation:ff-dashboard-scan 9s ease-in-out infinite;pointer-events:none}
+.overview-hero:after{content:"";position:absolute;width:280px;height:280px;right:-130px;bottom:-190px;border-radius:50%;border:1px solid rgba(50,229,138,.12);box-shadow:0 0 0 28px rgba(50,229,138,.018),0 0 0 58px rgba(50,229,138,.012);pointer-events:none}
+.overview-hero>*{position:relative;z-index:1}
+.metric-card{position:relative;overflow:hidden}.metric-card:after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent,rgba(50,229,138,.035),transparent);transform:translateX(-110%);transition:transform .7s cubic-bezier(.2,.75,.25,1);pointer-events:none}.metric-card:hover:after{transform:translateX(110%)}
+.metric-card .metric-icon{transition:transform .24s cubic-bezier(.2,.75,.25,1),box-shadow .24s}.metric-card:hover .metric-icon{transform:scale(1.04);box-shadow:0 0 22px rgba(50,229,138,.08)}
+.quick-card{position:relative;overflow:hidden}.quick-card:after{content:"";position:absolute;right:-30px;top:-30px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(50,229,138,.09),transparent 70%);pointer-events:none}
+@keyframes ff-dashboard-scan{0%,20%{transform:translateX(-35%);opacity:0}45%{opacity:1}70%,100%{transform:translateX(35%);opacity:0}}
+@media(max-width:700px){.overview-hero{padding:20px!important;border-radius:18px}.overview-hero:before{animation-duration:12s}.metric-card:hover:after{display:none}}
+@media(prefers-reduced-motion:reduce){.overview-hero:before{animation:none}.metric-card:after{transition:none}}
