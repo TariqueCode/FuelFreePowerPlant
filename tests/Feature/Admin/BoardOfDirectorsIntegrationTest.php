@@ -25,16 +25,23 @@ class BoardOfDirectorsIntegrationTest extends TestCase
         );
     }
 
-    public function test_profile_folder_resolves_as_board_of_directors_navigation_source(): void
+    public function test_profile_folder_is_not_exposed_as_a_navigation_source(): void
     {
         $folder = $this->boardOfDirectorsFolder();
 
         $source = app(NavigationSourceRegistry::class)->resolveAny('management_folder:'.$folder->id, 'public');
 
+        $this->assertNull($source);
+    }
+
+    public function test_board_of_directors_navigation_uses_the_live_management_route(): void
+    {
+        $source = app(NavigationSourceRegistry::class)->resolveAny('route:management', 'public');
+
         $this->assertSame('Board of Directors', $source['label']);
-        $this->assertSame('folder', $source['type']);
-        $this->assertSame('/board-of-directors', $source['url']);
-        $this->assertNull($source['route_name']);
+        $this->assertSame('route', $source['type']);
+        $this->assertSame('/management', $source['url']);
+        $this->assertSame('management', $source['route_name']);
     }
 
     public function test_homepage_management_section_uses_published_board_profiles_when_configured(): void
