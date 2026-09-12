@@ -201,7 +201,9 @@
                 });
                 const start = await jsonResponse(startResponse);
                 const uploadId = start.upload_id;
-                const actualChunkSize = Number(start.chunk_size) || chunkSize;
+                // Do not trust a server-provided larger chunk size: production web servers
+                // may enforce a lower request-body limit than PHP's upload settings.
+                const actualChunkSize = Math.min(chunkSize, Number(start.chunk_size) || chunkSize);
                 if (!uploadId) throw new Error('The server did not create an upload session.');
 
                 const totalChunks = Math.ceil(file.size / actualChunkSize);
