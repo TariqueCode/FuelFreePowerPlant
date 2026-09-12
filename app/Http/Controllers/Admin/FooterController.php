@@ -77,28 +77,21 @@ class FooterController
             'copyright_enabled' => ['nullable', 'boolean'],
         ]);
 
-        $keys = array_keys(self::DEFAULTS);
-        foreach ($keys as $key) {
-            if (str_starts_with($key, 'footer.')) {
-                SystemSetting::updateOrCreate(
-                    ['key' => $key],
-                    ['value' => (string) ($data[$key] ?? ''), 'is_sensitive' => false]
-                );
-            }
+        foreach (array_keys(self::DEFAULTS) as $key) {
+            if (! str_starts_with($key, 'footer.')) continue;
+            SystemSetting::updateOrCreate(
+                ['key' => $key],
+                ['value' => (string) (data_get($data, $key) ?? ''), 'is_sensitive' => false]
+            );
         }
 
-        $visibility = [
+        foreach ([
             'design.footer.columns_enabled' => $request->boolean('columns_enabled') ? '1' : '0',
             'design.footer.contact_enabled' => $request->boolean('contact_enabled') ? '1' : '0',
             'design.footer.social_enabled' => $request->boolean('social_enabled') ? '1' : '0',
             'design.footer.copyright_enabled' => $request->boolean('copyright_enabled') ? '1' : '0',
-        ];
-
-        foreach ($visibility as $key => $value) {
-            SystemSetting::updateOrCreate(
-                ['key' => $key],
-                ['value' => $value, 'is_sensitive' => false]
-            );
+        ] as $key => $value) {
+            SystemSetting::updateOrCreate(['key' => $key], ['value' => $value, 'is_sensitive' => false]);
         }
 
         Cache::forget('fuelfree.system_settings');
