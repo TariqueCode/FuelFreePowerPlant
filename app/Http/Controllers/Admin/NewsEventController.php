@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\SiteContentItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class NewsEventController extends Controller
 {
@@ -34,7 +35,8 @@ class NewsEventController extends Controller
         $data = $this->validateItem($request);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title']);
         $data['published_at'] = $data['status'] === 'published' ? now() : null;
-        SiteContentItem::create($data);
+        $item = SiteContentItem::create($data);
+        $this->applyThumbnail($item, $request);
         return redirect()->route('admin.news_and_event.index')->with('status', 'News & Event created successfully.');
     }
 
@@ -51,6 +53,7 @@ class NewsEventController extends Controller
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title'], $item->id);
         $data['published_at'] = $data['status'] === 'published' ? ($item->published_at ?: now()) : null;
         $item->update($data);
+        $this->applyThumbnail($item, $request);
         return redirect()->route('admin.news_and_event.index')->with('status', 'News & Event updated successfully.');
     }
 
@@ -65,6 +68,9 @@ class NewsEventController extends Controller
     public function destroy(SiteContentItem $item): RedirectResponse
     {
         abort_unless(in_array($item->type, ['news', 'announcement'], true), 404);
+        if ($item->image_path) {
+            Storage::disk('public')->delete($item->image_path);
+        }
         $item->delete();
         return back()->with('status', 'News & Event deleted successfully.');
     }
@@ -77,12 +83,16 @@ class NewsEventController extends Controller
             'slug' => ['nullable', 'string', 'max:180'],
             'excerpt' => ['nullable', 'string', 'max:1000'],
             'content' => ['nullable', 'string'],
+            'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:' . ((int) config('fuelfree.upload.max_mb', 50) * 1024)],
+            'cover_alt' => ['nullable', 'string', 'max:255'],
+            'remove_image' => ['nullable', 'boolean'],
             'status' => ['required', 'in:draft,published'],
             'is_featured' => ['nullable', 'boolean'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:1000'],
         ]);
         $data['is_featured'] = $request->boolean('is_featured');
+        unset($data['cover_image'], $data['remove_image']);
         $data['use_global_framework'] = true;
         $data['use_global_header'] = true;
         $data['use_global_footer'] = true;
@@ -90,13 +100,31 @@ class NewsEventController extends Controller
         return $data;
     }
 
+    private function applyThumbnail(SiteContentItem $item, Request $request): void
+    {
+        $oldPath = $item->image_path;
+        if ($request->hasFile('cover_image')) {
+            $newPath = $request->file('cover_image')->store('news/covers', 'public');
+            $item->update(['image_path' => $newPath]);
+            if ($oldPath && $oldPath !== $newPath) {
+                Storage::disk('public')->delete($oldPath);
+            }
+            return;
+        }
+        if ($request->boolean('remove_image') && $oldPath) {
+            Storage::disk('public')->delete($oldPath);
+            $item->update(['image_path' => null, 'cover_alt' => null]);
+        }
+    }
+
     private function uniqueSlug(string $value, ?int $ignoreId = null): string
     {
         $base = Str::slug($value);
         abort_if($base === '', 422, 'A valid slug could not be generated.');
-        $slug = $base; $counter = 2;
+        $slug = $base;
+        $counter = 2;
         while (SiteContentItem::where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
-            $slug = $base.'-'.$counter++;
+            $slug = $base . '-' . $counter++;
         }
         return $slug;
     }
