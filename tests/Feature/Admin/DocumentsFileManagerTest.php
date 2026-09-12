@@ -26,6 +26,23 @@ class DocumentsFileManagerTest extends TestCase
         return $user;
     }
 
+    private function document(User $user, ?int $folderId = null): Document
+    {
+        Storage::disk('local')->makeDirectory('private/'.$user->id);
+        Storage::disk('local')->put('private/'.$user->id.'/report.txt', 'test-content');
+        return Document::create([
+            'user_id' => $user->id,
+            'folder_id' => $folderId,
+            'original_name' => 'report.txt',
+            'stored_name' => 'report.txt',
+            'disk' => 'local',
+            'path' => 'private/'.$user->id.'/report.txt',
+            'mime_type' => 'text/plain',
+            'size' => 12,
+            'extension' => 'txt',
+        ]);
+    }
+
     public function test_file_manager_renders_and_uses_canonical_folder_query_url(): void
     {
         $user = $this->admin();
@@ -51,19 +68,7 @@ class DocumentsFileManagerTest extends TestCase
         Storage::fake('local');
         $user = $this->admin();
         $folder = DocumentFolder::create(['user_id' => $user->id, 'name' => 'Projects']);
-        $file = UploadedFile::fake()->create('report.txt', 8, 'text/plain');
-        Storage::disk('local')->putFileAs('private/'.$user->id, $file, 'report.txt');
-        $document = Document::create([
-            'user_id' => $user->id,
-            'folder_id' => $folder->id,
-            'original_name' => 'report.txt',
-            'stored_name' => 'report.txt',
-            'disk' => 'local',
-            'path' => 'private/'.$user->id.'/report.txt',
-            'mime_type' => 'text/plain',
-            'size' => 8192,
-            'extension' => 'txt',
-        ]);
+        $document = $this->document($user, $folder->id);
 
         $this->actingAs($user)->post(route('admin.documents.rename', $document), ['name' => 'renamed.txt'])->assertRedirect();
         $this->assertDatabaseHas('documents', ['id' => $document->id, 'original_name' => 'renamed.txt']);
@@ -71,5 +76,36 @@ class DocumentsFileManagerTest extends TestCase
         $this->actingAs($user)->post(route('admin.documents.destroy.post', $document))->assertRedirect();
         $this->assertDatabaseMissing('documents', ['id' => $document->id]);
         Storage::disk('local')->assertMissing('private/'.$user->id.'/report.txt');
+    }
+
+    public function test_file_can_be_moved_and_copied_without_server_error(): void
+    {
+        Storage::fake('local');
+        $user = $this->admin();
+        $source = DocumentFolder::create(['user_id' => $user->id, 'name' => 'Source']);
+        $target = DocumentFolder::create(['user_id' => $user->id, 'name' => 'ABC']);
+        $document = $this->document($user, $source->id);
+
+        $this->actingAs($user)->post(route('admin.documents.move', $document), ['folder_id' => $target->id])->assertRedirect();
+        $this->assertDatabaseHas('documents', ['id' => $document->id, 'folder_id' => $target->id]);
+
+        $this->actingAs($user)->post(route('admin.documents.copy', $document), ['folder_id' => $source->id])->assertRedirect();
+        $this->assertDatabaseCount('documents', 2);
+    }
+
+    public function test_file_can_be_shared_and_revoked(): void
+    {
+        Storage::fake('local');
+        $user = $this->admin();
+        $document = $this->document($user);
+
+        $this->actingAs($user)->post(route('admin.documents.share', $document))->assertRedirect();
+        $document->refresh();
+        $this->assertTrue($document->share_enabled);
+        $this->assertNotEmpty($document->share_token);
+        $this->assertNotNull($document->share_expires_at);
+
+        $this->actingAs($user)->post(route('admin.documents.unshare.post', $document))->assertRedirect();
+        $this->assertFalse($document->refresh()->share_enabled);
     }
 }
