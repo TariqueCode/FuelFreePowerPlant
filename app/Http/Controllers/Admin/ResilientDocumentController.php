@@ -31,11 +31,7 @@ class ResilientDocumentController extends DocumentController
             $usedBytes = (int) Document::where('user_id', $user->id)->sum('size');
         }
 
-        $quotaBytes = (int) config('fuelfree.storage.quota_bytes', 50 * 1024 * 1024 * 1024);
-        $availableBytes = max(0, $quotaBytes - $usedBytes);
-        $usedPercent = $quotaBytes > 0 ? min(100, round(($usedBytes / $quotaBytes) * 100, 1)) : 0;
-
-        return view('admin.documents.index', compact('folder', 'folders', 'allFolders', 'documents', 'search', 'usedBytes', 'availableBytes', 'quotaBytes', 'usedPercent'));
+        return view('admin.documents.index', compact('folder', 'folders', 'allFolders', 'documents', 'search', 'usedBytes'));
     }
 
     public function legacyFolderUrl(int $folder)
@@ -44,8 +40,8 @@ class ResilientDocumentController extends DocumentController
     }
 
     /**
-     * Use a larger-but-safe chunk than the previous 64 KiB default. 128 KiB
-     * keeps shared-hosting request bodies small while cutting request overhead.
+     * 128 KiB keeps shared-hosting request bodies small while reducing
+     * per-request overhead compared with the previous 64 KiB setting.
      */
     public function chunkUpload(Request $request): mixed
     {
@@ -59,12 +55,13 @@ class ResilientDocumentController extends DocumentController
                 DocumentFolder::whereKey($data['folder_id'])->where('user_id', $request->user()->id)->firstOrFail();
             }
             $uploadId = (string) Str::uuid();
-            Storage::disk('local')->makeDirectory('.uploads');
+            $disk = Storage::disk('local');
+            $disk->makeDirectory('.uploads');
             $chunkSize = 131072;
-            Storage::disk('local')->put(
+            $disk->put(
                 ".uploads/{$uploadId}.json",
                 json_encode([
-                    'user_id' => $request->user()->id,
+                    'user_id' => (int) $request->user()->id,
                     'filename' => $data['filename'],
                     'size' => (int) $data['size'],
                     'folder_id' => $data['folder_id'] ?? null,
@@ -140,10 +137,12 @@ class ResilientDocumentController extends DocumentController
         return response()->json(['ok' => true, 'uploaded' => $offset + $length]);
     }
 
+    /**
+     * Documents & Media has no application-level storage or per-file quota.
+     * Physical hosting/provider limits remain outside the application.
+     */
     protected function ensureQuotaAvailable(int $userId, int $additionalBytes): void
     {
-        $quotaBytes = (int) config('fuelfree.storage.quota_bytes', 50 * 1024 * 1024 * 1024);
-        $usedBytes = (int) Document::where('user_id', $userId)->sum('size');
-        abort_if($additionalBytes < 0 || $usedBytes + $additionalBytes > $quotaBytes, 422, 'There is not enough storage space for this file.');
+        abort_if($additionalBytes < 0, 422, 'Invalid file size.');
     }
 }
