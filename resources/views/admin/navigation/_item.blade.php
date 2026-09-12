@@ -11,6 +11,7 @@
                     <form method="POST" action="{{ route('admin.menu-builder.update', $item) }}" class="promote-form" title="Move to top level">
                         @csrf @method('PATCH')
                         <input type="hidden" name="label" value="{{ $item->displayLabel() }}">
+                        <input type="hidden" name="url" value="{{ $item->url }}">
                         <input type="hidden" name="parent_id" value="">
                         <input type="hidden" name="target" value="{{ $item->target }}">
                         <input type="hidden" name="icon" value="{{ $item->icon }}">
