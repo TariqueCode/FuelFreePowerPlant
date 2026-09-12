@@ -4,7 +4,6 @@ namespace Tests\Feature\Admin;
 
 use App\Models\Permission;
 use App\Models\Role;
-use App\Models\SystemSetting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -33,7 +32,8 @@ class SystemSettingsScopeTest extends TestCase
         $response->assertDontSee('Homepage sections');
         $response->assertDontSee('Contact &amp; Career email login');
         $response->assertDontSee('Default upload limit');
-        $response->assertSeeText('Storage & upload policy');
+        $response->assertSeeText('Storage policy');
+        $response->assertSeeText('no application-level per-file size limit');
     }
 
     public function test_mail_fields_cannot_create_mailbox_settings_from_system_settings(): void
@@ -48,7 +48,6 @@ class SystemSettingsScopeTest extends TestCase
             'storage' => ['quota_gib' => 50],
             'uploads' => [
                 'career_max_mb' => 50,
-                'documents_max_mb' => 50,
                 'gallery_max_mb' => 50,
                 'content_media_max_mb' => 100,
             ],
