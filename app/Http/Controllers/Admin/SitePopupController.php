@@ -7,6 +7,7 @@ use App\Models\SitePopup;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class SitePopupController extends Controller
@@ -21,14 +22,15 @@ class SitePopupController extends Controller
 
     public function create(): View
     {
-        return view('admin.site-popups.form', ['popup'=>new SitePopup()]);
+        return view('admin.site-popups.form', ['popup' => new SitePopup()]);
     }
 
     public function store(Request $request): RedirectResponse
     {
         $popup = new SitePopup();
         $this->save($popup, $request);
-        return redirect()->route('admin.site-popups.index')->with('status','Announcement banner created.');
+
+        return redirect()->route('admin.site-popups.index')->with('status', 'Announcement banner created.');
     }
 
     public function edit(SitePopup $popup): View
@@ -41,46 +43,102 @@ class SitePopupController extends Controller
         if ($request->boolean('toggle')) {
             abort_unless($request->user()->hasPermission('website.publish'), 403, 'Publishing highlights requires publishing permission.');
             $popup->update(['is_published' => !$popup->is_published]);
+
             return redirect()->route('admin.site-popups.index')->with('status', $popup->is_published ? 'Highlight activated.' : 'Highlight deactivated.');
         }
 
         $this->save($popup, $request);
-        return redirect()->route('admin.site-popups.index')->with('status','Announcement banner updated.');
+
+        return redirect()->route('admin.site-popups.index')->with('status', 'Announcement banner updated.');
     }
 
     public function destroy(SitePopup $popup): RedirectResponse
     {
-        if ($popup->image_path) Storage::disk('public')->delete($popup->image_path);
+        if ($popup->image_path) {
+            Storage::disk('public')->delete($popup->image_path);
+        }
         $popup->delete();
-        return back()->with('status','Announcement banner deleted.');
+
+        return back()->with('status', 'Announcement banner deleted.');
     }
 
     private function save(SitePopup $popup, Request $request): void
     {
-        $data=$request->validate([
-            'title'=>['nullable','string','max:255'],
-            'image'=>[$popup->exists?'nullable':'required','image','mimes:jpg,jpeg,png,webp,avif','max:'.$this->maxUploadKb()],
-            'link_url'=>['nullable','url','max:1000'],
-            'display_seconds'=>['nullable','integer','min:1','max:3600'],
-            'is_published'=>['nullable','boolean'],
-            'starts_at'=>['nullable','date'],
-            'ends_at'=>['nullable','date','after_or_equal:starts_at'],
+        $data = $request->validate([
+            'title' => ['nullable', 'string', 'max:255'],
+            'link_url' => ['nullable', 'url', 'max:1000'],
+            'display_seconds' => ['nullable', 'integer', 'min:1', 'max:3600'],
+            'is_published' => ['nullable', 'boolean'],
+            'starts_at' => ['nullable', 'date'],
+            'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
         ]);
+
         $publishing = $request->boolean('is_published');
         abort_unless(! $publishing || $request->user()->hasPermission('website.publish'), 403, 'Publishing highlights requires publishing permission.');
 
         if ($request->hasFile('image')) {
-            if ($popup->image_path) Storage::disk('public')->delete($popup->image_path);
-            $data['image_path']=$request->file('image')->store('site-popups','public');
+            $file = $request->file('image');
+            $this->validateImageUpload($file);
+
+            if ($popup->image_path) {
+                Storage::disk('public')->delete($popup->image_path);
+            }
+
+            $extension = strtolower($file->getClientOriginalExtension());
+            $path = 'site-popups/' . $file->hashName(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) ?: 'banner') . '.' . $extension;
+            $stream = fopen($file->getRealPath(), 'rb');
+
+            try {
+                Storage::disk('public')->put($path, $stream);
+            } finally {
+                if (is_resource($stream)) {
+                    fclose($stream);
+                }
+            }
+
+            $data['image_path'] = $path;
+        } elseif (! $popup->exists) {
+            throw ValidationException::withMessages(['image' => 'Please select a valid banner image.']);
         }
-        unset($data['image']);
-        $data['is_published']=$publishing;
+
+        $data['is_published'] = $publishing;
         $popup->fill($data)->save();
+    }
+
+    private function validateImageUpload(mixed $file): void
+    {
+        if (! $file || ! $file->isValid()) {
+            throw ValidationException::withMessages(['image' => 'The banner image could not be uploaded. Please try again.']);
+        }
+
+        $maxBytes = $this->maxUploadKb() * 1024;
+        if (($file->getSize() ?? 0) > $maxBytes) {
+            throw ValidationException::withMessages(['image' => 'The banner image is too large. Maximum allowed size is ' . (int) ceil($maxBytes / 1024 / 1024) . ' MB.']);
+        }
+
+        $extension = strtolower($file->getClientOriginalExtension());
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'avif'];
+        if (! in_array($extension, $allowedExtensions, true)) {
+            throw ValidationException::withMessages(['image' => 'Please upload a JPG, JPEG, PNG, WebP, or AVIF image.']);
+        }
+
+        $imageInfo = @getimagesize($file->getRealPath());
+        $allowedTypes = array_filter([
+            defined('IMAGETYPE_JPEG') ? IMAGETYPE_JPEG : null,
+            defined('IMAGETYPE_PNG') ? IMAGETYPE_PNG : null,
+            defined('IMAGETYPE_WEBP') ? IMAGETYPE_WEBP : null,
+            defined('IMAGETYPE_AVIF') ? IMAGETYPE_AVIF : null,
+        ]);
+
+        if (! $imageInfo || ! in_array($imageInfo[2] ?? null, $allowedTypes, true)) {
+            throw ValidationException::withMessages(['image' => 'The selected file is not a supported image.']);
+        }
     }
 
     private function maxUploadKb(): int
     {
-        $mb=(int) \App\Models\SystemSetting::query()->where('key','uploads.popups_max_mb')->value('value');
-        return max(1,$mb ?: (int) config('fuelfree.upload.popups_max_mb',50))*1024;
+        $mb = (int) \App\Models\SystemSetting::query()->where('key', 'uploads.popups_max_mb')->value('value');
+
+        return max(1, $mb ?: (int) config('fuelfree.upload.popups_max_mb', 50)) * 1024;
     }
 }
