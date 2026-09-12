@@ -34,17 +34,12 @@ class AppServiceProvider extends ServiceProvider
 
         $router = $this->app['router'];
         $this->app->booted(function () use ($router): void {
-            // Compatibility for old folder URLs. The current file manager uses
-            // /admin/documents?folder={id} as its canonical navigation path.
-            $router->get('/admin/documents/folders/{folder}', function (int $folder) {
-                return redirect()->route('admin.documents', ['folder' => $folder]);
-            })
+            $router->get('/admin/documents/folders/{folder}', [ResilientDocumentController::class, 'legacyFolderUrl'])
                 ->whereNumber('folder')
                 ->middleware(['web', 'auth', 'permission:documents.view'])
                 ->name('admin.documents.folders.compat');
 
-            // POST aliases keep destructive actions away from DELETE method
-            // filtering/WAF rules commonly found on shared LiteSpeed hosting.
+            // POST aliases avoid DELETE-method filtering/WAF rules commonly found on shared LiteSpeed hosting.
             $manage = ['web', 'auth', 'permission:documents.manage'];
             $router->post('/admin/documents/{document}/delete', [DocumentController::class, 'destroy'])
                 ->middleware($manage)->name('admin.documents.destroy.post');
