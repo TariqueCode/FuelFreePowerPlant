@@ -85,11 +85,13 @@ class SitePopupController extends Controller
             }
 
             $extension = strtolower($file->getClientOriginalExtension());
-            $path = 'site-popups/' . $file->hashName(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) ?: 'banner') . '.' . $extension;
+            $path = 'site-popups/' . bin2hex(random_bytes(16)) . '.' . $extension;
             $stream = fopen($file->getRealPath(), 'rb');
 
             try {
-                Storage::disk('public')->put($path, $stream);
+                if (! Storage::disk('public')->put($path, $stream)) {
+                    throw ValidationException::withMessages(['image' => 'The banner image could not be saved. Please try again.']);
+                }
             } finally {
                 if (is_resource($stream)) {
                     fclose($stream);
