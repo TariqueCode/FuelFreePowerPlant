@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Models\HomepageSection;
 use App\Models\ManagementProfileFolder;
 use App\Models\NavigationMenuItem;
+use App\Services\DashboardNavigationService;
 use App\Services\PublicNavigationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -44,5 +45,28 @@ class BoardOfDirectorsNavigationTest extends TestCase
 
         $this->assertTrue((bool) $section->is_enabled);
         $this->assertSame($folder->id, (int) ($settings['folder_id'] ?? 0));
+    }
+
+    public function test_dashboard_navigation_resolves_real_builder_routes_and_keeps_required_shell_items(): void
+    {
+        $this->actingAs($this->makeAdminUser());
+
+        $tree = app(DashboardNavigationService::class)->tree('dashboard');
+        $labels = $tree->pluck('label')->map(fn ($label) => trim((string) $label))->all();
+
+        $this->assertContains('Dashboard', $labels);
+        $website = $tree->firstWhere('label', 'Website');
+        $this->assertNotNull($website);
+
+        $childLabels = $website->children->pluck('label')->map(fn ($label) => trim((string) $label))->all();
+        $this->assertContains('Profile Builder', $childLabels);
+        $this->assertContains('Page Builder', $childLabels);
+
+        $profile = $website->children->firstWhere('source_key', 'route:admin.management.index');
+        $page = $website->children->firstWhere('source_key', 'route:admin.cms.index');
+        $this->assertNotNull($profile);
+        $this->assertNotNull($page);
+        $this->assertSame('/admin/management', $profile->url);
+        $this->assertSame('/admin/cms', $page->url);
     }
 }
