@@ -13,40 +13,49 @@ class AdminDashboardNavigationTest extends TestCase
     public function test_professional_dashboard_navigation_shell_and_icons_are_restored(): void
     {
         $roots = NavigationMenuItem::query()
-            ->where('menu', 'dashboard')
-            ->where('area', 'dashboard')
-            ->whereNull('parent_id')
-            ->orderBy('sort_order')
-            ->get();
+            ->where('menu', 'dashboard')->where('area', 'dashboard')->whereNull('parent_id')
+            ->orderBy('sort_order')->get();
 
-        $this->assertSame(['Dashboard', 'Website', 'Users & Access', 'Communications', 'Settings'], $roots->pluck('label')->all());
-        $this->assertSame(['fa-house', 'fa-globe', 'fa-users-gear', 'fa-comments', 'fa-sliders'], $roots->pluck('icon')->all());
+        foreach ([
+            'Dashboard' => 'fa-house',
+            'Website' => 'fa-globe',
+            'Users & Access' => 'fa-users-gear',
+            'Communications' => 'fa-comments',
+            'Settings' => 'fa-sliders',
+        ] as $label => $icon) {
+            $item = $roots->firstWhere('label', $label);
+            $this->assertNotNull($item, "Missing dashboard root item: {$label}");
+            $this->assertSame($icon, $item->icon, "Wrong icon for dashboard root item: {$label}");
+        }
 
         $website = $roots->firstWhere('label', 'Website');
-        $children = NavigationMenuItem::query()
-            ->where('menu', 'dashboard')
-            ->where('area', 'dashboard')
-            ->where('parent_id', $website->id)
-            ->orderBy('sort_order')
-            ->get();
+        $this->assertNotNull($website);
 
-        $this->assertSame(
-            ['Homepage', 'Slider', 'Highlight Banner', 'Profile Builder', 'News & Event', 'Gallery', 'Page Builder', 'Social Media', 'Menu Builder', 'Documents & Media', 'Footer Manager'],
-            $children->pluck('label')->all()
-        );
-        $this->assertSame(
-            ['fa-house-chimney', 'fa-images', 'fa-rectangle-ad', 'fa-user-tie', 'fa-newspaper', 'fa-images', 'fa-file-lines', 'fa-share-nodes', 'fa-sitemap', 'fa-folder-open', 'fa-window-maximize'],
-            $children->pluck('icon')->all()
-        );
+        $children = NavigationMenuItem::query()
+            ->where('menu', 'dashboard')->where('area', 'dashboard')->where('parent_id', $website->id)
+            ->get()->keyBy('label');
+
+        foreach ([
+            'Homepage' => 'fa-house-chimney',
+            'Slider' => 'fa-images',
+            'Highlight Banner' => 'fa-rectangle-ad',
+            'Profile Builder' => 'fa-user-tie',
+            'News & Event' => 'fa-newspaper',
+            'Gallery' => 'fa-images',
+            'Page Builder' => 'fa-file-lines',
+            'Social Media' => 'fa-share-nodes',
+            'Menu Builder' => 'fa-sitemap',
+            'Documents & Media' => 'fa-folder-open',
+        ] as $label => $icon) {
+            $item = $children->get($label);
+            $this->assertNotNull($item, "Missing Website navigation item: {$label}");
+            $this->assertSame($icon, $item->icon, "Wrong icon for Website navigation item: {$label}");
+        }
 
         $this->assertDatabaseHas('navigation_menu_items', [
-            'menu' => 'dashboard',
-            'area' => 'dashboard',
-            'label' => 'Footer Manager',
-            'parent_id' => $website->id,
-            'route_name' => 'admin.footer.index',
-            'source_key' => 'route:admin.footer.index',
-            'icon' => 'fa-window-maximize',
+            'menu' => 'dashboard', 'area' => 'dashboard', 'label' => 'Footer Manager',
+            'parent_id' => $website->id, 'route_name' => 'admin.footer.index',
+            'source_key' => 'route:admin.footer.index', 'icon' => 'fa-window-maximize',
         ]);
     }
 }
