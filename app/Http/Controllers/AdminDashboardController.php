@@ -48,8 +48,8 @@ class AdminDashboardController
         $platformStatus = [
             'website' => true,
             'database' => false,
-            'mail' => filled(config('mail.mailers.smtp.host')),
-            'storage' => is_writable(storage_path('app/public')),
+            'mail' => filled(config('mail.default')),
+            'storage' => is_dir(storage_path('app/public')) && is_writable(storage_path('app/public')),
         ];
 
         try {
@@ -61,22 +61,26 @@ class AdminDashboardController
 
         $storageBytes = Cache::remember('admin.dashboard.storage_bytes', 60, static function (): int {
             $root = storage_path('app/public');
-            if (! is_dir($root)) {
+            if (! is_dir($root) || ! is_readable($root)) {
                 return 0;
             }
 
-            $bytes = 0;
-            $iterator = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS)
-            );
+            try {
+                $bytes = 0;
+                $iterator = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS)
+                );
 
-            foreach ($iterator as $file) {
-                if ($file->isFile()) {
-                    $bytes += $file->getSize();
+                foreach ($iterator as $file) {
+                    if ($file->isFile()) {
+                        $bytes += $file->getSize();
+                    }
                 }
-            }
 
-            return $bytes;
+                return $bytes;
+            } catch (Throwable) {
+                return 0;
+            }
         });
 
         return view('admin.control-center', compact(
