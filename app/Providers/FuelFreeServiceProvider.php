@@ -17,12 +17,15 @@ class FuelFreeServiceProvider extends ServiceProvider
     {
         date_default_timezone_set(config('fuelfree.company.timezone', 'Asia/Dhaka'));
 
-        // Keep the dashboard's legacy audit route name compatible with the
-        // canonical admin.audit route already used by the portal.
-        if (! Route::has('admin.audit.index')) {
-            Route::middleware(['web', 'auth', 'permission:audit.view'])
-                ->get('/admin/audit', [AuditLogController::class, 'index'])
-                ->name('admin.audit.index');
-        }
+        // Register the dashboard compatibility name only after the application's
+        // route files have been loaded, so the canonical admin.audit route wins
+        // while the legacy admin.audit.index name remains available to views.
+        $this->app->booted(function (): void {
+            if (! Route::has('admin.audit.index')) {
+                Route::middleware(['web', 'auth', 'permission:audit.view'])
+                    ->get('/admin/audit', [AuditLogController::class, 'index'])
+                    ->name('admin.audit.index');
+            }
+        });
     }
 }
