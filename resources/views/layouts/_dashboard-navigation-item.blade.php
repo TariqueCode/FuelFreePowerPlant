@@ -3,7 +3,9 @@
 <link rel="stylesheet" href="{{ asset('admin-dashboard.css') }}?v=4">
 <link rel="stylesheet" href="{{ asset('admin-builder-polish.css') }}?v=4">
 <link rel="stylesheet" href="{{ asset('admin-ui-polish.css') }}?v=1">
+<style>.sidebar.nav-state-restoring,.sidebar.nav-state-restoring *{transition:none!important}</style>
 <script src="{{ asset('admin-documents.js') }}?v=6" defer></script>
+<script src="{{ asset('admin-navigation-fix.js') }}?v=1" defer></script>
 @endonce
 <style>
 .sidebar .nav>a,
