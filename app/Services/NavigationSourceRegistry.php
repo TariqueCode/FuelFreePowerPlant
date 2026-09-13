@@ -111,9 +111,9 @@ class NavigationSourceRegistry
             return ! str_starts_with($uri, 'admin/') && ! $middleware->contains(fn (string $value): bool => $value === 'auth' || Str::startsWith($value, ['role:', 'permission:']));
         }
         if ($area === 'dashboard') {
-            // Dashboard is the authenticated shell entry point. Its role middleware
-            // protects the route itself; it must not make the navigation source disappear.
-            if ($name === 'admin.dashboard') return str_starts_with($uri, 'admin/');
+            // The /admin shell route has a URI of "admin" (without a trailing slash).
+            // Treat it as an eligible dashboard source just like nested /admin/* routes.
+            if ($name === 'admin.dashboard') return $uri === 'admin' || str_starts_with($uri, 'admin/');
             return (str_starts_with($uri, 'admin/') || $name === 'dashboard') && ! $middleware->contains(fn (string $value): bool => Str::startsWith($value, 'role:'));
         }
         return false;
@@ -132,7 +132,7 @@ class NavigationSourceRegistry
         if (! $page && $name === 'site.about') $page = CmsPage::query()->where('slug', 'about-us')->where('is_published', true)->first();
         if (! $page || ! $this->isUsableNavigationLabel((string) $page->title)) return null;
         return ['key' => 'cms_page:'.$page->id, 'type' => 'cms_page', 'label' => (string) $page->title,
-            'url' => route('cms.page', ['slug' => $page->slug]), 'route_name' => 'cms.page', 'area' => 'public', 'permission' => null,
+            'url' => route('cms.page', ['slug' => $page->slug]), 'route_name' => 'cms.page', 'area' => $area, 'permission' => null,
             'meta' => ['cms_page_id' => $page->id, 'slug' => $page->slug]];
     }
 
