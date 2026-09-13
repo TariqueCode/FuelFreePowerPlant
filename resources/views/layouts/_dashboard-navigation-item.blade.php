@@ -16,7 +16,6 @@
 <script>
 (function () {
     function bindDashboardNavigationGroups() {
-        document.querySelectorAll('.nav-parent[data-dashboard-nav-bound="true"]').forEach(function () {});
         document.addEventListener('click', function (event) {
             var button = event.target.closest('.nav-parent');
             if (!button) return;
