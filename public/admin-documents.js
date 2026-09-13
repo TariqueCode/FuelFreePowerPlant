@@ -51,14 +51,17 @@
             setDrawer(shouldOpen, false);
         }
 
-        // The portal already has the primary drawer handlers. Capture these
-        // events here so this shared state layer does not fight those handlers.
-        if (toggle && backdrop) {
+        // The portal has legacy drawer handlers. Capture-phase interception keeps
+        // those handlers from closing the drawer when a normal admin link is used.
+        // We stop propagation only; the browser's default link navigation remains.
+        if (toggle) {
             toggle.addEventListener('click', function (event) {
                 event.stopPropagation();
                 setDrawer(!sidebar.classList.contains('mobile-open'), true);
             }, true);
+        }
 
+        if (backdrop) {
             backdrop.addEventListener('click', function (event) {
                 event.stopPropagation();
                 setDrawer(false, true);
@@ -66,17 +69,19 @@
         }
 
         sidebar.querySelectorAll('a[href]').forEach(function (link) {
-            link.addEventListener('click', function () {
+            link.addEventListener('click', function (event) {
                 if (!isMobile() || link.target === '_blank' || link.hasAttribute('download')) return;
 
-                // Keep the drawer open through the next page load so selecting a
-                // submenu does not make the administration navigation disappear.
+                // Prevent the portal's click-to-close handler from running while
+                // allowing the link's native navigation to continue normally.
+                event.stopPropagation();
+
                 try {
                     sessionStorage.setItem(drawerKey, '1');
                 } catch (error) {
                     // Ignore unavailable storage and allow normal navigation.
                 }
-            });
+            }, true);
         });
 
         function readGroups() {
