@@ -52,6 +52,10 @@ class BoardOfDirectorsNavigationTest extends TestCase
 
     public function test_dashboard_navigation_resolves_real_builder_routes_and_keeps_required_shell_items(): void
     {
+        $dashboardPermission = Permission::query()->firstOrCreate(
+            ['slug' => 'dashboard.view'],
+            ['name' => 'Dashboard View', 'description' => 'View the administration dashboard.']
+        );
         $websitePermission = Permission::query()->firstOrCreate(
             ['slug' => 'website.view'],
             ['name' => 'Website View', 'description' => 'View website administration surfaces.']
@@ -64,7 +68,7 @@ class BoardOfDirectorsNavigationTest extends TestCase
             ['slug' => 'super-admin'],
             ['name' => 'Super Admin', 'description' => 'Test administrator.', 'is_system' => true]
         );
-        $role->permissions()->syncWithoutDetaching([$websitePermission->id, $cmsPermission->id]);
+        $role->permissions()->syncWithoutDetaching([$dashboardPermission->id, $websitePermission->id, $cmsPermission->id]);
 
         $admin = User::factory()->create();
         $admin->roles()->attach($role);
@@ -77,7 +81,7 @@ class BoardOfDirectorsNavigationTest extends TestCase
             'area' => 'dashboard', 'permission_key' => 'dashboard.view',
         ]);
 
-        $website = NavigationMenuItem::query()->create([
+        NavigationMenuItem::query()->create([
             'menu' => 'dashboard', 'parent_id' => null, 'label' => 'Website', 'url' => '#',
             'route_name' => null, 'target' => '_self', 'icon' => 'fa-globe', 'is_visible' => true,
             'sort_order' => 10, 'source_key' => null, 'source_type' => 'folder', 'area' => 'dashboard',
