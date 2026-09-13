@@ -50,6 +50,9 @@ class SettingsController
 
     public function update(Request $request): RedirectResponse
     {
+        if ($request->query('section') === 'footer') {
+            return $this->updateFooter($request);
+        }
         $validated = $request->validate([
             'company.name' => ['required', 'string', 'max:150'],
             'company.domain' => ['required', 'string', 'max:255'],
