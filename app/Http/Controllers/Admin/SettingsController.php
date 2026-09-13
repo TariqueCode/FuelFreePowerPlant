@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Models\SystemSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -59,8 +58,6 @@ class SettingsController
                 ['value' => (string) ($value ?? ''), 'is_sensitive' => false]
             );
         }
-
-        Cache::forget('fuelfree.system_settings');
 
         return back()->with('status', 'System settings saved successfully.');
     }
