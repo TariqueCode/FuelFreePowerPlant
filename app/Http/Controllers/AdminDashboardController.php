@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditLog;
 use App\Models\CareerApplication;
 use App\Models\Inquiry;
 use App\Models\SiteContentItem;
 use App\Models\SitePopup;
 use App\Models\SiteSlider;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Throwable;
 
 class AdminDashboardController
 {
     public function __invoke(): View
     {
         $user = auth()->user();
-
-        // Dashboard cards must never reveal counts from modules the administrator
-        // is not allowed to view. Keep the dashboard useful without leaking data.
         $can = static fn (string $permission): bool => $user->hasPermission($permission);
 
         $contentTotal = $published = $drafts = $news = $gallery = $company = $sliders = $popups = 0;
@@ -39,6 +40,45 @@ class AdminDashboardController
 
         $inquiries = $can('inquiries.view') ? Inquiry::count() : 0;
 
+        $recentActivity = collect();
+        if ($can('audit.view')) {
+            $recentActivity = AuditLog::with('user:id,name')->latest()->limit(4)->get();
+        }
+
+        $platformStatus = [
+            'website' => true,
+            'database' => false,
+            'mail' => filled(config('mail.mailers.smtp.host')),
+            'storage' => is_writable(storage_path('app/public')),
+        ];
+
+        try {
+            DB::connection()->getPdo();
+            $platformStatus['database'] = true;
+        } catch (Throwable) {
+            $platformStatus['database'] = false;
+        }
+
+        $storageBytes = Cache::remember('admin.dashboard.storage_bytes', 60, static function (): int {
+            $root = storage_path('app/public');
+            if (! is_dir($root)) {
+                return 0;
+            }
+
+            $bytes = 0;
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS)
+            );
+
+            foreach ($iterator as $file) {
+                if ($file->isFile()) {
+                    $bytes += $file->getSize();
+                }
+            }
+
+            return $bytes;
+        });
+
         return view('admin.control-center', compact(
             'contentTotal',
             'published',
@@ -50,7 +90,10 @@ class AdminDashboardController
             'popups',
             'applications',
             'newApplications',
-            'inquiries'
+            'inquiries',
+            'recentActivity',
+            'platformStatus',
+            'storageBytes'
         ));
     }
 }
