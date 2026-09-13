@@ -45,4 +45,38 @@ class BoardOfDirectorsNavigationTest extends TestCase
         $this->assertTrue((bool) $section->is_enabled);
         $this->assertSame($folder->id, (int) ($settings['folder_id'] ?? 0));
     }
+
+    public function test_footer_manager_is_nested_under_website_navigation(): void
+    {
+        $website = NavigationMenuItem::query()
+            ->where('menu', 'dashboard')
+            ->where('area', 'dashboard')
+            ->whereNull('parent_id')
+            ->where('source_type', 'folder')
+            ->where(function ($query): void {
+                $query->where('label', 'Website')
+                    ->orWhere('source_key', 'folder:website')
+                    ->orWhere('source_key', 'dashboard:website');
+            })
+            ->firstOrFail();
+
+        $footer = NavigationMenuItem::query()
+            ->where('menu', 'dashboard')
+            ->where('area', 'dashboard')
+            ->where('parent_id', $website->id)
+            ->where('route_name', 'admin.footer.index')
+            ->firstOrFail();
+
+        $this->assertSame('Footer Manager', $footer->displayLabel());
+        $this->assertSame('/admin/footer', $footer->url);
+        $this->assertSame('route', $footer->source_type);
+        $this->assertSame('route:admin.footer.index', $footer->source_key);
+        $this->assertTrue((bool) $footer->is_visible);
+        $this->assertSame('website.view', $footer->permission_key);
+        $this->assertSame(1, NavigationMenuItem::query()
+            ->where('menu', 'dashboard')
+            ->where('area', 'dashboard')
+            ->where('route_name', 'admin.footer.index')
+            ->count());
+    }
 }
