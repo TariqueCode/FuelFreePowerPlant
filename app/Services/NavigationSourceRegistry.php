@@ -20,8 +20,10 @@ class NavigationSourceRegistry
     ];
 
     private const BUILDER_ROUTE_ALIASES = [
-        'admin.management.index' => ['admin.profile-builder.index', 'Profile Builder'],
-        'admin.cms.index' => ['admin.page-builder.index', 'Page Builder'],
+        // These are the real dashboard routes. Keep the builder labels friendly
+        // without pointing the resolver at non-existent route aliases.
+        'admin.management.index' => ['admin.management.index', 'Profile Builder'],
+        'admin.cms.index' => ['admin.cms.index', 'Page Builder'],
         'admin.navigation.index' => ['admin.menu-builder.index', 'Menu Builder'],
         'admin.site-content.index' => ['admin.news_and_event.index', 'News & Event'],
     ];
@@ -144,6 +146,8 @@ class NavigationSourceRegistry
     {
         $friendly = ['home' => 'Home', 'management' => 'Board of Directors', 'site.plants' => (string) config('fuelfree.projects.label', 'Projects & Our Plans'), 'site.future-project' => 'Future Project', 'site.solutions' => 'Solutions', 'site.gallery' => 'Gallery', 'site.career' => 'Career', 'news.index' => 'News & Event', 'sustainability' => 'Sustainability', 'contact' => 'Contact'];
         if (array_key_exists($name, $friendly)) return $friendly[$name];
+        if ($name === 'admin.management.index') return 'Profile Builder';
+        if ($name === 'admin.cms.index') return 'Page Builder';
         $action = (string) ($route->getActionName() ?? ''); $controller = Str::before(Str::afterLast($action, '\\'), '@');
         if ($controller === 'PublicSiteController') { $section = $route->defaults['section'] ?? null; if (is_string($section) && trim($section) !== '') return $this->humanizeNavigationLabel($section); $segment = trim(ltrim($route->uri(), '/')); if ($segment !== '' && ! str_contains($segment, '/')) return $this->humanizeNavigationLabel($segment); }
         $label = Str::headline(Str::replace(['admin.', '.index', '.'], ['admin ', '', ' '], $name));
