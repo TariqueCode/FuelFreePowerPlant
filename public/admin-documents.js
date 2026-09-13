@@ -51,14 +51,18 @@
             setDrawer(shouldOpen, false);
         }
 
+        // The portal already has the primary drawer handlers. Capture these
+        // events here so this shared state layer does not fight those handlers.
         if (toggle && backdrop) {
-            toggle.addEventListener('click', function () {
+            toggle.addEventListener('click', function (event) {
+                event.stopPropagation();
                 setDrawer(!sidebar.classList.contains('mobile-open'), true);
-            });
+            }, true);
 
-            backdrop.addEventListener('click', function () {
+            backdrop.addEventListener('click', function (event) {
+                event.stopPropagation();
                 setDrawer(false, true);
-            });
+            }, true);
         }
 
         sidebar.querySelectorAll('a[href]').forEach(function (link) {
