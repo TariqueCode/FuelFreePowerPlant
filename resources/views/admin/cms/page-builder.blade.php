@@ -19,5 +19,8 @@
 @media(max-width:1100px){.gcp-side{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.gcp{width:100%}.gcp-head{align-items:flex-start;flex-direction:column}.gcp-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.gcp-actions>*{width:100%}.gcp-side{grid-template-columns:1fr}.gcp-editor-head{flex-direction:column}.gcp-badge{align-self:flex-start}}
 @media(max-width:420px){.gcp-actions{grid-template-columns:1fr}.gcp-head h1{font-size:25px}}
+
+/* Keep the editor ribbon below the fixed/sticky admin topbar instead of sliding underneath it. */
+.ff-cms-editor .ff-ribbon{top:70px!important;z-index:950!important}
 </style>
 @endpush
