@@ -39,3 +39,52 @@
 </style>
 @endpush
 @endonce
+
+@push('styles')
+<style>
+/* Full-page editing workspace: keep the command ribbon available while the canvas scrolls. */
+.ff-cms-editor{min-height:calc(100vh - 210px);box-shadow:0 16px 40px rgba(0,0,0,.14)}
+.ff-cms-editor .ff-ribbon{position:sticky;top:0;z-index:1000;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.ff-cms-editor .ff-tabs{background:rgba(7,27,37,.96)}
+.ff-cms-editor .ff-panel{background:rgba(7,27,37,.97)}
+.ff-cms-editor .ff-editable{min-height:calc(100vh - 345px);padding:clamp(24px,4vw,48px) clamp(18px,5vw,72px);font-size:15px;line-height:1.85;background:linear-gradient(180deg,rgba(4,18,27,.98),rgba(3,15,22,.98))}
+.ff-cms-editor .ff-editable > p,
+.ff-cms-editor .ff-editable > h1,
+.ff-cms-editor .ff-editable > h2,
+.ff-cms-editor .ff-editable > h3,
+.ff-cms-editor .ff-editable > h4,
+.ff-cms-editor .ff-editable > h5,
+.ff-cms-editor .ff-editable > h6,
+.ff-cms-editor .ff-editable > blockquote,
+.ff-cms-editor .ff-editable > pre{max-width:1100px;margin-left:auto;margin-right:auto}
+.ff-cms-editor .ff-editable > table,
+.ff-cms-editor .ff-editable > .ff-columns,
+.ff-cms-editor .ff-editable > .ff-gallery{width:100%;max-width:1280px;margin-left:auto;margin-right:auto}
+.ff-cms-editor .ff-editable > img,
+.ff-cms-editor .ff-editable > video,
+.ff-cms-editor .ff-editable > iframe{display:block;max-width:min(100%,1280px);margin-left:auto;margin-right:auto}
+.ff-cms-editor .ff-footer{background:#061923;position:sticky;bottom:0;z-index:10}
+.ff-cms-editor .ff-command,
+.ff-cms-editor .ff-icon{min-height:40px;touch-action:manipulation}
+@media(max-width:700px){
+  .ff-cms-editor{min-height:calc(100vh - 165px);border-radius:0 0 12px 12px}
+  .ff-cms-editor .ff-ribbon{top:0}
+  .ff-cms-editor .ff-editable{min-height:calc(100vh - 300px);padding:22px 14px;font-size:16px;line-height:1.8}
+  .ff-cms-editor .ff-editable > p,
+  .ff-cms-editor .ff-editable > h1,
+  .ff-cms-editor .ff-editable > h2,
+  .ff-cms-editor .ff-editable > h3,
+  .ff-cms-editor .ff-editable > h4,
+  .ff-cms-editor .ff-editable > h5,
+  .ff-cms-editor .ff-editable > h6,
+  .ff-cms-editor .ff-editable > blockquote,
+  .ff-cms-editor .ff-editable > pre{max-width:none}
+  .ff-cms-editor .ff-editable > table,
+  .ff-cms-editor .ff-editable > .ff-columns,
+  .ff-cms-editor .ff-editable > .ff-gallery{max-width:none}
+  .ff-cms-editor .ff-editable > iframe{min-height:240px}
+  .ff-cms-editor .ff-command{min-height:44px}
+  .ff-cms-editor .ff-icon{width:40px;height:40px}
+}
+</style>
+@endpush
