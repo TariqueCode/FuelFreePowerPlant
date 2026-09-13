@@ -28,17 +28,17 @@ return new class extends Migration
             return NavigationMenuItem::create($values);
         };
 
-        $item = static function (string $label, string $url, string $icon, string $permission, int $order, int $parentId, ?string $routeName = null, ?string $sourceKey = null) use ($find): NavigationMenuItem {
+        $item = static function (string $label, string $url, string $icon, string $permission, int $order, ?int $parentId, ?string $routeName = null, ?string $sourceKey = null) use ($find): NavigationMenuItem {
             $existing = $sourceKey ? $find($sourceKey) : NavigationMenuItem::query()->where('menu','dashboard')->where('area','dashboard')->where('url',$url)->orderBy('id')->first();
             $values = ['menu'=>'dashboard','parent_id'=>$parentId,'label'=>$label,'label_override'=>null,'url'=>$url,'route_name'=>$routeName,'target'=>'_self','icon'=>$icon,'is_visible'=>true,'sort_order'=>$order,'source_key'=>$sourceKey,'source_type'=>$sourceKey ? 'route' : 'external_link','area'=>'dashboard','permission_key'=>$permission];
             if ($existing) { $existing->update($values); return $existing->fresh(); }
             return NavigationMenuItem::create($values);
         };
 
-        // Remove legacy Profile Builder folder entries; profile folders remain data only.
+        // Profile Builder folders are data containers, never dashboard navigation items.
         NavigationMenuItem::query()->where('menu','dashboard')->where('area','dashboard')->where('source_key','like','management_folder:%')->delete();
 
-        $dashboard = $item('Dashboard','/admin','fa-house','dashboard.view',0,0,'admin.dashboard','route:admin.dashboard');
+        $dashboard = $item('Dashboard','/admin','fa-house','dashboard.view',0,null,'admin.dashboard','route:admin.dashboard');
         $dashboard->update(['parent_id'=>null]);
 
         $website = $folder('Website','fa-globe',1);
@@ -64,8 +64,12 @@ return new class extends Migration
         $item('Webmail','/admin/mail','fa-envelope','mail.view',2,(int)$communications->id);
         $item('Career Applications','/admin/career-applications','fa-briefcase','career.view',3,(int)$communications->id);
 
-        $settings = $item('Settings','/admin/settings','fa-sliders','settings.manage',4,0);
+        $settings = $item('Settings','/admin/settings','fa-sliders','settings.manage',4,null);
         $settings->update(['parent_id'=>null]);
+
+        foreach ([$dashboard->id=>0,$website->id=>1,$users->id=>2,$communications->id=>3,$settings->id=>4] as $id=>$order) {
+            NavigationMenuItem::query()->whereKey($id)->update(['parent_id'=>null,'sort_order'=>$order,'is_visible'=>true]);
+        }
 
         cache()->forget('fuelfree.dashboard_navigation');
         cache()->forget('fuelfree.public_navigation');
