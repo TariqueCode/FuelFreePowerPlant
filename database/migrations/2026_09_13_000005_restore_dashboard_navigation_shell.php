@@ -6,125 +6,67 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Restore the professional admin sidebar shell without deleting any
-     * user-created navigation entries. Older dashboard navigation repairs
-     * could leave only the Website folder behind, which caused the portal to
-     * stop using its richer fallback navigation entirely.
-     */
     public function up(): void
     {
-        if (! Schema::hasTable('navigation_menu_items')) {
-            return;
-        }
+        if (! Schema::hasTable('navigation_menu_items')) return;
 
-        $find = static function (array $where, ?string $sourceKey = null): ?NavigationMenuItem {
-            $query = NavigationMenuItem::query()
-                ->where('menu', 'dashboard')
-                ->where('area', 'dashboard');
-
+        $find = static function (?string $sourceKey = null): ?NavigationMenuItem {
+            $query = NavigationMenuItem::query()->where('menu', 'dashboard')->where('area', 'dashboard');
             if ($sourceKey !== null) {
                 $query->where(function ($q) use ($sourceKey): void {
                     $q->where('source_key', $sourceKey)->orWhere('route_name', substr($sourceKey, 6));
                 });
-            } else {
-                foreach ($where as $column => $value) {
-                    $query->where($column, $value);
-                }
             }
-
             return $query->orderBy('id')->first();
         };
 
-        $nextRootOrder = static function (): int {
-            return ((int) NavigationMenuItem::query()
-                ->where('menu', 'dashboard')
-                ->where('area', 'dashboard')
-                ->whereNull('parent_id')
-                ->max('sort_order')) + 1;
-        };
-
-        $ensureFolder = static function (string $label, string $icon, int $sortOrder, ?int $parentId = null) use ($find, $nextRootOrder): NavigationMenuItem {
+        $ensureFolder = static function (string $label, string $icon, int $sortOrder, ?int $parentId = null): NavigationMenuItem {
             $item = NavigationMenuItem::query()
-                ->where('menu', 'dashboard')
-                ->where('area', 'dashboard')
-                ->where('source_type', 'folder')
-                ->where('label', $label)
-                ->where('parent_id', $parentId)
-                ->orderBy('id')
-                ->first();
+                ->where('menu', 'dashboard')->where('area', 'dashboard')
+                ->where('source_type', 'folder')->where('label', $label)->where('parent_id', $parentId)
+                ->orderBy('id')->first();
 
             if (! $item) {
                 $item = NavigationMenuItem::create([
-                    'menu' => 'dashboard',
-                    'parent_id' => $parentId,
-                    'label' => $label,
-                    'url' => null,
-                    'route_name' => null,
-                    'target' => '_self',
-                    'icon' => $icon,
-                    'is_visible' => true,
-                    'sort_order' => $parentId === null ? $nextRootOrder() : $sortOrder,
-                    'source_key' => null,
-                    'source_type' => 'folder',
-                    'area' => 'dashboard',
-                    'permission_key' => null,
+                    'menu' => 'dashboard', 'parent_id' => $parentId, 'label' => $label, 'url' => null,
+                    'route_name' => null, 'target' => '_self', 'icon' => $icon, 'is_visible' => true,
+                    'sort_order' => $sortOrder, 'source_key' => null, 'source_type' => 'folder',
+                    'area' => 'dashboard', 'permission_key' => null,
                 ]);
             } else {
-                $item->update(['icon' => $icon, 'is_visible' => true]);
+                $item->update(['icon' => $icon, 'is_visible' => true, 'sort_order' => $sortOrder]);
             }
-
             return $item;
         };
 
         $ensureItem = static function (
-            string $label,
-            string $url,
-            string $icon,
-            string $permission,
-            int $sortOrder,
-            int $parentId,
-            ?string $routeName = null,
-            ?string $sourceKey = null
+            string $label, string $url, string $icon, string $permission, int $sortOrder,
+            ?int $parentId, ?string $routeName = null, ?string $sourceKey = null
         ) use ($find): NavigationMenuItem {
-            $item = $sourceKey !== null
-                ? $find([], $sourceKey)
-                : NavigationMenuItem::query()
-                    ->where('menu', 'dashboard')
-                    ->where('area', 'dashboard')
-                    ->where(function ($q) use ($url, $routeName, $label): void {
-                        $q->where('url', $url);
-                        if ($routeName) $q->orWhere('route_name', $routeName);
-                        $q->orWhere('label', $label);
-                    })
-                    ->orderBy('id')
-                    ->first();
+            $item = $sourceKey !== null ? $find($sourceKey) : NavigationMenuItem::query()
+                ->where('menu', 'dashboard')->where('area', 'dashboard')
+                ->where(function ($q) use ($url, $routeName, $label): void {
+                    $q->where('url', $url);
+                    if ($routeName) $q->orWhere('route_name', $routeName);
+                    $q->orWhere('label', $label);
+                })->orderBy('id')->first();
 
             $values = [
-                'menu' => 'dashboard',
-                'parent_id' => $parentId,
-                'label' => $label,
-                'url' => $url,
-                'route_name' => $routeName,
-                'target' => '_self',
-                'icon' => $icon,
-                'is_visible' => true,
-                'sort_order' => $sortOrder,
-                'source_key' => $sourceKey,
+                'menu' => 'dashboard', 'parent_id' => $parentId, 'label' => $label, 'url' => $url,
+                'route_name' => $routeName, 'target' => '_self', 'icon' => $icon, 'is_visible' => true,
+                'sort_order' => $sortOrder, 'source_key' => $sourceKey,
                 'source_type' => $sourceKey !== null ? 'route' : 'external_link',
-                'area' => 'dashboard',
-                'permission_key' => $permission,
+                'area' => 'dashboard', 'permission_key' => $permission,
             ];
-
             if ($item) {
                 $item->update($values);
                 return $item->fresh();
             }
-
             return NavigationMenuItem::create($values);
         };
 
-        $dashboard = $ensureItem('Dashboard', '/admin', 'fa-house', 'dashboard.view', 0, 0, 'admin.dashboard', 'route:admin.dashboard');
+        $dashboard = $ensureItem('Dashboard', '/admin', 'fa-house', 'dashboard.view', 0, null, 'admin.dashboard', 'route:admin.dashboard');
+
         $website = NavigationMenuItem::query()
             ->where('menu', 'dashboard')->where('area', 'dashboard')->whereNull('parent_id')
             ->where('source_type', 'folder')->where('label', 'Website')->first();
@@ -136,7 +78,7 @@ return new class extends Migration
                 'permission_key' => null,
             ]);
         } else {
-            $website->update(['icon' => 'fa-globe', 'is_visible' => true]);
+            $website->update(['icon' => 'fa-globe', 'is_visible' => true, 'sort_order' => 1]);
         }
 
         $websiteItems = [
@@ -147,11 +89,10 @@ return new class extends Migration
             ['News & Event', '/admin/site-content?type=news', 'fa-newspaper', 'website.view', 4, null, null],
             ['Gallery', '/admin/galleries', 'fa-images', 'website.view', 5, 'admin.gallery.index', 'route:admin.gallery.index'],
             ['Page Builder', '/admin/cms', 'fa-file-lines', 'website.view', 6, 'admin.cms.index', 'route:admin.cms.index'],
-            ['Social Media', '/admin/social-links', 'fa-share-nodes', 'website.view', 7, null, null],
+            ['Social Media', '/admin/social-links', 'fa-share-nodes', 'social-media.manage', 7, null, null],
             ['Menu Builder', '/admin/navigation', 'fa-sitemap', 'website.view', 8, null, null],
             ['Documents & Media', '/admin/documents', 'fa-folder-open', 'documents.view', 9, null, null],
         ];
-
         foreach ($websiteItems as $row) {
             $ensureItem($row[0], $row[1], $row[2], $row[3], $row[4], (int) $website->id, $row[5], $row[6]);
         }
@@ -167,19 +108,10 @@ return new class extends Migration
         $ensureItem('Webmail', '/admin/mail', 'fa-envelope', 'mail.view', 2, (int) $communications->id);
         $ensureItem('Career Applications', '/admin/career-applications', 'fa-briefcase', 'career.view', 3, (int) $communications->id);
 
-        $settings = $ensureItem('Settings', '/admin/settings', 'fa-sliders', 'settings.manage', 4, 0);
+        $settings = $ensureItem('Settings', '/admin/settings', 'fa-sliders', 'settings.manage', 4, null);
 
-        // Keep the root shell in a predictable order while preserving the
-        // user's existing child ordering and any unrelated custom entries.
-        $rootOrder = [
-            $dashboard->id => 0,
-            $website->id => 1,
-            $users->id => 2,
-            $communications->id => 3,
-            $settings->id => 4,
-        ];
-        foreach ($rootOrder as $id => $order) {
-            NavigationMenuItem::query()->whereKey($id)->update(['sort_order' => $order, 'is_visible' => true]);
+        foreach ([$dashboard->id => 0, $website->id => 1, $users->id => 2, $communications->id => 3, $settings->id => 4] as $id => $order) {
+            NavigationMenuItem::query()->whereKey($id)->update(['parent_id' => null, 'sort_order' => $order, 'is_visible' => true]);
         }
     }
 
