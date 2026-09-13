@@ -34,6 +34,7 @@ class DashboardNavigationService
             $item->url = $source['url'];
             $item->route_name = $source['route_name'];
             $item->permission_key = $permission;
+            if ($item->source_key === 'route:admin.dashboard') $item->label = 'Dashboard';
             if ($item->source_key === 'route:admin.site-content.index' || $item->route_name === 'admin.news_and_event.index' || $item->route_name === 'admin.news_and_event') { $item->label_override = null; $item->label = 'News & Event'; }
             return true;
         })->values();
@@ -48,6 +49,7 @@ class DashboardNavigationService
             $permission = $source['permission'] ?? null;
             if ($permission && (! auth()->check() || ! auth()->user()->hasPermission($permission))) return;
             $item = new NavigationMenuItem(['menu'=>'dashboard','parent_id'=>$parentId,'label'=>$source['label'] ?: $fallbackLabel,'label_override'=>null,'url'=>$source['url'],'route_name'=>$source['route_name'],'target'=>'_self','icon'=>$fallbackIcon,'is_visible'=>true,'sort_order'=>$sortOrder,'source_key'=>$sourceKey,'source_type'=>'route','area'=>'dashboard','permission_key'=>$permission]);
+            if ($sourceKey === 'route:admin.dashboard') $item->label = $fallbackLabel;
             $item->exists = false;
             $virtual->push($item);
             $existingKeys->put($sourceKey, true);
