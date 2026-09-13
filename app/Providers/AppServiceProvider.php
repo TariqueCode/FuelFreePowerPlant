@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\ManagementController as AdminManagementController;
 use App\Http\Controllers\Admin\ResilientDocumentController;
@@ -27,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
             $template = preg_replace('/<option\s+value=["\']route:management["\'][^>]*>.*?<\/option>/is', '', $template) ?? $template;
             return str_replace(
                 ['Advanced Menu Builder','Content Pages','Website Navigation','CONTENT MANAGEMENT','WEBSITE SECTIONS · MANAGEMENT','New CMS Page','Edit CMS Page','Add Management Member','Edit Management Profile','Add management member',"route('admin.site-content.index',['type'=>'news'])","request()->routeIs('admin.site-content.*') && request('type')==='news'",'News & Notices','News & notices','News &amp; Notices','News &amp; notices','name="settings[management][folder_id]" class="management-folder" required'],
-                ['Menu Builder','Page Builder','Menu Builder','PAGE BUILDER','GLOBAL · PROFILE BUILDER','New Page','Edit Page','Add Profile','Edit Profile','Add profile',"route('admin.news_and_event.index')","request()->routeIs('admin.news_and_event*')",'News & Event','News & Event','News &amp; Event','News &amp; Event','name="settings[management][folder_id]" class="management-folder"'],
+                ['Menu Builder','Page Builder','Menu Builder','PAGE BUILDER','GLOBAL · PROFILE BUILDER','New Page','Edit Page','Add Profile','Edit Profile','Add profile',"route('admin.news_and_event')","request()->routeIs('admin.news_and_event*')",'News & Event','News & Event','News &amp; Event','News &amp; Event','name="settings[management][folder_id]" class="management-folder"'],
                 $template
             );
         });
@@ -38,6 +39,18 @@ class AppServiceProvider extends ServiceProvider
                 ->whereNumber('folder')
                 ->middleware(['web', 'auth', 'permission:documents.view'])
                 ->name('admin.documents.folders.compat');
+
+            // Canonical News & Event entry point. The legacy site-content URL
+            // redirects here so older bookmarks continue to work.
+            $router->get('/admin/news_and_Event', [CmsController::class, 'index'])
+                ->middleware(['web', 'auth', 'permission:website.view'])
+                ->name('admin.news_and_event');
+
+            // Normalize the malformed/hyphenated legacy navigation URL back to
+            // the original site-content entry point.
+            $router->get('/admin/news-and-Event', fn () => redirect()->route('admin.site-content.index', ['type' => 'news']))
+                ->middleware(['web', 'auth', 'permission:website.view'])
+                ->name('admin.news-and-event.compat');
 
             // POST aliases avoid DELETE-method filtering/WAF rules commonly found on shared LiteSpeed hosting.
             $manage = ['web', 'auth', 'permission:documents.manage'];
