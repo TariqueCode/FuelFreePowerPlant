@@ -6,7 +6,6 @@ use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\ManagementController as AdminManagementController;
 use App\Http\Controllers\Admin\ResilientDocumentController;
-use App\Http\Controllers\ManagementController as PublicManagementController;
 use App\Models\SystemSetting;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
@@ -40,17 +39,10 @@ class AppServiceProvider extends ServiceProvider
                 ->middleware(['web', 'auth', 'permission:documents.view'])
                 ->name('admin.documents.folders.compat');
 
-            // Canonical News & Event entry point. The legacy site-content URL
-            // redirects here so older bookmarks continue to work.
-            $router->get('/admin/news_and_Event', [CmsController::class, 'index'])
+            // Canonical News & Event entry point.
+            $router->get('/admin/news-and-Event', [CmsController::class, 'index'])
                 ->middleware(['web', 'auth', 'permission:website.view'])
                 ->name('admin.news_and_event');
-
-            // Normalize the malformed/hyphenated legacy navigation URL back to
-            // the original site-content entry point.
-            $router->get('/admin/news-and-Event', fn () => redirect()->route('admin.site-content.index', ['type' => 'news']))
-                ->middleware(['web', 'auth', 'permission:website.view'])
-                ->name('admin.news-and-event.compat');
 
             // POST aliases avoid DELETE-method filtering/WAF rules commonly found on shared LiteSpeed hosting.
             $manage = ['web', 'auth', 'permission:documents.manage'];
@@ -61,7 +53,7 @@ class AppServiceProvider extends ServiceProvider
             $router->post('/admin/documents/folders/{folder}/delete', [DocumentController::class, 'destroyFolder'])
                 ->middleware($manage)->name('admin.documents.folders.destroy.post');
 
-            $router->fallback([PublicManagementController::class, 'folderFallback'])->name('management.folder');
+            $router->fallback([\App\Http\Controllers\ManagementController::class, 'folderFallback'])->name('management.folder');
         });
 
         try {
