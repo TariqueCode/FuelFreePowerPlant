@@ -147,7 +147,7 @@ class NavigationSourceRegistry
 
     private function routeLabel(Route $route, string $name): string
     {
-        $friendly = ['home' => 'Home', 'management' => 'Board of Directors', 'site.plants' => (string) config('fuelfree.projects.label', 'Projects & Our Plans'), 'site.future-project' => 'Future Project', 'site.solutions' => 'Solutions', 'site.gallery' => 'Gallery', 'site.career' => 'Career', 'news.index' => 'News & Event', 'sustainability' => 'Sustainability', 'contact' => 'Contact'];
+        $friendly = ['home' => 'Home', 'management' => 'Board of Directors', 'admin.dashboard' => 'Dashboard', 'site.plants' => (string) config('fuelfree.projects.label', 'Projects & Our Plans'), 'site.future-project' => 'Future Project', 'site.solutions' => 'Solutions', 'site.gallery' => 'Gallery', 'site.career' => 'Career', 'news.index' => 'News & Event', 'sustainability' => 'Sustainability', 'contact' => 'Contact'];
         if (array_key_exists($name, $friendly)) return $friendly[$name];
         if ($name === 'admin.management.index') return 'Profile Builder';
         if ($name === 'admin.cms.index') return 'Page Builder';
