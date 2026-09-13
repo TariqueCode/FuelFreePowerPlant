@@ -20,79 +20,53 @@ class DashboardNavigationService
 
         $valid = $items->filter(function (NavigationMenuItem $item) use ($registry): bool {
             if ($item->source_type === 'folder') return true;
-
-            // Manually entered links are valid dashboard destinations without a
-            // registry source. This keeps the dashboard navigation consistent
-            // with NavigationMenuController, which explicitly supports URL items.
             if ($item->source_type === 'external_link') {
                 if (trim((string) $item->url) === '') return false;
                 if ($item->permission_key && ! auth()->user()->hasPermission($item->permission_key)) return false;
-
-                // News & Event is the canonical dashboard destination. Existing
-                // external-link records may still carry an older label, so
-                // normalize the rendered label by destination URL too.
-                $navigationUrl = trim((string) $item->url);
-                $navigationPath = parse_url($navigationUrl, PHP_URL_PATH) ?: $navigationUrl;
-                if (trim($navigationPath, '/') === 'admin/news_and_Event') {
-                    $item->label_override = null;
-                    $item->label = 'News & Event';
-                }
-
                 return true;
             }
-
             if (! $item->source_key) return false;
             $source = $registry->resolveAny($item->source_key, 'dashboard');
             if (! $source) return false;
-
             $permission = $source['permission'] ?? null;
             if ($permission && ! auth()->user()->hasPermission($permission)) return false;
-
             $item->label = $source['label'];
             $item->url = $source['url'];
             $item->route_name = $source['route_name'];
             $item->permission_key = $permission;
-
-            // News & Event is now the canonical dashboard destination. Older
-            // dashboard records may still contain the former label override,
-            // so clear it at render time rather than requiring a manual database
-            // migration for every existing navigation item.
-            if ($item->source_key === 'route:admin.site-content.index'
-                || $item->route_name === 'admin.news_and_event.index'
-                || $item->route_name === 'admin.news_and_event') {
-                $item->label_override = null;
-                $item->label = 'News & Event';
-            }
-
-            // Profile Builder is an admin-only builder label. Its public
-            // destination remains the dynamically named management folder.
-            if (Str::startsWith((string) $item->source_key, 'management_folder:') || $item->route_name === 'management') {
-                $item->label_override = 'Profile Builder';
-            }
-
+            if ($item->source_key === 'route:admin.site-content.index' || $item->route_name === 'admin.news_and_event.index' || $item->route_name === 'admin.news_and_event') { $item->label_override = null; $item->label = 'News & Event'; }
             return true;
         })->values();
 
+        $existingKeys = $valid->pluck('source_key')->filter()->flip();
+        $website = $valid->first(fn (NavigationMenuItem $item): bool => $item->source_type === 'folder' && strcasecmp(trim((string) $item->label), 'Website') === 0);
+        $virtual = collect();
+        $addVirtualRoute = function (string $sourceKey, string $fallbackLabel, string $fallbackIcon, int $sortOrder, ?int $parentId) use (&$virtual, $existingKeys, $registry): void {
+            if ($existingKeys->has($sourceKey)) return;
+            $source = $registry->resolveAny($sourceKey, 'dashboard');
+            if (! $source) return;
+            $permission = $source['permission'] ?? null;
+            if ($permission && (! auth()->check() || ! auth()->user()->hasPermission($permission))) return;
+            $item = new NavigationMenuItem(['menu'=>'dashboard','parent_id'=>$parentId,'label'=>$source['label'] ?: $fallbackLabel,'label_override'=>null,'url'=>$source['url'],'route_name'=>$source['route_name'],'target'=>'_self','icon'=>$fallbackIcon,'is_visible'=>true,'sort_order'=>$sortOrder,'source_key'=>$sourceKey,'source_type'=>'route','area'=>'dashboard','permission_key'=>$permission]);
+            $item->exists = false;
+            $virtual->push($item);
+            $existingKeys->put($sourceKey, true);
+        };
+        $addVirtualRoute('route:admin.dashboard', 'Dashboard', 'fa-house', 0, null);
+        if ($website?->getKey() !== null) {
+            $addVirtualRoute('route:admin.management.index', 'Profile Builder', 'fa-user-tie', 3, (int) $website->getKey());
+            $addVirtualRoute('route:admin.cms.index', 'Page Builder', 'fa-file-lines', 6, (int) $website->getKey());
+        }
+        $valid = $valid->concat($virtual)->sortBy(fn (NavigationMenuItem $item): array => [(int) ($item->parent_id ?? 0), (int) $item->sort_order, (int) $item->getKey()])->values();
         $children = $valid->groupBy(fn (NavigationMenuItem $item) => $item->parent_id ?? 0);
         $building = [];
-
         $build = function (int $parentId = 0, int $depth = 0) use (&$build, $children, &$building): Collection {
             if ($depth > 20 || isset($building[$parentId])) return collect();
             $building[$parentId] = true;
-
-            $result = $children->get($parentId, collect())
-                ->map(function (NavigationMenuItem $item) use (&$build, $depth): NavigationMenuItem {
-                    $item->setRelation('children', $build((int) $item->id, $depth + 1));
-                    return $item;
-                })
-                ->filter(function (NavigationMenuItem $item): bool {
-                    return $item->source_type !== 'folder' || $item->children->isNotEmpty();
-                })->values();
-
+            $result = $children->get($parentId, collect())->map(function (NavigationMenuItem $item) use (&$build, $depth): NavigationMenuItem { $item->setRelation('children', $build((int) $item->id, $depth + 1)); return $item; })->filter(fn (NavigationMenuItem $item): bool => $item->source_type !== 'folder' || $item->children->isNotEmpty())->values();
             unset($building[$parentId]);
             return $result;
         };
-
         return $build();
     }
 }
