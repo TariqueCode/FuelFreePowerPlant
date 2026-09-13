@@ -13,6 +13,21 @@ class PortalCapabilityNavigationTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_dashboard_navigation_always_exposes_the_admin_dashboard_entry(): void
+    {
+        $dashboard = Permission::firstOrCreate(['slug'=>'dashboard.view'], ['name'=>'View dashboard']);
+        $website = Permission::firstOrCreate(['slug'=>'website.view'], ['name'=>'View website']);
+        $role = Role::create(['name'=>'Dashboard Navigation QA','slug'=>'dashboard-navigation-qa','is_system'=>false]);
+        $role->permissions()->sync([$dashboard->id, $website->id]);
+        $user = User::factory()->create();
+        $user->roles()->attach($role);
+
+        $this->actingAs($user)->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('Dashboard')
+            ->assertSee('Website');
+    }
+
     public function test_user_management_navigation_is_capability_aware(): void
     {
         $view = Permission::firstOrCreate(['slug'=>'users.view'], ['name'=>'View users']);
