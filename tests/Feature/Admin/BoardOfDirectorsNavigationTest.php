@@ -60,11 +60,19 @@ class BoardOfDirectorsNavigationTest extends TestCase
             ['slug' => 'website.view'],
             ['name' => 'Website View', 'description' => 'View website administration surfaces.']
         );
+        $cmsPermission = Permission::query()->firstOrCreate(
+            ['slug' => 'cms.view'],
+            ['name' => 'CMS View', 'description' => 'View CMS and page builder surfaces.']
+        );
         $role = Role::query()->firstOrCreate(
             ['slug' => 'navigation-test-admin'],
             ['name' => 'Navigation Test Admin', 'description' => 'Test administrator.', 'is_system' => false]
         );
-        $role->permissions()->syncWithoutDetaching([$dashboardPermission->id, $websitePermission->id]);
+        $role->permissions()->syncWithoutDetaching([
+            $dashboardPermission->id,
+            $websitePermission->id,
+            $cmsPermission->id,
+        ]);
 
         $admin = User::factory()->create();
         $admin->roles()->attach($role);
