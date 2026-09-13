@@ -5,6 +5,8 @@ namespace Tests\Feature\Admin;
 use App\Models\HomepageSection;
 use App\Models\ManagementProfileFolder;
 use App\Models\NavigationMenuItem;
+use App\Models\Role;
+use App\Models\User;
 use App\Services\DashboardNavigationService;
 use App\Services\PublicNavigationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -49,7 +51,9 @@ class BoardOfDirectorsNavigationTest extends TestCase
 
     public function test_dashboard_navigation_resolves_real_builder_routes_and_keeps_required_shell_items(): void
     {
-        $this->actingAs($this->makeAdminUser());
+        $admin = User::factory()->create();
+        $admin->roles()->attach(Role::query()->where('slug', 'super-admin')->firstOrFail());
+        $this->actingAs($admin);
 
         $tree = app(DashboardNavigationService::class)->tree('dashboard');
         $labels = $tree->pluck('label')->map(fn ($label) => trim((string) $label))->all();
