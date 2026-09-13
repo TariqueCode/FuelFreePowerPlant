@@ -16,7 +16,14 @@ use Illuminate\View\View;
  */
 class SiteContentController extends Controller
 {
-    public function index(Request $request): RedirectResponse { abort(404); }
+    public function index(Request $request): RedirectResponse
+    {
+        // Keep the original News & Event URL usable for bookmarks and older
+        // navigation records. The canonical editor is the historical News &
+        // Event/Page Builder entry point.
+        return redirect()->route('admin.news_and_event');
+    }
+
     public function create(Request $request): View|RedirectResponse { abort(404); }
     public function store(Request $request): RedirectResponse { abort(404); }
     public function edit(SiteContentItem $item): View|RedirectResponse { abort(404); }
