@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Models\HomepageSection;
 use App\Models\ManagementProfileFolder;
 use App\Models\NavigationMenuItem;
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\DashboardNavigationService;
@@ -51,8 +52,18 @@ class BoardOfDirectorsNavigationTest extends TestCase
 
     public function test_dashboard_navigation_resolves_real_builder_routes_and_keeps_required_shell_items(): void
     {
+        $permission = Permission::query()->firstOrCreate(
+            ['slug' => 'website.view'],
+            ['name' => 'Website View', 'description' => 'View website administration surfaces.']
+        );
+        $role = Role::query()->firstOrCreate(
+            ['slug' => 'super-admin'],
+            ['name' => 'Super Admin', 'description' => 'Test administrator.', 'is_system' => true]
+        );
+        $role->permissions()->syncWithoutDetaching([$permission->id]);
+
         $admin = User::factory()->create();
-        $admin->roles()->attach(Role::query()->where('slug', 'super-admin')->firstOrFail());
+        $admin->roles()->attach($role);
         $this->actingAs($admin);
 
         $tree = app(DashboardNavigationService::class)->tree('dashboard');
