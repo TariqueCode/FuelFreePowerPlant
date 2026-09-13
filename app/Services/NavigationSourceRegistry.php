@@ -20,8 +20,6 @@ class NavigationSourceRegistry
     ];
 
     private const BUILDER_ROUTE_ALIASES = [
-        // These are the real dashboard routes. Keep the builder labels friendly
-        // without pointing the resolver at non-existent route aliases.
         'admin.management.index' => ['admin.management.index', 'Profile Builder'],
         'admin.cms.index' => ['admin.cms.index', 'Page Builder'],
         'admin.navigation.index' => ['admin.menu-builder.index', 'Menu Builder'],
@@ -112,7 +110,12 @@ class NavigationSourceRegistry
             if ($route->getDomain() !== null) return false;
             return ! str_starts_with($uri, 'admin/') && ! $middleware->contains(fn (string $value): bool => $value === 'auth' || Str::startsWith($value, ['role:', 'permission:']));
         }
-        if ($area === 'dashboard') return (str_starts_with($uri, 'admin/') || $name === 'dashboard') && ! $middleware->contains(fn (string $value): bool => Str::startsWith($value, 'role:'));
+        if ($area === 'dashboard') {
+            // Dashboard is the authenticated shell entry point. Its role middleware
+            // protects the route itself; it must not make the navigation source disappear.
+            if ($name === 'admin.dashboard') return str_starts_with($uri, 'admin/');
+            return (str_starts_with($uri, 'admin/') || $name === 'dashboard') && ! $middleware->contains(fn (string $value): bool => Str::startsWith($value, 'role:'));
+        }
         return false;
     }
 
