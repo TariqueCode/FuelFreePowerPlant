@@ -52,19 +52,37 @@ class BoardOfDirectorsNavigationTest extends TestCase
 
     public function test_dashboard_navigation_resolves_real_builder_routes_and_keeps_required_shell_items(): void
     {
-        $permission = Permission::query()->firstOrCreate(
+        $websitePermission = Permission::query()->firstOrCreate(
             ['slug' => 'website.view'],
             ['name' => 'Website View', 'description' => 'View website administration surfaces.']
+        );
+        $cmsPermission = Permission::query()->firstOrCreate(
+            ['slug' => 'cms.view'],
+            ['name' => 'CMS View', 'description' => 'View page builder.']
         );
         $role = Role::query()->firstOrCreate(
             ['slug' => 'super-admin'],
             ['name' => 'Super Admin', 'description' => 'Test administrator.', 'is_system' => true]
         );
-        $role->permissions()->syncWithoutDetaching([$permission->id]);
+        $role->permissions()->syncWithoutDetaching([$websitePermission->id, $cmsPermission->id]);
 
         $admin = User::factory()->create();
         $admin->roles()->attach($role);
         $this->actingAs($admin);
+
+        $dashboard = NavigationMenuItem::query()->create([
+            'menu' => 'dashboard', 'parent_id' => null, 'label' => 'Dashboard', 'url' => '/admin',
+            'route_name' => 'admin.dashboard', 'target' => '_self', 'icon' => 'fa-house', 'is_visible' => true,
+            'sort_order' => 0, 'source_key' => 'route:admin.dashboard', 'source_type' => 'route',
+            'area' => 'dashboard', 'permission_key' => 'dashboard.view',
+        ]);
+
+        $website = NavigationMenuItem::query()->create([
+            'menu' => 'dashboard', 'parent_id' => null, 'label' => 'Website', 'url' => '#',
+            'route_name' => null, 'target' => '_self', 'icon' => 'fa-globe', 'is_visible' => true,
+            'sort_order' => 10, 'source_key' => null, 'source_type' => 'folder', 'area' => 'dashboard',
+            'permission_key' => 'website.view',
+        ]);
 
         $tree = app(DashboardNavigationService::class)->tree('dashboard');
         $labels = $tree->pluck('label')->map(fn ($label) => trim((string) $label))->all();
@@ -72,6 +90,7 @@ class BoardOfDirectorsNavigationTest extends TestCase
         $this->assertContains('Dashboard', $labels);
         $website = $tree->firstWhere('label', 'Website');
         $this->assertNotNull($website);
+        $this->assertSame($dashboard->id, $tree->firstWhere('label', 'Dashboard')->id);
 
         $childLabels = $website->children->pluck('label')->map(fn ($label) => trim((string) $label))->all();
         $this->assertContains('Profile Builder', $childLabels);
@@ -82,6 +101,6 @@ class BoardOfDirectorsNavigationTest extends TestCase
         $this->assertNotNull($profile);
         $this->assertNotNull($page);
         $this->assertSame('/admin/management', $profile->url);
-        $this->assertSame('/admin/cms', $page->url);
+        $this->assertSame('/admin/page-builder', $page->url);
     }
 }
