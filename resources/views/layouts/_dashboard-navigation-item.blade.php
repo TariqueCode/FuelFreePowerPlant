@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="{{ asset('admin-dashboard.css') }}?v=4">
 <link rel="stylesheet" href="{{ asset('admin-builder-polish.css') }}?v=4">
 <link rel="stylesheet" href="{{ asset('admin-ui-polish.css') }}?v=1">
-<script src="{{ asset('admin-documents.js') }}?v=5" defer></script>
+<script src="{{ asset('admin-documents.js') }}?v=6" defer></script>
 @endonce
 <style>
 .sidebar .nav>a,
@@ -46,9 +46,10 @@ $hasActiveDescendant=$hasChildren && $item->children->contains(function ($child)
     return $child->children->isNotEmpty() && $child->children->contains(function ($nested): bool { return request()->url()===$nested->url; });
 });
 $navIcon=trim((string) $item->icon) !== '' ? trim($item->icon) : ($hasChildren ? 'fa-folder-tree' : 'fa-circle-dot');
+$navKey=$hasChildren ? sha1((string) $item->url.'|'.(string) $item->displayLabel()) : null;
 @endphp
 @if($hasChildren)
-<details class="nav-group" {{ $hasActiveDescendant ? 'open' : '' }}>
+<details class="nav-group" data-nav-key="{{ $navKey }}" {{ $hasActiveDescendant ? 'open' : '' }}>
     <summary class="nav-parent">
         <span class="nav-icon"><i class="fa-solid {{ $navIcon }}"></i></span>
         <span>{{ $item->displayLabel() }}</span>
