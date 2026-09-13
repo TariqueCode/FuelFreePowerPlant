@@ -32,21 +32,23 @@ class NewsAndEventNavigationTest extends TestCase
         return $user;
     }
 
-    public function test_news_and_event_compatibility_routes_are_registered(): void
+    public function test_canonical_news_and_event_route_uses_hyphenated_uri(): void
     {
         $canonical = Route::getRoutes()->getByName('admin.news_and_event');
-        $legacy = Route::getRoutes()->getByName('admin.site-content.index');
-        $broken = Route::getRoutes()->getByName('admin.news-and-event.compat');
 
         $this->assertNotNull($canonical);
-        $this->assertSame('admin/news_and_Event', $canonical->uri());
-        $this->assertNotNull($legacy);
-        $this->assertSame('admin/site-content', $legacy->uri());
-        $this->assertNotNull($broken);
-        $this->assertSame('admin/news-and-Event', $broken->uri());
+        $this->assertSame('admin/news-and-Event', $canonical->uri());
+        $this->assertNull(Route::getRoutes()->getByName('admin.news-and-event.compat'));
     }
 
-    public function test_navigation_registry_resolves_legacy_news_source_to_canonical_entry(): void
+    public function test_legacy_site_content_news_url_is_no_longer_available(): void
+    {
+        $this->actingAs($this->adminWithWebsiteView());
+
+        $this->get('/admin/site-content?type=news')->assertNotFound();
+    }
+
+    public function test_navigation_registry_resolves_news_source_to_canonical_entry(): void
     {
         $this->actingAs($this->adminWithWebsiteView());
 
@@ -54,7 +56,7 @@ class NewsAndEventNavigationTest extends TestCase
 
         $this->assertNotNull($source);
         $this->assertSame('News & Event', $source['label']);
-        $this->assertSame('/admin/news_and_Event', $source['url']);
+        $this->assertSame('/admin/news-and-Event', $source['url']);
         $this->assertSame('admin.news_and_event', $source['route_name']);
     }
 
@@ -68,7 +70,7 @@ class NewsAndEventNavigationTest extends TestCase
         $this->assertNotNull($website);
         $news = $website->children->firstWhere('label', 'News & Event');
         $this->assertNotNull($news);
-        $this->assertSame('/admin/news_and_Event', $news->url);
+        $this->assertSame('/admin/news-and-Event', $news->url);
         $this->assertSame('admin.news_and_event', $news->route_name);
     }
 }
