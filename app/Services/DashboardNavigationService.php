@@ -21,16 +21,10 @@ class DashboardNavigationService
         $valid = $items->filter(function (NavigationMenuItem $item) use ($registry): bool {
             if ($item->source_type === 'folder') return true;
 
-            // Manually entered links are valid dashboard destinations without a
-            // registry source. This keeps the dashboard navigation consistent
-            // with NavigationMenuController, which explicitly supports URL items.
             if ($item->source_type === 'external_link') {
                 if (trim((string) $item->url) === '') return false;
                 if ($item->permission_key && ! auth()->user()->hasPermission($item->permission_key)) return false;
 
-                // News & Event is the canonical dashboard destination. Existing
-                // external-link records may still carry an older label, so
-                // normalize the rendered label by destination URL too.
                 $navigationUrl = trim((string) $item->url);
                 $navigationPath = parse_url($navigationUrl, PHP_URL_PATH) ?: $navigationUrl;
                 if (trim($navigationPath, '/') === 'admin/news_and_Event') {
@@ -53,10 +47,6 @@ class DashboardNavigationService
             $item->route_name = $source['route_name'];
             $item->permission_key = $permission;
 
-            // News & Event is now the canonical dashboard destination. Older
-            // dashboard records may still contain the former label override,
-            // so clear it at render time rather than requiring a manual database
-            // migration for every existing navigation item.
             if ($item->source_key === 'route:admin.site-content.index'
                 || $item->route_name === 'admin.news_and_event.index'
                 || $item->route_name === 'admin.news_and_event') {
@@ -64,10 +54,12 @@ class DashboardNavigationService
                 $item->label = 'News & Event';
             }
 
-            // Profile Builder is an admin-only builder label. Its public
-            // destination remains the dynamically named management folder.
-            if (Str::startsWith((string) $item->source_key, 'management_folder:') || $item->route_name === 'management') {
-                $item->label_override = 'Profile Builder';
+            // Board of Directors is the canonical live profile destination.
+            // Profile Builder remains a separate dashboard tool and is never
+            // used as the rendered label for the public management route.
+            if ($item->source_key === 'route:management' || $item->route_name === 'management') {
+                $item->label_override = null;
+                $item->label = 'Board of Directors';
             }
 
             return true;
