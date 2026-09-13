@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="{{ asset('admin-premium.css') }}?v=4">
 <link rel="stylesheet" href="{{ asset('admin-dashboard.css') }}?v=4">
 <link rel="stylesheet" href="{{ asset('admin-builder-polish.css') }}?v=4">
+<link rel="stylesheet" href="{{ asset('admin-ui-polish.css') }}?v=1">
 <script src="{{ asset('admin-documents.js') }}?v=5" defer></script>
 @endonce
 <style>
