@@ -40,7 +40,7 @@ class CmsController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        return view('admin.cms.page-builder-index', ['pages' => $pages]);
+        return view('admin.cms.index', ['pages' => $pages]);
     }
 
     public function create(): View
@@ -108,58 +108,44 @@ class CmsController extends Controller
         ]);
         $file = $data['media'];
         $path = $file->store('site-content/media', 'public');
-
-        return response()->json([
-            'url' => Storage::disk('public')->url($path),
-            'mime' => $file->getMimeType(),
-            'name' => $file->getClientOriginalName(),
-        ]);
+        return response()->json(['path' => $path, 'url' => Storage::disk('public')->url($path), 'type' => str_starts_with((string) $file->getMimeType(), 'video/') ? 'video' : 'image']);
     }
 
     private function validatePage(Request $request): array
     {
-        $data = $request->validate([
+        return $request->validate([
             'title' => ['required', 'string', 'max:180'],
-            'slug' => ['nullable', 'string', 'max:180', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
+            'slug' => ['nullable', 'string', 'max:180'],
             'excerpt' => ['nullable', 'string', 'max:1000'],
             'content' => ['nullable', 'string'],
-            'template' => ['nullable', 'string', 'max:80'],
-            'meta_title' => ['nullable', 'string', 'max:255'],
-            'meta_description' => ['nullable', 'string', 'max:1000'],
             'is_published' => ['nullable', 'boolean'],
+            'use_global_framework' => ['nullable', 'boolean'],
+            'use_global_header' => ['nullable', 'boolean'],
+            'use_global_footer' => ['nullable', 'boolean'],
         ]);
-
-        $data['use_global_framework'] = true;
-        $data['use_global_header'] = true;
-        $data['use_global_footer'] = true;
-        $data['is_published'] = $request->boolean('is_published');
-        $data['builder_blocks'] = [];
-
-        return $data;
     }
 
     private function guardPublishing(Request $request, bool $publishing): void
     {
-        abort_unless(!$publishing || $request->user()->hasPermission('cms.publish'), 403, 'Publishing pages requires publishing permission.');
+        if ($publishing) {
+            abort_unless($request->user()->hasPermission('cms.publish'), 403, 'Publishing pages requires publishing permission.');
+        }
     }
 
-    private function uniqueSlug(string $value, ?int $ignoreId = null): string
+    private function uniqueSlug(string $source, ?int $ignoreId = null): string
     {
-        $base = Str::slug($value);
-        abort_if($base === '', 422, 'A valid page slug could not be generated.');
-        $slug = $base;
+        $slug = Str::slug($source) ?: 'page';
+        $base = $slug;
         $counter = 2;
-
         while (CmsPage::where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
             $slug = $base . '-' . $counter++;
         }
-
         return $slug;
     }
 
     private function maxUploadKb(): int
     {
-        $mb = (int) SystemSetting::query()->where('key', 'uploads.content_media_max_mb')->value('value');
-        return max(1, $mb ?: (int) config('fuelfree.upload.content_media_max_mb', 100)) * 1024;
+        $value = (int) SystemSetting::query()->where('key', 'media.max_upload_kb')->value('value');
+        return max(1024, $value ?: 20480);
     }
 }
