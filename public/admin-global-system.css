@@ -13,6 +13,17 @@
   --ff-g-muted:#89a9a8;
   --ff-g-shadow:0 22px 70px rgba(0,0,0,.28);
   --ff-g-radius:18px;
+
+  /* Global card system: one reusable surface language across the admin. */
+  --ff-card-bg:linear-gradient(145deg,rgba(8,37,50,.90),rgba(3,19,27,.94));
+  --ff-card-bg-soft:linear-gradient(145deg,var(--ff-g-panel),var(--ff-g-panel-2));
+  --ff-card-border:var(--ff-g-line);
+  --ff-card-border-hover:var(--ff-g-line-strong);
+  --ff-card-radius:18px;
+  --ff-card-radius-mobile:14px;
+  --ff-card-shadow:0 10px 28px rgba(0,0,0,.18);
+  --ff-card-shadow-raised:0 22px 70px rgba(0,0,0,.28);
+  --ff-card-padding:20px;
 }
 
 /* Shared visual language for admin page headers. */
@@ -28,10 +39,24 @@
 .content :where(.primary,.pbi-primary,.add-profile,.add-btn,.save-btn,.save-tree,.btn-primary):hover{filter:brightness(1.07)!important;box-shadow:0 16px 38px rgba(20,145,105,.25)!important}
 .content :where(.secondary,.btn-secondary){background:rgba(85,217,239,.045)!important;border:1px solid rgba(85,217,239,.16)!important;color:#bfe9e7!important}
 
-/* Shared glass panels. */
-.content :where(.card,.panel,.builder-card,.section-card,.form-card,.table-card,.stat-card,.content-card,.box,.settings-card){background:linear-gradient(145deg,var(--ff-g-panel),var(--ff-g-panel-2))!important;border-color:var(--ff-g-line)!important;border-radius:var(--ff-g-radius)!important;box-shadow:var(--ff-g-shadow)!important}
-.content :where(.card,.panel,.builder-card,.section-card,.form-card,.table-card,.stat-card,.content-card,.box,.settings-card):hover{border-color:var(--ff-g-line-strong)!important}
+/* Global card system. Existing admin card families inherit the same surface, border, radius and shadow tokens. */
+.content :where(.card,.panel,.builder-card,.section-card,.form-card,.table-card,.stat-card,.content-card,.box,.settings-card,.ff-card){
+  background:var(--ff-card-bg-soft)!important;
+  border:1px solid var(--ff-card-border)!important;
+  border-radius:var(--ff-card-radius)!important;
+  box-shadow:var(--ff-card-shadow-raised)!important;
+  min-width:0;
+}
+.content :where(.card,.panel,.builder-card,.section-card,.form-card,.table-card,.stat-card,.content-card,.box,.settings-card,.ff-card):hover{border-color:var(--ff-card-border-hover)!important}
 .content :where(.card-head,.card-heading,.card-header,.panel-header) :where(h2,h3,strong){color:var(--ff-g-text)}
+
+/* Reusable card primitives for new admin surfaces. */
+.content .ff-card{overflow:hidden;position:relative;background:var(--ff-card-bg)!important}
+.content .ff-card-flat{background:transparent!important;border-color:transparent!important;box-shadow:none!important}
+.content .ff-card-body{padding:var(--ff-card-padding);min-width:0}
+.content .ff-card-media{display:block;width:100%;aspect-ratio:1/1;overflow:hidden;background:#061923}
+.content .ff-card-media img{display:block;width:100%;height:100%;object-fit:cover}
+.content .ff-card-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
 
 /* Consistent field controls and focus state. */
 .content :where(input,select,textarea){background:rgba(1,12,17,.76)!important;border-color:rgba(104,204,235,.16)!important;color:var(--ff-g-text)!important;border-radius:11px!important}
@@ -57,9 +82,10 @@
 }
 @media(max-width:620px){
   .content :where(.cards-grid,.stats-grid){grid-template-columns:1fr!important}
-  .content :where(.card,.panel,.builder-card,.section-card,.form-card,.table-card,.stat-card,.content-card,.box,.settings-card){border-radius:14px!important}
+  .content :where(.card,.panel,.builder-card,.section-card,.form-card,.table-card,.stat-card,.content-card,.box,.settings-card,.ff-card){border-radius:var(--ff-card-radius-mobile)!important}
   .content :where(input,select,textarea){min-height:46px!important}
   .content :where(.primary,.pbi-primary,.add-profile,.add-btn,.save-btn,.save-tree,.btn-primary){min-height:44px!important}
+  .content .ff-card-body{padding:16px}
 }
 @media(max-width:420px){
   .content :where(.actions,.item-actions,.row-actions,.table-actions,.form-actions,.toolbar-actions){width:100%}
