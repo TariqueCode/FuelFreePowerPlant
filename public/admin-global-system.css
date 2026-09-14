@@ -24,49 +24,33 @@
   --ff-card-padding:20px;
 }
 
-/* Shared visual language for admin page headers. */
 .content :where(.hero,.overview-hero,.pbi-header,.settings-hero,.footer-hero){position:relative;isolation:isolate}
 .content :where(.hero,.overview-hero,.settings-hero,.footer-hero){border-color:var(--ff-g-line)!important;background:radial-gradient(circle at 88% 10%,rgba(50,229,138,.10),transparent 28%),linear-gradient(145deg,rgba(8,31,39,.82),rgba(3,16,22,.72))!important;box-shadow:var(--ff-g-shadow)}
-/* Intentional full-bleed admin headers: no card shell. */
 .content .highlight-hero{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important}
 .content :where(.hero,.overview-hero,.settings-hero,.footer-hero):after{content:"";position:absolute;right:-90px;top:-120px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(85,217,239,.07),transparent 68%);pointer-events:none;z-index:-1}
 .content :where(.hero,.overview-hero,.settings-hero,.footer-hero) :where(h1,h2,p,.eyebrow){position:relative;z-index:1}
 .content :where(.hero,.overview-hero,.settings-hero,.footer-hero) .eyebrow,.content .pbi-k{color:#67e7a1!important;letter-spacing:.16em!important;font-weight:800!important}
 .content :where(.hero,.overview-hero,.settings-hero,.footer-hero) h1{font-weight:850!important;letter-spacing:-.045em!important}
-
-/* Logo-matched primary actions. */
 .content :where(.primary,.pbi-primary,.add-profile,.add-btn,.save-btn,.save-tree,.btn-primary){background:linear-gradient(135deg,#20b978 0%,#27c79d 45%,#1b9eb8 100%)!important;border:1px solid rgba(103,231,161,.28)!important;color:#f5fffb!important;box-shadow:0 12px 32px rgba(20,145,105,.18)!important;font-weight:800!important}
 .content :where(.primary,.pbi-primary,.add-profile,.add-btn,.save-btn,.save-tree,.btn-primary):hover{filter:brightness(1.07)!important;box-shadow:0 16px 38px rgba(20,145,105,.25)!important}
 .content :where(.secondary,.btn-secondary){background:rgba(85,217,239,.045)!important;border:1px solid rgba(85,217,239,.16)!important;color:#bfe9e7!important}
-
-/* Global card system. Existing admin card families inherit the same surface, border, radius and shadow tokens. */
 .content :where(.card,.panel,.builder-card,.section-card,.form-card,.table-card,.stat-card,.content-card,.box,.settings-card,.ff-card){background:var(--ff-card-bg-soft)!important;border:1px solid var(--ff-card-border)!important;border-radius:var(--ff-card-radius)!important;box-shadow:var(--ff-card-shadow-raised)!important;min-width:0}
 .content :where(.card,.panel,.builder-card,.section-card,.form-card,.table-card,.stat-card,.content-card,.box,.settings-card,.ff-card):hover{border-color:var(--ff-card-border-hover)!important}
 .content :where(.card-head,.card-heading,.card-header,.panel-header) :where(h2,h3,strong){color:var(--ff-g-text)}
-
-/* Reusable card primitives for new admin surfaces. */
 .content .ff-card{overflow:hidden;position:relative;background:var(--ff-card-bg)!important}
 .content .ff-card-flat{background:transparent!important;border-color:transparent!important;box-shadow:none!important}
 .content .ff-card-body{padding:var(--ff-card-padding);min-width:0}
 .content .ff-card-media{display:block;width:100%;aspect-ratio:1/1;overflow:hidden;background:#061923}
 .content .ff-card-media img{display:block;width:100%;height:100%;object-fit:cover}
 .content .ff-card-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
-
-/* Consistent field controls and focus state. */
 .content :where(input,select,textarea){background:rgba(1,12,17,.76)!important;border-color:rgba(104,204,235,.16)!important;color:var(--ff-g-text)!important;border-radius:11px!important}
 .content :where(input,select,textarea):focus{border-color:rgba(50,229,138,.55)!important;box-shadow:0 0 0 3px rgba(50,229,138,.08)!important}
-
-/* Touch-safe responsive grids. */
 .content :where(.field-grid,.form-grid,.settings-grid,.cards-grid,.stats-grid){min-width:0}
 .content :where(.field-grid,.form-grid,.settings-grid){grid-template-columns:repeat(2,minmax(0,1fr))}
 .content :where(.cards-grid,.stats-grid){grid-template-columns:repeat(3,minmax(0,1fr))}
 .content :where(.field-grid,.form-grid,.settings-grid,.cards-grid,.stats-grid)>*{min-width:0}
-
-/* Dense action groups never create page-level horizontal overflow. */
 .content :where(.actions,.item-actions,.row-actions,.table-actions,.form-actions,.toolbar-actions){min-width:0;display:flex;flex-wrap:wrap;gap:7px;align-items:center}
 .content :where(.actions,.item-actions,.row-actions,.table-actions,.form-actions,.toolbar-actions)>*{max-width:100%}
-
-/* Mobile/tablet: preserve hierarchy, increase tap targets, eliminate accidental overflow. */
 @media(max-width:900px){
   .content :where(.field-grid,.form-grid,.settings-grid){grid-template-columns:1fr!important}
   .content :where(.cards-grid,.stats-grid){grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -86,8 +70,35 @@
   .content :where(.actions,.item-actions,.row-actions,.table-actions,.form-actions,.toolbar-actions)>button,
   .content :where(.actions,.item-actions,.row-actions,.table-actions,.form-actions,.toolbar-actions)>a{max-width:100%}
 }
-
-/* Accessibility and motion safety. */
 @media(prefers-reduced-motion:reduce){
   .content *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+
+/* News & Event card polish: status-first information hierarchy. */
+.content .nei-card .nei-body{padding-right:150px}
+.content .nei-card .nei-top{justify-content:flex-start!important;align-items:center!important}
+.content .nei-card .nei-top>span{display:none!important}
+.content .nei-card .nei-top .status-badge{order:0!important}
+.content .nei-card .nei-body h2{margin-top:12px!important}
+
+/* Stable, touch-friendly publish switch. */
+.content .nei-card .nei-actions .publish-control{box-sizing:border-box!important;position:relative!important;display:block!important;width:54px!important;height:30px!important;min-height:30px!important;padding:0!important;border-radius:999px!important;background:#18333e!important;border:1px solid rgba(120,205,222,.26)!important;box-shadow:inset 0 1px 2px rgba(0,0,0,.28)!important;overflow:visible!important}
+.content .nei-card .nei-actions .publish-control::before{content:""!important;position:absolute!important;top:4px!important;left:4px!important;width:20px!important;height:20px!important;border-radius:50%!important;background:#c6d5d9!important;box-shadow:0 2px 6px rgba(0,0,0,.38)!important;transition:left .18s ease,background .18s ease,box-shadow .18s ease!important}
+.content .nei-card .nei-actions .publish-control::after{content:""!important;position:absolute!important;inset:0!important;border-radius:999px!important;box-shadow:none!important;pointer-events:none!important}
+.content .nei-card .nei-actions .publish-control.is-published{background:#118d62!important;border-color:rgba(72,239,167,.58)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),0 0 18px rgba(39,227,148,.12)!important}
+.content .nei-card .nei-actions .publish-control.is-published::before{left:28px!important;background:#f3fff9!important;box-shadow:0 0 12px rgba(95,255,189,.7),0 2px 6px rgba(0,0,0,.3)!important}
+.content .nei-card .nei-actions .publish-control:focus-visible{outline:2px solid rgba(85,217,239,.8)!important;outline-offset:3px!important}
+
+@media(max-width:1024px){
+  .content .nei-card .nei-body{padding-right:125px}
+}
+@media(max-width:760px){
+  .content .nei-card .nei-body{padding-right:92px}
+  .content .nei-card .nei-top .status-badge{padding:6px 9px!important}
+}
+@media(max-width:560px){
+  .content .nei-card .nei-body{padding-right:14px;padding-bottom:78px}
+  .content .nei-card .nei-top{padding-right:0}
+  .content .nei-card .nei-actions .publish-control{width:52px!important;height:30px!important}
+  .content .nei-card .nei-actions .publish-control.is-published::before{left:27px!important}
 }
