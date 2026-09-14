@@ -15,6 +15,40 @@
             return window.matchMedia('(max-width: 900px)').matches;
         }
 
+        function normalizePath(value) {
+            try {
+                var url = new URL(value, window.location.origin);
+                var path = url.pathname.replace(/\/+$/, '');
+                return path || '/';
+            } catch (error) {
+                return String(value || '').replace(/\/+$/, '') || '/';
+            }
+        }
+
+        function syncActiveNavigation() {
+            var currentPath = normalizePath(window.location.href);
+            var links = sidebar.querySelectorAll('.nav-sub a[href], .nav > a[href]');
+            var activeLink = null;
+
+            links.forEach(function (link) {
+                var linkPath = normalizePath(link.href);
+                var active = linkPath === currentPath;
+                link.classList.toggle('active', active);
+                if (active) activeLink = link;
+            });
+
+            sidebar.querySelectorAll('.nav-group').forEach(function (group) {
+                var hasActive = !!group.querySelector('a.active');
+                if (hasActive) {
+                    group.open = true;
+                    var parent = group.querySelector(':scope > .nav-parent');
+                    if (parent) parent.setAttribute('aria-expanded', 'true');
+                }
+            });
+
+            return activeLink;
+        }
+
         function restoreDrawerWithoutAnimation() {
             if (!isMobile()) return;
 
@@ -42,12 +76,9 @@
             });
         }
 
-        // Do this as early as possible so a persisted open drawer does not
-        // animate from closed -> open during every admin page navigation.
+        syncActiveNavigation();
         restoreDrawerWithoutAnimation();
 
-        // Prevent the legacy portal click-to-close handler from running on
-        // normal navigation links. Native navigation remains untouched.
         sidebar.querySelectorAll('a[href]').forEach(function (link) {
             link.addEventListener('click', function (event) {
                 if (!isMobile() || link.target === '_blank' || link.hasAttribute('download')) return;
@@ -60,8 +91,6 @@
             }, true);
         });
 
-        // There must be only one owner for details-group toggling. Prevent the
-        // legacy portal handler from toggling the same group a second time.
         sidebar.querySelectorAll('.nav-group > .nav-parent').forEach(function (parent) {
             parent.addEventListener('click', function (event) {
                 event.stopPropagation();
@@ -96,7 +125,10 @@
             }, true);
         });
 
-        window.addEventListener('pageshow', restoreDrawerWithoutAnimation);
+        window.addEventListener('pageshow', function () {
+            syncActiveNavigation();
+            restoreDrawerWithoutAnimation();
+        });
     }
 
     if (document.readyState === 'loading') {
