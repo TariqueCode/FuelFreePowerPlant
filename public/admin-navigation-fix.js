@@ -87,8 +87,56 @@
             });
         }
 
+        function syncPageBuilderCardLayout() {
+            var cards = document.querySelectorAll('.pbi-card');
+            if (!cards.length) return;
+
+            var width = window.innerWidth || document.documentElement.clientWidth || 1200;
+            var columns = width <= 420 ? 'minmax(0,1fr) 86px' : width <= 620 ? 'minmax(0,1fr) 104px' : width <= 900 ? 'minmax(0,1fr) 116px' : 'minmax(0,1fr) 128px';
+
+            cards.forEach(function (card) {
+                var icon = card.querySelector('.pbi-icon');
+                var kind = card.querySelector('.pbi-kind');
+                var excerpt = card.querySelector('.pbi-body > p');
+                var body = card.querySelector('.pbi-body');
+                var actions = card.querySelector('.pbi-actions');
+
+                if (icon) {
+                    icon.style.display = 'grid';
+                    icon.style.gridColumn = '1';
+                    icon.style.gridRow = '1';
+                    icon.style.alignSelf = 'center';
+                    icon.style.marginLeft = width <= 480 ? '9px' : width <= 720 ? '10px' : width <= 1050 ? '13px' : '16px';
+                }
+                if (kind) kind.style.display = 'none';
+                if (excerpt) excerpt.style.display = 'none';
+
+                card.style.gridTemplateColumns = columns;
+                card.style.minHeight = width <= 620 ? (width <= 420 ? '88px' : '94px') : width <= 900 ? '100px' : '104px';
+
+                if (body) {
+                    body.style.gridColumn = '1';
+                    body.style.gridRow = '1';
+                    body.style.padding = width <= 480 ? '11px 8px 11px 56px' : width <= 720 ? '14px 12px 14px 66px' : '18px 22px 18px 76px';
+                    body.style.minWidth = '0';
+                }
+
+                if (actions) {
+                    actions.style.gridColumn = '2';
+                    actions.style.gridRow = '1';
+                    actions.style.height = '100%';
+                    actions.style.display = 'flex';
+                    actions.style.alignItems = 'center';
+                    actions.style.justifyContent = 'center';
+                    actions.style.gap = width <= 420 ? '6px' : width <= 620 ? '7px' : '12px';
+                    actions.style.padding = width <= 420 ? '0 6px' : width <= 620 ? '0 7px' : '0 12px';
+                }
+            });
+        }
+
         syncActiveNavigation();
         restoreDrawerWithoutAnimation();
+        syncPageBuilderCardLayout();
 
         sidebar.querySelectorAll('a[href]').forEach(function (link) {
             link.addEventListener('click', function (event) {
@@ -136,9 +184,11 @@
             }, true);
         });
 
+        window.addEventListener('resize', syncPageBuilderCardLayout);
         window.addEventListener('pageshow', function () {
             syncActiveNavigation();
             restoreDrawerWithoutAnimation();
+            syncPageBuilderCardLayout();
         });
     }
 
