@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Http\Controllers\Admin\DocumentController;
+use App\Http\Controllers\Admin\NewsEventController;
 use App\Http\Controllers\Admin\ResilientDocumentController;
 use App\Models\SystemSetting;
 use Illuminate\Support\Facades\Blade;
@@ -32,6 +33,10 @@ class AppServiceProvider extends ServiceProvider
 
         $router = $this->app['router'];
         $this->app->booted(function () use ($router): void {
+            $router->get('/admin/news-and-Event', [NewsEventController::class, 'index'])
+                ->middleware(['web', 'auth', 'permission:website.view'])
+                ->name('admin.news_and_event');
+
             $router->get('/admin/documents/folders/{folder}', [ResilientDocumentController::class, 'legacyFolderUrl'])
                 ->whereNumber('folder')
                 ->middleware(['web', 'auth', 'permission:documents.view'])
