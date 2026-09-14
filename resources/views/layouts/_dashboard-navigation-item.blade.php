@@ -4,47 +4,186 @@
 <link rel="stylesheet" href="{{ asset('admin-builder-polish.css') }}?v=4">
 <link rel="stylesheet" href="{{ asset('admin-ui-polish.css') }}?v=1">
 <link rel="stylesheet" href="{{ asset('admin-global-system.css') }}?v=1">
-<style>.sidebar.nav-state-restoring,.sidebar.nav-state-restoring *{transition:none!important}</style>
+<style>
+/* FuelFree PowerPlant — canonical admin navigation system.
+   One visual language, route-aware active state, zero-motion, responsive. */
+.sidebar .nav>a,
+.sidebar .nav-parent{
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-height:44px!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:11px!important;
+    padding:9px 11px!important;
+    border:1px solid transparent!important;
+    border-radius:11px!important;
+    background:transparent!important;
+    color:#89a9a8!important;
+    text-decoration:none!important;
+    font-size:14px!important;
+    font-weight:600!important;
+    line-height:1.2!important;
+    white-space:nowrap!important;
+    text-align:left!important;
+    cursor:pointer!important;
+    transform:none!important;
+    transition:none!important;
+    animation:none!important;
+}
+.sidebar .nav>a:hover,
+.sidebar .nav-parent:hover{
+    background:rgba(50,229,138,.055)!important;
+    border-color:rgba(85,217,239,.10)!important;
+    color:#eefcf8!important;
+    transform:none!important;
+}
+.sidebar .nav>a.active{
+    background:linear-gradient(100deg,rgba(50,229,138,.18),rgba(85,217,239,.075))!important;
+    border-color:rgba(50,229,138,.23)!important;
+    color:#f3fffb!important;
+    font-weight:800!important;
+    box-shadow:inset 3px 0 0 #32e58a!important;
+}
+.sidebar .nav-icon{
+    width:22px!important;
+    height:22px!important;
+    display:grid!important;
+    place-items:center!important;
+    flex:0 0 22px!important;
+    color:#66a8a7!important;
+}
+.sidebar .nav>a.active .nav-icon,
+.sidebar .nav>a:hover .nav-icon,
+.sidebar .nav-group[open]>.nav-parent .nav-icon{
+    color:#79ffb5!important;
+}
+.sidebar .nav-icon i{font-size:15px!important;line-height:1!important}
+.nav-group{margin:2px 0 4px!important}
+.nav-group summary{list-style:none!important}
+.nav-group summary::-webkit-details-marker{display:none!important}
+.nav-group[open]>.nav-parent{
+    background:rgba(50,229,138,.065)!important;
+    border-color:rgba(50,229,138,.13)!important;
+    color:#eefcf8!important;
+    box-shadow:none!important;
+}
+.nav-group[open]>.nav-parent .nav-chevron{transform:rotate(180deg)!important}
+.nav-parent>span:nth-child(2){
+    min-width:0!important;
+    flex:1!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+}
+.nav-chevron{
+    flex:0 0 auto!important;
+    font-size:9px!important;
+    transform:none!important;
+    transition:none!important;
+    animation:none!important;
+}
+.nav-sub{
+    display:none;
+    margin:3px 0 6px 33px!important;
+    padding-left:9px!important;
+    border-left:1px solid rgba(85,217,239,.13)!important;
+}
+.nav-group[open]>.nav-sub{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:2px!important;
+}
+.nav-sub a{
+    min-width:0!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:9px!important;
+    min-height:37px!important;
+    padding:8px 9px!important;
+    border:1px solid transparent!important;
+    border-radius:9px!important;
+    color:#789b9a!important;
+    background:transparent!important;
+    text-decoration:none!important;
+    font-size:12px!important;
+    font-weight:550!important;
+    line-height:1.2!important;
+    white-space:nowrap!important;
+    transform:none!important;
+    transition:none!important;
+    animation:none!important;
+}
+.nav-sub a:hover{
+    background:rgba(50,229,138,.055)!important;
+    border-color:rgba(85,217,239,.08)!important;
+    color:#eafcf7!important;
+}
+.nav-sub a.active{
+    background:linear-gradient(100deg,rgba(50,229,138,.18),rgba(85,217,239,.075))!important;
+    border-color:rgba(50,229,138,.22)!important;
+    color:#f3fffb!important;
+    font-weight:800!important;
+    box-shadow:inset 2px 0 0 #32e58a!important;
+}
+.nav-sub a.active .nav-icon{color:#79ffb5!important}
+.nav-sub a .nav-icon{width:18px!important;height:18px!important;flex-basis:18px!important}
+.nav-sub a .nav-icon i{font-size:13px!important}
+.nav-label{
+    user-select:none!important;
+    padding:9px 9px 3px!important;
+    color:#527776!important;
+    font-size:9px!important;
+    font-weight:800!important;
+    letter-spacing:.14em!important;
+}
+.nav-parent:focus-visible,
+.nav-sub a:focus-visible,
+.nav>a:focus-visible,
+.profile-trigger:focus-visible,
+.mobile-menu-toggle:focus-visible{
+    outline:2px solid #55d9ef!important;
+    outline-offset:2px!important;
+}
+/* No motion: fast, deterministic navigation. */
+.sidebar,
+.sidebar *,
+.mobile-drawer-backdrop,
+.mobile-menu-toggle,
+.profile-trigger{
+    animation:none!important;
+    transition:none!important;
+}
+@media(max-width:900px){
+    .sidebar .nav>a,
+    .sidebar .nav-parent{
+        min-height:46px!important;
+        font-size:15px!important;
+    }
+    .nav-sub{margin-left:27px!important}
+    .nav-sub a{min-height:39px!important;padding:10px 9px!important;font-size:13px!important}
+}
+@media(max-width:520px){
+    .sidebar{width:min(86vw,292px)!important}
+    .sidebar .nav>a,
+    .sidebar .nav-parent{font-size:15px!important}
+    .nav-sub a{font-size:13px!important}
+}
+@media(prefers-reduced-motion:reduce){
+    .sidebar,.sidebar *,.mobile-drawer-backdrop{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
 <script src="{{ asset('admin-documents.js') }}?v=6" defer></script>
 <script src="{{ asset('admin-navigation-fix.js') }}?v=4" defer></script>
 @endonce
-<style>
-.sidebar .nav>a,
-.sidebar .nav-parent{box-sizing:border-box;width:100%;min-height:44px;display:flex!important;align-items:center;gap:11px;padding:9px 11px;border:1px solid transparent;border-radius:12px;background:transparent;color:var(--muted);text-decoration:none;font-size:15px!important;font-weight:500;line-height:1.2;white-space:nowrap;text-align:left;cursor:pointer}
-.sidebar .nav>a:hover,
-.sidebar .nav-parent:hover{background:rgba(67,194,229,.055);border-color:rgba(104,204,235,.07);color:#d9f1f5}
-.sidebar .nav>a.active{background:linear-gradient(90deg,rgba(67,194,229,.13),rgba(67,194,229,.045));border-color:rgba(104,204,235,.11);color:var(--text);box-shadow:inset 3px 0 0 #49c8e6}
-.sidebar .nav-icon{width:22px!important;height:22px;display:grid!important;place-items:center;flex:0 0 22px;color:#6e9fac}
-.sidebar .nav>a.active .nav-icon,
-.sidebar .nav>a:hover .nav-icon,
-.sidebar .nav-group[open]>.nav-parent .nav-icon{color:#72d8ef!important}
-.sidebar .nav-icon i{font-size:15px!important;line-height:1}
-.nav-group{margin:2px 0 4px}
-.nav-group summary{list-style:none}
-.nav-group summary::-webkit-details-marker{display:none}
-.nav-group[open]>.nav-parent{background:rgba(67,194,229,.055);border-color:rgba(104,204,235,.07);color:#d9f1f5}
-.nav-group[open]>.nav-parent .nav-icon{color:#79ffb5!important}
-.nav-group[open]>.nav-parent .nav-chevron{transform:rotate(180deg)}
-.nav-parent>span:nth-child(2){min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nav-chevron{flex:0 0 auto;font-size:10px!important;transition:transform .18s}
-.nav-sub{display:none;margin:2px 0 5px 33px;padding-left:8px;border-left:1px solid rgba(104,204,235,.11)}
-.nav-group[open]>.nav-sub{display:flex;flex-direction:column;gap:2px}
-.nav-sub a{min-width:0;display:flex!important;align-items:center;gap:10px;padding:8px 9px;border-radius:8px;color:#7898a5;text-decoration:none;font-size:14px!important;line-height:1.2;white-space:nowrap}
-.nav-sub a:hover,.nav-sub a.active{color:#eaf8fb;background:rgba(67,194,229,.07)}
-.nav-sub a .nav-icon{width:18px!important;height:18px;flex-basis:18px}
-.nav-sub a .nav-icon i{font-size:13px!important}
-.nav-label{user-select:none;padding:9px 9px 3px;color:#4f7180;font-size:10px!important;font-weight:700;letter-spacing:.13em}
-.nav-parent:focus-visible,.nav-sub a:focus-visible,.nav>a:focus-visible,.profile-trigger:focus-visible,.mobile-menu-toggle:focus-visible{outline:2px solid #61d8f1;outline-offset:2px}
-@media(max-width:900px){
-    .sidebar .nav>a,.sidebar .nav-parent{font-size:16px!important;min-height:46px}
-    .nav-sub{margin-left:27px}
-    .nav-sub a{padding:10px 9px;font-size:14px!important}
-}
-</style>
 @php
 $hasChildren=$item->children->isNotEmpty();
 $matchesCurrent=function ($candidate): bool {
-    if ($candidate->route_name && request()->routeIs($candidate->route_name)) return true;
+    if ($candidate->route_name) {
+        $routeName=(string) $candidate->route_name;
+        if (request()->routeIs($routeName)) return true;
+        if (str_ends_with($routeName,'.index') && request()->routeIs(substr($routeName,0,-6).'*')) return true;
+    }
     return rtrim(request()->fullUrl(), '/') === rtrim(url((string) $candidate->url), '/');
 };
 $isActive=!$hasChildren && $matchesCurrent($item);
