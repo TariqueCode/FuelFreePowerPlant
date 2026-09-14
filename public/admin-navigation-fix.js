@@ -146,10 +146,57 @@
             });
         }
 
+        function syncPageBuilderRibbon() {
+            if (!window.location.pathname.match(/^\/admin\/page-builder(?:\/|$)/)) return;
+
+            var editor = document.querySelector('.gcp-editor-card .ff-cms-editor');
+            if (!editor) return;
+            var ribbon = editor.querySelector('.ff-ribbon');
+            if (!ribbon) return;
+
+            var editorRect = editor.getBoundingClientRect();
+            var ribbonRect = ribbon.getBoundingClientRect();
+            var stickyTop = 0;
+            var shouldPin = ribbonRect.top <= stickyTop && editorRect.bottom > ribbonRect.height;
+
+            if (shouldPin) {
+                if (!ribbon.classList.contains('ff-viewport-pinned')) {
+                    var placeholder = ribbon.parentElement && ribbon.parentElement.querySelector('.ff-ribbon-placeholder');
+                    if (!placeholder) {
+                        placeholder = document.createElement('div');
+                        placeholder.className = 'ff-ribbon-placeholder';
+                        placeholder.setAttribute('aria-hidden', 'true');
+                        ribbon.parentElement.insertBefore(placeholder, ribbon);
+                    }
+                    placeholder.style.height = ribbon.offsetHeight + 'px';
+                    ribbon.classList.add('ff-viewport-pinned');
+                }
+
+                var rect = editor.getBoundingClientRect();
+                ribbon.style.setProperty('position', 'fixed', 'important');
+                ribbon.style.setProperty('top', '0px', 'important');
+                ribbon.style.setProperty('left', rect.left + 'px', 'important');
+                ribbon.style.setProperty('width', rect.width + 'px', 'important');
+                ribbon.style.setProperty('z-index', '2000', 'important');
+            } else {
+                if (ribbon.classList.contains('ff-viewport-pinned')) {
+                    var placeholder = ribbon.parentElement && ribbon.parentElement.querySelector('.ff-ribbon-placeholder');
+                    if (placeholder) placeholder.remove();
+                    ribbon.classList.remove('ff-viewport-pinned');
+                }
+                ribbon.style.removeProperty('position');
+                ribbon.style.removeProperty('top');
+                ribbon.style.removeProperty('left');
+                ribbon.style.removeProperty('width');
+                ribbon.style.removeProperty('z-index');
+            }
+        }
+
         removePageBuilderFrameworkCard();
         syncActiveNavigation();
         restoreDrawerWithoutAnimation();
         syncPageBuilderCardLayout();
+        syncPageBuilderRibbon();
 
         sidebar.querySelectorAll('a[href]').forEach(function (link) {
             link.addEventListener('click', function (event) {
@@ -197,13 +244,21 @@
             }, true);
         });
 
-        window.addEventListener('resize', syncPageBuilderCardLayout);
+        window.addEventListener('resize', function () {
+            syncPageBuilderCardLayout();
+            syncPageBuilderRibbon();
+        });
+        window.addEventListener('scroll', syncPageBuilderRibbon, { passive: true });
         window.addEventListener('pageshow', function () {
             removePageBuilderFrameworkCard();
             syncActiveNavigation();
             restoreDrawerWithoutAnimation();
             syncPageBuilderCardLayout();
+            syncPageBuilderRibbon();
         });
+
+        window.setTimeout(syncPageBuilderRibbon, 100);
+        window.setTimeout(syncPageBuilderRibbon, 500);
     }
 
     if (document.readyState === 'loading') {
