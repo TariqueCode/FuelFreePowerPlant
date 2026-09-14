@@ -27,9 +27,9 @@ class NavigationSourceRegistry
     ];
 
     /** Request-local indexes prevent repeated full route scans during admin navigation rendering. */
-    private static array $routeIndex = [];
-    private static array $canonicalCmsCache = [];
-    private static ?bool $aboutPagePublished = null;
+    private array $routeIndex = [];
+    private array $canonicalCmsCache = [];
+    private ?bool $aboutPagePublished = null;
 
     public function available(string $area = 'public', string $menu = 'main'): Collection
     {
@@ -103,16 +103,16 @@ class NavigationSourceRegistry
 
     private function routeByName(string $name): ?Route
     {
-        if (! array_key_exists($name, self::$routeIndex)) {
-            if (self::$routeIndex === []) {
-                self::$routeIndex = collect(RouteFacade::getRoutes()->getRoutes())
+        if (! array_key_exists($name, $this->routeIndex)) {
+            if ($this->routeIndex === []) {
+                $this->routeIndex = collect(RouteFacade::getRoutes()->getRoutes())
                     ->filter(fn (Route $route): bool => is_string($route->getName()) && $route->getName() !== '')
                     ->keyBy(fn (Route $route): string => (string) $route->getName())
                     ->all();
             }
         }
 
-        return self::$routeIndex[$name] ?? null;
+        return $this->routeIndex[$name] ?? null;
     }
 
     private function eligibleRoute(Route $route, string $area): bool
@@ -138,7 +138,7 @@ class NavigationSourceRegistry
 
     private function aboutPageIsPublished(): bool
     {
-        return self::$aboutPagePublished ??= CmsPage::query()->where('slug', 'about-us')->where('is_published', true)->exists();
+        return $this->aboutPagePublished ??= CmsPage::query()->where('slug', 'about-us')->where('is_published', true)->exists();
     }
 
     private function hasCanonicalCmsPage(Route $route, string $area): bool { return $this->canonicalCmsPageForRoute((string) $route->getName(), $area) !== null; }
@@ -146,16 +146,16 @@ class NavigationSourceRegistry
     private function canonicalCmsPageForRoute(string $name, string $area): ?array
     {
         if ($area !== 'public') return null;
-        if (array_key_exists($name, self::$canonicalCmsCache)) return self::$canonicalCmsCache[$name];
+        if (array_key_exists($name, $this->canonicalCmsCache)) return $this->canonicalCmsCache[$name];
 
         $route = $this->routeByName($name);
-        if (! $route || ! $this->eligibleRoute($route, $area)) return self::$canonicalCmsCache[$name] = null;
+        if (! $route || ! $this->eligibleRoute($route, $area)) return $this->canonicalCmsCache[$name] = null;
         $slug = ltrim($route->uri(), '/');
-        if ($slug === '' || str_contains($slug, '/') || str_contains($slug, '{')) return self::$canonicalCmsCache[$name] = null;
+        if ($slug === '' || str_contains($slug, '/') || str_contains($slug, '{')) return $this->canonicalCmsCache[$name] = null;
         $page = CmsPage::query()->where('slug', $slug)->where('is_published', true)->first();
         if (! $page && $name === 'site.about') $page = CmsPage::query()->where('slug', 'about-us')->where('is_published', true)->first();
-        if (! $page || ! $this->isUsableNavigationLabel((string) $page->title)) return self::$canonicalCmsCache[$name] = null;
-        return self::$canonicalCmsCache[$name] = ['key' => 'cms_page:'.$page->id, 'type' => 'cms_page', 'label' => (string) $page->title,
+        if (! $page || ! $this->isUsableNavigationLabel((string) $page->title)) return $this->canonicalCmsCache[$name] = null;
+        return $this->canonicalCmsCache[$name] = ['key' => 'cms_page:'.$page->id, 'type' => 'cms_page', 'label' => (string) $page->title,
             'url' => route('cms.page', ['slug' => $page->slug]), 'route_name' => 'cms.page', 'area' => 'public', 'permission' => null,
             'meta' => ['cms_page_id' => $page->id, 'slug' => $page->slug]];
     }
