@@ -1,8 +1,8 @@
 @extends('layouts.portal')
 @section('title','Highlights')
 @section('content')
-<section class="hero highlight-hero">
-    <div>
+<section class="highlight-hero">
+    <div class="highlight-hero-copy">
         <span class="eyebrow">PUBLIC WEBSITE CONTROL</span>
         <h1>Highlights</h1>
         <p>Manage the homepage banners visitors see first. Schedule them, set an auto-close timer, or let visitors close them manually.</p>
@@ -68,21 +68,30 @@
 
 @push('styles')
 <style>
-/* Highlights: clean responsive management layout. Keep the item structure intact while removing the hero card treatment. */
+/* Highlights page: intentionally does not use the shared .hero card shell. */
 .highlight-hero{
-    margin-bottom:18px!important;
+    width:100%;
+    margin:0 0 20px!important;
+    padding:0!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:22px;
+    align-items:end;
     background:transparent!important;
     border:0!important;
     box-shadow:none!important;
     border-radius:0!important;
-    padding:0!important;
+    min-height:0!important;
 }
-.highlight-hero > div:first-child{min-width:0}
-.highlight-header-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:stretch;margin-bottom:10px;min-width:0}
-.highlight-header-actions .primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:auto;min-width:0;border:0;border-radius:11px;padding:11px 15px;background:linear-gradient(135deg,#25abc9,#1687a4);color:#fff;text-decoration:none;font-size:10px;font-weight:800;white-space:nowrap}
+.highlight-hero-copy{min-width:0;max-width:900px}
+.highlight-hero .eyebrow{display:inline-block;margin:0 0 8px;color:#61e1aa;font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+.highlight-hero h1{margin:0;color:var(--text);font-size:clamp(30px,3.2vw,48px);line-height:1.1}
+.highlight-hero p{margin:12px 0 0;max-width:900px;color:#8eabb5;font-size:16px;line-height:1.6}
+.highlight-header-actions{display:grid;grid-template-columns:minmax(210px,1fr) auto;gap:10px;align-items:stretch;min-width:min(100%,390px)}
+.highlight-header-actions .primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;min-width:0;min-height:46px;border:1px solid rgba(104,221,239,.18);border-radius:11px;padding:11px 15px;background:linear-gradient(135deg,#25c488,#1db6cf);color:#fff;text-decoration:none;font-size:13px;font-weight:800;white-space:nowrap}
 .highlight-header-actions .primary i{font-size:12px;color:#fff}
-.highlight-header-actions .profile-count{display:flex;align-items:center;justify-content:center;gap:5px;min-width:100px;padding:0 15px;border:1px solid var(--line);border-radius:14px;background:rgba(67,194,229,.035);color:#7f9ba5;font-size:10px;white-space:nowrap}
-.highlight-header-actions .profile-count strong{font-size:16px;color:#eaf8fb}
+.highlight-header-actions .profile-count{display:flex;align-items:center;justify-content:center;gap:5px;min-width:104px;min-height:46px;padding:0 15px;border:1px solid var(--line);border-radius:13px;background:rgba(67,194,229,.035);color:#7f9ba5;font-size:11px;white-space:nowrap}
+.highlight-header-actions .profile-count strong{font-size:18px;color:#eaf8fb}
 .highlight-list{display:grid;grid-template-columns:1fr;gap:14px;min-width:0}
 .highlight-card{position:relative;display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 88px;min-height:190px;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,rgba(8,37,50,.9),rgba(3,19,27,.94));transition:transform .2s,border-color .2s,box-shadow .2s;min-width:0}
 .highlight-card:hover{transform:translateY(-2px);border-color:rgba(72,216,241,.38);box-shadow:0 10px 28px rgba(0,0,0,.18)}
@@ -96,9 +105,9 @@
 .meta-row{display:flex;flex-wrap:wrap;gap:10px 22px;color:#7898a2;font-size:10px;line-height:1.45;min-width:0}.meta-row span{display:flex;align-items:flex-start;gap:6px;min-width:0;overflow-wrap:anywhere}.meta-row i{color:#58cfe7;width:11px;min-width:11px;margin-top:1px}
 .highlight-actions{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-left:1px solid rgba(116,221,239,.1);padding:10px;min-width:0}.highlight-actions form{margin:0;width:100%;display:flex;justify-content:center}.toggle-btn,.delete-btn{width:40px;height:40px;box-sizing:border-box;border:1px solid;cursor:pointer;display:grid;place-items:center;border-radius:11px}.toggle-btn{padding:0;background:rgba(72,216,241,.06);border-color:rgba(72,216,241,.18)}.toggle-btn.active{background:rgba(67,194,137,.08);border-color:rgba(67,194,137,.24)}.toggle-btn.inactive{background:rgba(72,216,241,.06);border-color:rgba(72,216,241,.18)}.toggle-btn:hover{transform:translateY(-1px);filter:brightness(1.08)}.toggle-track{position:relative;width:24px;height:14px;border-radius:999px;background:#405962;display:block;transition:background .18s ease}.toggle-knob{position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:#b3c4c8;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .18s ease,background .18s ease}.toggle-btn.active .toggle-track{background:#32b985}.toggle-btn.active .toggle-knob{left:12px;background:#effff8}.delete-btn{padding:0;background:rgba(255,93,113,.045);border-color:rgba(255,93,113,.14);color:#ff9eaa;font-size:13px}.delete-btn:hover{background:rgba(255,93,113,.11);border-color:rgba(255,93,113,.24)}
 .empty-state{grid-column:1/-1;display:flex;align-items:center;gap:14px;padding:18px 20px;border:1px solid var(--line);border-radius:16px;background:rgba(8,37,50,.38);color:#7898a2}.empty-icon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:12px;background:rgba(72,216,241,.08);color:#58cfe7;font-size:18px}.empty-copy{display:flex;flex-direction:column;gap:3px}.empty-copy strong{color:var(--text);font-size:14px}.empty-copy span{font-size:9px;line-height:1.45}.pagination{margin-top:14px}
-@media(max-width:1180px){.highlight-card{grid-template-columns:minmax(0,170px) minmax(0,1fr) 76px;min-height:170px}.highlight-media{width:170px;height:170px;flex-basis:170px}.highlight-content{padding:16px}.highlight-content h2{font-size:17px}.meta-row{font-size:9px}.highlight-actions{padding:8px}}
-@media(max-width:900px){.highlight-card{grid-template-columns:minmax(0,150px) minmax(0,1fr) 70px;min-height:150px}.highlight-media{width:150px;height:150px;flex-basis:150px}.highlight-content{padding:13px}.highlight-content h2{font-size:15px}.meta-row{flex-direction:column;gap:6px}}
-@media(max-width:600px){.highlight-hero{margin-bottom:12px!important}.highlight-header-actions{gap:8px;grid-template-columns:minmax(0,1fr) auto}.highlight-header-actions .primary{width:auto;min-width:0}.highlight-list{gap:10px}.highlight-card{grid-template-columns:minmax(0,104px) minmax(0,1fr) 74px;min-height:104px;border-radius:14px}.highlight-media{width:104px;height:104px;min-width:104px;min-height:104px;aspect-ratio:1/1;align-self:start}.highlight-content{padding:11px 10px}.highlight-content h2{font-size:14px;margin:7px 0 6px}.status,.link-type{font-size:7px}.status{padding:4px 6px}.meta-row{font-size:8px;gap:4px}.highlight-actions{padding:6px;gap:5px}.toggle-btn,.delete-btn{width:32px;height:32px;border-radius:9px}.toggle-track{width:18px;height:11px}.toggle-knob{width:7px;height:7px;top:2px;left:2px}.toggle-btn.active .toggle-knob{left:9px}.delete-btn{font-size:12px}.highlight-header-actions .profile-count{min-height:44px;padding:0 13px}.highlight-header-actions .profile-count strong{font-size:15px}.highlight-header-actions .profile-count span{font-size:10px}.empty-state{padding:13px 14px;border-radius:14px;gap:11px}.empty-icon{width:36px;height:36px;flex-basis:36px;border-radius:10px;font-size:15px}.empty-copy strong{font-size:12px}.empty-copy span{font-size:8px}}
+@media(max-width:1180px){.highlight-hero{grid-template-columns:minmax(0,1fr);gap:14px}.highlight-header-actions{max-width:600px}.highlight-card{grid-template-columns:minmax(0,170px) minmax(0,1fr) 76px;min-height:170px}.highlight-media{width:170px;height:170px;flex-basis:170px}.highlight-content{padding:16px}.highlight-content h2{font-size:17px}.meta-row{font-size:9px}.highlight-actions{padding:8px}}
+@media(max-width:900px){.highlight-header-actions{grid-template-columns:minmax(0,1fr) auto}.highlight-card{grid-template-columns:minmax(0,150px) minmax(0,1fr) 70px;min-height:150px}.highlight-media{width:150px;height:150px;flex-basis:150px}.highlight-content{padding:13px}.highlight-content h2{font-size:15px}.meta-row{flex-direction:column;gap:6px}}
+@media(max-width:600px){.highlight-hero{margin-bottom:14px!important;gap:12px}.highlight-hero .eyebrow{font-size:10px}.highlight-hero h1{font-size:32px}.highlight-hero p{font-size:14px;line-height:1.5;margin-top:9px}.highlight-header-actions{gap:8px;grid-template-columns:minmax(0,1fr) auto}.highlight-header-actions .primary{min-height:44px;font-size:12px}.highlight-header-actions .profile-count{min-width:92px;min-height:44px;padding:0 12px;font-size:10px}.highlight-header-actions .profile-count strong{font-size:15px}.highlight-list{gap:10px}.highlight-card{grid-template-columns:minmax(0,104px) minmax(0,1fr) 74px;min-height:104px;border-radius:14px}.highlight-media{width:104px;height:104px;min-width:104px;min-height:104px;aspect-ratio:1/1;align-self:start}.highlight-content{padding:11px 10px}.highlight-content h2{font-size:14px;margin:7px 0 6px}.status,.link-type{font-size:7px}.status{padding:4px 6px}.meta-row{font-size:8px;gap:4px}.highlight-actions{padding:6px;gap:5px}.toggle-btn,.delete-btn{width:32px;height:32px;border-radius:9px}.toggle-track{width:18px;height:11px}.toggle-knob{width:7px;height:7px;top:2px;left:2px}.toggle-btn.active .toggle-knob{left:9px}.delete-btn{font-size:12px}.empty-state{padding:13px 14px;border-radius:14px;gap:11px}.empty-icon{width:36px;height:36px;flex-basis:36px;border-radius:10px;font-size:15px}.empty-copy strong{font-size:12px}.empty-copy span{font-size:8px}}
 @media(max-width:380px){.highlight-header-actions{gap:6px}.highlight-header-actions .profile-count{min-width:84px;padding:0 10px}.highlight-card{grid-template-columns:minmax(0,96px) minmax(0,1fr) 68px;min-height:96px}.highlight-media{width:96px;height:96px;min-height:96px}.highlight-content{padding:10px 8px}.highlight-content h2{font-size:13px}.meta-row{font-size:7px}.toggle-btn,.delete-btn{width:30px;height:30px}.toggle-track{width:17px;height:10px}.toggle-knob{width:6px;height:6px}.toggle-btn.active .toggle-knob{left:9px}}
 </style>
 @endpush
