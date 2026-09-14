@@ -87,6 +87,12 @@
             });
         }
 
+        function removePageBuilderFrameworkCard() {
+            document.querySelectorAll('.pbi-framework').forEach(function (card) {
+                card.remove();
+            });
+        }
+
         function syncPageBuilderCardLayout() {
             var cards = document.querySelectorAll('.pbi-card');
             if (!cards.length) return;
@@ -102,38 +108,39 @@
                 var actions = card.querySelector('.pbi-actions');
 
                 if (icon) {
-                    icon.style.display = 'grid';
-                    icon.style.gridColumn = '1';
-                    icon.style.gridRow = '1';
-                    icon.style.alignSelf = 'center';
-                    icon.style.marginLeft = width <= 480 ? '9px' : width <= 720 ? '10px' : width <= 1050 ? '13px' : '16px';
+                    icon.style.setProperty('display', 'grid', 'important');
+                    icon.style.setProperty('grid-column', '1', 'important');
+                    icon.style.setProperty('grid-row', '1', 'important');
+                    icon.style.setProperty('align-self', 'center', 'important');
+                    icon.style.setProperty('margin-left', width <= 480 ? '9px' : width <= 720 ? '10px' : width <= 1050 ? '13px' : '16px', 'important');
                 }
-                if (kind) kind.style.display = 'none';
-                if (excerpt) excerpt.style.display = 'none';
+                if (kind) kind.style.setProperty('display', 'none', 'important');
+                if (excerpt) excerpt.style.setProperty('display', 'none', 'important');
 
-                card.style.gridTemplateColumns = columns;
-                card.style.minHeight = width <= 620 ? (width <= 420 ? '88px' : '94px') : width <= 900 ? '100px' : '104px';
+                card.style.setProperty('grid-template-columns', columns, 'important');
+                card.style.setProperty('min-height', width <= 620 ? (width <= 420 ? '88px' : '94px') : width <= 900 ? '100px' : '104px', 'important');
 
                 if (body) {
-                    body.style.gridColumn = '1';
-                    body.style.gridRow = '1';
-                    body.style.padding = width <= 480 ? '11px 8px 11px 56px' : width <= 720 ? '14px 12px 14px 66px' : '18px 22px 18px 76px';
-                    body.style.minWidth = '0';
+                    body.style.setProperty('grid-column', '1', 'important');
+                    body.style.setProperty('grid-row', '1', 'important');
+                    body.style.setProperty('padding', width <= 480 ? '11px 8px 11px 56px' : width <= 720 ? '14px 12px 14px 66px' : '18px 22px 18px 76px', 'important');
+                    body.style.setProperty('min-width', '0', 'important');
                 }
 
                 if (actions) {
-                    actions.style.gridColumn = '2';
-                    actions.style.gridRow = '1';
-                    actions.style.height = '100%';
-                    actions.style.display = 'flex';
-                    actions.style.alignItems = 'center';
-                    actions.style.justifyContent = 'center';
-                    actions.style.gap = width <= 420 ? '6px' : width <= 620 ? '7px' : '12px';
-                    actions.style.padding = width <= 420 ? '0 6px' : width <= 620 ? '0 7px' : '0 12px';
+                    actions.style.setProperty('grid-column', '2', 'important');
+                    actions.style.setProperty('grid-row', '1', 'important');
+                    actions.style.setProperty('height', '100%', 'important');
+                    actions.style.setProperty('display', 'flex', 'important');
+                    actions.style.setProperty('align-items', 'center', 'important');
+                    actions.style.setProperty('justify-content', 'center', 'important');
+                    actions.style.setProperty('gap', width <= 420 ? '6px' : width <= 620 ? '7px' : '12px', 'important');
+                    actions.style.setProperty('padding', width <= 420 ? '0 6px' : width <= 620 ? '0 7px' : '0 12px', 'important');
                 }
             });
         }
 
+        removePageBuilderFrameworkCard();
         syncActiveNavigation();
         restoreDrawerWithoutAnimation();
         syncPageBuilderCardLayout();
@@ -186,6 +193,7 @@
 
         window.addEventListener('resize', syncPageBuilderCardLayout);
         window.addEventListener('pageshow', function () {
+            removePageBuilderFrameworkCard();
             syncActiveNavigation();
             restoreDrawerWithoutAnimation();
             syncPageBuilderCardLayout();
