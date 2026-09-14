@@ -1,3 +1,27 @@
+@once
+<style>
+@media(max-width:700px){
+    .content .menu-card-top{display:grid!important;grid-template-columns:22px 30px minmax(0,1fr) auto 34px!important;align-items:center!important;gap:7px!important}
+    .content .menu-card-title{display:contents!important}
+    .content .drag-handle{grid-column:1!important;grid-row:1!important;width:22px!important;height:28px!important;padding:3px!important;display:grid!important;place-items:center!important;flex:0 0 22px!important}
+    .content .type-icon{grid-column:2!important;grid-row:1!important;width:28px!important;height:28px!important}
+    .content .menu-card-name{grid-column:3!important;grid-row:1!important;display:block!important;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:16px!important;line-height:1.25!important}
+    .content .menu-card-title .type-pill{grid-column:4!important;grid-row:1!important;white-space:nowrap!important;font-size:7px!important;padding:3px 5px!important}
+    .content .item-actions{grid-column:5!important;grid-row:1!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:0!important;min-width:34px!important;flex:0 0 34px!important}
+    .content .rename-btn{width:28px!important;height:28px!important;display:grid!important;place-items:center!important;margin:0!important}
+    .content .move-btn{display:none!important}
+}
+@media(max-width:420px){
+    .content .menu-card-top{grid-template-columns:20px 27px minmax(0,1fr) auto 30px!important;gap:5px!important}
+    .content .drag-handle{width:20px!important;height:26px!important;flex-basis:20px!important}
+    .content .type-icon{width:26px!important;height:26px!important}
+    .content .menu-card-name{font-size:15px!important}
+    .content .menu-card-title .type-pill{font-size:6.5px!important;padding:3px 4px!important}
+    .content .item-actions{min-width:30px!important;flex-basis:30px!important}
+    .content .rename-btn{width:26px!important;height:26px!important}
+}
+</style>
+@endonce
 @php
     $isLegacyBoardFolder = $item->source_type === 'folder' && str_starts_with((string) $item->source_key, 'management_folder:');
     $isFolder = $item->source_type === 'folder' && ! $isLegacyBoardFolder;
