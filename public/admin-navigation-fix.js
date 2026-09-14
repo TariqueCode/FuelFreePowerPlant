@@ -98,7 +98,13 @@
             if (!cards.length) return;
 
             var width = window.innerWidth || document.documentElement.clientWidth || 1200;
-            var columns = width <= 420 ? 'minmax(0,1fr) 86px' : width <= 620 ? 'minmax(0,1fr) 104px' : width <= 900 ? 'minmax(0,1fr) 116px' : 'minmax(0,1fr) 128px';
+            var columns = width <= 480
+                ? '48px minmax(0,1fr) 72px'
+                : width <= 720
+                    ? '58px minmax(0,1fr) 82px'
+                    : width <= 1050
+                        ? '62px minmax(0,1fr) 100px'
+                        : '70px minmax(0,1fr) 128px';
 
             cards.forEach(function (card) {
                 var icon = card.querySelector('.pbi-icon');
@@ -121,14 +127,14 @@
                 card.style.setProperty('min-height', width <= 620 ? (width <= 420 ? '88px' : '94px') : width <= 900 ? '100px' : '104px', 'important');
 
                 if (body) {
-                    body.style.setProperty('grid-column', '1', 'important');
+                    body.style.setProperty('grid-column', '2', 'important');
                     body.style.setProperty('grid-row', '1', 'important');
-                    body.style.setProperty('padding', width <= 480 ? '11px 8px 11px 56px' : width <= 720 ? '14px 12px 14px 66px' : '18px 22px 18px 76px', 'important');
+                    body.style.setProperty('padding', width <= 480 ? '11px 8px' : width <= 720 ? '14px 12px' : '18px 20px', 'important');
                     body.style.setProperty('min-width', '0', 'important');
                 }
 
                 if (actions) {
-                    actions.style.setProperty('grid-column', '2', 'important');
+                    actions.style.setProperty('grid-column', '3', 'important');
                     actions.style.setProperty('grid-row', '1', 'important');
                     actions.style.setProperty('height', '100%', 'important');
                     actions.style.setProperty('display', 'flex', 'important');
