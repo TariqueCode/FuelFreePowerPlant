@@ -23,7 +23,7 @@ class NavigationSourceRegistry
         'admin.management.index' => ['admin.management.index', 'Profile Builder'],
         'admin.cms.index' => ['admin.cms.index', 'Page Builder'],
         'admin.navigation.index' => ['admin.menu-builder.index', 'Menu Builder'],
-        'admin.site-content.index' => ['admin.news_and_event', 'News & Event'],
+        'admin.site-content.index' => ['admin.news_and_event.index', 'News & Event'],
     ];
 
     public function available(string $area = 'public', string $menu = 'main'): Collection
