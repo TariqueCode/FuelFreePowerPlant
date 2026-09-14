@@ -26,6 +26,11 @@ class NavigationSourceRegistry
         'admin.site-content.index' => ['admin.news_and_event.index', 'News & Event'],
     ];
 
+    /** Request-local indexes prevent repeated full route scans during admin navigation rendering. */
+    private static array $routeIndex = [];
+    private static array $canonicalCmsCache = [];
+    private static ?bool $aboutPagePublished = null;
+
     public function available(string $area = 'public', string $menu = 'main'): Collection
     {
         abort_unless(in_array($menu, ['main', 'dashboard'], true), 404);
@@ -65,7 +70,7 @@ class NavigationSourceRegistry
             $name = Str::after($key, 'route:');
             if (isset(self::BUILDER_ROUTE_ALIASES[$name])) {
                 [$canonical, $label] = self::BUILDER_ROUTE_ALIASES[$name];
-                $route = collect(RouteFacade::getRoutes()->getRoutes())->first(fn (Route $route): bool => $route->getName() === $canonical);
+                $route = $this->routeByName($canonical);
                 if ($route && $this->eligibleRoute($route, $area)) {
                     $source = $this->routeSource($route, $area); $source['label'] = $label; return $source;
                 }
@@ -73,7 +78,7 @@ class NavigationSourceRegistry
             }
             $canonical = $this->canonicalCmsPageForRoute($name, $area);
             if ($canonical) return $canonical;
-            $route = collect(RouteFacade::getRoutes()->getRoutes())->first(fn (Route $route): bool => $route->getName() === $name);
+            $route = $this->routeByName($name);
             if ($route && $this->eligibleRoute($route, $area)) {
                 $source = $this->routeSource($route, $area);
                 if (! $this->isUsableNavigationLabel($source['label'])) return null;
@@ -96,6 +101,20 @@ class NavigationSourceRegistry
 
     private function usedSourceKeys(string $menu): Collection { return NavigationMenuItem::query()->where('menu', $menu)->whereNotNull('source_key')->pluck('source_key'); }
 
+    private function routeByName(string $name): ?Route
+    {
+        if (! array_key_exists($name, self::$routeIndex)) {
+            if (self::$routeIndex === []) {
+                self::$routeIndex = collect(RouteFacade::getRoutes()->getRoutes())
+                    ->filter(fn (Route $route): bool => is_string($route->getName()) && $route->getName() !== '')
+                    ->keyBy(fn (Route $route): string => (string) $route->getName())
+                    ->all();
+            }
+        }
+
+        return self::$routeIndex[$name] ?? null;
+    }
+
     private function eligibleRoute(Route $route, string $area): bool
     {
         $name = $route->getName(); $uri = ltrim($route->uri(), '/');
@@ -106,17 +125,20 @@ class NavigationSourceRegistry
         if (Str::startsWith($uri, 'admin/site-content')) return false;
         $middleware = collect($route->gatherMiddleware())->map(fn ($value): string => (string) $value);
         if ($area === 'public') {
-            if ($name === 'site.about') return CmsPage::query()->where('slug', 'about-us')->where('is_published', true)->exists();
+            if ($name === 'site.about') return $this->aboutPageIsPublished();
             if ($route->getDomain() !== null) return false;
             return ! str_starts_with($uri, 'admin/') && ! $middleware->contains(fn (string $value): bool => $value === 'auth' || Str::startsWith($value, ['role:', 'permission:']));
         }
         if ($area === 'dashboard') {
-            // The /admin shell route has a URI of "admin" (without a trailing slash).
-            // Treat it as an eligible dashboard source just like nested /admin/* routes.
             if ($name === 'admin.dashboard') return $uri === 'admin' || str_starts_with($uri, 'admin/');
             return (str_starts_with($uri, 'admin/') || $name === 'dashboard') && ! $middleware->contains(fn (string $value): bool => Str::startsWith($value, 'role:'));
         }
         return false;
+    }
+
+    private function aboutPageIsPublished(): bool
+    {
+        return self::$aboutPagePublished ??= CmsPage::query()->where('slug', 'about-us')->where('is_published', true)->exists();
     }
 
     private function hasCanonicalCmsPage(Route $route, string $area): bool { return $this->canonicalCmsPageForRoute((string) $route->getName(), $area) !== null; }
@@ -124,15 +146,17 @@ class NavigationSourceRegistry
     private function canonicalCmsPageForRoute(string $name, string $area): ?array
     {
         if ($area !== 'public') return null;
-        $route = collect(RouteFacade::getRoutes()->getRoutes())->first(fn (Route $route): bool => $route->getName() === $name);
-        if (! $route || ! $this->eligibleRoute($route, $area)) return null;
+        if (array_key_exists($name, self::$canonicalCmsCache)) return self::$canonicalCmsCache[$name];
+
+        $route = $this->routeByName($name);
+        if (! $route || ! $this->eligibleRoute($route, $area)) return self::$canonicalCmsCache[$name] = null;
         $slug = ltrim($route->uri(), '/');
-        if ($slug === '' || str_contains($slug, '/') || str_contains($slug, '{')) return null;
+        if ($slug === '' || str_contains($slug, '/') || str_contains($slug, '{')) return self::$canonicalCmsCache[$name] = null;
         $page = CmsPage::query()->where('slug', $slug)->where('is_published', true)->first();
         if (! $page && $name === 'site.about') $page = CmsPage::query()->where('slug', 'about-us')->where('is_published', true)->first();
-        if (! $page || ! $this->isUsableNavigationLabel((string) $page->title)) return null;
-        return ['key' => 'cms_page:'.$page->id, 'type' => 'cms_page', 'label' => (string) $page->title,
-            'url' => route('cms.page', ['slug' => $page->slug]), 'route_name' => 'cms.page', 'area' => $area, 'permission' => null,
+        if (! $page || ! $this->isUsableNavigationLabel((string) $page->title)) return self::$canonicalCmsCache[$name] = null;
+        return self::$canonicalCmsCache[$name] = ['key' => 'cms_page:'.$page->id, 'type' => 'cms_page', 'label' => (string) $page->title,
+            'url' => route('cms.page', ['slug' => $page->slug]), 'route_name' => 'cms.page', 'area' => 'public', 'permission' => null,
             'meta' => ['cms_page_id' => $page->id, 'slug' => $page->slug]];
     }
 
