@@ -155,9 +155,8 @@
             if (!ribbon) return;
 
             var editorRect = editor.getBoundingClientRect();
-            var ribbonRect = ribbon.getBoundingClientRect();
             var stickyTop = 0;
-            var shouldPin = ribbonRect.top <= stickyTop && editorRect.bottom > ribbonRect.height;
+            var shouldPin = editorRect.top <= stickyTop && editorRect.bottom > ribbon.offsetHeight;
 
             if (shouldPin) {
                 if (!ribbon.classList.contains('ff-viewport-pinned')) {
