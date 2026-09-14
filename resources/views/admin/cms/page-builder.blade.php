@@ -20,7 +20,8 @@
 @media(max-width:650px){.gcp{width:100%}.gcp-head{align-items:flex-start;flex-direction:column}.gcp-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.gcp-actions>*{width:100%}.gcp-side{grid-template-columns:1fr}.gcp-editor-head{flex-direction:column}.gcp-badge{align-self:flex-start}}
 @media(max-width:420px){.gcp-actions{grid-template-columns:1fr}.gcp-head h1{font-size:25px}}
 
-/* Keep the editor ribbon below the fixed/sticky admin topbar instead of sliding underneath it. */
-.ff-cms-editor .ff-ribbon{top:70px!important;z-index:950!important}
+/* Page Builder editor: the global CMS toolbar must pin to the viewport top while the document canvas scrolls. */
+.gcp-layout,.gcp-main,.gcp-editor-card,.gcp-editor-wrap,.ff-cms-editor{overflow:visible!important}
+.ff-cms-editor .ff-ribbon{position:sticky!important;top:0!important;z-index:1000!important}
 </style>
 @endpush
