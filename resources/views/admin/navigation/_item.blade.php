@@ -40,7 +40,7 @@
             </div>
         </div>
         <div class="inline-label-edit" id="rename-{{ $item->id }}" hidden>
-            <form method="POST" action="{{ route('admin.menu-builder.update',$item) }}">
+            <form method="POST" action="{{ route('admin.navigation.update',$item) }}">
                 @csrf @method('PATCH')
                 <input name="label" value="{{ $item->displayLabel() }}" maxlength="160" required aria-label="Navigation label">
                 <input type="hidden" name="parent_id" value="{{ $item->parent_id }}">
