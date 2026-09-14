@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="{{ asset('admin-global-system.css') }}?v=1">
 <style>.sidebar.nav-state-restoring,.sidebar.nav-state-restoring *{transition:none!important}</style>
 <script src="{{ asset('admin-documents.js') }}?v=6" defer></script>
-<script src="{{ asset('admin-navigation-fix.js') }}?v=2" defer></script>
+<script src="{{ asset('admin-navigation-fix.js') }}?v=3" defer></script>
 @endonce
 <style>
 .sidebar .nav>a,
