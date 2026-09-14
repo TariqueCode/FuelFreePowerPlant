@@ -15,7 +15,7 @@ class PublicNavigationServiceTest extends TestCase
 
     public function test_it_builds_a_deep_navigation_tree_without_n_plus_one_relationship_loading(): void
     {
-        Cache::forget('public.navigation.v3.main');
+        Cache::forget('public.navigation.v4.main');
         Route::get('/__navigation-deep-test', fn () => 'ok')->name('navigation.test.deep');
         Cache::forget('public.navigation.main');
 
