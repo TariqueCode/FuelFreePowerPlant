@@ -6,7 +6,7 @@
     <div class="menu-card">
         <div class="menu-card-top">
             <div class="menu-card-title">
-                <span class="drag-handle" title="Drag to reorder" aria-label="Drag to reorder" role="button" tabindex="0"><i class="fa-solid fa-ellipsis-vertical"></i></span>
+                <span class="drag-handle" title="Drag to reorder" aria-label="Drag to reorder" role="button" tabindex="0"><i class="fa-solid fa-grip-vertical"></i></span>
                 <span class="type-icon {{ $isFolder ? 'folder' : 'source' }}"><i class="fa-solid {{ $isFolder ? 'fa-folder' : ($item->source_type === 'external_link' ? 'fa-link' : 'fa-bolt') }}"></i></span>
                 <span class="menu-card-name">{{ $item->displayLabel() }}</span>
                 <span class="type-pill"><i class="fa-solid {{ $item->is_visible ? 'fa-eye' : 'fa-eye-slash' }}"></i> {{ $item->is_visible ? 'Visible' : 'Hidden' }}</span>
