@@ -2,9 +2,7 @@
 
 namespace App\Providers;
 
-use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\DocumentController;
-use App\Http\Controllers\Admin\ManagementController as AdminManagementController;
 use App\Http\Controllers\Admin\ResilientDocumentController;
 use App\Models\SystemSetting;
 use Illuminate\Support\Facades\Blade;
@@ -38,16 +36,6 @@ class AppServiceProvider extends ServiceProvider
                 ->whereNumber('folder')
                 ->middleware(['web', 'auth', 'permission:documents.view'])
                 ->name('admin.documents.folders.compat');
-
-            // Canonical News & Event entry point.
-            $newsEventMiddleware = ['web', 'auth', 'permission:website.view'];
-            $router->get('/admin/news-and-Event', [CmsController::class, 'index'])
-                ->middleware($newsEventMiddleware)
-                ->name('admin.news_and_event');
-            // Named index alias keeps existing create/edit surfaces compatible without creating a second URL.
-            $router->get('/admin/news-and-Event', [CmsController::class, 'index'])
-                ->middleware($newsEventMiddleware)
-                ->name('admin.news_and_event.index');
 
             // POST aliases avoid DELETE-method filtering/WAF rules commonly found on shared LiteSpeed hosting.
             $manage = ['web', 'auth', 'permission:documents.manage'];
