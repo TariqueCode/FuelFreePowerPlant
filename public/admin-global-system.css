@@ -13,8 +13,6 @@
   --ff-g-muted:#89a9a8;
   --ff-g-shadow:0 22px 70px rgba(0,0,0,.28);
   --ff-g-radius:18px;
-
-  /* Global card system: one reusable surface language across the admin. */
   --ff-card-bg:linear-gradient(145deg,rgba(8,37,50,.90),rgba(3,19,27,.94));
   --ff-card-bg-soft:linear-gradient(145deg,var(--ff-g-panel),var(--ff-g-panel-2));
   --ff-card-border:var(--ff-g-line);
@@ -29,6 +27,8 @@
 /* Shared visual language for admin page headers. */
 .content :where(.hero,.overview-hero,.pbi-header,.settings-hero,.footer-hero){position:relative;isolation:isolate}
 .content :where(.hero,.overview-hero,.settings-hero,.footer-hero){border-color:var(--ff-g-line)!important;background:radial-gradient(circle at 88% 10%,rgba(50,229,138,.10),transparent 28%),linear-gradient(145deg,rgba(8,31,39,.82),rgba(3,16,22,.72))!important;box-shadow:var(--ff-g-shadow)}
+/* Intentional full-bleed admin headers: no card shell. */
+.content .highlight-hero{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important}
 .content :where(.hero,.overview-hero,.settings-hero,.footer-hero):after{content:"";position:absolute;right:-90px;top:-120px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(85,217,239,.07),transparent 68%);pointer-events:none;z-index:-1}
 .content :where(.hero,.overview-hero,.settings-hero,.footer-hero) :where(h1,h2,p,.eyebrow){position:relative;z-index:1}
 .content :where(.hero,.overview-hero,.settings-hero,.footer-hero) .eyebrow,.content .pbi-k{color:#67e7a1!important;letter-spacing:.16em!important;font-weight:800!important}
@@ -40,13 +40,7 @@
 .content :where(.secondary,.btn-secondary){background:rgba(85,217,239,.045)!important;border:1px solid rgba(85,217,239,.16)!important;color:#bfe9e7!important}
 
 /* Global card system. Existing admin card families inherit the same surface, border, radius and shadow tokens. */
-.content :where(.card,.panel,.builder-card,.section-card,.form-card,.table-card,.stat-card,.content-card,.box,.settings-card,.ff-card){
-  background:var(--ff-card-bg-soft)!important;
-  border:1px solid var(--ff-card-border)!important;
-  border-radius:var(--ff-card-radius)!important;
-  box-shadow:var(--ff-card-shadow-raised)!important;
-  min-width:0;
-}
+.content :where(.card,.panel,.builder-card,.section-card,.form-card,.table-card,.stat-card,.content-card,.box,.settings-card,.ff-card){background:var(--ff-card-bg-soft)!important;border:1px solid var(--ff-card-border)!important;border-radius:var(--ff-card-radius)!important;box-shadow:var(--ff-card-shadow-raised)!important;min-width:0}
 .content :where(.card,.panel,.builder-card,.section-card,.form-card,.table-card,.stat-card,.content-card,.box,.settings-card,.ff-card):hover{border-color:var(--ff-card-border-hover)!important}
 .content :where(.card-head,.card-heading,.card-header,.panel-header) :where(h2,h3,strong){color:var(--ff-g-text)}
 
