@@ -15,35 +15,46 @@
             return window.matchMedia('(max-width: 900px)').matches;
         }
 
-        function normalizePath(value) {
+        function normalizeUrl(value) {
             try {
                 var url = new URL(value, window.location.origin);
-                var path = url.pathname.replace(/\/+$/, '');
-                return path || '/';
+                var path = url.pathname.replace(/\/+$/, '') || '/';
+                var params = new URLSearchParams(url.search);
+                params.sort();
+                var search = params.toString();
+                return path + (search ? '?' + search : '');
             } catch (error) {
                 return String(value || '').replace(/\/+$/, '') || '/';
             }
         }
 
+        function normalizePath(value) {
+            return normalizeUrl(value).split('?')[0];
+        }
+
         function syncActiveNavigation() {
+            var currentUrl = normalizeUrl(window.location.href);
             var currentPath = normalizePath(window.location.href);
-            var links = sidebar.querySelectorAll('.nav-sub a[href], .nav > a[href]');
-            var activeLink = null;
+            var links = Array.prototype.slice.call(sidebar.querySelectorAll('.nav-sub a[href], .nav > a[href]'));
+            var exactMatches = links.filter(function (link) {
+                return normalizeUrl(link.href) === currentUrl;
+            });
+            var pathMatches = links.filter(function (link) {
+                var target = normalizeUrl(link.href);
+                return !target.includes('?') && target.split('?')[0] === currentPath;
+            });
+            var matches = exactMatches.length ? exactMatches : pathMatches;
+            var activeLink = matches[0] || null;
 
             links.forEach(function (link) {
-                var linkPath = normalizePath(link.href);
-                var active = linkPath === currentPath;
-                link.classList.toggle('active', active);
-                if (active) activeLink = link;
+                link.classList.toggle('active', matches.indexOf(link) !== -1);
             });
 
             sidebar.querySelectorAll('.nav-group').forEach(function (group) {
                 var hasActive = !!group.querySelector('a.active');
-                if (hasActive) {
-                    group.open = true;
-                    var parent = group.querySelector(':scope > .nav-parent');
-                    if (parent) parent.setAttribute('aria-expanded', 'true');
-                }
+                group.open = hasActive || group.open;
+                var parent = group.querySelector(':scope > .nav-parent');
+                if (parent) parent.setAttribute('aria-expanded', String(group.open));
             });
 
             return activeLink;
