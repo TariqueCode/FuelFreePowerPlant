@@ -19,8 +19,8 @@ return new class extends Migration
             })
             ->update([
                 'label' => 'News & Event',
-                'url' => '/admin/news-and-Event',
-                'route_name' => 'admin.news_and_event',
+                'url' => '/admin/site-content?type=news',
+                'route_name' => 'admin.site-content.index',
                 'source_key' => 'route:admin.site-content.index',
                 'source_type' => 'route',
             ]);
@@ -28,14 +28,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        NavigationMenuItem::query()
-            ->where('menu', 'dashboard')
-            ->where('route_name', 'admin.news_and_event')
-            ->where('label', 'News & Event')
-            ->update([
-                'url' => '/admin/site-content?type=news',
-                'route_name' => 'admin.site-content.index',
-                'source_key' => 'route:admin.site-content.index',
-            ]);
+        // Keep the canonical live route; there is no safe legacy route to restore.
     }
 };
