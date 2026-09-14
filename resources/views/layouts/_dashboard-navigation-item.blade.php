@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="{{ asset('admin-global-system.css') }}?v=1">
 <style>.sidebar.nav-state-restoring,.sidebar.nav-state-restoring *{transition:none!important}</style>
 <script src="{{ asset('admin-documents.js') }}?v=6" defer></script>
-<script src="{{ asset('admin-navigation-fix.js') }}?v=1" defer></script>
+<script src="{{ asset('admin-navigation-fix.js') }}?v=2" defer></script>
 @endonce
 <style>
 .sidebar .nav>a,
@@ -43,17 +43,21 @@
 </style>
 @php
 $hasChildren=$item->children->isNotEmpty();
-$isActive=request()->url()===$item->url;
-$hasActiveDescendant=$hasChildren && $item->children->contains(function ($child): bool {
-    if (request()->url()===$child->url) return true;
-    return $child->children->isNotEmpty() && $child->children->contains(function ($nested): bool { return request()->url()===$nested->url; });
+$matchesCurrent=function ($candidate): bool {
+    if ($candidate->route_name && request()->routeIs($candidate->route_name)) return true;
+    return rtrim(request()->fullUrl(), '/') === rtrim(url((string) $candidate->url), '/');
+};
+$isActive=!$hasChildren && $matchesCurrent($item);
+$hasActiveDescendant=$hasChildren && $item->children->contains(function ($child) use ($matchesCurrent): bool {
+    if ($matchesCurrent($child)) return true;
+    return $child->children->isNotEmpty() && $child->children->contains(fn ($nested): bool => $matchesCurrent($nested));
 });
 $navIcon=trim((string) $item->icon) !== '' ? trim($item->icon) : ($hasChildren ? 'fa-folder-tree' : 'fa-circle-dot');
 $navKey=$hasChildren ? sha1((string) $item->url.'|'.(string) $item->displayLabel()) : null;
 @endphp
 @if($hasChildren)
 <details class="nav-group" data-nav-key="{{ $navKey }}" {{ $hasActiveDescendant ? 'open' : '' }}>
-    <summary class="nav-parent">
+    <summary class="nav-parent" aria-expanded="{{ $hasActiveDescendant ? 'true' : 'false' }}">
         <span class="nav-icon"><i class="fa-solid {{ $navIcon }}"></i></span>
         <span>{{ $item->displayLabel() }}</span>
         <i class="fa-solid fa-chevron-down nav-chevron" aria-hidden="true"></i>
