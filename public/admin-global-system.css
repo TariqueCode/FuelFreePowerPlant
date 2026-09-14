@@ -16,3 +16,60 @@
 .content .nei-card .nei-actions .publish-control{box-sizing:border-box!important;position:relative!important;display:block!important;width:54px!important;height:30px!important;min-height:30px!important;padding:0!important;border-radius:999px!important;background:#18333e!important;border:1px solid rgba(120,205,222,.26)!important;box-shadow:inset 0 1px 2px rgba(0,0,0,.28)!important;overflow:visible!important}.content .nei-card .nei-actions .publish-control::before{content:""!important;position:absolute!important;top:4px!important;left:4px!important;width:20px!important;height:20px!important;border-radius:50%!important;background:#c6d5d9!important;box-shadow:0 2px 6px rgba(0,0,0,.38)!important;transition:left .18s ease,background .18s ease,box-shadow .18s ease!important}.content .nei-card .nei-actions .publish-control::after{content:""!important;position:absolute!important;inset:0!important;border-radius:999px!important;box-shadow:none!important;pointer-events:none!important}.content .nei-card .nei-actions .publish-control.is-published{background:#118d62!important;border-color:rgba(72,239,167,.58)!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),0 0 18px rgba(39,227,148,.12)!important}.content .nei-card .nei-actions .publish-control.is-published::before{left:28px!important;background:#f3fff9!important;box-shadow:0 0 12px rgba(95,255,189,.7),0 2px 6px rgba(0,0,0,.3)!important}.content .nei-card .nei-actions .publish-control:focus-visible{outline:2px solid rgba(85,217,239,.8)!important;outline-offset:3px!important}
 .sidebar .nav-sub a.active{color:#f3fffb!important;background:linear-gradient(90deg,rgba(50,229,138,.18),rgba(85,217,239,.08))!important;border:1px solid rgba(50,229,138,.22)!important;box-shadow:inset 3px 0 0 #32e58a,0 5px 18px rgba(0,0,0,.12)!important;font-weight:800!important}.sidebar .nav-sub a.active .nav-icon{color:#79ffb5!important}
 @media(max-width:1024px){.content .nei-card .nei-body{padding-right:125px}}@media(max-width:760px){.content .nei-card .nei-body{padding-right:92px}.content .nei-card .nei-top .status-badge{padding:6px 9px!important}}@media(max-width:560px){.content .nei-card .nei-body{padding-right:14px;padding-bottom:78px}.content .nei-card .nei-top{padding-right:0}.content .nei-card .nei-actions .publish-control{width:52px!important;height:30px!important}.content .nei-card .nei-actions .publish-control.is-published::before{left:27px!important}}
+
+/* News & Event publish switch — canonical reference design. */
+.content .nei-card .nei-actions .publish-control,
+.content .nei-card .nei-actions form .publish-control{
+  box-sizing:border-box!important;
+  position:relative!important;
+  display:block!important;
+  width:52px!important;
+  min-width:52px!important;
+  max-width:52px!important;
+  height:30px!important;
+  min-height:30px!important;
+  margin:0!important;
+  padding:0!important;
+  border-radius:999px!important;
+  border:1px solid rgba(103,208,234,.18)!important;
+  background:#294653!important;
+  color:transparent!important;
+  font-size:0!important;
+  line-height:0!important;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.32)!important;
+  overflow:hidden!important;
+  cursor:pointer!important;
+  appearance:none!important;
+  -webkit-appearance:none!important;
+}
+.content .nei-card .nei-actions .publish-control::before{
+  content:""!important;
+  position:absolute!important;
+  top:4px!important;
+  left:4px!important;
+  width:20px!important;
+  height:20px!important;
+  margin:0!important;
+  padding:0!important;
+  border-radius:50%!important;
+  background:#c6d1d5!important;
+  box-shadow:0 1px 4px rgba(0,0,0,.38)!important;
+  transition:left .18s ease,background .18s ease,box-shadow .18s ease!important;
+}
+.content .nei-card .nei-actions .publish-control::after{display:none!important;content:none!important}
+.content .nei-card .nei-actions .publish-control i,
+.content .nei-card .nei-actions .publish-control span{display:none!important}
+.content .nei-card .nei-actions .publish-control.is-published{
+  background:#159463!important;
+  border-color:rgba(82,236,170,.48)!important;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.18),0 0 14px rgba(39,227,148,.10)!important;
+}
+.content .nei-card .nei-actions .publish-control.is-published::before{
+  left:27px!important;
+  background:#f3fff9!important;
+  box-shadow:0 1px 4px rgba(0,0,0,.28),0 0 9px rgba(95,255,189,.32)!important;
+}
+.content .nei-card .nei-actions .publish-control:hover{transform:none!important;filter:none!important}
+.content .nei-card .nei-actions .publish-control:focus-visible{outline:2px solid rgba(85,217,239,.78)!important;outline-offset:3px!important}
+@media(max-width:1024px){.content .nei-card .nei-actions .publish-control,.content .nei-card .nei-actions form .publish-control{width:48px!important;min-width:48px!important;max-width:48px!important;height:28px!important;min-height:28px!important}.content .nei-card .nei-actions .publish-control::before{width:18px!important;height:18px!important;top:4px!important;left:4px!important}.content .nei-card .nei-actions .publish-control.is-published::before{left:25px!important}}
+@media(max-width:560px){.content .nei-card .nei-actions .publish-control,.content .nei-card .nei-actions form .publish-control{width:48px!important;min-width:48px!important;max-width:48px!important;height:28px!important;min-height:28px!important}.content .nei-card .nei-actions .publish-control::before{width:18px!important;height:18px!important}.content .nei-card .nei-actions .publish-control.is-published::before{left:25px!important}}
