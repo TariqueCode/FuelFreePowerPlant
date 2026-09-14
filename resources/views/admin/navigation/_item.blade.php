@@ -6,21 +6,15 @@
     <div class="menu-card">
         <div class="menu-card-top">
             <div class="menu-card-title">
-                <span class="drag-handle" title="Drag to reorder" aria-label="Drag to reorder" role="button" tabindex="0"><i class="fa-solid fa-grip-vertical"></i></span>
+                <span class="drag-handle" title="Drag to reorder" aria-label="Drag to reorder" role="button" tabindex="0"><i class="fa-solid fa-ellipsis-vertical"></i></span>
                 <span class="type-icon {{ $isFolder ? 'folder' : 'source' }}"><i class="fa-solid {{ $isFolder ? 'fa-folder' : ($item->source_type === 'external_link' ? 'fa-link' : 'fa-bolt') }}"></i></span>
                 <span class="menu-card-name">{{ $item->displayLabel() }}</span>
+                <span class="type-pill"><i class="fa-solid {{ $item->is_visible ? 'fa-eye' : 'fa-eye-slash' }}"></i> {{ $item->is_visible ? 'Visible' : 'Hidden' }}</span>
             </div>
             <div class="item-actions">
                 <button type="button" class="rename-btn" onclick="document.getElementById('rename-{{ $item->id }}').hidden=false; document.getElementById('rename-{{ $item->id }}').querySelector('input[name=label]').focus();" title="Rename navigation item" aria-label="Rename {{ $item->displayLabel() }}"><i class="fa-solid fa-pen"></i></button>
             </div>
         </div>
-        <div class="menu-card-meta">
-            <span>{{ $item->is_visible ? 'Visible' : 'Hidden' }}</span>
-            @if($item->permission_key)<span>{{ $item->permission_key }}</span>@endif
-            @if($item->parent_id !== null)<span class="parent-pill">Sub-menu</span>@endif
-            @if($item->children->isNotEmpty())<span class="parent-pill">Has sub-menu</span>@endif
-        </div>
-        <small class="menu-card-url">{{ $isLegacyBoardFolder ? 'management' : ($item->route_name ?: ($item->url ?: 'Structural folder')) }}</small>
         <div class="inline-label-edit" id="rename-{{ $item->id }}" hidden>
             <form method="POST" action="{{ route('admin.menu-builder.update',$item) }}">
                 @csrf @method('PATCH')
