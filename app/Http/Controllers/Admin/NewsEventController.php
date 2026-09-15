@@ -33,6 +33,7 @@ class NewsEventController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validateItem($request);
+        $this->guardPublishing($request, $data['status'] === 'published');
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title']);
         $data['published_at'] = $data['status'] === 'published' ? now() : null;
         $item = SiteContentItem::create($data);
@@ -50,6 +51,7 @@ class NewsEventController extends Controller
     {
         abort_unless(in_array($item->type, ['news', 'announcement'], true), 404);
         $data = $this->validateItem($request);
+        $this->guardPublishing($request, $data['status'] === 'published');
         $data['slug'] = $this->uniqueSlug($data['slug'] ?: $data['title'], $item->id);
         $data['published_at'] = $data['status'] === 'published' ? ($item->published_at ?: now()) : null;
         $item->update($data);
@@ -61,6 +63,7 @@ class NewsEventController extends Controller
     {
         abort_unless(in_array($item->type, ['news', 'announcement'], true), 404);
         $published = $item->status !== 'published';
+        $this->guardPublishing(request(), $published);
         $item->update(['status' => $published ? 'published' : 'draft', 'published_at' => $published ? ($item->published_at ?: now()) : null]);
         return back()->with('status', $published ? 'Published successfully.' : 'Moved to draft successfully.');
     }
@@ -98,6 +101,13 @@ class NewsEventController extends Controller
         $data['use_global_footer'] = true;
         $data['builder_blocks'] = [];
         return $data;
+    }
+
+    private function guardPublishing(Request $request, bool $publishing): void
+    {
+        if ($publishing) {
+            abort_unless($request->user()->hasPermission('website.publish'), 403, 'Publishing News & Event items requires publishing permission.');
+        }
     }
 
     private function applyThumbnail(SiteContentItem $item, Request $request): void
