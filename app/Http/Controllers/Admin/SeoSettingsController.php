@@ -40,7 +40,7 @@ class SeoSettingsController
             'seo.bing_verification' => ['nullable', 'string', 'max:255'],
             'seo.meta_verification' => ['nullable', 'string', 'max:255'],
             'seo.ga4_measurement_id' => ['nullable', 'regex:/^G-[A-Z0-9]+$/i', 'max:40'],
-            'seo.indexnow_key' => ['nullable', 'regex:/^[A-Za-z0-9_-]{8,128}$/', 'max:128'],
+            'seo.indexnow_key' => ['nullable', 'regex:/^[A-Fa-f0-9-]{8,128}$/', 'max:128'],
         ]);
 
         foreach (self::KEYS as $key) {
