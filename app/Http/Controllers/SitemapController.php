@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CmsPage;
+use App\Models\ManagementProfileFolder;
 use App\Models\SiteContentItem;
 use Illuminate\Http\Response;
 
@@ -24,11 +25,17 @@ class SitemapController extends Controller
             ['loc' => route('site.solutions')],
             ['loc' => route('site.gallery')],
             ['loc' => route('site.career')],
-            ['loc' => route('management')],
             ['loc' => route('news.index')],
             ['loc' => route('sustainability')],
             ['loc' => route('contact')],
         ]);
+
+        foreach (ManagementProfileFolder::query()->where('status', 'published')->whereNotNull('slug')->orderBy('sort_order')->orderBy('id')->get(['slug', 'updated_at']) as $folder) {
+            $urls->push([
+                'loc' => $baseUrl . '/' . ltrim($folder->slug, '/'),
+                'lastmod' => optional($folder->updated_at)->toAtomString(),
+            ]);
+        }
 
         foreach (CmsPage::query()->where('is_published', true)->whereNotIn('slug', ['about-us'])->get(['slug', 'updated_at']) as $page) {
             $urls->push([
