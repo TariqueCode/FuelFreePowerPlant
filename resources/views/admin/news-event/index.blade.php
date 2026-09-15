@@ -45,3 +45,289 @@
 })();
 </script>
 @endpush
+
+@push('styles')
+<style>
+/* FuelFree PowerPlant — NEWS & EVENT MOBILE LIST SYSTEM */
+
+/*
+ * Keep the exact desktop list identity on mobile.
+ * Mobile only reduces dimensions; it does NOT convert cards
+ * into a different stacked component.
+ */
+
+@media(max-width:560px){
+
+    .nei-wrap{
+        width:100%!important;
+        max-width:none!important;
+        min-width:0!important;
+    }
+
+    .nei-header{
+        display:flex!important;
+        flex-direction:column!important;
+        align-items:stretch!important;
+        gap:11px!important;
+    }
+
+    .nei-header h1{
+        font-size:28px!important;
+        line-height:1.08!important;
+    }
+
+    .nei-header p{
+        font-size:9px!important;
+        line-height:1.5!important;
+    }
+
+    .nei-new{
+        width:100%!important;
+        min-height:42px!important;
+        flex:none!important;
+    }
+
+    .nei-search{
+        display:flex!important;
+        flex-direction:row!important;
+        align-items:stretch!important;
+        gap:6px!important;
+    }
+
+    .nei-search>div{
+        flex:1 1 auto!important;
+        min-width:0!important;
+    }
+
+    .nei-search button{
+        width:auto!important;
+        min-width:68px!important;
+        flex:0 0 auto!important;
+    }
+
+    /*
+     * IMPORTANT:
+     * Preserve horizontal list structure on mobile.
+     */
+    .nei-card{
+        display:grid!important;
+        grid-template-columns:82px 20px minmax(0,1fr)!important;
+        min-height:118px!important;
+        height:auto!important;
+        border-radius:15px!important;
+        overflow:hidden!important;
+    }
+
+    .nei-media{
+        width:82px!important;
+        height:118px!important;
+        min-width:82px!important;
+        min-height:118px!important;
+        aspect-ratio:auto!important;
+    }
+
+    .nei-media img{
+        width:100%!important;
+        height:100%!important;
+        object-fit:cover!important;
+        object-position:center!important;
+    }
+
+    .nei-kind{
+        min-width:20px!important;
+        width:20px!important;
+        font-size:6px!important;
+        letter-spacing:.12em!important;
+    }
+
+    .nei-body{
+        min-width:0!important;
+        min-height:118px!important;
+        padding:11px 76px 11px 10px!important;
+        padding-right:76px!important;
+    }
+
+    .nei-top{
+        gap:5px!important;
+        font-size:6px!important;
+    }
+
+    .nei-top .status-badge{
+        padding:5px 7px!important;
+        font-size:6px!important;
+        gap:4px!important;
+    }
+
+    .nei-top .status-badge::before{
+        width:4px!important;
+        height:4px!important;
+    }
+
+    .nei-body h2{
+        margin:7px 0 5px!important;
+        font-size:13px!important;
+        line-height:1.25!important;
+        -webkit-line-clamp:2!important;
+    }
+
+    .nei-body p{
+        font-size:7px!important;
+        line-height:1.45!important;
+        -webkit-line-clamp:2!important;
+    }
+
+    .nei-meta{
+        gap:6px!important;
+        padding-top:7px!important;
+        font-size:6px!important;
+        line-height:1.3!important;
+    }
+
+    /*
+     * Keep actions on the right side, matching desktop list.
+     */
+    .nei-actions{
+        position:absolute!important;
+        top:0!important;
+        right:0!important;
+        bottom:0!important;
+        left:auto!important;
+        width:64px!important;
+        height:100%!important;
+        padding:0!important;
+        border-left:1px solid rgba(72,216,241,.10)!important;
+        border-top:0!important;
+        flex-direction:column!important;
+        justify-content:center!important;
+        align-items:center!important;
+        gap:9px!important;
+        background:rgba(2,16,23,.32)!important;
+    }
+
+    .nei-actions .publish-control{
+        width:42px!important;
+        height:25px!important;
+        flex:0 0 25px!important;
+    }
+
+    .nei-actions .publish-control::before{
+        top:4px!important;
+        left:4px!important;
+        width:16px!important;
+        height:16px!important;
+    }
+
+    .nei-actions .publish-control.is-published::before{
+        left:22px!important;
+    }
+
+    .nei-actions .delete-control{
+        width:40px!important;
+        height:40px!important;
+        flex:0 0 40px!important;
+        border-radius:11px!important;
+    }
+
+    .nei-actions .delete-control i{
+        font-size:14px!important;
+    }
+
+    .nei-actions button:hover{
+        transform:none!important;
+    }
+
+    .nei-pager{
+        width:100%!important;
+        overflow-x:auto!important;
+    }
+}
+
+/* Small phones */
+@media(max-width:390px){
+
+    .nei-card{
+        grid-template-columns:74px 18px minmax(0,1fr)!important;
+        min-height:108px!important;
+    }
+
+    .nei-media{
+        width:74px!important;
+        height:108px!important;
+        min-width:74px!important;
+        min-height:108px!important;
+    }
+
+    .nei-kind{
+        width:18px!important;
+        min-width:18px!important;
+        font-size:5px!important;
+    }
+
+    .nei-body{
+        min-height:108px!important;
+        padding:9px 68px 9px 9px!important;
+    }
+
+    .nei-body h2{
+        font-size:12px!important;
+        margin-top:6px!important;
+    }
+
+    .nei-body p{
+        font-size:6.5px!important;
+    }
+
+    .nei-meta{
+        font-size:5.8px!important;
+    }
+
+    .nei-actions{
+        width:57px!important;
+        gap:7px!important;
+    }
+
+    .nei-actions .publish-control{
+        width:38px!important;
+        height:23px!important;
+    }
+
+    .nei-actions .publish-control::before{
+        width:15px!important;
+        height:15px!important;
+    }
+
+    .nei-actions .publish-control.is-published::before{
+        left:19px!important;
+    }
+
+    .nei-actions .delete-control{
+        width:36px!important;
+        height:36px!important;
+    }
+
+    .nei-actions .delete-control i{
+        font-size:13px!important;
+    }
+
+    .nei-search{
+        flex-direction:column!important;
+    }
+
+    .nei-search button{
+        width:100%!important;
+    }
+}
+
+/* No mobile motion */
+@media(prefers-reduced-motion:reduce){
+    .nei-card,
+    .nei-card *,
+    .nei-search *,
+    .nei-new{
+        animation:none!important;
+        transition:none!important;
+    }
+}
+</style>
+@endpush
+

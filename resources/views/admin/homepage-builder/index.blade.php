@@ -5,7 +5,7 @@
     $icons = ['hero'=>'fa-images','welcome'=>'fa-building','management'=>'fa-users','news'=>'fa-newspaper','gallery'=>'fa-images','highlight'=>'fa-bullhorn','cta'=>'fa-paper-plane'];
     $titles = ['hero'=>'Hero Slider','welcome'=>'Welcome Message','management'=>'Board of Directors','news'=>'News & Notices','gallery'=>'Gallery','highlight'=>'Homepage Highlight','cta'=>'Contact & Call to Action'];
     $sourceLabels = ['hero'=>'Slider Manager','welcome'=>'Homepage Content','management'=>'Board of Directors','news'=>'News & Notices','gallery'=>'Gallery Manager','highlight'=>'Highlight Manager','cta'=>'Homepage System'];
-    $manageRoutes = ['hero'=>route('admin.sliders.index'),'management'=>route('admin.management.index'),'news'=>route('admin.site-content.index',['type'=>'news']),'gallery'=>route('admin.gallery.index'),'highlight'=>route('admin.site-popups.index')];
+    $manageRoutes = ['hero'=>route('admin.sliders.index'),'management'=>route('admin.profile-builder.index'),'news'=>route('admin.site-content.index',['type'=>'news']),'gallery'=>route('admin.gallery.index'),'highlight'=>route('admin.site-popups.index')];
     $controlSections = ['hero','welcome','management','news','gallery','highlight','cta'];
     $countLabels = ['hero'=>['key'=>'sliders','suffix'=>'published slides'],'management'=>['key'=>'management','suffix'=>'published profiles'],'news'=>['key'=>'news','suffix'=>'published items'],'gallery'=>['key'=>'gallery','suffix'=>'published galleries']];
     $visibleCount = $sections->where('is_enabled',true)->count();

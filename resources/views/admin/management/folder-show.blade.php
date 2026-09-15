@@ -1,7 +1,7 @@
 @extends('layouts.portal')
 @section('title', $folder->name.' · Profile Builder')
 @section('content')
-<section class="hero">
+<section class="hero profile-page-header">
     <div>
         <a class="back" href="{{ route('admin.profile-builder.index') }}"><i class="fa-solid fa-arrow-left"></i> Profile Builder</a>
         <span class="eyebrow">PROFILE FOLDER</span>
@@ -104,3 +104,4 @@
 })();
 </script>
 @endpush
+<style>.hero.profile-page-header{position:relative!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:24px!important;margin:0 0 24px!important;padding:6px 0 22px!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}.hero.profile-page-header:after{content:"";position:absolute;left:0;bottom:0;width:58px;height:3px;border-radius:3px;background:#35d8b0}.hero.profile-page-header>div{background:transparent!important;border:0!important;box-shadow:none!important}.hero.profile-page-header .eyebrow{color:#54cde8!important}.hero.profile-page-header h1{margin:6px 0!important}.hero.profile-page-header p{margin:0!important}.hero.profile-page-header .hero-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;flex:0 0 auto!important}.hero.profile-page-header .primary,.hero.profile-page-header .back{white-space:nowrap!important}@media(max-width:650px){.hero.profile-page-header{align-items:flex-start!important;flex-direction:column!important;gap:14px!important}.hero.profile-page-header .hero-actions{width:100%!important;justify-content:flex-start!important}}</style>

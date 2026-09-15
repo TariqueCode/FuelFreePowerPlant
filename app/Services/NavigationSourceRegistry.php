@@ -20,7 +20,7 @@ class NavigationSourceRegistry
     ];
 
     private const BUILDER_ROUTE_ALIASES = [
-        'admin.management.index' => ['admin.management.index', 'Profile Builder'],
+        'admin.profile-builder.index' => ['admin.profile-builder.index', 'Profile Builder'],
         'admin.cms.index' => ['admin.cms.index', 'Page Builder'],
         'admin.navigation.index' => ['admin.menu-builder.index', 'Menu Builder'],
         'admin.site-content.index' => ['admin.news_and_event', 'News & Event'],
@@ -160,7 +160,7 @@ class NavigationSourceRegistry
             'meta' => ['cms_page_id' => $page->id, 'slug' => $page->slug]];
     }
 
-    private function isNavigationBuilderRoute(string $name): bool { return Str::startsWith($name, ['admin.navigation.', 'admin.menu-builder.', 'admin.profile-builder.', 'admin.page-builder.']); }
+    private function isNavigationBuilderRoute(string $name): bool { return Str::startsWith($name, ['admin.navigation.', 'admin.menu-builder.', 'admin.page-builder.']); }
 
     private function routeSource(Route $route, string $area): array
     {
@@ -173,7 +173,7 @@ class NavigationSourceRegistry
     {
         $friendly = ['home' => 'Home', 'management' => 'Board of Directors', 'site.plants' => (string) config('fuelfree.projects.label', 'Projects & Our Plans'), 'site.future-project' => 'Future Project', 'site.solutions' => 'Solutions', 'site.gallery' => 'Gallery', 'site.career' => 'Career', 'news.index' => 'News & Event', 'sustainability' => 'Sustainability', 'contact' => 'Contact'];
         if (array_key_exists($name, $friendly)) return $friendly[$name];
-        if ($name === 'admin.management.index') return 'Profile Builder';
+        if ($name === 'admin.profile-builder.index') return 'Profile Builder';
         if ($name === 'admin.cms.index') return 'Page Builder';
         $action = (string) ($route->getActionName() ?? ''); $controller = Str::before(Str::afterLast($action, '\\'), '@');
         if ($controller === 'PublicSiteController') { $section = $route->defaults['section'] ?? null; if (is_string($section) && trim($section) !== '') return $this->humanizeNavigationLabel($section); $segment = trim(ltrim($route->uri(), '/')); if ($segment !== '' && ! str_contains($segment, '/')) return $this->humanizeNavigationLabel($segment); }
