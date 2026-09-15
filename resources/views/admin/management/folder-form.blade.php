@@ -1,9 +1,9 @@
 @extends('layouts.portal')
 @section('title',$folder->exists?'Edit Profile Folder':'New Profile Folder')
 @section('content')
-<section class="hero profile-page-header">
+<section class="profile-page-header">
     <div class="profile-header-copy">
-        <span class="eyebrow"><i class="fa-solid fa-folder profile-header-icon" aria-hidden="true"></i> GLOBAL · PROFILE BUILDER</span>
+        <span class="eyebrow">GLOBAL · PROFILE BUILDER</span>
         <h1>{{ $folder->exists?'Edit folder':'Create folder' }}</h1>
         <p>The folder name becomes the public leadership section title and its URL slug.</p>
     </div>
@@ -41,11 +41,10 @@
 @push('styles')
 <style>
 /* Profile Builder / folder-form only — keep the global dashboard language intact. */
-.content>.profile-page-header{position:relative!important;display:flex!important;align-items:flex-end!important;justify-content:space-between!important;gap:32px!important;margin:0 0 30px!important;padding:2px 0 22px!important;background:transparent!important;background-image:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important;overflow:visible!important}
+.content>.profile-page-header{position:relative!important;display:flex!important;align-items:flex-end!important;justify-content:space-between!important;gap:32px!important;margin:0 0 30px!important;padding:0 0 22px!important;background:transparent!important;background-image:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;outline:0!important;overflow:visible!important}
 .content>.profile-page-header:after{content:"";position:absolute;left:0;bottom:0;width:72px;height:3px;border-radius:3px;background:#35d8b0;box-shadow:none}
 .profile-header-copy{min-width:0;background:transparent!important;border:0!important;box-shadow:none!important}
-.profile-page-header .eyebrow{display:flex;align-items:center;gap:7px;color:#54cde8!important;font-size:9px;font-weight:800;letter-spacing:.17em}
-.profile-header-icon{color:#35d8b0;font-size:11px}
+.profile-page-header .eyebrow{display:block;color:#54cde8!important;font-size:9px;font-weight:800;letter-spacing:.17em}
 .profile-page-header h1{margin:8px 0 6px!important;color:#e8f6f8!important;font-size:clamp(32px,4vw,48px)!important;line-height:1.04!important;letter-spacing:-.025em!important}
 .profile-page-header p{margin:0!important;max-width:760px!important;color:#7898a5!important;font-size:12px!important;line-height:1.6!important}
 .header-back{display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;min-height:38px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.012);color:#9db9c2!important;text-decoration:none!important;font-size:10px;font-weight:700;white-space:nowrap;box-sizing:border-box}
