@@ -15,24 +15,71 @@
     if ($ogImage !== '' && !str_starts_with($ogImage, 'http://') && !str_starts_with($ogImage, 'https://')) {
         $ogImage = $baseUrl . '/' . ltrim($ogImage, '/');
     }
+    $logoUrl = trim((string) config('fuelfree.company.logo_path', ''));
+    if ($logoUrl !== '' && !str_starts_with($logoUrl, 'http://') && !str_starts_with($logoUrl, 'https://')) {
+        $logoUrl = $baseUrl . '/storage/' . ltrim($logoUrl, '/');
+    }
+    $schema = [
+        '@context' => 'https://schema.org',
+        '@graph' => [
+            [
+                '@type' => 'Organization',
+                '@id' => $baseUrl . '/#organization',
+                'name' => $siteName,
+                'url' => $baseUrl . '/',
+                'description' => $description !== '' ? $description : config('fuelfree.company.tagline', ''),
+            ],
+            [
+                '@type' => 'WebSite',
+                '@id' => $baseUrl . '/#website',
+                'name' => $siteName,
+                'url' => $baseUrl . '/',
+                'publisher' => ['@id' => $baseUrl . '/#organization'],
+                'inLanguage' => str_replace('_', '-', app()->getLocale()),
+            ],
+        ],
+    ];
+    if ($logoUrl !== '') {
+        $schema['@graph'][0]['logo'] = ['@type' => 'ImageObject', 'url' => $logoUrl];
+    }
+    if (isset($article)) {
+        $articleImage = trim((string) ($article->image_path ?? ''));
+        if ($articleImage !== '' && !str_starts_with($articleImage, 'http://') && !str_starts_with($articleImage, 'https://')) {
+            $articleImage = $baseUrl . '/storage/' . ltrim($articleImage, '/');
+        }
+        $articleSchema = [
+            '@type' => $article->type === 'announcement' ? 'Article' : 'NewsArticle',
+            '@id' => $canonicalUrl . '#article',
+            'headline' => (string) $article->title,
+            'mainEntityOfPage' => ['@id' => $canonicalUrl],
+            'publisher' => ['@id' => $baseUrl . '/#organization'],
+        ];
+        if ($article->published_at) $articleSchema['datePublished'] = $article->published_at->toAtomString();
+        if ($article->updated_at) $articleSchema['dateModified'] = $article->updated_at->toAtomString();
+        if ($articleImage !== '') $articleSchema['image'] = [$articleImage];
+        $schema['@graph'][] = $articleSchema;
+    }
 @endphp
 @if($description !== '')
 <meta name="description" content="{{ $description }}">
 @endif
 <meta name="robots" content="{{ $robots }}">
+<meta name="theme-color" content="#031018">
 <link rel="canonical" href="{{ $canonicalUrl }}">
-<meta property="og:type" content="website">
+<meta property="og:type" content="{{ isset($article) ? 'article' : 'website' }}">
 <meta property="og:title" content="{{ $pageTitle }}">
 @if($description !== '')
 <meta property="og:description" content="{{ $description }}">
 @endif
 <meta property="og:url" content="{{ $canonicalUrl }}">
 <meta property="og:site_name" content="{{ $siteName }}">
+<meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
 @if($ogImage !== '')
 <meta property="og:image" content="{{ $ogImage }}">
 @endif
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ $pageTitle }}">
+<meta name="twitter:url" content="{{ $canonicalUrl }}">
 @if($description !== '')
 <meta name="twitter:description" content="{{ $description }}">
 @endif
@@ -57,3 +104,4 @@ gtag('js', new Date());
 gtag('config', @json($seo['ga4_measurement_id']));
 </script>
 @endif
+<script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
