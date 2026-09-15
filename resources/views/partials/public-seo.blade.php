@@ -11,7 +11,7 @@
     $pageTitle = trim((string) $__env->yieldContent('title', $siteName));
     $description = trim((string) $__env->yieldContent('meta_description', config('fuelfree.company.tagline', '')));
     $robots = trim((string) $__env->yieldContent('meta_robots', 'index,follow'));
-    $ogImage = trim((string) $__env->yieldContent('og_image', config('fuelfree.company.logo_path', '')));
+    $ogImage = trim((string) $__env->yieldContent('og_image', ''));
     if ($ogImage !== '' && !str_starts_with($ogImage, 'http://') && !str_starts_with($ogImage, 'https://')) {
         $ogImage = $baseUrl . '/' . ltrim($ogImage, '/');
     }
