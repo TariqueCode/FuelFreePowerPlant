@@ -12,8 +12,18 @@
 @php
 $hasChildren=$item->children->isNotEmpty();
 $matchesCurrent=function ($candidate): bool {
-    if ($candidate->route_name && request()->routeIs($candidate->route_name)) return true;
-    return rtrim(request()->fullUrl(), '/') === rtrim(url((string) $candidate->url), '/');
+    if ($candidate->route_name) {
+        $routeName=trim((string) $candidate->route_name);
+        if ($routeName !== "" && request()->routeIs($routeName)) return true;
+        if ($routeName !== "" && str_ends_with($routeName, ".index")) {
+            $family=substr($routeName, 0, -6);
+            if ($family !== "" && request()->routeIs($family.".*")) return true;
+        }
+    }
+    $currentPath=rtrim(parse_url(request()->fullUrl(), PHP_URL_PATH) ?: "/", "/");
+    $candidatePath=rtrim(parse_url(url((string) $candidate->url), PHP_URL_PATH) ?: "/", "/");
+    if ($candidatePath !== "/" && ($currentPath === $candidatePath || str_starts_with($currentPath, $candidatePath."/"))) return true;
+    return $currentPath === $candidatePath;
 };
 $isActive=!$hasChildren && $matchesCurrent($item);
 $hasActiveDescendant=$hasChildren && $item->children->contains(function ($child) use ($matchesCurrent): bool {

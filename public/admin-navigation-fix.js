@@ -41,7 +41,8 @@
             });
             var pathMatches = links.filter(function (link) {
                 var target = normalizeUrl(link.href);
-                return !target.includes('?') && target.split('?')[0] === currentPath;
+                var targetPath = target.split('?')[0];
+                return !target.includes('?') && (targetPath === currentPath || (targetPath !== '/' && currentPath.indexOf(targetPath + '/') === 0));
             });
             var matches = exactMatches.length ? exactMatches : pathMatches;
             var activeLink = matches[0] || null;

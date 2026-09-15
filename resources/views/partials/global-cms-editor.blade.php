@@ -44,7 +44,7 @@
 <style>
 /* Full-page editing workspace: keep the command ribbon available while the canvas scrolls. */
 .ff-cms-editor{min-height:calc(100vh - 210px);box-shadow:0 16px 40px rgba(0,0,0,.14)}
-.ff-cms-editor .ff-ribbon{position:sticky;top:0;z-index:1000;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.ff-cms-editor .ff-ribbon{position:sticky!important;top:70px!important;z-index:900!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .ff-cms-editor .ff-tabs{background:rgba(7,27,37,.96)}
 .ff-cms-editor .ff-panel{background:rgba(7,27,37,.97)}
 .ff-cms-editor .ff-editable{min-height:calc(100vh - 345px);padding:clamp(24px,4vw,48px) clamp(18px,5vw,72px);font-size:15px;line-height:1.85;background:linear-gradient(180deg,rgba(4,18,27,.98),rgba(3,15,22,.98))}
@@ -68,7 +68,10 @@
 .ff-cms-editor .ff-icon{min-height:40px;touch-action:manipulation}
 @media(max-width:700px){
   .ff-cms-editor{min-height:calc(100vh - 165px);border-radius:0 0 12px 12px}
-  .ff-cms-editor .ff-ribbon{top:0}
+  .ff-cms-editor .ff-ribbon{top:64px!important}
+@media(max-width:520px){
+  .ff-cms-editor .ff-ribbon{top:60px!important}
+}
   .ff-cms-editor .ff-editable{min-height:calc(100vh - 300px);padding:22px 14px;font-size:16px;line-height:1.8}
   .ff-cms-editor .ff-editable > p,
   .ff-cms-editor .ff-editable > h1,

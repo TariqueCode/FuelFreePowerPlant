@@ -83,7 +83,6 @@ $dashboardNavigation=app(\App\Services\DashboardNavigationService::class)->tree(
 .content .promote-btn{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;width:auto;min-width:92px;min-height:38px;padding:7px 10px;border:1px solid rgba(98,217,238,.25);border-radius:8px;background:rgba(98,217,238,.08);color:#dffaff;cursor:pointer;font-size:12px!important;font-weight:800}
 @media(max-width:700px){.nav>a,.nav-parent{font-size:16px!important}.nav-sub a{font-size:14px!important}.content{font-size:16px}.content .hero p{font-size:16px!important}.content .menu-card-name{font-size:16px!important}.content .menu-card-meta,.content .menu-card-url{font-size:13px!important}.content .menu-card-top{align-items:flex-start}.content .item-actions{flex-wrap:wrap;justify-content:flex-end}.content .promote-btn{font-size:13px!important;min-height:42px}.content .move-btn,.content .rename-btn{width:38px;height:38px}.content .menu-children{margin-left:12px;padding-left:10px}}
 @media(max-width:420px){.content .builder-card{padding:12px}.content .toolbar-actions{align-items:stretch;flex-direction:column}.content .save-tree{width:100%}.content .promote-btn span{display:inline}.content .item-actions{gap:5px}}
-<style>
 /* ADMIN NAV — FINAL CLEAN RESPONSIVE / STATIC 2D */
 .sidebar{
 width:238px!important;
