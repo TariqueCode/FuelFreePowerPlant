@@ -1,6 +1,9 @@
 @extends('layouts.public')
 
 @section('title', ($item->meta_title ?: $item->title) . ' — ' . config('fuelfree.company.name'))
+@if($item->meta_description ?: $item->excerpt)
+@section('meta_description', $item->meta_description ?: $item->excerpt)
+@endif
 
 @php
     $safeHtml = static function (?string $html): string {
