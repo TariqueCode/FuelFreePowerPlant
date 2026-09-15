@@ -99,8 +99,8 @@ class HomepageBuilderController extends Controller
                 ->published()
                 ->whereIn('id', $selectedIds['management'])
                 ->pluck('id')->map(fn ($id) => (int) $id)->all();
-            if (count($selectedIds['management']) > 0 && count($managementValidIds) < 1) {
-                return back()->withErrors(['settings.management.ids' => 'Select at least one published profile from the selected folder.']);
+            if (count($selectedIds['management']) !== count($managementValidIds)) {
+                return back()->withErrors(['settings.management.ids' => 'Every selected profile must belong to the selected published folder and be published.']);
             }
         }
 
@@ -109,8 +109,20 @@ class HomepageBuilderController extends Controller
             'news' => SiteContentItem::query()->whereIn('type', ['news','announcement'])->published()->whereIn('id', $selectedIds['news'])->pluck('id')->map(fn ($id) => (int) $id)->all(),
             'gallery' => SiteContentItem::query()->where('type', 'gallery')->published()->whereIn('id', $selectedIds['gallery'])->pluck('id')->map(fn ($id) => (int) $id)->all(),
         ];
+        if (count($selectedIds['news']) !== count($validIds['news'])) {
+            return back()->withErrors(['settings.news.ids' => 'Every selected news item must be published.']);
+        }
+        if (count($selectedIds['gallery']) !== count($validIds['gallery'])) {
+            return back()->withErrors(['settings.gallery.ids' => 'Every selected gallery item must be published.']);
+        }
 
-        DB::transaction(function () use ($order, $request, $validIds, $managementFolderId, $managementEnabled) {
+        $welcomeManagementIds = array_values(array_unique(array_map('intval', (array) $request->input('settings.welcome.management_ids', []))));
+        $validWelcomeManagementIds = SiteContentItem::query()->where('type','management')->published()->whereIn('id',$welcomeManagementIds)->pluck('id')->map(fn ($id) => (int) $id)->all();
+        if (count($welcomeManagementIds) !== count($validWelcomeManagementIds)) {
+            return back()->withErrors(['settings.welcome.management_ids' => 'Every selected welcome profile must be published.']);
+        }
+
+        DB::transaction(function () use ($order, $request, $validIds, $managementFolderId, $managementEnabled, $validWelcomeManagementIds) {
             foreach ($order as $position => $key) {
                 $section = HomepageSection::query()->where('key', $key)->first();
                 $settings = is_array($section?->settings) ? $section->settings : [];
@@ -126,12 +138,7 @@ class HomepageBuilderController extends Controller
                     $settings['more_words'] = max(20, min(2000, (int) ($welcome['more_words'] ?? 900)));
                     $settings['show_full'] = $request->boolean('settings.welcome.show_full');
                     $settings['layout'] = in_array(($welcome['layout'] ?? 'left'), ['left','center','right'], true) ? $welcome['layout'] : 'left';
-                    $requestedManagementIds = array_values(array_unique(array_map('intval', (array) ($welcome['management_ids'] ?? []))));
-                    $settings['management_ids'] = array_values(array_slice(
-                        SiteContentItem::query()->where('type','management')->published()->whereIn('id', $requestedManagementIds)->pluck('id')->map(fn ($id) => (int) $id)->all(),
-                        0,
-                        2
-                    ));
+                    $settings['management_ids'] = array_values(array_slice($validWelcomeManagementIds, 0, 2));
                 }
 
                 if ($key === 'management' && $managementEnabled) {
