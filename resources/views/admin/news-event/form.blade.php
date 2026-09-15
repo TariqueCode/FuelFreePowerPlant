@@ -68,7 +68,7 @@
 .ne-editor-card .ne-card-head{padding:16px 18px!important;margin:0!important;border-bottom:1px solid rgba(103,208,234,.12)!important;border-radius:14px 14px 0 0!important;background:#091f2b!important}
 .ne-editor-body{padding:0!important}
 .ff-cms-editor{width:100%!important;max-width:none!important;overflow:visible!important;border-radius:0 0 14px 14px!important}
-.ff-cms-editor .ff-ribbon{position:sticky!important;top:0!important;z-index:1000!important;background:#071b25!important;border-bottom:1px solid rgba(103,208,234,.14)!important}
+
 .ne-form-grid{gap:0 14px!important}
 .ne-media-card{display:grid!important;grid-template-columns:220px minmax(0,1fr)!important;grid-template-rows:auto auto auto auto!important;column-gap:16px!important;align-items:start!important}
 .ne-media-card .ne-card-head{grid-column:1/-1!important;grid-row:1!important}

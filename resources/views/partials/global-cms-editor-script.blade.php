@@ -23,6 +23,67 @@
     if(states.has(textarea))return;
     const st={root,ed:root.querySelector('.ff-editable'),textarea,range:null,source:false,selected:null}; if(!st.ed)return;
     states.set(textarea,st);allStates.add(st);st.ed.innerHTML=textarea.value||'';textarea.style.display='none';
+    const ribbon = root.querySelector('.ff-ribbon');
+    const boundary = root;
+    let ribbonSpacer = null;
+
+    const resetFloatingRibbon = () => {
+      if (!ribbon) return;
+
+      ribbon.classList.remove('ff-floating');
+
+      if (ribbonSpacer) {
+        ribbonSpacer.classList.remove('active');
+        ribbonSpacer.style.height = '';
+      }
+
+      ribbon.style.left = '';
+      ribbon.style.width = '';
+      ribbon.style.top = '';
+    };
+
+    const updateFloatingRibbon = () => {
+      if (!ribbon || !boundary || root.classList.contains('ff-fullscreen')) {
+        resetFloatingRibbon();
+        return;
+      }
+
+      const rootRect = root.getBoundingClientRect();
+      const boundaryRect = boundary.getBoundingClientRect();
+      const ribbonRect = ribbon.getBoundingClientRect();
+
+      const topbarOffset = 0;
+
+      const ribbonHeight = ribbonRect.height || 0;
+
+      const shouldFloat =
+        rootRect.top <= topbarOffset &&
+        boundaryRect.bottom > topbarOffset + ribbonHeight;
+
+      if (!shouldFloat) {
+        resetFloatingRibbon();
+        return;
+      }
+
+      if (!ribbonSpacer) {
+        ribbonSpacer = document.createElement('div');
+        ribbonSpacer.className = 'ff-ribbon-spacer';
+        ribbon.parentNode.insertBefore(ribbonSpacer, ribbon);
+      }
+
+      ribbonSpacer.style.height = ribbonHeight + 'px';
+      ribbonSpacer.classList.add('active');
+
+      ribbon.classList.add('ff-floating');
+
+      ribbon.style.left = ribbonRect.left + 'px';
+      ribbon.style.width = ribbonRect.width + 'px';
+      ribbon.style.top = topbarOffset + 'px';
+    };
+
+    window.addEventListener('scroll', updateFloatingRibbon, {passive:true});
+    window.addEventListener('resize', updateFloatingRibbon);
+    requestAnimationFrame(updateFloatingRibbon);
     root.querySelectorAll('button,select,input[type="color"]').forEach(c=>c.addEventListener('mousedown',()=>saveSelection(st)));
     root.querySelectorAll('[data-tab]').forEach(tab=>tab.addEventListener('click',()=>{root.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===tab));root.querySelectorAll('[data-panel]').forEach(p=>{const on=p.dataset.panel===tab.dataset.tab;p.classList.toggle('active',on);p.style.display=on?'flex':'none'});restoreSelection(st)}));
     root.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>exec(st,b.dataset.action)));
@@ -39,7 +100,20 @@
     root.querySelectorAll('[data-image-align]').forEach(b=>b.addEventListener('click',()=>{if(!st.selected){alert('Select an image first.');return}st.selected.classList.remove('ff-left','ff-center','ff-right');st.selected.classList.add('ff-'+b.dataset.imageAlign);sync(st);positionResize(st)}));
     root.querySelector('[data-view="source"]')?.addEventListener('click',()=>{st.source=!st.source;if(st.source){st.ed.textContent=st.ed.innerHTML;st.ed.classList.add('source-mode')}else{st.ed.innerHTML=st.ed.textContent;st.ed.classList.remove('source-mode');sync(st)}root.querySelector('[data-view="source"]').classList.toggle('active',st.source)});
     root.querySelector('[data-view="preview"]')?.addEventListener('click',()=>{if(st.source)root.querySelector('[data-view="source"]').click();const w=window.open('','_blank','width=1100,height=800');if(!w)return;w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Content Preview</title><style>body{font:16px/1.75 Arial;max-width:900px;margin:40px auto;padding:0 20px;color:#17252d}img,video,iframe{max-width:100%;height:auto}table{width:100%;border-collapse:collapse}td,th{border:1px solid #ccc;padding:8px}</style></head><body>${st.ed.innerHTML}</body></html>`);w.document.close()});
-    root.querySelector('[data-view="fullscreen"]')?.addEventListener('click',()=>{root.classList.toggle('ff-fullscreen');const i=root.querySelector('[data-view="fullscreen"] i');if(i)i.className=root.classList.contains('ff-fullscreen')?'fa-solid fa-compress':'fa-solid fa-expand'});
+    root.querySelector('[data-view="fullscreen"]')?.addEventListener('click',()=>{
+      root.classList.toggle('ff-fullscreen');
+
+      if(root.classList.contains('ff-fullscreen')){
+        resetFloatingRibbon();
+      }
+
+      const i=root.querySelector('[data-view="fullscreen"] i');
+      if(i)i.className=root.classList.contains('ff-fullscreen')
+        ?'fa-solid fa-compress'
+        :'fa-solid fa-expand';
+
+      requestAnimationFrame(updateFloatingRibbon);
+    });
     st.ed.addEventListener('click',e=>{const img=e.target.closest?.('img');if(img&&st.ed.contains(img)){st.root.querySelectorAll('img.ff-selected').forEach(x=>x.classList.remove('ff-selected'));st.selected=img;img.classList.add('ff-selected');positionResize(st)}else{if(st.selected)st.selected.classList.remove('ff-selected');st.selected=null;hideResize(st)}});
     ['input','keyup','mouseup','focus'].forEach(ev=>st.ed.addEventListener(ev,()=>{saveSelection(st);if(!st.source)sync(st);buttons(st)})); status(st);buttons(st);
   }
