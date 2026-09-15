@@ -98,13 +98,18 @@ class SettingsController
             'design.footer.contact_enabled' => ['nullable', 'boolean'],
             'design.footer.copyright_enabled' => ['nullable', 'boolean'],
         ]);
-        foreach (array_keys($validated) as $key) {
-            $value = data_get($validated, $key);
-            SystemSetting::updateOrCreate(['key' => $key], ['value' => is_bool($value) ? ($value ? '1' : '0') : (string) ($value ?? ''), 'is_sensitive' => false]);
+        foreach (\Illuminate\Support\Arr::dot($validated) as $key => $value) {
+            SystemSetting::updateOrCreate(
+                ['key' => $key],
+                [
+                    'value' => is_bool($value) ? ($value ? '1' : '0') : (string) ($value ?? ''),
+                    'is_sensitive' => false,
+                ]
+            );
         }
         foreach (['columns', 'links', 'social', 'contact', 'copyright'] as $key) {
             $setting = 'design.footer.'.$key.'_enabled';
-            if (! array_key_exists($setting, $validated)) {
+            if (! \Illuminate\Support\Arr::has($validated, $setting)) {
                 SystemSetting::updateOrCreate(['key' => $setting], ['value' => '0', 'is_sensitive' => false]);
             }
         }
