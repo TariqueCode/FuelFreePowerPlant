@@ -4,7 +4,7 @@
 <section class="hero profile-page-header">
     <div>
         <a class="back" href="{{ route('admin.profile-builder.index') }}"><i class="fa-solid fa-arrow-left"></i> Profile Builder</a>
-        <span class="eyebrow">PROFILE FOLDER</span>
+        <span class="eyebrow"><i class="fa-solid fa-folder profile-header-icon" aria-hidden="true"></i> GLOBAL · PROFILE BUILDER</span>
         <h1>{{ $folder->name }}</h1>
         <p>{{ $folder->profiles_count }} {{ $folder->profiles_count === 1 ? 'profile' : 'profiles' }} in this folder.</p>
     </div>
@@ -105,3 +105,99 @@
 </script>
 @endpush
 <style>.hero.profile-page-header{position:relative!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:24px!important;margin:0 0 24px!important;padding:6px 0 22px!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}.hero.profile-page-header:after{content:"";position:absolute;left:0;bottom:0;width:58px;height:3px;border-radius:3px;background:#35d8b0}.hero.profile-page-header>div{background:transparent!important;border:0!important;box-shadow:none!important}.hero.profile-page-header .eyebrow{color:#54cde8!important}.hero.profile-page-header h1{margin:6px 0!important}.hero.profile-page-header p{margin:0!important}.hero.profile-page-header .hero-actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;flex:0 0 auto!important}.hero.profile-page-header .primary,.hero.profile-page-header .back{white-space:nowrap!important}@media(max-width:650px){.hero.profile-page-header{align-items:flex-start!important;flex-direction:column!important;gap:14px!important}.hero.profile-page-header .hero-actions{width:100%!important;justify-content:flex-start!important}}</style>
+
+<style>
+/* Profile Builder folder details — page-specific premium header polish */
+.content>.hero.profile-page-header{
+    position:relative!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:24px!important;
+    margin:0 0 28px!important;
+    padding:4px 0 22px!important;
+    background:transparent!important;
+    background-image:none!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    outline:0!important;
+    overflow:visible!important;
+}
+
+.content>.hero.profile-page-header::after{
+    content:"";
+    position:absolute;
+    left:0;
+    bottom:0;
+    width:58px;
+    height:3px;
+    border-radius:3px;
+    background:#35d8b0;
+    box-shadow:none!important;
+}
+
+.content>.hero.profile-page-header>div{
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+}
+
+.content>.hero.profile-page-header .eyebrow{
+    display:flex!important;
+    align-items:center!important;
+    gap:7px!important;
+    color:#54cde8!important;
+    font-size:9px!important;
+    font-weight:800!important;
+    letter-spacing:.17em!important;
+}
+
+.content>.hero.profile-page-header .profile-header-icon{
+    color:#35d8b0!important;
+    font-size:11px!important;
+}
+
+.content>.hero.profile-page-header h1{
+    margin:8px 0 6px!important;
+    color:#e8f6f8!important;
+    font-size:clamp(32px,4vw,48px)!important;
+    line-height:1.04!important;
+    letter-spacing:-.025em!important;
+}
+
+.content>.hero.profile-page-header p{
+    margin:0!important;
+    max-width:760px!important;
+    color:#7898a5!important;
+    font-size:12px!important;
+    line-height:1.6!important;
+}
+
+.content>.hero.profile-page-header .hero-actions{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:8px!important;
+    flex:0 0 auto!important;
+}
+
+.content>.hero.profile-page-header .back,
+.content>.hero.profile-page-header .primary{
+    white-space:nowrap!important;
+}
+
+@media(max-width:650px){
+    .content>.hero.profile-page-header{
+        align-items:flex-start!important;
+        flex-direction:column!important;
+        gap:14px!important;
+        margin-bottom:24px!important;
+    }
+
+    .content>.hero.profile-page-header .hero-actions{
+        width:100%!important;
+        justify-content:flex-start!important;
+    }
+}
+</style>
