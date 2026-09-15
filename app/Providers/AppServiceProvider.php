@@ -79,7 +79,7 @@ class AppServiceProvider extends ServiceProvider
 
             $router->get('/sitemap.xml', SitemapController::class)->name('sitemap');
             $router->get('/indexnow/{key}.txt', [IndexNowController::class, 'key'])
-                ->where('key', '[A-Za-z0-9_-]{8,128}')
+                ->where('key', '[A-Fa-f0-9-]{8,128}')
                 ->name('indexnow.key');
 
             $router->fallback([\App\Http\Controllers\ManagementController::class, 'folderFallback'])->name('management.folder');
