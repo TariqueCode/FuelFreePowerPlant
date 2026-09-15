@@ -4,7 +4,7 @@
 <section class="hero profile-page-header">
     <div>
         <a class="back" href="{{ route('admin.profile-builder.index') }}"><i class="fa-solid fa-arrow-left"></i> Profile Builder</a>
-        <span class="eyebrow"><i class="fa-solid fa-folder profile-header-icon" aria-hidden="true"></i> GLOBAL · PROFILE BUILDER</span>
+        <span class="eyebrow">GLOBAL · PROFILE BUILDER</span>
         <h1>{{ $folder->name }}</h1>
         <p>{{ $folder->profiles_count }} {{ $folder->profiles_count === 1 ? 'profile' : 'profiles' }} in this folder.</p>
     </div>
