@@ -47,13 +47,73 @@
 .profile-page-header .eyebrow{display:block;color:#54cde8!important;font-size:9px;font-weight:800;letter-spacing:.17em}
 .profile-page-header h1{margin:8px 0 6px!important;color:#e8f6f8!important;font-size:clamp(32px,4vw,48px)!important;line-height:1.04!important;letter-spacing:-.025em!important}
 .profile-page-header p{margin:0!important;max-width:760px!important;color:#7898a5!important;font-size:12px!important;line-height:1.6!important}
-.header-back{display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;min-height:38px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.012);color:#9db9c2!important;text-decoration:none!important;font-size:10px;font-weight:700;white-space:nowrap;box-sizing:border-box}
+.header-back{display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;min-height:40px;padding:0 15px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.012);color:#9db9c2!important;text-decoration:none!important;font-size:10px;font-weight:700;white-space:nowrap;box-sizing:border-box}
 .header-back:hover,.header-back:visited{color:#b9d9e1!important;text-decoration:none!important}
-.profile-form-shell{width:min(100%,980px);border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.01));overflow:hidden}
-.form-heading{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:21px 23px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.012)}
+.profile-form-shell{width:min(100%,920px);border:1px solid rgba(91,214,239,.13);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.01));overflow:hidden}
+.form-heading{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:20px 22px;border-bottom:1px solid rgba(91,214,239,.09);background:rgba(255,255,255,.008)}
 .form-heading-copy{min-width:0}.form-heading .eyebrow{color:#54cde8;font-size:9px;font-weight:800;letter-spacing:.16em}.form-heading h2{margin:6px 0 4px;color:#e8f6f8;font-size:17px;line-height:1.2}.form-heading p{margin:0;color:#718f99;font-size:10px;line-height:1.55;max-width:700px}.form-badge{display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;padding:7px 10px;border:1px solid rgba(84,205,232,.18);border-radius:999px;color:#8db7c2;background:rgba(84,205,232,.045);font-size:9px;font-weight:700}.form-badge i{color:#35d8b0}
-.profile-form-shell form{padding:25px 23px}.field+.field{margin-top:21px}.field label{display:block;margin:0 0 8px;color:#9ab5bd;font-size:10px;font-weight:700}.field label span{color:#35d8b0}.input-shell,.select-shell{display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:11px;background:#061923;color:#e4f3f7}.input-shell>i,.select-shell>i{flex:0 0 auto;margin-left:13px;color:#54cde8;font-size:11px}.field input,.field select{width:100%;min-width:0;box-sizing:border-box;margin:0;border:0;background:transparent;color:#e4f3f7;padding:12px 13px 12px 0;font:inherit;font-size:11px;outline:none}.field select{padding-right:13px}.field input::placeholder{color:#58727c}.input-shell:focus-within,.select-shell:focus-within{border-color:rgba(84,205,232,.55);box-shadow:0 0 0 3px rgba(84,205,232,.06)}.help{display:flex;align-items:center;gap:6px;margin-top:7px;color:#667f88;font-size:9px;line-height:1.55}.help strong{color:#9eddec}.help i{color:#54cde8;font-size:8px}
-.form-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:27px;padding-top:18px;border-top:1px solid var(--line)}.cancel,.save{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:0 16px;border-radius:10px;font-size:10px;font-weight:800;text-decoration:none!important;box-sizing:border-box}.cancel{border:1px solid var(--line);background:transparent;color:#8faab3!important}.cancel:hover,.cancel:visited{color:#b9d9e1!important}.save{border:0;background:linear-gradient(135deg,#25abc9,#1687a4);color:#fff;cursor:pointer}.errors{margin:0 0 18px;padding:11px 13px;border:1px solid rgba(210,65,65,.25);border-radius:10px;background:rgba(210,65,65,.10);color:#ffb0b0;font-size:10px}
+.profile-form-shell form{padding:25px 23px}.field+.field{margin-top:21px}.field label{display:block;margin:0 0 8px;color:#9ab5bd;font-size:10px;font-weight:700}.field label span{color:#35d8b0}.input-shell,.select-shell{display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;border:1px solid rgba(91,214,239,.12);border-radius:10px;background:#061923;min-height:48px;color:#e4f3f7}.input-shell>i,.select-shell>i{flex:0 0 auto;margin-left:13px;color:#54cde8;font-size:11px}.field input,.field select{width:100%;min-width:0;box-sizing:border-box;margin:0;border:0;background:transparent;color:#e4f3f7;padding:12px 13px 12px 0;font:inherit;font-size:11px;outline:none}.field select{padding-right:13px}.field input::placeholder{color:#58727c}.input-shell:focus-within,.select-shell:focus-within{border-color:rgba(84,205,232,.55);box-shadow:0 0 0 3px rgba(84,205,232,.06)}.help{display:flex;align-items:center;gap:6px;margin-top:7px;color:#667f88;font-size:9px;line-height:1.55}.help strong{color:#9eddec}.help i{color:#54cde8;font-size:8px}
+.form-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:30px;padding-top:20px;border-top:1px solid var(--line)}.cancel,.save{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:0 17px;border-radius:10px;font-size:10px;font-weight:800;text-decoration:none!important;box-sizing:border-box}.cancel{border:1px solid var(--line);background:transparent;color:#8faab3!important}.cancel:hover,.cancel:visited{color:#b9d9e1!important}.save{border:0;background:linear-gradient(135deg,#25abc9,#1687a4);color:#fff;cursor:pointer}.errors{margin:0 0 18px;padding:11px 13px;border:1px solid rgba(210,65,65,.25);border-radius:10px;background:rgba(210,65,65,.10);color:#ffb0b0;font-size:10px}
 @media(max-width:650px){.content>.profile-page-header{align-items:flex-start!important;flex-direction:column!important;gap:15px!important;margin-bottom:24px!important}.header-back{width:auto}.profile-form-shell{border-radius:15px}.form-heading{align-items:flex-start;flex-direction:column;padding:18px 17px}.profile-form-shell form{padding:19px 17px}.form-actions{justify-content:stretch}.form-actions>*{flex:1}.help{align-items:flex-start}}
 </style>
 @endpush
+
+<style>
+/* Final page-local polish: Edit Profile Folder only. */
+.content>.profile-page-header .eyebrow{
+    position:relative;
+    z-index:1;
+}
+.content>.profile-page-header h1{
+    text-wrap:balance;
+}
+.profile-form-shell{
+    box-shadow:0 14px 36px rgba(0,0,0,.12);
+}
+.form-heading{
+    min-height:78px;
+    box-sizing:border-box;
+}
+.form-heading h2{
+    letter-spacing:-.01em;
+}
+.form-badge{
+    white-space:nowrap;
+}
+.input-shell,
+.select-shell{
+    transition:none!important;
+}
+.input-shell:focus-within,
+.select-shell:focus-within{
+    border-color:rgba(84,205,232,.62)!important;
+    box-shadow:0 0 0 3px rgba(84,205,232,.055)!important;
+}
+.field input,
+.field select{
+    min-height:46px;
+}
+.form-actions .cancel,
+.form-actions .save{
+    min-width:112px;
+}
+.header-back:focus-visible,
+.cancel:focus-visible,
+.save:focus-visible{
+    outline:2px solid rgba(84,205,232,.65);
+    outline-offset:2px;
+}
+@media(max-width:650px){
+    .profile-form-shell{
+        width:100%;
+        box-shadow:none;
+    }
+    .form-heading{
+        min-height:0;
+    }
+    .form-actions .cancel,
+    .form-actions .save{
+        min-width:0;
+    }
+}
+</style>
