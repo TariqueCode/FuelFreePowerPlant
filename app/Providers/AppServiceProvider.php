@@ -40,6 +40,10 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
 
+            if (str_contains($template, 'id="seoHelpModal"')) {
+                $template = str_replace('</body>', "@include('partials.admin-seo-help-script')\n</body>", $template);
+            }
+
             return $template;
         });
 
