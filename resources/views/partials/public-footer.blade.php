@@ -433,6 +433,14 @@
     .public-footer-developer{font-size:8px}
 }
 
+/* FINAL MOBILE FOOTER OVERRIDE */
+@media(max-width:600px){
+.public-footer-brand{display:block!important;width:100%!important;max-width:none!important;white-space:nowrap!important;overflow:visible!important;text-align:center!important;font-size:clamp(14px,4.3vw,19px)!important;line-height:1.15!important;letter-spacing:-.25px!important;background:linear-gradient(270deg,#fff 0%,#39E6A6 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important}
+.public-footer-brand-first,.public-footer-brand-rest{display:inline!important;white-space:nowrap!important;background:linear-gradient(270deg,#fff 0%,#39E6A6 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important}
+.public-footer-brand-first::after{content:" "!important}
+.public-footer-summary-chevron{display:none!important;visibility:hidden!important;width:0!important;height:0!important;margin:0!important;padding:0!important;border:0!important}
+}
+
 @media(max-width:390px){
     .public-footer-logo{
         width:94px;
