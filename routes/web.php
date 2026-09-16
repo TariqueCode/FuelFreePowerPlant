@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\InquiryController;
 use App\Http\Controllers\Admin\HelpDeskController;
 use App\Http\Controllers\Admin\ManagementController as AdminManagementController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\FooterManagerController;
 use App\Http\Controllers\Admin\SiteContentController;
 use App\Http\Controllers\Admin\SiteContentAttachmentController;
 use App\Http\Controllers\Admin\SitePopupController;
