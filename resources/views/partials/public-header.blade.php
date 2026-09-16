@@ -93,10 +93,7 @@
                 @else
                     <span class="public-brand-fallback" aria-hidden="true">⚡</span>
                 @endif
-                <span class="public-brand-name">
-                    <span class="public-brand-name-first">{{ $publicNameFirst }}</span>
-                    @if($publicNameRest) <span class="public-brand-name-rest">{{ $publicNameRest }}</span>@endif
-                </span>
+                <span class="public-brand-name">{{ $publicDisplayName }}</span>
             </a>
 
             <div class="public-header-tools">
