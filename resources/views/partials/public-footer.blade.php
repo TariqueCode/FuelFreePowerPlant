@@ -6,10 +6,9 @@
     $publicFooterName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
     $publicFooterTagline = $footerSettings['tagline'] ?? (is_object($publicBrand) ? ($publicBrand->get('tagline') ?: $publicBrand->get('company.tagline') ?: config('fuelfree.company.tagline')) : ($publicBrand['tagline'] ?? $publicBrand['company.tagline'] ?? config('fuelfree.company.tagline')));
     $publicFooterLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
-    $publicFooterName = preg_replace('/^FUEL\\s*FREE\\s*POWER\\s*PLANT$/i', 'FUELFREE POWERPLANT', trim((string) $publicFooterName));
-    $publicFooterNameParts = preg_split('/\s+/', trim((string) $publicFooterName), 2);
-    $publicFooterNameFirst = $publicFooterNameParts[0] ?? '';
-    $publicFooterNameRest = $publicFooterNameParts[1] ?? '';
+    $publicFooterName = "Fuel Free Power Plant Limited";
+    $publicFooterNameFirst = "Fuel Free";
+    $publicFooterNameRest = "Power Plant Limited";
 @endphp
 @php
     $publicSocials = \Illuminate\Support\Facades\Cache::remember('public.social-links', 600, fn () => \App\Models\SocialLink::active()->get(['platform','label','url','icon'])->map(fn ($social) => ['platform' => $social->platform, 'label' => $social->label, 'url' => $social->url, 'icon' => $social->icon, 'color' => data_get(config('fuelfree.social.platforms'), $social->platform.'.color', '#39E6A6')])->values()->all());
@@ -32,13 +31,13 @@
 .public-footer-shell{width:min(1120px,calc(100% - 40px));margin:0 auto}
 .public-footer-grid{
     display:grid;
-    grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr);
-    gap:46px;
-    padding-bottom:42px;
+    grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);
+    gap:34px;
+    padding-bottom:34px;
 }
 .public-footer-section{min-width:0}
 .public-footer-brand-section{
-    padding-right:28px;
+    padding-right:20px;
     position:relative;
 }
 .public-footer-brand-section::after{
@@ -59,24 +58,28 @@
 .public-footer-brand-row{
     display:flex;
     align-items:center;
-    gap:18px;
+    gap:16px;
     margin-bottom:13px;
 }
 .public-footer-logo{
-    width:128px;
-    height:128px;
+    width:124px;
+    height:124px;
     object-fit:contain;
     object-position:center;
     display:block;
-    flex:0 0 128px;
+    flex:0 0 124px;
     filter:drop-shadow(0 0 18px rgba(57,230,166,.20));
 }
 .public-footer-brand{
     color:#fff;
-    font-size:24px;
+    font-size:23px;
     font-weight:850;
-    line-height:1.15;
-    letter-spacing:-.4px;
+    line-height:1.12;
+    letter-spacing:-.35px;
+    max-width:180px;
+}
+.public-footer-brand-first,.public-footer-brand-middle,.public-footer-brand-rest{
+    display:block;
 }
 .public-footer-brand-first{
     background:linear-gradient(90deg,#39e6a6 0%,#8df2ce 48%,#fff 100%);
@@ -128,6 +131,9 @@
     color:#8caab5;
     font-size:13px;
     line-height:1.8;
+}
+.public-footer-address span{
+    max-width:230px;
 }
 .public-footer-address i{
     color:#39e6a6;
@@ -323,7 +329,7 @@
         flex-basis:104px;
     }
 
-    .public-footer-brand{font-size:20px}
+      .public-footer-brand{width:100%;max-width:none;white-space:nowrap;font-size:clamp(14px,4.5vw,19px);letter-spacing:-.25px;text-align:center;background:linear-gradient(270deg,#fff 0%,#39E6A6 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 
     .public-footer-tagline{
         font-size:11px;
