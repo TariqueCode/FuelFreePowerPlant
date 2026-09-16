@@ -5,7 +5,26 @@
 @if(session('status'))<div class="notice">{{ session('status') }}</div>@endif
 @if($errors->any())<div class="errors">{{ $errors->first() }}</div>@endif
 <form method="POST" enctype="multipart/form-data" action="{{ route('admin.settings.update') }}" class="settings-stack">@csrf
-<section class="settings-card"><header class="card-heading"><div><span class="eyebrow">IDENTITY</span><h2>Company identity</h2><p>Global brand information shared across the public website and platform.</p></div><span class="heading-icon"><i class="fa-solid fa-building"></i></span></header><div class="identity-card"><div class="logo-preview">@if($settings['company.logo_path'])<img src="{{ asset('storage/'.$settings['company.logo_path']) }}" alt="Company logo">@else<i class="fa-solid fa-building"></i>@endif</div><div class="identity-copy"><strong>{{ $settings['company.name'] }}</strong><span>Use a clear square or transparent logo for the best result.</span><label class="upload-button"><i class="fa-solid fa-cloud-arrow-up"></i><span>Change logo</span><input type="file" name="company[logo]" accept="image/png,image/jpeg,image/webp,image/svg+xml"></label></div></div><div class="field-grid"><label><span>Company name</span><input name="company[name]" value="{{ old('company.name',$settings['company.name']) }}" required maxlength="150"></label><label><span>Company domain</span><input name="company[domain]" value="{{ old('company.domain',$settings['company.domain']) }}" required maxlength="255"></label><label class="full"><span>Tagline</span><input name="company[tagline]" value="{{ old('company.tagline',$settings['company.tagline']) }}" maxlength="255"></label><label><span>Timezone</span><input name="company[timezone]" value="{{ old('company.timezone',$settings['company.timezone']) }}" required placeholder="Asia/Dhaka"></label></div></section>
+<section class="settings-card">
+<header class="card-heading">
+<div>
+<span class="eyebrow">PLATFORM</span>
+<h2>System configuration</h2>
+<p>Manage platform-level settings that are not part of the public Header & Footer.</p>
+</div>
+<span class="heading-icon"><i class="fa-solid fa-sliders"></i></span>
+</header>
+<div class="field-grid">
+<label>
+<span>Company domain</span>
+<input name="company[domain]" value="{{ old('company.domain',$settings['company.domain']) }}" required maxlength="255">
+</label>
+<label>
+<span>Timezone</span>
+<input name="company[timezone]" value="{{ old('company.timezone',$settings['company.timezone']) }}" required placeholder="Asia/Dhaka">
+</label>
+</div>
+</section>
 <section class="settings-card settings-integration"><div class="integration-copy"><span class="eyebrow">SEARCH · ANALYTICS · VERIFICATION</span><h2>SEO &amp; Integrations</h2><p>Configure Google Search Console, Bing Webmaster, Meta verification, GA4 and IndexNow from one place. Each field includes a beginner-friendly tutorial.</p></div><a class="integration-link" href="{{ route('admin.settings.seo') }}"><span><i class="fa-solid fa-chart-line"></i> Open SEO &amp; Integrations</span><i class="fa-solid fa-arrow-right"></i></a></section>
 <div class="save-bar"><div><strong>System settings</strong><span>Changes apply platform-wide. Upload-size controls are intentionally not configurable here.</span></div><button type="submit"><i class="fa-solid fa-floppy-disk"></i> Save settings</button></div>
 </form>

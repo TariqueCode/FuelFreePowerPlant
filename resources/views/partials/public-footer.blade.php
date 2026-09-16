@@ -1,14 +1,130 @@
 @php
     $publicBrand = $brand ?? [];
     $footerSettings = config('fuelfree.footer', []);
-    $footerVisibility = \App\Models\SystemSetting::query()->whereIn('key',['design.footer.columns_enabled','design.footer.links_enabled','design.footer.social_enabled','design.footer.contact_enabled','design.footer.copyright_enabled'])->pluck('value','key');
-    $footerVisible = fn($key) => filter_var($footerVisibility->get('design.footer.'.$key.'_enabled','1'), FILTER_VALIDATE_BOOLEAN);
-    $publicFooterName = is_object($publicBrand) ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name')) : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
-    $publicFooterTagline = $footerSettings['tagline'] ?? (is_object($publicBrand) ? ($publicBrand->get('tagline') ?: $publicBrand->get('company.tagline') ?: config('fuelfree.company.tagline')) : ($publicBrand['tagline'] ?? $publicBrand['company.tagline'] ?? config('fuelfree.company.tagline')));
-    $publicFooterLogo = is_object($publicBrand) ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path')) : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
-    $publicFooterName = "Fuel Free Power Plant Limited";
-    $publicFooterNameFirst = "Fuel Free";
-    $publicFooterNameRest = "Power Plant Limited";
+
+    $footerKeys = [
+        'footer.company_name',
+        'footer.tagline',
+        'footer.technology',
+        'footer.office_heading',
+        'footer.address',
+        'footer.contact_heading',
+        'footer.email',
+        'footer.phone',
+        'footer.website',
+        'footer.website_url',
+        'footer.get_in_touch_label',
+        'footer.get_in_touch_url',
+        'footer.copyright_text',
+        'design.footer.columns_enabled',
+        'design.footer.links_enabled',
+        'design.footer.social_enabled',
+        'design.footer.contact_enabled',
+        'design.footer.copyright_enabled',
+    ];
+
+    $footerSaved = \App\Models\SystemSetting::query()
+        ->whereIn('key', $footerKeys)
+        ->pluck('value', 'key');
+
+    $footerVisible = fn ($key) => filter_var(
+        $footerSaved->get(
+            'design.footer.' . $key . '_enabled',
+            '1'
+        ),
+        FILTER_VALIDATE_BOOLEAN
+    );
+
+    $publicFooterName = $footerSaved->get('footer.company_name');
+
+    if (!$publicFooterName) {
+        $publicFooterName = is_object($publicBrand)
+            ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name'))
+            : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
+    }
+
+    $publicFooterTagline = $footerSaved->get(
+        'footer.tagline',
+        $footerSettings['tagline'] ?? (
+            is_object($publicBrand)
+                ? ($publicBrand->get('tagline') ?: $publicBrand->get('company.tagline') ?: config('fuelfree.company.tagline'))
+                : ($publicBrand['tagline'] ?? $publicBrand['company.tagline'] ?? config('fuelfree.company.tagline'))
+        )
+    );
+
+    $publicFooterTechnology = $footerSaved->get(
+        'footer.technology',
+        $footerSettings['technology'] ?? 'Fuel-Free Flywheel-Based Clean Energy Technology'
+    );
+
+    $publicFooterOfficeHeading = $footerSaved->get(
+        'footer.office_heading',
+        $footerSettings['office_heading'] ?? 'Office'
+    );
+
+    $publicFooterAddress = $footerSaved->get(
+        'footer.address',
+        $footerSettings['address'] ?? ''
+    );
+
+    $publicFooterContactHeading = $footerSaved->get(
+        'footer.contact_heading',
+        $footerSettings['contact_heading'] ?? 'Contact'
+    );
+
+    $publicFooterEmail = $footerSaved->get(
+        'footer.email',
+        $footerSettings['email'] ?? ''
+    );
+
+    $publicFooterPhone = $footerSaved->get(
+        'footer.phone',
+        $footerSettings['phone'] ?? ''
+    );
+
+    $publicFooterWebsite = $footerSaved->get(
+        'footer.website',
+        $footerSettings['website'] ?? ''
+    );
+
+    $publicFooterWebsiteUrl = $footerSaved->get(
+        'footer.website_url',
+        $footerSettings['website_url'] ?? ''
+    );
+
+    $publicFooterGetInTouchLabel = $footerSaved->get(
+        'footer.get_in_touch_label',
+        $footerSettings['get_in_touch_label'] ?? 'Get in touch'
+    );
+
+    $publicFooterGetInTouchUrl = $footerSaved->get(
+        'footer.get_in_touch_url',
+        $footerSettings['get_in_touch_url'] ?? route('contact')
+    );
+
+    $publicFooterCopyright = $footerSaved->get(
+        'footer.copyright_text',
+        $footerSettings['copyright_text'] ?? 'All rights reserved.'
+    );
+
+    $publicFooterLogo = is_object($publicBrand)
+        ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path'))
+        : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
+
+    if (!$publicFooterLogo) {
+        $publicFooterLogo = \App\Models\SystemSetting::query()
+            ->where('key', 'company.logo_path')
+            ->value('value');
+    }
+
+    $publicFooterNameParts = preg_split(
+        '/\s+/',
+        trim((string) $publicFooterName),
+        2
+    );
+
+    $publicFooterNameFirst = $publicFooterNameParts[0] ?? '';
+    $publicFooterNameRest = $publicFooterNameParts[1] ?? '';
 @endphp
 @php
     $publicSocials = \Illuminate\Support\Facades\Cache::remember('public.social-links', 600, fn () => \App\Models\SocialLink::active()->get(['platform','label','url','icon'])->map(fn ($social) => ['platform' => $social->platform, 'label' => $social->label, 'url' => $social->url, 'icon' => $social->icon, 'color' => data_get(config('fuelfree.social.platforms'), $social->platform.'.color', '#39E6A6')])->values()->all());
@@ -497,7 +613,7 @@
                 @endif
 
                 <div class="public-footer-tech">
-                    {{ $footerSettings['technology'] ?? 'Fuel-Free Flywheel-Based Clean Energy Technology' }}
+                    {{ $publicFooterTechnology }}
                 </div>
 
                 @if($footerVisible('social') && !empty($publicSocials))
@@ -524,14 +640,14 @@
                     <details class="public-footer-accordion" open>
                         <summary class="public-footer-summary">
                             <h2 class="public-footer-heading">
-                                {{ $footerSettings['office_heading'] ?? 'Office' }}
+                                {{ $publicFooterOfficeHeading }}
                             </h2>
                             <span class="public-footer-summary-chevron" aria-hidden="true"></span>
                         </summary>
 
                         <div class="public-footer-address">
                             <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                            <span>{!! nl2br(e($footerSettings['address'] ?? 'House-141, 3rd Floor, Road-22, Mohakhali DOHS, Dhaka-1206, Bangladesh')) !!}</span>
+                            <span>{!! nl2br(e($publicFooterAddress)) !!}</span>
                         </div>
                     </details>
                 </section>
@@ -542,30 +658,30 @@
                     <details class="public-footer-accordion" open>
                         <summary class="public-footer-summary">
                             <h2 class="public-footer-heading">
-                                {{ $footerSettings['contact_heading'] ?? 'Contact' }}
+                                {{ $publicFooterContactHeading }}
                             </h2>
                             <span class="public-footer-summary-chevron" aria-hidden="true"></span>
                         </summary>
 
                         <div class="public-footer-contact">
-                            <a href="mailto:{{ $footerSettings['email'] ?? 'info@fuelfreepowerplant.com' }}">
+                            <a href="mailto:{{ $publicFooterEmail }}">
                                 <i class="fa-solid fa-envelope" aria-hidden="true"></i>
-                                <span>{{ $footerSettings['email'] ?? 'info@fuelfreepowerplant.com' }}</span>
+                                <span>{{ $publicFooterEmail }}</span>
                             </a>
 
                             <a href="tel:{{ preg_replace('/[^0-9+]/', '', $footerSettings['phone'] ?? '+880 1712-251892') }}">
                                 <i class="fa-solid fa-phone" aria-hidden="true"></i>
-                                <span>{{ $footerSettings['phone'] ?? '+880 1712-251892' }}</span>
+                                <span>{{ $publicFooterPhone }}</span>
                             </a>
 
-                            <a href="{{ $footerSettings['website_url'] ?? 'https://www.fuelfreepowerplant.com' }}">
+                            <a href="{{ $publicFooterWebsiteUrl }}">
                                 <i class="fa-solid fa-globe" aria-hidden="true"></i>
-                                <span>{{ $footerSettings['website'] ?? 'www.fuelfreepowerplant.com' }}</span>
+                                <span>{{ $publicFooterWebsite }}</span>
                             </a>
 
-                            <a href="{{ $footerSettings['get_in_touch_url'] ?? route('contact') }}">
+                            <a href="{{ $publicFooterGetInTouchUrl }}">
                                 <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                <span>{{ $footerSettings['get_in_touch_label'] ?? 'Get in touch' }}</span>
+                                <span>{{ $publicFooterGetInTouchLabel }}</span>
                             </a>
                         </div>
                     </details>
@@ -577,7 +693,7 @@
         <div class="public-footer-bottom">
             @if($footerVisible('copyright'))
                 <div>
-                    © {{ date('Y') }} {{ $publicFooterName }} · {{ $footerSettings['copyright_text'] ?? 'All rights reserved.' }}
+                    © {{ date('Y') }} {{ $publicFooterName }} · {{ $publicFooterCopyright }}
                 </div>
             @endif
 

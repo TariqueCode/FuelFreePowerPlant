@@ -1,9 +1,32 @@
 @php
     $publicBrand = $brand ?? [];
     $headerLabels = config('fuelfree.header', []);
-    $publicName = is_object($publicBrand)
-        ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name'))
-        : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
+
+    $headerSettings = \App\Models\SystemSetting::query()
+        ->whereIn('key', [
+            'header.company_name',
+            'header.portal_label',
+            'header.login_label',
+        ])
+        ->pluck('value', 'key');
+
+    $publicName = $headerSettings->get('header.company_name');
+
+    if (!$publicName) {
+        $publicName = is_object($publicBrand)
+            ? ($publicBrand->get('name') ?: $publicBrand->get('company.name') ?: config('fuelfree.company.name'))
+            : ($publicBrand['name'] ?? $publicBrand['company.name'] ?? config('fuelfree.company.name'));
+    }
+
+    $headerLabels['portal_label'] = $headerSettings->get(
+        'header.portal_label',
+        $headerLabels['portal_label'] ?? 'Portal'
+    );
+
+    $headerLabels['login_label'] = $headerSettings->get(
+        'header.login_label',
+        $headerLabels['login_label'] ?? 'Login'
+    );
     $publicLogo = is_object($publicBrand)
         ? ($publicBrand->get('logo_path') ?: $publicBrand->get('company.logo_path'))
         : ($publicBrand['logo_path'] ?? $publicBrand['company.logo_path'] ?? null);
@@ -12,9 +35,7 @@
         $publicLogo = \App\Models\SystemSetting::query()->where('key', 'company.logo_path')->value('value');
     }
 
-    // Keep the registered brand spelling intact, but separate the two words
-    // in the public header when the stored value is the concatenated form.
-    $publicDisplayName = preg_replace('/^FUEL\\s*FREE\\s*POWER\\s*PLANT$/i', 'FUELFREE POWERPLANT', trim((string) $publicName));
+    $publicDisplayName = trim((string) $publicName);
     $publicNameParts = preg_split('/\\s+/', $publicDisplayName, 2);
     $publicNameFirst = $publicNameParts[0] ?? '';
     $publicNameRest = $publicNameParts[1] ?? '';
