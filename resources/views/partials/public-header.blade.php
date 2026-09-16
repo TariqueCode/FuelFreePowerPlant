@@ -186,3 +186,287 @@
     });
 })();
 </script>
+
+<style>
+/* =========================================================
+   FUELFREE GLOBAL HEADER — ALL DEVICE RESPONSIVE POLISH
+   Scoped only to public global header.
+   ========================================================= */
+
+.public-header{
+    width:100%;
+    overflow:visible;
+}
+
+.public-header .public-shell{
+    width:min(1280px,calc(100% - 40px));
+    margin-inline:auto;
+}
+
+.public-header-top{
+    width:100%;
+    min-width:0;
+}
+
+.public-brand{
+    min-width:0;
+    max-width:min(48%,520px);
+}
+
+.public-brand-name{
+    min-width:0;
+    max-width:100%;
+}
+
+.public-header-tools{
+    min-width:0;
+    flex-shrink:1;
+}
+
+.public-header-socials{
+    min-width:0;
+    flex-wrap:nowrap;
+}
+
+.public-header-nav{
+    min-width:0;
+    overflow:visible;
+}
+
+.public-menu{
+    min-width:0;
+    overflow:visible;
+}
+
+.public-menu>a,
+.public-menu-dropdown,
+.public-menu-dropdown-toggle{
+    flex:0 0 auto;
+}
+
+/* Large desktop */
+@media (min-width:1201px){
+    .public-header-top{
+        min-height:68px;
+    }
+
+    .public-brand img,
+    .public-brand-fallback{
+        width:46px;
+        height:46px;
+        flex-basis:46px;
+    }
+
+    .public-brand-name{
+        font-size:16px;
+    }
+
+    .public-header-nav{
+        height:48px;
+    }
+}
+
+/* Medium desktop / tablet landscape */
+@media (max-width:1200px) and (min-width:901px){
+    .public-header .public-shell{
+        width:calc(100% - 28px);
+    }
+
+    .public-brand{
+        max-width:40%;
+    }
+
+    .public-brand-name{
+        font-size:14px;
+    }
+
+    .public-header-social{
+        width:31px;
+        height:31px;
+    }
+
+    .public-portal{
+        min-height:34px;
+        padding-inline:11px;
+        font-size:10px;
+    }
+
+    .public-menu{
+        gap:1px;
+    }
+
+    .public-menu>a,
+    .public-menu-dropdown-toggle{
+        padding-inline:7px;
+        font-size:10.5px;
+    }
+}
+
+/* Tablet / mobile */
+@media (max-width:900px){
+    .public-header{
+        position:sticky;
+        top:0;
+        z-index:1000;
+    }
+
+    .public-header .public-shell{
+        width:calc(100% - 24px);
+    }
+
+    .public-header-top{
+        min-height:60px;
+        gap:10px;
+    }
+
+    .public-brand{
+        max-width:calc(100% - 52px);
+        flex:1 1 auto;
+    }
+
+    .public-brand img,
+    .public-brand-fallback{
+        width:42px;
+        height:42px;
+        flex-basis:42px;
+        border-radius:9px;
+    }
+
+    .public-brand-name{
+        font-size:14px;
+        line-height:1.15;
+    }
+
+    .public-menu-toggle{
+        flex:0 0 40px;
+    }
+
+    .public-header-nav{
+        left:8px;
+        right:8px;
+        width:auto;
+    }
+}
+
+/* Small phones */
+@media (max-width:520px){
+    .public-header .public-shell{
+        width:calc(100% - 16px);
+    }
+
+    .public-header-top{
+        min-height:56px;
+        gap:8px;
+    }
+
+    .public-brand{
+        max-width:calc(100% - 48px);
+    }
+
+    .public-brand img,
+    .public-brand-fallback{
+        width:38px;
+        height:38px;
+        flex-basis:38px;
+        border-radius:8px;
+    }
+
+    .public-brand-name{
+        font-size:12.5px;
+        letter-spacing:0;
+    }
+
+    .public-menu-toggle{
+        width:38px;
+        height:38px;
+        flex-basis:38px;
+        border-radius:10px;
+    }
+
+    .public-header-nav{
+        top:calc(100% + 6px);
+        left:4px;
+        right:4px;
+        max-height:calc(100dvh - 68px);
+        padding:8px;
+        border-radius:14px;
+    }
+
+    .public-menu>a,
+    .public-menu-dropdown-toggle{
+        min-height:46px;
+        height:46px;
+        padding-inline:13px;
+        font-size:14px;
+    }
+
+    .public-menu-dropdown-panel{
+        padding-left:8px;
+    }
+
+    .public-menu-dropdown-panel a{
+        min-height:40px;
+        height:40px;
+        font-size:13px;
+    }
+
+    .mobile-menu-portal{
+        min-height:47px!important;
+        font-size:14px!important;
+    }
+}
+
+/* Very narrow phones */
+@media (max-width:360px){
+    .public-header .public-shell{
+        width:calc(100% - 12px);
+    }
+
+    .public-brand-name{
+        font-size:11.5px;
+    }
+
+    .public-brand img,
+    .public-brand-fallback{
+        width:36px;
+        height:36px;
+        flex-basis:36px;
+    }
+
+    .public-menu-toggle{
+        width:36px;
+        height:36px;
+        flex-basis:36px;
+    }
+
+    .public-header-nav{
+        left:2px;
+        right:2px;
+    }
+}
+
+/* Accessibility + safe viewport behavior */
+@media (prefers-reduced-motion:reduce){
+    .public-header *,
+    .public-header *::before,
+    .public-header *::after{
+        scroll-behavior:auto!important;
+        transition:none!important;
+        animation:none!important;
+    }
+}
+
+/* Prevent horizontal overflow caused by nested navigation */
+.public-header,
+.public-header .public-shell,
+.public-header-top,
+.public-header-nav,
+.public-menu,
+.public-menu-dropdown{
+    box-sizing:border-box;
+}
+
+.public-header img{
+    max-width:100%;
+}
+</style>
