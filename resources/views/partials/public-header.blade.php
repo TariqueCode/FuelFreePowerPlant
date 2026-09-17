@@ -472,3 +472,37 @@
     max-width:100%;
 }
 </style>
+
+<style>
+/* FUELFREE — GLOBAL COMPANY NAME SIZE POLISH
+   Visual-only override. No navigation/functionality changes. */
+
+.public-header .public-brand-name{
+    font-size:clamp(18px,1.45vw,20px)!important;
+    line-height:1.15!important;
+}
+
+@media (max-width:1200px) and (min-width:901px){
+    .public-header .public-brand-name{
+        font-size:18px!important;
+    }
+}
+
+@media (max-width:900px){
+    .public-header .public-brand-name{
+        font-size:17px!important;
+    }
+}
+
+@media (max-width:520px){
+    .public-header .public-brand-name{
+        font-size:16px!important;
+    }
+}
+
+@media (max-width:360px){
+    .public-header .public-brand-name{
+        font-size:15px!important;
+    }
+}
+</style>
