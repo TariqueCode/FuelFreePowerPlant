@@ -437,6 +437,91 @@
             color:#b9cec2;
         }
 
+        /* =========================================================
+           Reusable page/card primitives
+           Use these instead of page-specific card CSS.
+           ========================================================= */
+        .ff-page{width:100%;min-width:0}
+        .ff-page-header{
+            padding:clamp(38px,6vw,76px) 0 clamp(28px,4vw,48px);
+            border-bottom:1px solid rgba(53,216,106,.09);
+            background:
+                radial-gradient(circle at 12% 20%,rgba(53,216,106,.055),transparent 30%),
+                radial-gradient(circle at 88% 10%,rgba(22,141,255,.035),transparent 28%);
+        }
+        .ff-page-header__inner{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:end}
+        .ff-page-header__actions{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap}
+        .ff-page-header__actions .ff-btn{width:auto}
+        .ff-section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:24px}
+        .ff-section-head__copy{min-width:0}
+        .ff-section-head__actions{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap}
+        .ff-section-head__actions .ff-btn{width:auto}
+
+        .ff-card-grid{display:grid;grid-template-columns:repeat(var(--ff-columns,3),minmax(0,1fr));gap:var(--ff-gap,24px)}
+        .ff-card-grid--2{--ff-columns:2}
+        .ff-card-grid--3{--ff-columns:3}
+        .ff-card-grid--4{--ff-columns:4}
+        .ff-card-grid--auto{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+        .ff-card--compact{padding:18px}
+        .ff-card--feature{min-height:220px}
+        .ff-card--interactive{cursor:pointer}
+        .ff-card--interactive:hover{text-decoration:none}
+        .ff-card--media{padding:0;overflow:hidden}
+        .ff-card__media{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#07150f}
+        .ff-card__body{padding:22px}
+        .ff-card__eyebrow{display:block;margin:0 0 8px;color:#72e99a;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+        .ff-card__title{margin:0;color:var(--ff-white);font-size:18px;line-height:1.25;font-weight:800;letter-spacing:-.01em}
+        .ff-card__text{margin:9px 0 0;color:#91a99d;font-size:13px;line-height:1.75}
+        .ff-card__meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:13px;color:#6f897d;font-size:11px;line-height:1.5}
+        .ff-card__footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;padding-top:15px;border-top:1px solid rgba(53,216,106,.09)}
+        .ff-card__link{display:inline-flex;align-items:center;gap:7px;color:#9aefb1;font-size:12px;font-weight:800;text-decoration:none}
+        .ff-card__link:hover{color:#fff}
+        .ff-icon{
+            width:44px;height:44px;display:grid;place-items:center;flex:0 0 44px;
+            border:1px solid rgba(53,216,106,.20);border-radius:13px;
+            background:linear-gradient(145deg,rgba(53,216,106,.10),rgba(22,141,255,.035));color:#72e99a;
+        }
+        .ff-icon--sm{width:36px;height:36px;flex-basis:36px;border-radius:10px;font-size:13px}
+        .ff-icon--lg{width:54px;height:54px;flex-basis:54px;border-radius:15px;font-size:18px}
+        .ff-stat{
+            position:relative;padding:22px;border:1px solid rgba(53,216,106,.14);border-radius:var(--ff-radius);
+            background:linear-gradient(145deg,rgba(8,26,18,.78),rgba(3,13,9,.88));overflow:hidden;
+        }
+        .ff-stat__value{display:block;margin-top:9px;color:var(--ff-white);font-size:clamp(24px,3vw,34px);line-height:1;font-weight:850;letter-spacing:-.03em}
+        .ff-stat__label{display:block;margin-top:8px;color:#718b7f;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+        .ff-stat::after{content:"";position:absolute;width:100px;height:100px;right:-50px;top:-50px;border-radius:50%;background:rgba(53,216,106,.045);pointer-events:none}
+        .ff-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+        .ff-actions .ff-btn{width:auto}
+        .ff-prose{max-width:820px;color:#9aada3;font-size:14px;line-height:1.9}
+        .ff-prose h2,.ff-prose h3{color:var(--ff-white);line-height:1.2}
+        .ff-prose a{color:#8ce9a8;text-decoration:underline;text-decoration-color:rgba(53,216,106,.35);text-underline-offset:3px}
+        .ff-empty{padding:38px 24px;text-align:center;border:1px dashed rgba(53,216,106,.16);border-radius:var(--ff-radius);background:rgba(53,216,106,.025);color:#718b7f}
+        .ff-status{display:inline-flex;align-items:center;gap:7px;min-height:27px;padding:5px 9px;border-radius:999px;font-size:10px;font-weight:800}
+        .ff-status::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 9px currentColor}
+        .ff-status--success{color:#76e99a;background:rgba(53,216,106,.07)}
+        .ff-status--info{color:#7abaff;background:rgba(22,141,255,.07)}
+        .ff-status--muted{color:#879c92;background:rgba(215,221,224,.06)}
+        .ff-skeleton{background:linear-gradient(90deg,rgba(255,255,255,.025),rgba(53,216,106,.055),rgba(255,255,255,.025));background-size:200% 100%;animation:ffSkeleton 1.5s linear infinite}
+        @keyframes ffSkeleton{to{background-position:-200% 0}}
+
+        /* Public legacy aliases: common page card names now inherit the framework.
+           This reduces repeated per-page CSS without touching admin UI. */
+        .public-site .page-card,.public-site .content-card,.public-site .info-card,.public-site .feature-card,
+        .public-site .news-card,.public-site .project-card,.public-site .service-card{
+            position:relative;padding:24px;background:linear-gradient(145deg,rgba(8,26,18,.78),rgba(3,13,9,.88));
+            border:1px solid rgba(53,216,106,.14);border-radius:var(--ff-radius);box-shadow:0 14px 42px rgba(0,0,0,.22);
+            overflow:hidden;transition:transform .22s var(--ff-ease),border-color .22s ease,box-shadow .22s ease;
+        }
+        .public-site .page-card:hover,.public-site .content-card:hover,.public-site .info-card:hover,.public-site .feature-card:hover,
+        .public-site .news-card:hover,.public-site .project-card:hover,.public-site .service-card:hover{
+            transform:translateY(-3px);border-color:rgba(53,216,106,.28);box-shadow:0 20px 52px rgba(0,0,0,.28),var(--ff-shadow-green);
+        }
+        .public-site .page-card::before,.public-site .content-card::before,.public-site .info-card::before,.public-site .feature-card::before,
+        .public-site .news-card::before,.public-site .project-card::before,.public-site .service-card::before{
+            content:"";position:absolute;left:0;right:0;top:0;height:1px;
+            background:linear-gradient(90deg,transparent,rgba(53,216,106,.45),rgba(22,141,255,.18),transparent);pointer-events:none;
+        }
+
         /* Responsive helpers */
         .ff-hide-mobile{display:block}
         .ff-only-mobile{display:none}
@@ -504,7 +589,7 @@
         @media (min-width:721px) { .public-header-nav .public-menu-dropdown-panel { max-width:min(320px,calc(100vw - 24px)); } .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown-panel { max-height:min(70vh,520px);overflow-y:auto; } }
     </style>
 </head>
-<body>
+<body class="public-site">
     @if($useGlobalHeader) @include('partials.public-header', ['brand' => $publicBrand]) @endif
     @yield('content')
     @if($useGlobalFooter) @include('partials.public-footer', ['brand' => $publicBrand]) @endif
