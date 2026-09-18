@@ -290,35 +290,6 @@ img{max-width:100%}
 
 /* === FFP modern motion architecture: GPU-light, responsive, content-safe === */
 main.shell{position:relative;isolation:isolate}
-main.shell>.energy-atmosphere{position:absolute;inset:0;z-index:-2;pointer-events:none;overflow:hidden;contain:strict;background:
- radial-gradient(circle at 18% 18%,rgba(43,203,232,.08),transparent 28%),
- radial-gradient(circle at 82% 46%,rgba(36,157,191,.06),transparent 25%),
- linear-gradient(180deg,rgba(2,11,17,.15),rgba(1,8,13,.32))}
-.energy-atmosphere .energy-grid{position:absolute;inset:-20%;opacity:.17;background-image:
- linear-gradient(rgba(72,216,241,.08) 1px,transparent 1px),
- linear-gradient(90deg,rgba(72,216,241,.08) 1px,transparent 1px);
- background-size:72px 72px;transform:perspective(700px) rotateX(58deg) translateY(18%);transform-origin:center bottom;
- mask-image:linear-gradient(to top,black,transparent 72%);animation:gridDrift 22s linear infinite}
-.energy-atmosphere .energy-core{position:absolute;width:min(42vw,520px);aspect-ratio:1;left:50%;top:47%;border:1px solid rgba(72,216,241,.08);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 90px rgba(72,216,241,.035),inset 0 0 70px rgba(72,216,241,.025);animation:coreBreath 10s ease-in-out infinite}
-.energy-atmosphere .energy-core:before,.energy-atmosphere .energy-core:after{content:"";position:absolute;inset:12%;border:1px solid rgba(72,216,241,.06);border-radius:50%}
-.energy-atmosphere .energy-core:after{inset:27%;border-style:dashed;animation:coreSpin 28s linear infinite}
-.energy-atmosphere .energy-orbit{position:absolute;width:clamp(260px,34vw,520px);height:clamp(90px,12vw,180px);left:50%;top:48%;border:1px solid rgba(72,216,241,.07);border-radius:50%;transform:translate(-50%,-50%) rotate(-14deg);animation:orbitFloat 13s ease-in-out infinite}
-.energy-atmosphere .energy-orbit:after{content:"";position:absolute;width:5px;height:5px;left:17%;top:18%;border-radius:50%;background:var(--cyan);box-shadow:0 0 18px rgba(72,216,241,.65)}
-.energy-atmosphere .energy-pulse{position:absolute;left:6%;right:6%;top:58%;height:1px;background:linear-gradient(90deg,transparent,rgba(72,216,241,.08),transparent);animation:pulseTravel 8s ease-in-out infinite}
-.energy-atmosphere .energy-pulse:before,.energy-atmosphere .energy-pulse:after{content:"";position:absolute;top:-3px;width:7px;height:7px;border:1px solid rgba(72,216,241,.28);transform:rotate(45deg);background:#031018}
-.home-section .head>div,.welcome-heading,.welcome-copy{will-change:transform}
-.home-section .head>div{transform:translate3d(var(--motion-x,0px),var(--motion-y,0px),0)}
-.welcome-heading{transform:translate3d(var(--motion-x,0px),var(--motion-y,0px),0)}
-.welcome-copy{transform:translate3d(calc(var(--motion-x,0px) * -.65),calc(var(--motion-y,0px) * -.65),0)}
-.home-section:nth-of-type(odd) .head>div{--motion-x:0px}
-.home-section .head>p{transform:translate3d(calc(var(--motion-x,0px) * -.55),0,0);will-change:transform}
-@keyframes gridDrift{from{background-position:0 0}to{background-position:0 72px}}
-@keyframes coreBreath{0%,100%{opacity:.45;transform:translate(-50%,-50%) scale(.96)}50%{opacity:.8;transform:translate(-50%,-50%) scale(1.035)}}
-@keyframes coreSpin{to{transform:rotate(360deg)}}
-@keyframes orbitFloat{0%,100%{transform:translate(-50%,-50%) rotate(-14deg) scale(1)}50%{transform:translate(-50%,-50%) rotate(-8deg) scale(1.04)}}
-@keyframes pulseTravel{0%,100%{opacity:.25;transform:scaleX(.92)}50%{opacity:.75;transform:scaleX(1)}}
-
-
 .welcome-profile-mobile-panel{display:none}
 .welcome-profile-mobile-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:12px 14px 10px;border-bottom:1px solid rgba(72,216,241,.10)}
 .welcome-profile-mobile-head strong{display:block;color:#eaf8fb;font-size:11px;line-height:1.3}.welcome-profile-mobile-head span{display:block;margin-top:4px;color:#63d4e9;font-size:8px;line-height:1.35}.welcome-profile-mobile-close{width:30px;height:30px;flex:0 0 30px;display:grid;place-items:center;border:1px solid rgba(72,216,241,.14);border-radius:9px;background:rgba(72,216,241,.05);color:#b9d8df;cursor:pointer}.welcome-profile-mobile-message{padding:12px 14px 14px;color:#9bb6bf;font-size:10px;line-height:1.75;overflow-wrap:anywhere}
