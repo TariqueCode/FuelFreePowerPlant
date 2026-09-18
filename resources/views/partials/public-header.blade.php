@@ -150,8 +150,8 @@
         if(button.dataset.bound === '1') return;
         button.dataset.bound = '1';
 
-        var shell = button.closest('.public-shell');
-        var menu = shell && shell.querySelector('.public-header-nav');
+        var header = button.closest('.public-header');
+        var menu = header && header.querySelector('.public-header-nav');
         var icon = button.querySelector('.public-menu-icon');
         if(!menu) return;
 
@@ -175,7 +175,7 @@
         });
 
         document.addEventListener('click', function(e){
-            if(menu.classList.contains('is-open') && !shell.contains(e.target)) setOpen(false);
+            if(menu.classList.contains('is-open') && !header.contains(e.target)) setOpen(false);
         });
 
         document.addEventListener('keydown', function(e){
