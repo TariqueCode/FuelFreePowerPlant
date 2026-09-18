@@ -8,10 +8,10 @@
 
 @section('content')
 <style>
-:root{--bg:#031018;--panel:#071b26;--line:rgba(83,218,240,.16);--text:#effcff;--muted:#91aeb8;--cyan:#48d8f1;--max:1280px}
+:root{--bg:var(--ff-ink,#020906);--panel:var(--ff-surface,#06120d);--line:var(--ff-border,rgba(53,216,106,.16));--text:var(--ff-white,#f4fff8);--muted:var(--ff-muted,#91a99d);--cyan:var(--ff-green,#35d86a);--max:var(--ff-max,1280px)}
 *{box-sizing:border-box}
 html{overflow-x:hidden}
-body{margin:0;overflow-x:hidden;background:radial-gradient(circle at 10% 0,rgba(33,187,221,.13),transparent 30%),linear-gradient(180deg,#020a10,#061721 55%,#020a10);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+body{margin:0;overflow-x:hidden;background:linear-gradient(180deg,#020906 0%,#03100b 50%,#020906 100%);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
 a{text-decoration:none;color:inherit}
 img{max-width:100%}
 .shell{width:min(var(--max),calc(100% - 32px));margin-inline:auto}
@@ -3262,7 +3262,6 @@ main.shell{
 @media(max-width:420px){.home-profile-title{font-size:22px!important}.home-profile-message{font-size:14px!important;line-height:1.85!important}}
 \n/* FINAL MANAGEMENT CARD LAYOUT PATCH */\n@media(min-width:651px){\n  .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:18px !important;align-items:start !important;}\n  .home-section-management .member-card{display:grid !important;grid-template-columns:minmax(0,40%) minmax(0,60%) !important;align-items:stretch !important;height:auto !important;min-height:0 !important;}\n  .home-section-management .member-photo{width:100% !important;height:auto !important;aspect-ratio:4 / 5 !important;min-height:0 !important;flex:none !important;}\n  .home-section-management .member-photo img{width:100% !important;height:100% !important;object-fit:cover !important;object-position:center center !important;}\n  .home-section-management .member-body{min-width:0 !important;min-height:0 !important;height:auto !important;display:flex !important;flex-direction:column !important;justify-content:center !important;padding:22px !important;}\n  .home-section-management .member-body h3{font-size:clamp(18px,1.55vw,24px) !important;line-height:1.2 !important;text-transform:none !important;}\n  .home-section-management .member-role{font-size:11px !important;line-height:1.4 !important;text-transform:uppercase !important;}\n  .home-section-management .member-contacts{margin-top:13px !important;padding-top:0 !important;border-top:0 !important;gap:7px !important;}\n  .home-section-management .member-contact{display:flex !important;align-items:center !important;gap:9px !important;font-size:11px !important;line-height:1.45 !important;text-transform:none !important;}\n  .home-section-management .member-contact i{display:inline-flex !important;flex:0 0 16px !important;width:16px !important;justify-content:center !important;color:var(--cyan) !important;}\n  .home-section-management .member-contact span{min-width:0 !important;overflow:hidden !important;text-overflow:ellipsis !important;white-space:nowrap !important;}\n  .home-section-management .member-message{margin-top:13px !important;padding-top:0 !important;border-top:0 !important;font-size:12px !important;line-height:1.55 !important;font-weight:500 !important;text-transform:none !important;letter-spacing:normal !important;-webkit-line-clamp:3 !important;}\n  .home-section-management .member-message:before{content:none !important;display:none !important;}\n  .home-section-management .member-more{align-self:flex-start !important;width:auto !important;min-width:160px !important;min-height:42px !important;margin-top:15px !important;padding:10px 16px !important;font-size:11px !important;}\n}\n@media(max-width:650px){\n  .home-section-management .member-message{text-transform:none !important;letter-spacing:normal !important;}\n  .home-section-management .member-contact i{display:inline-flex !important;}\n}\n\n/* FINAL BOARD OF DIRECTORS CARD GEOMETRY REPAIR */\n@media(min-width:651px){\n  .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:20px !important;align-items:start !important;}\n  .home-section-management .member-card{display:grid !important;grid-template-columns:minmax(0,40%) minmax(0,60%) !important;grid-template-rows:auto !important;align-items:stretch !important;align-self:start !important;width:100% !important;height:auto !important;min-height:0 !important;aspect-ratio:2 / 1 !important;overflow:hidden !important;}\n  .home-section-management .member-photo{width:100% !important;height:100% !important;aspect-ratio:4 / 5 !important;min-height:0 !important;align-self:stretch !important;flex:none !important;}\n  .home-section-management .member-photo img{width:100% !important;height:100% !important;object-fit:cover !important;object-position:center center !important;display:block !important;}\n  .home-section-management .member-body{min-width:0 !important;min-height:0 !important;height:100% !important;display:flex !important;flex-direction:column !important;justify-content:center !important;align-self:stretch !important;padding:20px 22px !important;overflow:hidden !important;}\n  .home-section-management .member-body h3{margin:0 !important;font-size:clamp(17px,1.45vw,23px) !important;line-height:1.2 !important;text-transform:none !important;letter-spacing:-.02em !important;}\n  .home-section-management .member-role{margin-top:6px !important;font-size:9px !important;line-height:1.35 !important;text-transform:uppercase !important;}\n  .home-section-management .member-contacts{margin-top:12px !important;padding-top:0 !important;border-top:0 !important;gap:6px !important;}\n  .home-section-management .member-contact{display:flex !important;align-items:center !important;gap:8px !important;font-size:9px !important;line-height:1.35 !important;text-transform:none !important;}\n  .home-section-management .member-contact i{display:inline-flex !important;visibility:visible !important;opacity:1 !important;flex:0 0 13px !important;width:13px !important;justify-content:center !important;color:var(--cyan) !important;text-align:center !important;}\n  .home-section-management .member-contact span{min-width:0 !important;overflow:hidden !important;text-overflow:ellipsis !important;white-space:nowrap !important;}\n  .home-section-management .member-message{margin-top:12px !important;padding-top:0 !important;border-top:0 !important;color:#9ab7bf !important;font-size:9.5px !important;line-height:1.5 !important;font-weight:500 !important;text-transform:none !important;letter-spacing:normal !important;display:-webkit-box !important;-webkit-box-orient:vertical !important;-webkit-line-clamp:3 !important;overflow:hidden !important;}\n  .home-section-management .member-message:before{content:none !important;display:none !important;}\n  .home-section-management .member-more{align-self:flex-start !important;width:auto !important;min-width:160px !important;min-height:38px !important;margin-top:13px !important;padding:9px 16px !important;justify-content:center !important;font-size:9px !important;}\n}\n@media(min-width:651px) and (max-width:1099px){\n  .home-section-management .member-card{grid-template-columns:minmax(0,42%) minmax(0,58%) !important;aspect-ratio:1.9 / 1 !important;}\n  .home-section-management .member-body{padding:16px !important;}\n  .home-section-management .member-body h3{font-size:15px !important;}\n  .home-section-management .member-contact{font-size:8px !important;}\n  .home-section-management .member-message{font-size:8.5px !important;}\n}\n@media(max-width:650px){\n  .home-section-management .management-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:10px !important;}\n  .home-section-management .member-card{display:flex !important;flex-direction:column !important;aspect-ratio:auto !important;height:100% !important;overflow:hidden !important;}\n  .home-section-management .member-photo{width:100% !important;height:auto !important;aspect-ratio:1 / 1 !important;}\n  .home-section-management .member-body{height:auto !important;padding:11px !important;justify-content:flex-start !important;overflow:visible !important;text-align:left !important;}\n  .home-section-management .member-body h3{text-align:center !important;font-size:11px !important;}\n  .home-section-management .member-role{text-align:center !important;font-size:7px !important;}\n  .home-section-management .member-contacts{margin-top:9px !important;gap:5px !important;}\n  .home-section-management .member-contact{font-size:7px !important;justify-content:flex-start !important;}\n  .home-section-management .member-contact i{display:inline-flex !important;visibility:visible !important;}\n  .home-section-management .member-message{margin-top:9px !important;font-size:7px !important;line-height:1.5 !important;text-align:left !important;text-transform:none !important;letter-spacing:normal !important;-webkit-line-clamp:3 !important;}\n  .home-section-management .member-more{width:100% !important;min-height:34px !important;margin-top:10px !important;padding:8px 7px !important;font-size:7px !important;}\n}\n@media(max-width:380px){\n  .home-section-management .management-grid{gap:8px !important;}\n  .home-section-management .member-body{padding:9px !important;}\n  .home-section-management .member-body h3{font-size:10px !important;}\n  .home-section-management .member-role,.home-section-management .member-contact{font-size:6.5px !important;}\n  .home-section-management .member-message{font-size:6.5px !important;}\n  .home-section-management .member-more{font-size:6.5px !important;}\n}\n</style>
 <main class="shell home-v3">
-<div class="energy-atmosphere" aria-hidden="true"><span class="energy-grid"></span><span class="energy-core"></span><span class="energy-orbit"></span><span class="energy-pulse"></span></div>
 @foreach($home['section_order'] as $section)
 @if($section==='hero' && $home['slider'] && $sliders->isNotEmpty())
 <section class="home-slider home-section home-section-hero section-layout-{{ ($sectionSettings['hero'] ?? [])['layout'] ?? 'left' }}" aria-label="Company highlights">
@@ -3665,6 +3664,147 @@ main.shell{
 </script>
 @endpush
 
+
+
+<style>
+/* FINAL HOMEPAGE VISUAL DIRECTION
+   Static, clean and executive: no animated/background graphics.
+   Uses the shared FuelFree PowerPlant green / blue / silver system. */
+.home-v3 .energy-atmosphere,
+.home-v3 .welcome:before,
+.home-v3 .welcome:after,
+.home-v3 .welcome-heading:before,
+.home-v3 .cta-card:before,
+.home-v3 .cta-card:after,
+.home-v3 .home-slider:before{
+    display:none !important;
+}
+.home-v3{
+    isolation:isolate;
+    color:var(--ff-white);
+}
+.home-v3 .home-slider{
+    margin-top:clamp(18px,3vw,34px);
+}
+.home-v3 .slide-media{
+    border-color:rgba(53,216,106,.20);
+    background:var(--ff-surface);
+    box-shadow:0 18px 55px rgba(0,0,0,.28);
+}
+.home-v3 .slide.is-active .slide-media{
+    border-color:rgba(53,216,106,.32);
+    box-shadow:0 22px 65px rgba(0,0,0,.34),0 0 28px rgba(53,216,106,.055);
+}
+.home-v3 .eyebrow,
+.home-v3 .more,
+.home-v3 .read,
+.home-v3 .project-top,
+.home-v3 .member-role,
+.home-v3 .member-more,
+.home-v3 .folder-count,
+.home-v3 .welcome-more-toggle{
+    color:var(--ff-green);
+}
+.home-v3 .welcome-heading{
+    border-bottom-color:rgba(53,216,106,.13);
+}
+.home-v3 .welcome h1{
+    color:var(--ff-white);
+}
+.home-v3 .welcome h1 em{
+    color:#9cefb2;
+}
+.home-v3 .welcome-rule{
+    background:linear-gradient(90deg,var(--ff-green),var(--ff-blue));
+}
+.home-v3 .stat-card,
+.home-v3 .project-card,
+.home-v3 .member-card,
+.home-v3 .news,
+.home-v3 .folder,
+.home-v3 .cta-card{
+    background:linear-gradient(145deg,rgba(8,26,18,.88),rgba(3,13,9,.94));
+    border-color:rgba(53,216,106,.14);
+    box-shadow:0 14px 42px rgba(0,0,0,.22);
+}
+.home-v3 .stat-card:hover,
+.home-v3 .project-card:hover,
+.home-v3 .member-card:hover,
+.home-v3 .news:hover,
+.home-v3 .folder:hover{
+    border-color:rgba(53,216,106,.28);
+    box-shadow:0 20px 52px rgba(0,0,0,.28),0 0 28px rgba(53,216,106,.055);
+}
+.home-v3 .stat-card i,
+.home-v3 .project-top i,
+.home-v3 .folder-meta i,
+.home-v3 .member-contact i{
+    color:var(--ff-green);
+}
+.home-v3 .project-body>strong{
+    color:#9cefb2;
+}
+.home-v3 .news-kind{
+    color:#8ee9a8;
+    background:rgba(53,216,106,.055);
+}
+.home-v3 .news-kind.notice{
+    color:#b9c8d1;
+    background:rgba(22,141,255,.055);
+}
+.home-v3 .cta-card{
+    background:linear-gradient(135deg,rgba(8,35,21,.96),rgba(4,18,12,.98));
+}
+.home-v3 .home-section{
+    border-top-color:rgba(53,216,106,.08);
+}
+.home-v3 .empty{
+    border-color:rgba(53,216,106,.16);
+    color:var(--ff-muted);
+    background:rgba(53,216,106,.02);
+}
+.home-v3 .folder-media,
+.home-v3 .project-media,
+.home-v3 .member-photo,
+.home-v3 .news-media{
+    background:#06120d;
+}
+.home-v3 .welcome-profile{
+    background:linear-gradient(145deg,rgba(8,26,18,.90),rgba(3,13,9,.96));
+    border-color:rgba(53,216,106,.14);
+}
+.home-v3 .welcome-profile:hover{
+    border-color:rgba(53,216,106,.30);
+    box-shadow:0 18px 42px rgba(0,0,0,.24),0 0 28px rgba(53,216,106,.05);
+}
+.home-v3 .welcome-profile-role,
+.home-v3 .welcome-profile-hint{
+    color:#8ee9a8;
+}
+.home-v3 .welcome-profile-photo{
+    border-color:rgba(53,216,106,.18);
+}
+.home-v3 .member-more{
+    border-color:rgba(53,216,106,.20);
+    background:rgba(53,216,106,.025);
+}
+.home-v3 .member-more:hover{
+    border-color:rgba(53,216,106,.40);
+    background:rgba(53,216,106,.07);
+}
+.home-v3 .home-profile-modal{
+    background:rgba(0,5,3,.82);
+}
+.home-v3 .home-profile-panel{
+    background:linear-gradient(145deg,#092014,#04120b 62%,#020906);
+    border-color:rgba(53,216,106,.22);
+}
+@media(max-width:650px){
+    .home-v3 .home-slider{margin-top:12px}
+    .home-v3 .welcome{padding-top:44px;padding-bottom:42px}
+    .home-v3 .section{padding-top:44px;padding-bottom:44px}
+}
+</style>
 
 @endsection
 
