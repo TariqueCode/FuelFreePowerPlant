@@ -126,8 +126,101 @@
     }
 
     @media (min-width:721px) {
-        .public-header-nav .public-menu-dropdown-panel { max-width:min(320px,calc(100vw - 24px)); }
-        .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown-panel { max-height:min(70vh,520px); overflow-y:auto; }
+        /* Desktop hierarchy: each level has a predictable panel and a clear parent/child relationship. */
+        .public-header-nav .public-menu-dropdown-panel {
+            width:250px !important;
+            min-width:250px !important;
+            max-width:min(340px,calc(100vw - 24px)) !important;
+            padding:9px !important;
+            border-color:rgba(87,230,255,.22) !important;
+            box-shadow:0 22px 60px rgba(0,0,0,.48),0 0 32px rgba(87,230,255,.055) !important;
+        }
+
+        .public-header-nav .public-menu-dropdown-panel > a,
+        .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle {
+            position:relative;
+            min-height:40px !important;
+            margin:2px 0 !important;
+            padding:9px 11px !important;
+            border:1px solid transparent !important;
+            border-radius:9px !important;
+            font-size:13px !important;
+            font-weight:650 !important;
+            color:#b8ced5 !important;
+            box-sizing:border-box !important;
+            transition:color .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease !important;
+        }
+
+        .public-header-nav .public-menu-dropdown-panel > a:hover,
+        .public-header-nav .public-menu-dropdown-panel > a:focus-visible,
+        .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle:hover,
+        .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle:focus-visible,
+        .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown:focus-within > .public-menu-dropdown-toggle,
+        .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown.is-open > .public-menu-dropdown-toggle {
+            color:#effcff !important;
+            background:linear-gradient(135deg,rgba(87,230,255,.105),rgba(57,230,166,.055)) !important;
+            border-color:rgba(87,230,255,.16) !important;
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.035) !important;
+            outline:none !important;
+        }
+
+        /* Child folders behave like real hierarchy nodes, not like unrelated links. */
+        .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown {
+            position:relative !important;
+            display:block !important;
+            width:100% !important;
+            margin:2px 0 !important;
+        }
+
+        .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle {
+            width:100% !important;
+            justify-content:space-between !important;
+        }
+
+        .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown-panel {
+            top:-9px !important;
+            left:100% !important;
+            margin-left:8px !important;
+            width:250px !important;
+            min-width:250px !important;
+            max-height:min(70vh,520px) !important;
+            overflow-y:auto !important;
+            overflow-x:visible !important;
+            padding:9px !important;
+            border-left:2px solid rgba(87,230,255,.22) !important;
+        }
+
+        .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown-panel::before {
+            content:"";
+            position:absolute;
+            left:-8px;
+            top:18px;
+            width:7px;
+            height:1px;
+            background:rgba(87,230,255,.32);
+            pointer-events:none;
+        }
+
+        /* Focus and hover should expose the same hierarchy for mouse and keyboard users. */
+        .public-header-nav .public-menu-dropdown:focus-within > .public-menu-dropdown-panel,
+        .public-header-nav .public-menu-dropdown.is-open > .public-menu-dropdown-panel {
+            opacity:1 !important;
+            visibility:visible !important;
+            pointer-events:auto !important;
+            transform:translate(0,0) !important;
+        }
+
+        .public-header-nav > .public-menu > .public-menu-dropdown:focus-within > .public-menu-dropdown-panel,
+        .public-header-nav > .public-menu > .public-menu-dropdown.is-open > .public-menu-dropdown-panel {
+            transform:translate(-50%,0) !important;
+        }
+
+        /* Keep the first-level panel centered while nested panels open beside their parent. */
+        .public-header-nav > .public-menu > .public-menu-dropdown > .public-menu-dropdown-panel {
+            left:50% !important;
+            top:100% !important;
+            margin-left:0 !important;
+        }
     }
 </style>
 @endif
