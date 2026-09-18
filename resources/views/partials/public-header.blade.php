@@ -226,7 +226,9 @@
                 return;
             }
 
-            var shouldStick = nav.getBoundingClientRect().top <= 0;
+            /* Read the placeholder, not the fixed nav itself. Once the nav is fixed,
+               its own rect stays at 0 and can no longer tell us when to release it. */
+            var shouldStick = slot.getBoundingClientRect().top <= 0;
             if(shouldStick === sticky) return;
 
             sticky = shouldStick;
