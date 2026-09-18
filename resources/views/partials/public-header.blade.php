@@ -236,18 +236,26 @@
         if(!toggle || toggle.dataset.bound === '1') return;
         toggle.dataset.bound = '1';
 
+        var isRootFolder = !dropdown.parentElement.closest('.public-menu-dropdown');
+        var clickPinned = false;
+
         toggle.addEventListener('click', function(e){
             e.preventDefault();
             e.stopPropagation();
 
             var isMobile = window.innerWidth <= 820;
-            var isRootFolder = !dropdown.parentElement.closest('.public-menu-dropdown');
 
-            /* Root folders are hover-driven on desktop.
-               Nested folders are click-driven on desktop and mobile. */
+            /* Root folders on desktop support both interaction modes:
+               hover opens temporarily; click pins the menu open until clicked again.
+               Nested folders remain click-to-toggle only. */
             if(!isMobile && isRootFolder){
+                clickPinned = !clickPinned;
                 closeSiblingDropdowns(dropdown);
-                setDropdownOpen(dropdown,false);
+                setDropdownOpen(dropdown,clickPinned);
+
+                if(clickPinned) requestAnimationFrame(function(){
+                    positionNestedDropdown(dropdown);
+                });
                 return;
             }
 
@@ -259,6 +267,29 @@
                 positionNestedDropdown(dropdown);
             });
         });
+
+        if(isRootFolder){
+            dropdown.addEventListener('mouseenter', function(){
+                if(window.innerWidth <= 820) return;
+
+                closeSiblingDropdowns(dropdown);
+                setDropdownOpen(dropdown,true);
+
+                requestAnimationFrame(function(){
+                    positionNestedDropdown(dropdown);
+                });
+            });
+
+            dropdown.addEventListener('mouseleave', function(){
+                if(window.innerWidth <= 820) return;
+
+                /* A click pins the root menu open. Without a click pin,
+                   leaving the root folder closes its hover-open menu. */
+                if(!clickPinned){
+                    setDropdownOpen(dropdown,false);
+                }
+            });
+        }
 
         toggle.addEventListener('keydown', function(e){
             if(e.key === 'Escape'){
