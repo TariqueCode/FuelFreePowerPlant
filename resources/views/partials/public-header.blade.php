@@ -188,7 +188,7 @@
         });
 
         document.addEventListener('click', function(e){
-            if(menu.classList.contains('is-open') && !header.contains(e.target)) setOpen(false);
+            if(menu.classList.contains('is-open') && !header.contains(e.target) && !menu.contains(e.target)) setOpen(false);
         });
 
         document.addEventListener('keydown', function(e){
@@ -485,6 +485,8 @@
 
 /* Large desktop */
 @media (min-width:1201px){
+    .public-navigation-slot{height:48px}
+
     .public-header-top{
         min-height:68px;
     }
