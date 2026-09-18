@@ -70,7 +70,7 @@
 .public-shell{width:min(1280px,calc(100% - 40px));margin:auto}
 .public-header{position:relative;top:auto;z-index:100;background:linear-gradient(180deg,rgba(2,11,18,.985),rgba(3,15,23,.965));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(87,230,255,.14);box-shadow:0 12px 36px rgba(0,0,0,.24),0 1px 0 rgba(255,255,255,.025)}
 .public-navigation-slot{height:46px;position:relative;z-index:1100}
-.public-header-nav.ff-nav-sticky{position:fixed!important;top:0!important;left:0!important;right:0!important;width:100%!important;height:46px!important;z-index:1100!important;background:linear-gradient(180deg,rgba(2,11,18,.985),rgba(3,15,23,.97));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(57,230,166,.18);box-shadow:0 10px 30px rgba(0,0,0,.28),0 0 22px rgba(57,230,166,.035)}
+.public-header-nav.ff-nav-sticky{position:fixed!important;top:0!important;left:0!important;right:0!important;width:100%!important;height:46px!important;z-index:1100!important;background:linear-gradient(180deg,rgba(2,11,18,.985),rgba(3,15,23,.97));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(57,230,166,.18);box-shadow:0 10px 30px rgba(0,0,0,.28),0 0 22px rgba(57,230,166,.035)}.public-header-nav.ff-nav-sticky::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(57,230,166,.48),rgba(87,230,255,.22),transparent);opacity:.85;pointer-events:none}
 .public-header-top{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid rgba(87,230,255,.08)}
 .public-brand{display:flex;align-items:center;gap:10px;min-width:0;flex:0 0 auto;color:var(--ff-text)!important;text-decoration:none!important}
 .public-brand img,.public-brand-fallback{width:44px;height:44px;flex:0 0 44px}.public-brand img{object-fit:contain;border-radius:10px;filter:drop-shadow(0 0 9px rgba(87,230,255,.18))}
@@ -207,7 +207,8 @@
     (function initStickyNavigation(){
         var nav = document.getElementById('public-navigation');
         var slot = document.querySelector('.public-navigation-slot');
-        if(!nav || !slot) return;
+        var header = document.querySelector('.public-header');
+        if(!nav || !slot || !header) return;
 
         var sticky = false;
         var ticking = false;
@@ -220,6 +221,7 @@
                 if(sticky){
                     sticky = false;
                     nav.classList.remove('ff-nav-sticky');
+                    header.classList.remove('ff-nav-handoff');
                 }
                 return;
             }
@@ -229,6 +231,7 @@
 
             sticky = shouldStick;
             nav.classList.toggle('ff-nav-sticky', sticky);
+            header.classList.toggle('ff-nav-handoff', sticky);
         }
 
         function requestStickyUpdate(){
@@ -427,6 +430,15 @@
 </script>
 
 <style>
+/* Sticky handoff polish: once the navigation takes over the viewport edge,
+   the branding row is visually carried above it without changing document flow. */
+@media (min-width:821px){
+    .public-header.ff-nav-handoff{transform:translateY(-46px);}
+}
+@media (min-width:1201px){
+    .public-header.ff-nav-handoff{transform:translateY(-48px);}
+}
+
 /* =========================================================
    FUELFREE GLOBAL HEADER — ALL DEVICE RESPONSIVE POLISH
    Scoped only to public global header.
@@ -504,6 +516,10 @@
 
     .public-header-nav{
         height:48px;
+    }
+
+    .public-header-nav.ff-nav-sticky{
+        height:48px!important;
     }
 }
 
