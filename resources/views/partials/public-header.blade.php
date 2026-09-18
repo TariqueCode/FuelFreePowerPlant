@@ -68,7 +68,9 @@
 <style>
 :root{--ff-cyan:#57e6ff;--ff-emerald:#39e6a6;--ff-bg:#020b12;--ff-surface:#061923;--ff-text:#effcff;--ff-muted:#8caab5;--ff-line:rgba(57,230,166,.20);--ff-neon-green:#39e6a6;--ff-neon-green-soft:rgba(57,230,166,.10);--ff-neon-green-line:rgba(57,230,166,.26)}
 .public-shell{width:min(1280px,calc(100% - 40px));margin:auto}
-.public-header{position:sticky;top:0;z-index:100;background:linear-gradient(180deg,rgba(2,11,18,.985),rgba(3,15,23,.965));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(87,230,255,.14);box-shadow:0 12px 36px rgba(0,0,0,.24),0 1px 0 rgba(255,255,255,.025)}
+.public-header{position:relative;top:auto;z-index:100;background:linear-gradient(180deg,rgba(2,11,18,.985),rgba(3,15,23,.965));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(87,230,255,.14);box-shadow:0 12px 36px rgba(0,0,0,.24),0 1px 0 rgba(255,255,255,.025)}
+.public-header.ff-nav-sticky-active{padding-bottom:46px}
+.public-header-nav.ff-nav-sticky{position:fixed;top:0;left:0;right:0;width:100%;height:46px;z-index:1100;background:linear-gradient(180deg,rgba(2,11,18,.985),rgba(3,15,23,.97));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(57,230,166,.18);box-shadow:0 10px 30px rgba(0,0,0,.28),0 0 22px rgba(57,230,166,.035)}
 .public-header-top{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid rgba(87,230,255,.08)}
 .public-brand{display:flex;align-items:center;gap:10px;min-width:0;flex:0 0 auto;color:var(--ff-text)!important;text-decoration:none!important}
 .public-brand img,.public-brand-fallback{width:44px;height:44px;flex:0 0 44px}.public-brand img{object-fit:contain;border-radius:10px;filter:drop-shadow(0 0 9px rgba(87,230,255,.18))}
@@ -183,6 +185,37 @@
             if(window.innerWidth > 820) setOpen(false);
         });
     });
+
+    /* Desktop: keep only the navigation row sticky after the top branding row scrolls away. */
+    (function initStickyNavigation(){
+        var header = document.querySelector('.public-header');
+        var nav = document.querySelector('.public-header-nav');
+        if(!header || !nav) return;
+
+        var sticky = false;
+
+        function updateStickyNavigation(){
+            var desktop = window.innerWidth > 820;
+            if(!desktop){
+                sticky = false;
+                header.classList.remove('ff-nav-sticky-active');
+                nav.classList.remove('ff-nav-sticky');
+                return;
+            }
+
+            var shouldStick = header.getBoundingClientRect().top < 0;
+
+            if(shouldStick === sticky) return;
+            sticky = shouldStick;
+
+            header.classList.toggle('ff-nav-sticky-active', sticky);
+            nav.classList.toggle('ff-nav-sticky', sticky);
+        }
+
+        window.addEventListener('scroll', updateStickyNavigation, {passive:true});
+        window.addEventListener('resize', updateStickyNavigation);
+        updateStickyNavigation();
+    })();
 
     var dropdowns = Array.prototype.slice.call(document.querySelectorAll('.public-menu-dropdown'));
 
