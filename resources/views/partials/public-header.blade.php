@@ -266,7 +266,11 @@
                 return;
             }
 
-            var open = !dropdown.classList.contains('is-open');
+            /* Nested folders support both temporary hover-open and click-pinned open. */
+            dropdown.__ffClickPinned = !dropdown.__ffClickPinned;
+            dropdown.classList.toggle('ff-hover-disabled', !dropdown.__ffClickPinned);
+
+            var open = dropdown.__ffClickPinned;
             closeSiblingDropdowns(dropdown);
             setDropdownOpen(dropdown,open);
 
@@ -297,6 +301,28 @@
                     setDropdownOpen(dropdown,false);
                 }
             });
+        } else {
+            /* Nested folders: hover temporarily opens; click pins. */
+            dropdown.addEventListener('mouseenter', function(){
+                if(window.innerWidth <= 820 || dropdown.__ffClickPinned) return;
+
+                dropdown.classList.remove('ff-hover-disabled');
+                closeSiblingDropdowns(dropdown);
+                setDropdownOpen(dropdown,true);
+
+                requestAnimationFrame(function(){
+                    positionNestedDropdown(dropdown);
+                });
+            });
+
+            dropdown.addEventListener('mouseleave', function(){
+                if(window.innerWidth <= 820) return;
+
+                if(!dropdown.__ffClickPinned){
+                    dropdown.classList.remove('ff-hover-disabled');
+                    setDropdownOpen(dropdown,false);
+                }
+            });
         }
 
         toggle.addEventListener('keydown', function(e){
@@ -320,7 +346,11 @@
     document.addEventListener('keydown', function(e){
         if(e.key !== 'Escape') return;
         dropdowns.forEach(function(dropdown){
-            if(dropdown.classList.contains('is-open')) setDropdownOpen(dropdown,false);
+            if(dropdown.classList.contains('is-open')){
+                dropdown.__ffClickPinned = false;
+                dropdown.classList.remove('ff-hover-disabled');
+                setDropdownOpen(dropdown,false);
+            }
         });
     });
 
