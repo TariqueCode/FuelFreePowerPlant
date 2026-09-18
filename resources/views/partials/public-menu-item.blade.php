@@ -54,7 +54,7 @@
             padding:2px 0 2px 10px !important;
             background:transparent !important;
             border:0 !important;
-            border-left:1px solid rgba(86,210,238,.24) !important;
+            border-left:1px solid rgba(57,230,166,.24) !important;
             border-radius:0 !important;
             box-shadow:none !important;
             transform:none !important;
@@ -94,7 +94,7 @@
             flex:0 0 4px;
             margin-right:9px;
             border-radius:50%;
-            background:rgba(81,216,240,.6);
+            background:rgba(57,230,166,.68);
         }
 
         .public-header-nav .public-menu-dropdown-panel > a:hover,
@@ -102,7 +102,7 @@
         .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle:hover,
         .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle:focus,
         .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle[aria-expanded="true"] {
-            background:rgba(67,209,240,.07) !important;
+            background:rgba(57,230,166,.075) !important;
             color:#f2fff9 !important;
             outline:none;
         }
