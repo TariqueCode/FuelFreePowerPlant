@@ -3903,7 +3903,6 @@ main.shell{
     }
 }
 @media(prefers-reduced-motion:reduce){
-    .home-v3 .welcome-vision-panel,
     .home-v3 .stat-card,
     .home-v3 .project-card,
     .home-v3 .member-card,
