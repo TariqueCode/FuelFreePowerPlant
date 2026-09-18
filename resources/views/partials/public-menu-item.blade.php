@@ -202,7 +202,6 @@
         }
 
         /* Focus and hover should expose the same hierarchy for mouse and keyboard users. */
-        .public-header-nav .public-menu-dropdown:focus-within > .public-menu-dropdown-panel,
         .public-header-nav .public-menu-dropdown.is-open > .public-menu-dropdown-panel {
             opacity:1 !important;
             visibility:visible !important;
@@ -210,7 +209,6 @@
             transform:translate(0,0) !important;
         }
 
-        .public-header-nav > .public-menu > .public-menu-dropdown:focus-within > .public-menu-dropdown-panel,
         .public-header-nav > .public-menu > .public-menu-dropdown.is-open > .public-menu-dropdown-panel {
             transform:translate(-50%,0) !important;
         }
