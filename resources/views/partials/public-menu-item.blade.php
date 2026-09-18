@@ -165,7 +165,7 @@
         }
 
         /* Only root-level folders open on hover. Nested folders stay click-only. */
-        .public-header-nav > .public-menu > .public-menu-dropdown > .public-menu-dropdown-panel .public-menu-dropdown:hover > .public-menu-dropdown-panel{
+        .public-header-nav > .public-menu > .public-menu-dropdown > .public-menu-dropdown-panel .public-menu-dropdown.ff-hover-disabled:hover > .public-menu-dropdown-panel{
             opacity:0 !important;
             visibility:hidden !important;
             pointer-events:none !important;
