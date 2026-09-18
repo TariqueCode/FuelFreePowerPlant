@@ -103,7 +103,7 @@
         .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle:focus,
         .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle[aria-expanded="true"] {
             background:rgba(67,209,240,.07) !important;
-            color:#effcff !important;
+            color:#f2fff9 !important;
             outline:none;
         }
 
@@ -132,8 +132,8 @@
             min-width:250px !important;
             max-width:min(340px,calc(100vw - 24px)) !important;
             padding:9px !important;
-            border-color:rgba(87,230,255,.22) !important;
-            box-shadow:0 22px 60px rgba(0,0,0,.48),0 0 32px rgba(87,230,255,.055) !important;
+            border-color:rgba(57,230,166,.26) !important;
+            box-shadow:0 22px 60px rgba(0,0,0,.48),0 0 32px rgba(57,230,166,.055) !important;
         }
 
         .public-header-nav .public-menu-dropdown-panel > a,
@@ -157,9 +157,9 @@
         .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown > .public-menu-dropdown-toggle:focus-visible,
         .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown:focus-within > .public-menu-dropdown-toggle,
         .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown.is-open > .public-menu-dropdown-toggle {
-            color:#effcff !important;
-            background:linear-gradient(135deg,rgba(87,230,255,.105),rgba(57,230,166,.055)) !important;
-            border-color:rgba(87,230,255,.16) !important;
+            color:#f2fff9 !important;
+            background:linear-gradient(135deg,rgba(57,230,166,.115),rgba(57,230,166,.055)) !important;
+            border-color:rgba(57,230,166,.18) !important;
             box-shadow:inset 0 1px 0 rgba(255,255,255,.035) !important;
             outline:none !important;
         }
@@ -201,7 +201,7 @@
             overflow-y:auto !important;
             overflow-x:visible !important;
             padding:9px !important;
-            border-left:2px solid rgba(87,230,255,.22) !important;
+            border-left:2px solid rgba(57,230,166,.26) !important;
         }
 
         .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown-panel::before {
