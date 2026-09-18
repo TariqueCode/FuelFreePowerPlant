@@ -3914,6 +3914,144 @@ main.shell{
 }
 </style>
 
+
+<style>
+/* === FINAL DESKTOP EXECUTIVE PROFILE CARD ===
+   Existing profile data only; no additional content. */
+@media(min-width:1100px){
+    .home-v3 .home-section-management .management-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:22px !important;
+    }
+    .home-v3 .home-section-management .member-card{
+        position:relative !important;
+        display:grid !important;
+        grid-template-columns:minmax(0,38%) minmax(0,62%) !important;
+        aspect-ratio:1.92 / 1 !important;
+        border:1px solid transparent !important;
+        border-radius:22px !important;
+        background:
+            linear-gradient(#04120b,#04120b) padding-box,
+            linear-gradient(115deg,rgba(53,216,106,.48),rgba(22,141,255,.30),rgba(53,216,106,.12)) border-box !important;
+        box-shadow:0 20px 55px rgba(0,0,0,.28),0 0 30px rgba(53,216,106,.035) !important;
+        transform:none !important;
+        transition:box-shadow .3s ease,filter .3s ease !important;
+    }
+    .home-v3 .home-section-management .member-card:hover{
+        transform:translateY(-3px) !important;
+        box-shadow:0 26px 65px rgba(0,0,0,.34),0 0 38px rgba(53,216,106,.07) !important;
+        filter:brightness(1.035);
+    }
+    .home-v3 .home-section-management .member-photo{
+        position:relative !important;
+        height:100% !important;
+        min-height:0 !important;
+        border:0 !important;
+        border-radius:21px 0 0 21px !important;
+        background:#07150e !important;
+    }
+    .home-v3 .home-section-management .member-photo:after{
+        content:"";
+        position:absolute;
+        inset:0;
+        pointer-events:none;
+        background:linear-gradient(90deg,transparent 72%,rgba(3,14,9,.48) 100%);
+    }
+    .home-v3 .home-section-management .member-photo img{
+        object-fit:cover !important;
+        object-position:center !important;
+        transition:transform .45s ease !important;
+    }
+    .home-v3 .home-section-management .member-card:hover .member-photo img{
+        transform:scale(1.018);
+    }
+    .home-v3 .home-section-management .member-body{
+        position:relative !important;
+        padding:24px 26px !important;
+        justify-content:center !important;
+        background:
+            linear-gradient(145deg,rgba(8,29,19,.92),rgba(3,13,9,.98)) !important;
+    }
+    .home-v3 .home-section-management .member-body:before{
+        content:"";
+        position:absolute;
+        top:24px;
+        bottom:24px;
+        left:0;
+        width:1px;
+        background:linear-gradient(180deg,transparent,rgba(53,216,106,.30),transparent);
+    }
+    .home-v3 .home-section-management .member-body h3{
+        max-width:100% !important;
+        background:linear-gradient(105deg,#f4fff8 0%,#b8ffd0 48%,#35d86a 78%,#168dff 100%) !important;
+        -webkit-background-clip:text !important;
+        background-clip:text !important;
+        -webkit-text-fill-color:transparent !important;
+        color:transparent !important;
+        font-size:clamp(19px,1.35vw,24px) !important;
+        letter-spacing:-.035em !important;
+    }
+    .home-v3 .home-section-management .member-role{
+        color:#35d86a !important;
+        font-size:10px !important;
+        font-weight:850 !important;
+        letter-spacing:.10em !important;
+        text-transform:uppercase !important;
+    }
+    .home-v3 .home-section-management .member-contacts{
+        gap:5px !important;
+        margin-top:15px !important;
+    }
+    .home-v3 .home-section-management .member-contact{
+        color:#9db5aa !important;
+        font-size:10px !important;
+    }
+    .home-v3 .home-section-management .member-contact i{
+        color:#35d86a !important;
+        font-size:9px !important;
+    }
+    .home-v3 .home-section-management .member-message{
+        color:#a8bbb0 !important;
+        font-size:10px !important;
+        line-height:1.55 !important;
+        margin-top:13px !important;
+        -webkit-line-clamp:3 !important;
+        line-clamp:3 !important;
+    }
+    .home-v3 .home-section-management .member-more{
+        min-width:170px !important;
+        min-height:38px !important;
+        margin-top:13px !important;
+        padding:7px 14px !important;
+        border:1px solid rgba(53,216,106,.30) !important;
+        border-radius:999px !important;
+        color:#35d86a !important;
+        background:rgba(53,216,106,.035) !important;
+        font-size:10px !important;
+        font-weight:800 !important;
+        box-shadow:none !important;
+    }
+    .home-v3 .home-section-management .member-more:hover{
+        border-color:rgba(53,216,106,.55) !important;
+        background:rgba(53,216,106,.075) !important;
+        box-shadow:0 8px 24px rgba(53,216,106,.07) !important;
+    }
+}
+@media(min-width:651px) and (max-width:1099px){
+    .home-v3 .home-section-management .member-card{
+        grid-template-columns:minmax(0,38%) minmax(0,62%) !important;
+        aspect-ratio:1.85 / 1 !important;
+    }
+    .home-v3 .home-section-management .member-body{padding:18px !important}
+    .home-v3 .home-section-management .member-body h3{font-size:18px !important}
+}
+@media(max-width:650px){
+    .home-v3 .home-section-management .member-card{
+        border-radius:17px !important;
+    }
+}
+</style>
+
 @endsection
 
 <style>
