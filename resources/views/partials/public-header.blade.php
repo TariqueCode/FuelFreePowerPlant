@@ -240,10 +240,18 @@
             e.preventDefault();
             e.stopPropagation();
 
-            var open = window.innerWidth <= 820
-                ? !dropdown.classList.contains('is-open')
-                : true;
+            var isMobile = window.innerWidth <= 820;
+            var isRootFolder = !dropdown.parentElement.closest('.public-menu-dropdown');
 
+            /* Root folders are hover-driven on desktop.
+               Nested folders are click-driven on desktop and mobile. */
+            if(!isMobile && isRootFolder){
+                closeSiblingDropdowns(dropdown);
+                setDropdownOpen(dropdown,false);
+                return;
+            }
+
+            var open = !dropdown.classList.contains('is-open');
             closeSiblingDropdowns(dropdown);
             setDropdownOpen(dropdown,open);
 
