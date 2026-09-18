@@ -22,6 +22,15 @@
         line-height:1.3 !important;
     }
 
+    /* Folder labels are navigation groups, so keep them visibly stronger than leaf links. */
+    .public-header-nav .public-menu-dropdown-toggle {
+        font-weight:800 !important;
+    }
+
+    .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown-toggle {
+        font-weight:750 !important;
+    }
+
     /* Compact responsive tree: hierarchy is created by indentation, not oversized cards. */
     @media (max-width:720px) {
         .public-header-nav .public-menu { gap:4px !important; }
@@ -35,7 +44,7 @@
             border-radius:10px !important;
             box-sizing:border-box !important;
             font-size:14px !important;
-            font-weight:600 !important;
+            font-weight:800 !important;
         }
 
         .public-header-nav .public-menu > .public-menu-dropdown {
@@ -145,7 +154,7 @@
             border:1px solid transparent !important;
             border-radius:9px !important;
             font-size:13px !important;
-            font-weight:650 !important;
+            font-weight:750 !important;
             color:#b8ced5 !important;
             box-sizing:border-box !important;
             transition:color .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease !important;
