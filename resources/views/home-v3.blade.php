@@ -3291,6 +3291,21 @@ main.shell{
 </div>
 </div>
 </div>
+<aside class="welcome-vision-panel" aria-label="FuelFree PowerPlant technology vision">
+    <div class="welcome-vision-top">
+        <span>FuelFree Energy</span>
+        <i class="fa-solid fa-bolt"></i>
+    </div>
+    <div class="welcome-vision-title">A smarter direction for power generation.</div>
+    <div class="welcome-vision-copy">Flywheel-based energy technology focused on efficiency, independence and more sustainable power generation.</div>
+    <div class="welcome-vision-list">
+        <div><i class="fa-solid fa-circle-check"></i><span>Less conventional fuel dependency</span></div>
+        <div><i class="fa-solid fa-circle-check"></i><span>Designed for long-term efficiency</span></div>
+        <div><i class="fa-solid fa-circle-check"></i><span>Built around responsible growth</span></div>
+    </div>
+    <div class="welcome-vision-mark">FFP<span> / </span>ENERGY SYSTEM</div>
+</aside>
+</div>
 </section>
 @endif
 
@@ -3803,6 +3818,219 @@ main.shell{
     .home-v3 .home-slider{margin-top:12px}
     .home-v3 .welcome{padding-top:44px;padding-bottom:42px}
     .home-v3 .section{padding-top:44px;padding-bottom:44px}
+}
+</style>
+
+<style>
+/* === HOMEPAGE PREMIUM HERO SYSTEM ===
+   Static editorial composition; no animated background graphics. */
+.home-v3 .welcome{
+    padding:clamp(58px,7vw,92px) 0 clamp(50px,6vw,76px);
+}
+.home-v3 .welcome-inner{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(300px,390px);
+    align-items:center;
+    gap:clamp(34px,5vw,72px);
+}
+.home-v3 .welcome-content{min-width:0}
+.home-v3 .welcome-heading{
+    border-bottom:0;
+    padding-bottom:20px;
+    position:relative;
+}
+.home-v3 .welcome-heading:after{
+    content:"";
+    display:block;
+    width:min(100%,760px);
+    height:1px;
+    margin-top:25px;
+    background:linear-gradient(90deg,rgba(53,216,106,.48),rgba(22,141,255,.22),transparent);
+}
+.home-v3 .welcome h1,
+.home-v3 .head h2,
+.home-v3 .cta-card h2{
+    background:linear-gradient(105deg,#f4fff8 0%,#b8ffd0 34%,#35d86a 63%,#168dff 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    color:transparent;
+    text-shadow:0 0 30px rgba(53,216,106,.06);
+}
+.home-v3 .welcome h1{
+    max-width:980px;
+    margin-top:12px;
+    font-size:clamp(46px,6vw,86px);
+    line-height:.98;
+    letter-spacing:-.058em;
+}
+.home-v3 .welcome-copy{
+    max-width:900px;
+    padding-top:7px;
+}
+.home-v3 .welcome-preview{
+    color:#a8bdb2;
+    font-size:clamp(13px,1.1vw,15px);
+    line-height:1.9;
+}
+.home-v3 .welcome-more-content{
+    color:#a8bdb2;
+}
+.home-v3 .welcome-more-toggle{
+    margin-top:20px;
+    border-color:rgba(53,216,106,.24);
+    background:rgba(53,216,106,.045);
+    box-shadow:0 8px 24px rgba(0,0,0,.14);
+}
+.home-v3 .welcome-vision-panel{
+    position:relative;
+    min-width:0;
+    padding:24px;
+    border:1px solid rgba(53,216,106,.20);
+    border-radius:22px;
+    background:
+        linear-gradient(145deg,rgba(10,34,21,.96),rgba(3,14,9,.98));
+    box-shadow:0 24px 65px rgba(0,0,0,.30),0 0 34px rgba(53,216,106,.045);
+    overflow:hidden;
+}
+.home-v3 .welcome-vision-panel:before{
+    content:"";
+    position:absolute;
+    left:0;
+    right:0;
+    top:0;
+    height:2px;
+    background:linear-gradient(90deg,#35d86a,#168dff);
+}
+.home-v3 .welcome-vision-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    color:#8ee9a8;
+    font-size:9px;
+    font-weight:850;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+}
+.home-v3 .welcome-vision-top i{font-size:15px;color:#35d86a}
+.home-v3 .welcome-vision-title{
+    margin-top:20px;
+    color:#f4fff8;
+    font-size:clamp(21px,2vw,28px);
+    line-height:1.18;
+    letter-spacing:-.035em;
+    font-weight:800;
+}
+.home-v3 .welcome-vision-copy{
+    margin-top:12px;
+    color:#8fa79a;
+    font-size:11px;
+    line-height:1.7;
+}
+.home-v3 .welcome-vision-list{
+    display:grid;
+    gap:10px;
+    margin-top:20px;
+    padding-top:17px;
+    border-top:1px solid rgba(53,216,106,.11);
+}
+.home-v3 .welcome-vision-list div{
+    display:flex;
+    align-items:flex-start;
+    gap:9px;
+    color:#b7c9bf;
+    font-size:10px;
+    line-height:1.45;
+}
+.home-v3 .welcome-vision-list i{flex:0 0 auto;margin-top:2px;color:#35d86a;font-size:10px}
+.home-v3 .welcome-vision-mark{
+    margin-top:22px;
+    color:#5e796b;
+    font-size:8px;
+    font-weight:850;
+    letter-spacing:.18em;
+}
+.home-v3 .welcome-vision-mark span{color:#168dff}
+.home-v3 .section .head{
+    padding-bottom:17px;
+    border-bottom:1px solid rgba(53,216,106,.08);
+}
+.home-v3 .head h2{
+    margin-top:7px;
+}
+.home-v3 .head p{
+    color:#91a99d;
+}
+.home-v3 .more{
+    padding:8px 11px;
+    border:1px solid rgba(53,216,106,.18);
+    border-radius:999px;
+    background:rgba(53,216,106,.025);
+}
+.home-v3 .cta-card h2{
+    max-width:760px;
+}
+@media(max-width:900px){
+    .home-v3 .welcome-inner{
+        grid-template-columns:1fr;
+        gap:28px;
+    }
+    .home-v3 .welcome-vision-panel{
+        max-width:620px;
+    }
+}
+@media(max-width:650px){
+    .home-v3 .welcome{
+        padding:44px 0 42px;
+    }
+    .home-v3 .welcome-inner{
+        gap:24px;
+    }
+    .home-v3 .welcome-heading{
+        padding-bottom:4px;
+    }
+    .home-v3 .welcome-heading:after{
+        margin-top:19px;
+    }
+    .home-v3 .welcome h1{
+        font-size:clamp(38px,11vw,52px);
+        line-height:1;
+        letter-spacing:-.05em;
+    }
+    .home-v3 .welcome-preview{
+        font-size:13px;
+        line-height:1.78;
+    }
+    .home-v3 .welcome-copy{
+        padding-top:3px;
+    }
+    .home-v3 .welcome-vision-panel{
+        padding:20px;
+        border-radius:18px;
+    }
+    .home-v3 .welcome-vision-title{
+        font-size:22px;
+    }
+    .home-v3 .welcome-vision-copy{
+        font-size:10px;
+    }
+    .home-v3 .welcome-vision-list div{
+        font-size:9px;
+    }
+    .home-v3 .section .head{
+        padding-bottom:13px;
+    }
+}
+@media(prefers-reduced-motion:reduce){
+    .home-v3 .welcome-vision-panel,
+    .home-v3 .stat-card,
+    .home-v3 .project-card,
+    .home-v3 .member-card,
+    .home-v3 .news,
+    .home-v3 .folder{
+        transition:none!important;
+    }
 }
 </style>
 
