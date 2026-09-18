@@ -164,6 +164,20 @@
             outline:none !important;
         }
 
+        /* Only root-level folders open on hover. Nested folders stay click-only. */
+        .public-header-nav > .public-menu > .public-menu-dropdown > .public-menu-dropdown-panel .public-menu-dropdown:hover > .public-menu-dropdown-panel{
+            opacity:0 !important;
+            visibility:hidden !important;
+            pointer-events:none !important;
+        }
+
+        .public-header-nav > .public-menu > .public-menu-dropdown > .public-menu-dropdown-panel .public-menu-dropdown.is-open > .public-menu-dropdown-panel{
+            opacity:1 !important;
+            visibility:visible !important;
+            pointer-events:auto !important;
+            transform:translate(0,0) !important;
+        }
+
         /* Child folders behave like real hierarchy nodes, not like unrelated links. */
         .public-header-nav .public-menu-dropdown-panel > .public-menu-dropdown {
             position:relative !important;
