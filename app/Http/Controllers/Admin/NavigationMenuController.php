@@ -200,7 +200,19 @@ class NavigationMenuController extends Controller
 
         if ($item->source_type === 'folder') {
             abort_if($data['label'] === '', 422, 'Folder name is required.');
-            unset($data['url']);
+
+            if (str_starts_with((string) $item->source_key, 'management_folder:')) {
+                $source = $registry->resolveAny((string) $item->source_key, $item->area);
+                abort_unless($source !== null, 422, 'This profile folder no longer exists.');
+
+                $data['url'] = $source['url'];
+                $data['route_name'] = $source['route_name'];
+                $data['permission_key'] = $source['permission'] ?? null;
+                $data['source_type'] = $source['type'];
+                $data['label_override'] = $data['label'] !== $source['label'] ? $data['label'] : null;
+            } else {
+                unset($data['url']);
+            }
         } elseif ($item->source_type === 'external_link') {
             $data['url'] = $this->normalizeNavigationUrl((string) ($data['url'] ?? ''));
             abort_if($data['url'] === '', 422, 'A valid link URL is required.');
