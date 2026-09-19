@@ -20,6 +20,16 @@ class ManagementController extends Controller
         $folders=ManagementProfileFolder::query()->withCount('profiles')->with('profiles')->orderBy('sort_order')->orderBy('id')->get();
         return view('admin.management.index',compact('folders'));
     }
+
+    public function folderShow(ManagementProfileFolder $folder): View
+    {
+        $folder->loadCount('profiles')->load([
+            'profiles' => fn ($query) => $query->orderBy('sort_order')->orderBy('id'),
+        ]);
+
+        return view('admin.management.folder-show', compact('folder'));
+    }
+
     public function folderCreate(): View { return view('admin.management.folder-form',['folder'=>new ManagementProfileFolder(['status'=>'published'])]); }
     public function folderStore(Request $request): RedirectResponse
     {
@@ -45,7 +55,19 @@ class ManagementController extends Controller
         foreach($data['order'] as $position=>$id)if(isset($folders[$id]))$folders[$id]->update(['sort_order'=>$position+1]);
         return response()->json(['ok'=>true]);
     }
-    public function create(): View { return view('admin.management.form',['member'=>new SiteContentItem(['type'=>'management','status'=>'draft']),'folders'=>ManagementProfileFolder::query()->orderBy('sort_order')->orderBy('id')->get()]); }
+    public function create(Request $request): View
+    {
+        $member = new SiteContentItem(['type'=>'management','status'=>'draft']);
+
+        if ($request->filled('management_profile_folder_id')) {
+            $member->management_profile_folder_id = (int) $request->input('management_profile_folder_id');
+        }
+
+        return view('admin.management.form', [
+            'member' => $member,
+            'folders' => ManagementProfileFolder::query()->orderBy('sort_order')->orderBy('id')->get(),
+        ]);
+    }
     public function store(Request $request): RedirectResponse { $member=new SiteContentItem();$this->save($member,$request);return redirect()->route('admin.profile-builder.index')->with('status','Profile created.'); }
     public function edit(SiteContentItem $member): View { abort_unless($member->type==='management',404);return view('admin.management.form',['member'=>$member,'folders'=>ManagementProfileFolder::query()->orderBy('sort_order')->orderBy('id')->get()]); }
     public function update(Request $request,SiteContentItem $member): RedirectResponse { abort_unless($member->type==='management',404);$this->save($member,$request);return redirect()->route('admin.profile-builder.index')->with('status','Profile updated.'); }
