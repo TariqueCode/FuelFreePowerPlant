@@ -495,6 +495,13 @@ img{max-width:100%}
  const contacts=document.getElementById('homeProfileContacts');
  const addContact=document.getElementById('homeProfileAddContact');
  const close=document.getElementById('homeProfileClose');
+ const syncProfileMobileMode=()=>{
+   const mobile=window.matchMedia('(max-width: 650px)').matches;
+   modal.classList.toggle('home-profile-mobile',mobile);
+ };
+ syncProfileMobileMode();
+ window.addEventListener('resize',syncProfileMobileMode,{passive:true});
+
  const buttons=[...document.querySelectorAll('.home-section-management .member-more')];
  let lastTrigger=null;
  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -1622,6 +1629,141 @@ img{max-width:100%}
     .home-profile-message p:first-child{font-size:13px}
     .home-profile-add-contact{width:calc(100% - 22px);margin:0 11px 10px;min-height:49px;font-size:12px}
 }
+
+/* FINAL MOBILE PROFILE LOCK — runtime scoped, independent of viewport stylesheet order. */
+.home-profile-modal.home-profile-mobile .home-profile-panel{
+    width:min(430px,calc(100vw - 20px)) !important;
+    height:min(94svh,820px) !important;
+    max-height:calc(100svh - 20px) !important;
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+    grid-template-areas:"identity" "message" "contact" !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    overflow:hidden !important;
+    border-radius:22px !important;
+}
+.home-profile-modal.home-profile-mobile .home-profile-identity{
+    grid-column:1 !important;
+    grid-row:1 !important;
+    grid-area:identity !important;
+    display:grid !important;
+    grid-template-columns:104px minmax(0,1fr) !important;
+    grid-template-rows:1fr auto !important;
+    column-gap:14px !important;
+    align-items:center !important;
+    width:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    padding:30px 14px 18px !important;
+    box-sizing:border-box !important;
+    border-right:0 !important;
+    border-bottom:1px solid rgba(67,220,145,.14) !important;
+    overflow:hidden !important;
+}
+.home-profile-modal.home-profile-mobile .home-profile-kicker{display:none !important}
+.home-profile-modal.home-profile-mobile .home-profile-photo{
+    grid-column:1 !important;
+    grid-row:1 / 3 !important;
+    width:104px !important;
+    min-width:104px !important;
+    max-width:104px !important;
+    height:130px !important;
+    aspect-ratio:auto !important;
+    justify-self:start !important;
+    align-self:center !important;
+}
+.home-profile-modal.home-profile-mobile .home-profile-identity-copy{
+    grid-column:2 !important;
+    grid-row:1 !important;
+    width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    padding:0 42px 0 0 !important;
+    text-align:left !important;
+    align-self:end !important;
+    overflow:hidden !important;
+}
+.home-profile-modal.home-profile-mobile .home-profile-title{
+    width:100% !important;
+    min-width:0 !important;
+    white-space:normal !important;
+    word-break:normal !important;
+    overflow-wrap:normal !important;
+    hyphens:none !important;
+    font-size:clamp(18px,5.3vw,24px) !important;
+    line-height:1.12 !important;
+}
+.home-profile-modal.home-profile-mobile .home-profile-role{
+    margin-top:6px !important;
+    font-size:8px !important;
+    line-height:1.3 !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+}
+.home-profile-modal.home-profile-mobile .home-profile-contacts{
+    grid-column:2 !important;
+    grid-row:2 !important;
+    width:100% !important;
+    min-width:0 !important;
+    display:grid !important;
+    gap:6px !important;
+    margin:9px 0 0 !important;
+    padding:8px 0 0 !important;
+    overflow:hidden !important;
+}
+.home-profile-modal.home-profile-mobile .home-profile-contact{
+    display:grid !important;
+    grid-template-columns:29px minmax(0,1fr) !important;
+    gap:7px !important;
+    width:100% !important;
+    min-width:0 !important;
+}
+.home-profile-modal.home-profile-mobile .home-profile-message-pane{
+    grid-column:1 !important;
+    grid-row:2 !important;
+    grid-area:message !important;
+    width:calc(100% - 28px) !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:10px 14px !important;
+    padding:24px 14px 10px !important;
+    box-sizing:border-box !important;
+    display:flex !important;
+    flex-direction:column !important;
+    position:relative !important;
+    overflow:hidden !important;
+    border:1px solid rgba(43,177,255,.24) !important;
+    border-radius:18px !important;
+}
+.home-profile-modal.home-profile-mobile .home-profile-scroll{
+    width:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    flex:1 1 auto !important;
+    margin-top:18px !important;
+    padding:0 10px 4px 0 !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+}
+.home-profile-modal.home-profile-mobile .home-profile-message{
+    width:100% !important;
+    max-width:none !important;
+    min-width:0 !important;
+    overflow-wrap:anywhere !important;
+}
+.home-profile-modal.home-profile-mobile .home-profile-add-contact{
+    grid-column:1 !important;
+    grid-row:3 !important;
+    grid-area:contact !important;
+    width:calc(100% - 28px) !important;
+    min-height:52px !important;
+    margin:0 14px 13px !important;
+    box-sizing:border-box !important;
+}
+
 </style>
 
 @endsection
