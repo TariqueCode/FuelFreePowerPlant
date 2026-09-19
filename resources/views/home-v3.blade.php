@@ -459,26 +459,25 @@ img{max-width:100%}
 
 <div class="home-profile-modal" id="homeProfileModal" aria-hidden="true">
     <div class="home-profile-panel" role="dialog" aria-modal="true" aria-labelledby="homeProfileTitle">
-        <div class="home-profile-photo" id="homeProfilePhoto"></div>
-        <div class="home-profile-info">
-            <div class="home-profile-head">
-                <div>
-                    <div class="home-profile-kicker">Management Profile</div>
-                    <h2 class="home-profile-title" id="homeProfileTitle"></h2>
-                    <div class="home-profile-role" id="homeProfileRole"></div>
-                    <div class="home-profile-contact-mobile" id="homeProfileContactMobile"></div>
-                </div>
-                <button class="home-profile-close" id="homeProfileClose" type="button" aria-label="Close profile"><i class="fa-solid fa-xmark"></i></button>
+        <aside class="home-profile-identity">
+            <div class="home-profile-kicker">Management Profile</div>
+            <div class="home-profile-photo" id="homeProfilePhoto"></div>
+            <div class="home-profile-identity-copy">
+                <h2 class="home-profile-title" id="homeProfileTitle"></h2>
+                <div class="home-profile-role" id="homeProfileRole"></div>
             </div>
-            <div class="home-profile-divider"></div>
-            <div class="home-profile-scroll">
+            <div class="home-profile-contacts" id="homeProfileContacts"></div>
+        </aside>
+        <section class="home-profile-message-pane">
+            <button class="home-profile-close" id="homeProfileClose" type="button" aria-label="Close profile"><i class="fa-solid fa-xmark"></i></button>
+            <div class="home-profile-message-head">
                 <div class="home-profile-section-title" id="homeProfileMessageTitle">Message from leadership</div>
+                <div class="home-profile-message-rule"></div>
+            </div>
+            <div class="home-profile-scroll">
                 <div class="home-profile-message" id="homeProfileMessage"></div>
             </div>
-            <div class="home-profile-footer">
-                <div class="home-profile-links" id="homeProfileLinks"></div>
-            </div>
-        </div>
+        </section>
     </div>
 </div>
 
@@ -489,7 +488,8 @@ img{max-width:100%}
  const title=document.getElementById('homeProfileTitle'),role=document.getElementById('homeProfileRole');
  const messageTitle=document.getElementById('homeProfileMessageTitle');
  const photo=document.getElementById('homeProfilePhoto'),message=document.getElementById('homeProfileMessage');
- const links=document.getElementById('homeProfileLinks'),close=document.getElementById('homeProfileClose'),contactMobile=document.getElementById('homeProfileContactMobile');
+ const contacts=document.getElementById('homeProfileContacts');
+ const close=document.getElementById('homeProfileClose');
  const buttons=[...document.querySelectorAll('.home-section-management .member-more')];
  let lastTrigger=null;
  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -506,30 +506,22 @@ img{max-width:100%}
    const data=btn.closest('.member-card')?.querySelector('.home-profile-data'); if(!data)return;
    lastTrigger=btn;
    title.textContent=data.dataset.name||'';
-   const profileRole=String(data.dataset.role||'').trim();
-   role.textContent=profileRole;
-   if(messageTitle) messageTitle.textContent='Message from '+(profileRole||'Leadership');
+   role.textContent=String(data.dataset.role||'').trim();
+   if(messageTitle) messageTitle.textContent='Message from '+(String(data.dataset.role||'').trim()||'Leadership');
    message.innerHTML=renderMessage(data.dataset.message||'');
-   photo.innerHTML=data.dataset.image?'<img src="'+esc(data.dataset.image)+'" alt="'+esc(data.dataset.name||'')+'">':'<i class="fa-solid fa-user-tie" style="font-size:48px;color:#48d8f1"></i>';
-   const out=[];
-   if(data.dataset.phone)out.push('<a class="home-profile-link" href="tel:'+esc(data.dataset.phone.replace(/[^0-9+]/g,''))+'"><i class="fa-solid fa-phone"></i> Call</a>');
-   if(data.dataset.email)out.push('<a class="home-profile-link" href="mailto:'+esc(data.dataset.email)+'"><i class="fa-solid fa-envelope"></i> Email</a>');
-   if(data.dataset.vcard)out.push('<a class="home-profile-link primary" href="'+esc(data.dataset.vcard)+'"><i class="fa-solid fa-user-plus"></i> Add to Contacts</a>');
-   if(data.dataset.card)out.push('<a class="home-profile-link" href="'+esc(data.dataset.card)+'" target="_blank" rel="noopener"><i class="fa-regular fa-address-card"></i> Visiting Card</a>');
-   links.innerHTML=out.join('');
-   if(contactMobile){
-     const contact=[];
-     if(data.dataset.phone)contact.push('<a href="tel:'+esc(data.dataset.phone.replace(/[^0-9+]/g,''))+'"><i class="fa-solid fa-phone"></i><span>'+esc(data.dataset.phone)+'</span></a>');
-     if(data.dataset.email)contact.push('<a href="mailto:'+esc(data.dataset.email)+'"><i class="fa-solid fa-envelope"></i><span>'+esc(data.dataset.email)+'</span></a>');
-     contactMobile.innerHTML=contact.join('');
-   }
+   photo.innerHTML=data.dataset.image
+      ? '<img src="'+esc(data.dataset.image)+'" alt="'+esc(data.dataset.name||'')+'">'
+      : '<div class="home-profile-photo-placeholder"><i class="fa-solid fa-user-tie"></i></div>';
+   const contact=[];
+   if(data.dataset.phone)contact.push('<a class="home-profile-contact" href="tel:'+esc(data.dataset.phone.replace(/[^0-9+]/g,''))+'"><i class="fa-solid fa-phone"></i><span><small>Phone</small><strong>'+esc(data.dataset.phone)+'</strong></span></a>');
+   if(data.dataset.email)contact.push('<a class="home-profile-contact" href="mailto:'+esc(data.dataset.email)+'"><i class="fa-solid fa-envelope"></i><span><small>Email</small><strong>'+esc(data.dataset.email)+'</strong></span></a>');
+   contacts.innerHTML=contact.join('');
    modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; close.focus();
  };
  buttons.forEach(btn=>btn.addEventListener('click',()=>openModal(btn)));
  close.addEventListener('click',closeModal);
  modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))closeModal()});
-})();
 </script>
 
 <style>
@@ -1282,34 +1274,40 @@ img{max-width:100%}
 </style>
 
 
+
+
 <style>
-/* FIX: Restore homepage management profile modal presentation. */
-.home-profile-modal{position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,5,9,.84);backdrop-filter:blur(18px) saturate(120%)}
+/* FINAL DESKTOP MESSAGE VIEWER — executive profile presentation */
+.home-profile-modal{position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;padding:28px;background:rgba(0,5,8,.86);backdrop-filter:blur(18px) saturate(120%)}
 .home-profile-modal.open{display:flex}
-.home-profile-panel{width:min(1120px,94vw);height:min(760px,88vh);display:grid;grid-template-columns:minmax(360px,42%) minmax(0,58%);overflow:hidden;border:1px solid rgba(53,216,106,.24);border-radius:26px;background:radial-gradient(650px 500px at 0 0,rgba(53,216,106,.105),transparent 68%),linear-gradient(145deg,#082014 0%,#04150c 52%,#020906 100%);box-shadow:0 45px 130px rgba(0,0,0,.72),0 0 90px rgba(53,216,106,.09)}
-.home-profile-photo{min-width:0;display:grid;place-items:center;padding:28px;overflow:hidden;background:linear-gradient(145deg,#06120d 0%,#04150c 58%,#020906 100%);border-right:1px solid rgba(53,216,106,.16)}
-.home-profile-photo img{width:auto;height:auto;max-width:100%;max-height:100%;aspect-ratio:4 / 5;object-fit:cover;border:1px solid rgba(53,216,106,.58);border-radius:14px;box-shadow:0 0 0 3px rgba(53,216,106,.045),0 18px 45px rgba(0,0,0,.35)}
-.home-profile-info{min-width:0;min-height:0;display:flex;flex-direction:column}
-.home-profile-head{flex:0 0 auto;display:flex;justify-content:space-between;gap:18px;padding:30px 32px 22px}
-.home-profile-kicker{margin-bottom:7px;color:#55e58a;font-size:9px;line-height:1.4;letter-spacing:.20em;text-transform:uppercase}
-.home-profile-title{margin:0;color:var(--text);font-size:31px;line-height:1.15;letter-spacing:-.035em}.home-profile-contact-mobile{display:none}.home-profile-role{margin-top:9px;color:#8ee9a8;font-size:11px;line-height:1.5}
-.home-profile-close{flex:0 0 42px;width:42px;height:42px;border:1px solid rgba(53,216,106,.20);border-radius:12px;background:rgba(53,216,106,.045);color:#9cefb2;cursor:pointer}
-.home-profile-divider{height:1px;margin:0 32px;background:rgba(53,216,106,.13)}
-.home-profile-scroll{min-height:0;flex:1 1 auto;overflow:auto;padding:25px 32px 20px;scrollbar-width:thin;overscroll-behavior:contain}.home-profile-scroll::-webkit-scrollbar{width:6px}.home-profile-scroll::-webkit-scrollbar-thumb{background:rgba(53,216,106,.24);border-radius:99px}
-.home-profile-section-title{margin-bottom:12px;color:#55e58a;font-size:9px;line-height:1.4;font-weight:800;letter-spacing:.18em;text-transform:uppercase}.home-profile-message{max-width:760px;color:#a9c1b1;font-size:13px;line-height:1.95}.home-profile-message p{margin:0 0 16px}.home-profile-message p:last-child{margin-bottom:0}
-.home-profile-footer{flex:0 0 auto;padding:17px 32px 24px;background:linear-gradient(180deg,rgba(2,14,9,.18),rgba(2,14,9,.62));box-shadow:0 -12px 30px rgba(0,0,0,.10)}.home-profile-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-.home-profile-link{display:flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:8px 10px;border:1px solid rgba(53,216,106,.14);border-radius:11px;background:rgba(53,216,106,.035);color:#ccefd8;font-size:10px;font-weight:750}.home-profile-link.primary{background:rgba(53,216,106,.08);color:#8ee9a8;border-color:rgba(53,216,106,.28)}
-@media(max-width:1099px){.home-profile-panel{width:min(980px,96vw);height:min(720px,90vh);grid-template-columns:minmax(300px,40%) minmax(0,60%)}.home-profile-photo{padding:20px}.home-profile-head{padding:23px 25px 18px}.home-profile-title{font-size:26px}.home-profile-divider{margin:0 25px}.home-profile-scroll{padding:19px 25px 15px}.home-profile-footer{padding:13px 25px 18px}}
+.home-profile-panel{position:relative;width:min(1120px,92vw);height:min(720px,86vh);display:grid;grid-template-columns:minmax(260px,34%) minmax(0,66%);overflow:hidden;border:1px solid transparent;border-radius:28px;background:linear-gradient(#04140d,#04140d) padding-box,linear-gradient(135deg,rgba(55,224,108,.55),rgba(35,183,255,.52)) border-box;box-shadow:0 45px 130px rgba(0,0,0,.72),0 0 90px rgba(30,206,137,.10)}
+.home-profile-identity{min-width:0;padding:34px 28px 30px;display:flex;flex-direction:column;align-items:center;background:radial-gradient(380px 360px at 50% 5%,rgba(44,214,117,.09),transparent 72%),linear-gradient(180deg,rgba(8,37,23,.72),rgba(2,15,9,.96));border-right:1px solid rgba(74,218,129,.14)}
+.home-profile-kicker{align-self:flex-start;margin-bottom:20px;color:#58e58d;font-size:9px;font-weight:800;letter-spacing:.22em;text-transform:uppercase}
+.home-profile-photo{width:min(210px,82%);aspect-ratio:4/5;display:grid;place-items:center;overflow:hidden;border-radius:16px;background:#06150d;border:1px solid rgba(64,220,121,.42);box-shadow:0 0 0 4px rgba(64,220,121,.035),0 22px 55px rgba(0,0,0,.38)}
+.home-profile-photo img{width:100%;height:100%;display:block;object-fit:cover;object-position:center top}
+.home-profile-photo-placeholder{display:grid;place-items:center;width:100%;height:100%;color:#58e58d;font-size:48px}
+.home-profile-identity-copy{width:100%;margin-top:20px;text-align:center}
+.home-profile-title{margin:0;color:#f1f8f3;font-size:clamp(23px,2vw,30px);line-height:1.15;letter-spacing:-.035em}
+.home-profile-role{margin-top:8px;color:#65e895;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.home-profile-contacts{width:100%;display:grid;gap:8px;margin-top:22px;padding-top:18px;border-top:1px solid rgba(74,218,129,.13)}
+.home-profile-contact{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:9px;min-width:0;color:#b9d1c1;text-decoration:none}
+.home-profile-contact>i{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(74,218,129,.15);border-radius:10px;background:rgba(74,218,129,.045);color:#63e996;font-size:12px}
+.home-profile-contact span{min-width:0;display:grid;gap:2px}.home-profile-contact small{color:#5ed98a;font-size:7px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.home-profile-contact strong{overflow-wrap:anywhere;color:#cfe2d5;font-size:10px;line-height:1.45;font-weight:600}
+.home-profile-message-pane{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;padding:38px 44px 38px;background:radial-gradient(600px 500px at 100% 100%,rgba(31,157,208,.055),transparent 70%),linear-gradient(145deg,#061b10 0%,#03140b 56%,#020c07 100%)}
+.home-profile-close{position:absolute;top:22px;right:22px;z-index:3;width:42px;height:42px;border:1px solid rgba(74,218,129,.18);border-radius:12px;background:rgba(74,218,129,.045);color:#86eba8;cursor:pointer}
+.home-profile-close:hover{background:rgba(74,218,129,.10);border-color:rgba(74,218,129,.38)}
+.home-profile-message-head{padding-right:58px}.home-profile-section-title{margin:0;color:#63e996;font-size:10px;font-weight:800;letter-spacing:.19em;text-transform:uppercase}.home-profile-message-rule{width:54px;height:3px;margin-top:10px;border-radius:99px;background:linear-gradient(90deg,#55e58a,#29c7ff)}
+.home-profile-scroll{min-height:0;flex:1;overflow:auto;margin-top:25px;padding:0 18px 10px 0;scrollbar-width:thin;scrollbar-color:rgba(74,218,129,.25) transparent}.home-profile-scroll::-webkit-scrollbar{width:6px}.home-profile-scroll::-webkit-scrollbar-thumb{background:rgba(74,218,129,.25);border-radius:99px}
+.home-profile-message{max-width:780px;color:#b9cfc0;font-size:14px;line-height:1.9}.home-profile-message p{margin:0 0 18px}.home-profile-message p:last-child{margin-bottom:0}.home-profile-message p:first-child{color:#e2eee5;font-size:17px;line-height:1.65}
+@media(max-width:900px) and (min-width:651px){.home-profile-panel{width:min(960px,94vw);grid-template-columns:minmax(230px,32%) minmax(0,68%)}.home-profile-identity{padding:28px 20px}.home-profile-photo{width:min(175px,86%)}.home-profile-message-pane{padding:32px 30px}.home-profile-message{font-size:13px}.home-profile-message p:first-child{font-size:15px}}
 @media(max-width:650px){
-.home-profile-modal{padding:12px;align-items:center;justify-content:center;background:rgba(0,4,8,.80);backdrop-filter:blur(14px)}
-.home-profile-panel{width:100%;max-width:720px;height:min(90svh,720px);max-height:calc(100svh - 24px);min-height:0;display:grid;grid-template-columns:minmax(112px,32%) minmax(0,68%);grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden;border-radius:22px;border-bottom:1px solid rgba(53,216,106,.24)}
-.home-profile-photo{grid-column:1;grid-row:1;min-width:0;height:auto;padding:14px 0 14px 16px;display:flex;align-items:flex-start;justify-content:flex-start;border:0;background:transparent}.home-profile-photo img{width:100%;height:auto;max-width:none;aspect-ratio:4/5;object-fit:cover;border-radius:11px}
-.home-profile-info{display:contents}.home-profile-head{grid-column:2;grid-row:1;min-width:0;display:block;padding:25px 58px 12px 14px}.home-profile-kicker{margin-bottom:6px;font-size:7px;letter-spacing:.16em}.home-profile-title{font-size:19px;line-height:1.16;overflow-wrap:anywhere}.home-profile-role{margin-top:5px;font-size:8px;line-height:1.4}
-.home-profile-contact-mobile{display:flex;flex-direction:column;gap:6px;margin-top:12px}.home-profile-contact-mobile a{min-width:0;display:flex;align-items:flex-start;gap:6px;color:#9ec9a8;font-size:7px;line-height:1.45;text-decoration:none;overflow-wrap:anywhere}.home-profile-contact-mobile i{flex:0 0 10px;margin-top:1px;color:#55e58a}.home-profile-close{position:absolute;top:10px;right:10px;z-index:20;width:36px;height:36px;flex-basis:36px;border-radius:10px}.home-profile-divider{grid-column:1 / -1;grid-row:2;width:auto;height:1px;margin:0 16px;align-self:start}
-.home-profile-scroll{grid-column:1 / -1;grid-row:2;min-height:0;margin:14px 16px 12px;padding:13px 13px 18px;overflow-y:auto;border:1px solid rgba(53,216,106,.14);border-radius:13px;background:rgba(1,12,8,.52);box-shadow:inset 0 0 24px rgba(53,216,106,.025);pointer-events:auto}.home-profile-section-title{margin-bottom:9px;font-size:7px;letter-spacing:.16em}.home-profile-message{max-width:none;color:#a9c1b1;font-size:10px;line-height:1.75}.home-profile-message p{margin:0 0 11px}
-.home-profile-footer{grid-column:1 / -1;grid-row:3;min-height:0;padding:0 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(2,14,9,.18),rgba(2,14,9,.88));pointer-events:auto}.home-profile-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.home-profile-link{min-height:36px;border-radius:9px;font-size:8px}}
-@media(max-width:420px){.home-profile-panel{height:min(94vh,740px);border-radius:20px 20px 0 0}.home-profile-title{font-size:20px}.home-profile-message{font-size:11px;line-height:1.75}.home-profile-links{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:reduce){.home-profile-panel{animation:none}}
+ .home-profile-modal{padding:12px;align-items:center;background:rgba(0,4,8,.84)}
+ .home-profile-panel{width:100%;height:min(92svh,720px);grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);border-radius:22px}
+ .home-profile-identity{padding:20px 18px 16px;display:grid;grid-template-columns:105px minmax(0,1fr);grid-template-rows:auto auto;column-gap:15px;align-items:center;border-right:0;border-bottom:1px solid rgba(74,218,129,.14)}
+ .home-profile-kicker{grid-column:1/-1;margin-bottom:11px}.home-profile-photo{grid-column:1;grid-row:2;width:105px;height:132px;aspect-ratio:auto}.home-profile-identity-copy{grid-column:2;grid-row:2;margin:0;text-align:left}.home-profile-title{font-size:20px}.home-profile-role{font-size:8px;margin-top:6px}.home-profile-contacts{grid-column:1/-1;margin-top:14px;padding-top:12px;grid-template-columns:1fr 1fr}.home-profile-contact strong{font-size:8px}
+ .home-profile-message-pane{padding:22px 18px 18px}.home-profile-close{top:13px;right:13px;width:36px;height:36px}.home-profile-message-head{padding-right:48px}.home-profile-scroll{margin-top:17px}.home-profile-message{font-size:11px;line-height:1.75}.home-profile-message p:first-child{font-size:13px;line-height:1.65}
+}
+@media(max-width:420px){.home-profile-identity{grid-template-columns:88px minmax(0,1fr);column-gap:12px}.home-profile-photo{width:88px;height:110px}.home-profile-title{font-size:18px}.home-profile-contacts{grid-template-columns:1fr}.home-profile-message{font-size:10px}}
 </style>
 
 @endsection
