@@ -149,7 +149,7 @@
                 }
                 html body main.shell.home-v3 .home-section-management .member-card {
                     display:grid !important;
-                    grid-template-columns:minmax(0,40%) minmax(0,1fr) !important;
+                    grid-template-columns:minmax(0,38%) minmax(0,62%) !important;
                     width:100% !important;
                     min-width:0 !important;
                     min-height:0 !important;
