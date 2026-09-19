@@ -96,4 +96,34 @@ class BoardOfDirectorsNavigationTest extends TestCase
         $this->assertSame('/admin/management', $profile->url);
         $this->assertSame('/admin/page-builder', $page->url);
     }
+    public function test_published_secondary_profile_folder_has_a_public_route(): void
+    {
+        $canonical = ManagementProfileFolder::query()->where('slug', 'board-of-directors')->firstOrFail();
+
+        $folder = ManagementProfileFolder::create([
+            'name' => 'Executive Committee',
+            'slug' => 'executive-committee',
+            'status' => 'published',
+            'sort_order' => $canonical->sort_order + 10,
+        ]);
+
+        $this->get(route('management.folder', ['folderSlug' => $folder->slug]))
+            ->assertOk()
+            ->assertSee('Executive Committee');
+    }
+
+    public function test_draft_profile_folder_is_not_publicly_routable(): void
+    {
+        $canonical = ManagementProfileFolder::query()->where('slug', 'board-of-directors')->firstOrFail();
+
+        $folder = ManagementProfileFolder::create([
+            'name' => 'Internal Leadership',
+            'slug' => 'internal-leadership',
+            'status' => 'draft',
+            'sort_order' => $canonical->sort_order + 10,
+        ]);
+
+        $this->get('/'.$folder->slug)->assertNotFound();
+    }
+
 }
