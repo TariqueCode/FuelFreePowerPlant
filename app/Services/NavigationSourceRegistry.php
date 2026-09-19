@@ -228,7 +228,7 @@ class NavigationSourceRegistry
             'key' => 'management_folder:'.$folder->id,
             'type' => 'folder',
             'label' => (string) $folder->name,
-            'url' => route('management.folder', ['folderSlug' => $folder->slug]),
+            'url' => '/'.ltrim($folder->slug, '/'),
             'route_name' => 'management.folder',
             'area' => 'public',
             'permission' => null,
