@@ -522,7 +522,8 @@ img{max-width:100%}
  close.addEventListener('click',closeModal);
  modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))closeModal()});
-
+})();
+</script>
 
 <style>
 /* === FINAL STATIC HOMEPAGE MODE ===
