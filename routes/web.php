@@ -100,3 +100,14 @@ Route::prefix('admin')->middleware('permission:social-media.manage')->group(func
 
 Route::prefix('admin')->middleware('permission:website.publish')->group(function(){Route::patch('/site-content/news/{item}/toggle',[SiteContentController::class,'toggleNews'])->name('admin.site-content.news.toggle');Route::patch('/site-content/pages/{item}/toggle',[SiteContentController::class,'togglePage'])->name('admin.site-content.page.toggle');});
 Route::prefix('admin')->middleware('permission:cms.publish')->group(function(){Route::patch('/cms/{page}/toggle',[CmsController::class,'togglePublication'])->name('admin.cms.toggle');});
+
+/*
+|--------------------------------------------------------------------------
+| Profile Builder public folders
+|--------------------------------------------------------------------------
+| Keep this single-segment route at the end so every explicit application
+| route (including authentication/admin endpoints) keeps its precedence.
+*/
+Route::get('/{folderSlug}', [ManagementController::class, 'folder'])
+    ->where('folderSlug', '[a-z0-9]+(?:-[a-z0-9]+)*')
+    ->name('management.folder');
