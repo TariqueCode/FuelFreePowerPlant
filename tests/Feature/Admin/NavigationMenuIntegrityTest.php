@@ -3,10 +3,12 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\CmsPage;
+use App\Models\ManagementProfileFolder;
 use App\Models\NavigationMenuItem;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\PublicNavigationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\QueryException;
 use Tests\TestCase;
@@ -203,4 +205,87 @@ class NavigationMenuIntegrityTest extends TestCase
         $this->assertSame(1, NavigationMenuItem::query()->where('menu', 'main')->where('source_key', 'route:test.navigation.unique')->count());
         $this->assertSame(1, NavigationMenuItem::query()->where('menu', 'dashboard')->where('source_key', 'route:test.navigation.unique')->count());
     }
+    public function test_published_profile_folder_appears_in_the_menu_builder_source_picker(): void
+    {
+        $user = $this->navigationAdmin();
+        $canonical = ManagementProfileFolder::query()->where('slug', 'board-of-directors')->firstOrFail();
+
+        $folder = ManagementProfileFolder::create([
+            'name' => 'Executive Committee',
+            'slug' => 'executive-committee',
+            'status' => 'published',
+            'sort_order' => $canonical->sort_order + 10,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('admin.menu-builder.index', ['menu' => 'main']))
+            ->assertOk()
+            ->assertSee('Executive Committee')
+            ->assertSee('/executive-committee');
+
+        $this->assertDatabaseMissing('navigation_menu_items', [
+            'source_key' => 'management_folder:'.$folder->id,
+        ]);
+    }
+
+    public function test_profile_folder_can_be_added_to_public_navigation_and_resolves_live(): void
+    {
+        $user = $this->navigationAdmin();
+        $canonical = ManagementProfileFolder::query()->where('slug', 'board-of-directors')->firstOrFail();
+
+        $folder = ManagementProfileFolder::create([
+            'name' => 'Executive Committee',
+            'slug' => 'executive-committee',
+            'status' => 'published',
+            'sort_order' => $canonical->sort_order + 10,
+        ]);
+
+        $sourceKey = 'management_folder:'.$folder->id;
+
+        $response = $this->actingAs($user)->post(route('admin.menu-builder.store'), [
+            'menu' => 'main',
+            'kind' => 'source',
+            'source_key' => $sourceKey,
+            'target' => '_self',
+            'is_visible' => '1',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('navigation_menu_items', [
+            'menu' => 'main',
+            'source_key' => $sourceKey,
+            'source_type' => 'folder',
+            'label' => 'Executive Committee',
+            'url' => '/executive-committee',
+            'route_name' => 'management.folder',
+        ]);
+
+        $tree = app(PublicNavigationService::class)->tree('main');
+        $item = $tree->firstWhere('source_key', $sourceKey);
+
+        $this->assertNotNull($item);
+        $this->assertSame('Executive Committee', $item->displayLabel());
+        $this->assertSame('/executive-committee', $item->url);
+        $this->assertSame('folder', $item->source_type);
+    }
+
+    public function test_draft_profile_folder_is_not_available_to_the_menu_builder(): void
+    {
+        $user = $this->navigationAdmin();
+        $canonical = ManagementProfileFolder::query()->where('slug', 'board-of-directors')->firstOrFail();
+
+        $folder = ManagementProfileFolder::create([
+            'name' => 'Internal Leadership',
+            'slug' => 'internal-leadership',
+            'status' => 'draft',
+            'sort_order' => $canonical->sort_order + 10,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('admin.menu-builder.index', ['menu' => 'main']))
+            ->assertOk()
+            ->assertDontSee('Internal Leadership')
+            ->assertDontSee('/internal-leadership');
+    }
+
 }
