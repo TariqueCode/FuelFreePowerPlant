@@ -1647,6 +1647,7 @@ img{max-width:100%}
     /* Close belongs to the modal, not the message column. */
     .home-profile-message-pane{
         position:static !important;
+        grid-column:1 !important;
         grid-row:2 !important;
         width:auto !important;
         margin:0 14px 10px !important;
