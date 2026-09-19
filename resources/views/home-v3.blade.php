@@ -459,6 +459,7 @@ img{max-width:100%}
 
 <div class="home-profile-modal" id="homeProfileModal" aria-hidden="true">
     <div class="home-profile-panel" role="dialog" aria-modal="true" aria-labelledby="homeProfileTitle">
+        <button class="home-profile-close" id="homeProfileClose" type="button" aria-label="Close profile"><i class="fa-solid fa-xmark"></i></button>
         <aside class="home-profile-identity">
             <div class="home-profile-kicker">Management Profile</div>
             <div class="home-profile-photo" id="homeProfilePhoto"></div>
@@ -469,7 +470,6 @@ img{max-width:100%}
             <div class="home-profile-contacts" id="homeProfileContacts"></div>
         </aside>
         <section class="home-profile-message-pane">
-            <button class="home-profile-close" id="homeProfileClose" type="button" aria-label="Close profile"><i class="fa-solid fa-xmark"></i></button>
             <div class="home-profile-message-head">
                 <div class="home-profile-section-title" id="homeProfileMessageTitle">Message from leadership</div>
                 <div class="home-profile-message-rule"></div>
@@ -1717,8 +1717,15 @@ img{max-width:100%}
     right:auto !important;
     width:38px !important;
     height:38px !important;
-    z-index:30 !important;
-    box-shadow:0 8px 20px rgba(0,0,0,.28) !important;
+    z-index:60 !important;
+    border:1px solid rgba(43,177,255,.52) !important;
+    border-radius:11px !important;
+    background:rgba(4,30,38,.78) !important;
+    color:#f2fbff !important;
+    font-size:15px !important;
+    display:grid !important;
+    place-items:center !important;
+    box-shadow:0 8px 20px rgba(0,0,0,.30),0 0 16px rgba(22,141,255,.08) !important;
 }
 
 .home-profile-modal.home-profile-mobile .home-profile-identity-copy{
@@ -1770,7 +1777,6 @@ img{max-width:100%}
 }
 .home-profile-modal.home-profile-mobile .home-profile-message-pane{
     grid-column:1 !important;
-    position:static !important;
     grid-row:2 !important;
     grid-area:message !important;
     width:calc(100% - 28px) !important;
