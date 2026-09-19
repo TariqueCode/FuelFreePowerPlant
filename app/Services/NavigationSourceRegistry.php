@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\CmsPage;
+use App\Models\ManagementProfileFolder;
 use App\Models\NavigationMenuItem;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
@@ -51,7 +52,20 @@ class NavigationSourceRegistry
                 ])
             : collect();
 
-        return $routes->concat($cms)
+        $managementFolders = ($area === 'public' && $menu === 'main')
+            ? ManagementProfileFolder::query()
+                ->where('status', 'published')
+                ->orderBy('sort_order')
+                ->orderBy('id')
+                ->get(['id', 'name', 'slug', 'sort_order'])
+                // /management is the canonical entry point for the first published folder.
+                // Keep that folder represented by route:management so the menu never shows
+                // a duplicate Board of Directors source.
+                ->reject(fn (ManagementProfileFolder $folder): bool => $this->isCanonicalManagementFolder($folder))
+                ->map(fn (ManagementProfileFolder $folder): array => $this->managementFolderSource($folder))
+            : collect();
+
+        return $routes->concat($cms)->concat($managementFolders)
             ->reject(fn (array $source): bool => $used->contains($source['key']))
             ->reject(fn (array $source): bool => ! $this->isUsableNavigationLabel($source['label']))
             ->sortBy(fn (array $source): string => mb_strtolower($source['label']))->values();
@@ -85,6 +99,20 @@ class NavigationSourceRegistry
                 if ($source['permission'] !== null && (! auth()->check() || ! auth()->user()->hasPermission($source['permission']))) return null;
                 return $source;
             }
+        }
+
+        if (Str::startsWith($key, 'management_folder:') && $area === 'public') {
+            $id = (int) Str::after($key, 'management_folder:');
+            $folder = ManagementProfileFolder::query()
+                ->whereKey($id)
+                ->where('status', 'published')
+                ->first();
+
+            if ($folder && ! $this->isCanonicalManagementFolder($folder)) {
+                return $this->managementFolderSource($folder);
+            }
+
+            return null;
         }
 
         if (Str::startsWith($key, 'cms_page:') && $area === 'public') {
@@ -181,6 +209,34 @@ class NavigationSourceRegistry
         $label = Str::headline(Str::replace(['admin.', '.index', '.'], ['admin ', '', ' '], $name));
         if ($controller && $controller !== 'Closure') { $method = Str::headline(Str::beforeLast($controller, 'Controller')); if ($method && $method !== 'Closure') $label = $method; }
         return $label;
+    }
+
+    private function isCanonicalManagementFolder(ManagementProfileFolder $folder): bool
+    {
+        $canonicalId = ManagementProfileFolder::query()
+            ->where('status', 'published')
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->value('id');
+
+        return $canonicalId !== null && (int) $canonicalId === (int) $folder->id;
+    }
+
+    private function managementFolderSource(ManagementProfileFolder $folder): array
+    {
+        return [
+            'key' => 'management_folder:'.$folder->id,
+            'type' => 'folder',
+            'label' => (string) $folder->name,
+            'url' => route('management.folder', ['folderSlug' => $folder->slug]),
+            'route_name' => 'management.folder',
+            'area' => 'public',
+            'permission' => null,
+            'meta' => [
+                'management_profile_folder_id' => $folder->id,
+                'slug' => $folder->slug,
+            ],
+        ];
     }
 
     private function humanizeNavigationLabel(string $value): string { return Str::headline(str_replace(['-', '_'], ' ', trim($value))); }
