@@ -1281,4 +1281,35 @@ img{max-width:100%}
 }
 </style>
 
+
+<style>
+/* FIX: Restore homepage management profile modal presentation. */
+.home-profile-modal{position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,5,9,.84);backdrop-filter:blur(18px) saturate(120%)}
+.home-profile-modal.open{display:flex}
+.home-profile-panel{width:min(1120px,94vw);height:min(760px,88vh);display:grid;grid-template-columns:minmax(360px,42%) minmax(0,58%);overflow:hidden;border:1px solid rgba(53,216,106,.24);border-radius:26px;background:radial-gradient(650px 500px at 0 0,rgba(53,216,106,.105),transparent 68%),linear-gradient(145deg,#082014 0%,#04150c 52%,#020906 100%);box-shadow:0 45px 130px rgba(0,0,0,.72),0 0 90px rgba(53,216,106,.09)}
+.home-profile-photo{min-width:0;display:grid;place-items:center;padding:28px;overflow:hidden;background:linear-gradient(145deg,#06120d 0%,#04150c 58%,#020906 100%);border-right:1px solid rgba(53,216,106,.16)}
+.home-profile-photo img{width:auto;height:auto;max-width:100%;max-height:100%;aspect-ratio:4 / 5;object-fit:cover;border:1px solid rgba(53,216,106,.58);border-radius:14px;box-shadow:0 0 0 3px rgba(53,216,106,.045),0 18px 45px rgba(0,0,0,.35)}
+.home-profile-info{min-width:0;min-height:0;display:flex;flex-direction:column}
+.home-profile-head{flex:0 0 auto;display:flex;justify-content:space-between;gap:18px;padding:30px 32px 22px}
+.home-profile-kicker{margin-bottom:7px;color:#55e58a;font-size:9px;line-height:1.4;letter-spacing:.20em;text-transform:uppercase}
+.home-profile-title{margin:0;color:var(--text);font-size:31px;line-height:1.15;letter-spacing:-.035em}.home-profile-contact-mobile{display:none}.home-profile-role{margin-top:9px;color:#8ee9a8;font-size:11px;line-height:1.5}
+.home-profile-close{flex:0 0 42px;width:42px;height:42px;border:1px solid rgba(53,216,106,.20);border-radius:12px;background:rgba(53,216,106,.045);color:#9cefb2;cursor:pointer}
+.home-profile-divider{height:1px;margin:0 32px;background:rgba(53,216,106,.13)}
+.home-profile-scroll{min-height:0;flex:1 1 auto;overflow:auto;padding:25px 32px 20px;scrollbar-width:thin;overscroll-behavior:contain}.home-profile-scroll::-webkit-scrollbar{width:6px}.home-profile-scroll::-webkit-scrollbar-thumb{background:rgba(53,216,106,.24);border-radius:99px}
+.home-profile-section-title{margin-bottom:12px;color:#55e58a;font-size:9px;line-height:1.4;font-weight:800;letter-spacing:.18em;text-transform:uppercase}.home-profile-message{max-width:760px;color:#a9c1b1;font-size:13px;line-height:1.95}.home-profile-message p{margin:0 0 16px}.home-profile-message p:last-child{margin-bottom:0}
+.home-profile-footer{flex:0 0 auto;padding:17px 32px 24px;background:linear-gradient(180deg,rgba(2,14,9,.18),rgba(2,14,9,.62));box-shadow:0 -12px 30px rgba(0,0,0,.10)}.home-profile-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.home-profile-link{display:flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:8px 10px;border:1px solid rgba(53,216,106,.14);border-radius:11px;background:rgba(53,216,106,.035);color:#ccefd8;font-size:10px;font-weight:750}.home-profile-link.primary{background:rgba(53,216,106,.08);color:#8ee9a8;border-color:rgba(53,216,106,.28)}
+@media(max-width:1099px){.home-profile-panel{width:min(980px,96vw);height:min(720px,90vh);grid-template-columns:minmax(300px,40%) minmax(0,60%)}.home-profile-photo{padding:20px}.home-profile-head{padding:23px 25px 18px}.home-profile-title{font-size:26px}.home-profile-divider{margin:0 25px}.home-profile-scroll{padding:19px 25px 15px}.home-profile-footer{padding:13px 25px 18px}}
+@media(max-width:650px){
+.home-profile-modal{padding:12px;align-items:center;justify-content:center;background:rgba(0,4,8,.80);backdrop-filter:blur(14px)}
+.home-profile-panel{width:100%;max-width:720px;height:min(90svh,720px);max-height:calc(100svh - 24px);min-height:0;display:grid;grid-template-columns:minmax(112px,32%) minmax(0,68%);grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden;border-radius:22px;border-bottom:1px solid rgba(53,216,106,.24)}
+.home-profile-photo{grid-column:1;grid-row:1;min-width:0;height:auto;padding:14px 0 14px 16px;display:flex;align-items:flex-start;justify-content:flex-start;border:0;background:transparent}.home-profile-photo img{width:100%;height:auto;max-width:none;aspect-ratio:4/5;object-fit:cover;border-radius:11px}
+.home-profile-info{display:contents}.home-profile-head{grid-column:2;grid-row:1;min-width:0;display:block;padding:25px 58px 12px 14px}.home-profile-kicker{margin-bottom:6px;font-size:7px;letter-spacing:.16em}.home-profile-title{font-size:19px;line-height:1.16;overflow-wrap:anywhere}.home-profile-role{margin-top:5px;font-size:8px;line-height:1.4}
+.home-profile-contact-mobile{display:flex;flex-direction:column;gap:6px;margin-top:12px}.home-profile-contact-mobile a{min-width:0;display:flex;align-items:flex-start;gap:6px;color:#9ec9a8;font-size:7px;line-height:1.45;text-decoration:none;overflow-wrap:anywhere}.home-profile-contact-mobile i{flex:0 0 10px;margin-top:1px;color:#55e58a}.home-profile-close{position:absolute;top:10px;right:10px;z-index:20;width:36px;height:36px;flex-basis:36px;border-radius:10px}.home-profile-divider{grid-column:1 / -1;grid-row:2;width:auto;height:1px;margin:0 16px;align-self:start}
+.home-profile-scroll{grid-column:1 / -1;grid-row:2;min-height:0;margin:14px 16px 12px;padding:13px 13px 18px;overflow-y:auto;border:1px solid rgba(53,216,106,.14);border-radius:13px;background:rgba(1,12,8,.52);box-shadow:inset 0 0 24px rgba(53,216,106,.025);pointer-events:auto}.home-profile-section-title{margin-bottom:9px;font-size:7px;letter-spacing:.16em}.home-profile-message{max-width:none;color:#a9c1b1;font-size:10px;line-height:1.75}.home-profile-message p{margin:0 0 11px}
+.home-profile-footer{grid-column:1 / -1;grid-row:3;min-height:0;padding:0 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(2,14,9,.18),rgba(2,14,9,.88));pointer-events:auto}.home-profile-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.home-profile-link{min-height:36px;border-radius:9px;font-size:8px}}
+@media(max-width:420px){.home-profile-panel{height:min(94vh,740px);border-radius:20px 20px 0 0}.home-profile-title{font-size:20px}.home-profile-message{font-size:11px;line-height:1.75}.home-profile-links{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.home-profile-panel{animation:none}}
+</style>
+
 @endsection
