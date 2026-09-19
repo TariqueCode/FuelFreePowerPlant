@@ -259,6 +259,186 @@ img{max-width:100%}
     .home-section-management .member-contact{font-size:8px}
     .home-section-management .member-message{font-size:8px!important}
 }
+/* Desktop leadership cards — mirror the corporate Board of Directors presentation. */
+@media (min-width:992px){
+    .home-section-management .management-grid{
+        display:grid !important;
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:24px !important;
+        width:100% !important;
+        max-width:none !important;
+    }
+    .home-section-management .member-card{
+        position:relative;
+        display:grid !important;
+        grid-template-columns:minmax(0,38%) minmax(0,62%) !important;
+        min-width:0 !important;
+        min-height:420px !important;
+        height:auto !important;
+        overflow:hidden;
+        isolation:isolate;
+        border:1px solid transparent;
+        border-radius:22px;
+        background:
+            linear-gradient(145deg,rgba(8,28,18,.98),rgba(3,13,9,.99)) padding-box,
+            linear-gradient(115deg,rgba(53,216,106,.78),rgba(53,216,106,.24) 44%,rgba(22,141,255,.72)) border-box;
+        box-shadow:0 18px 55px rgba(0,0,0,.32),0 0 28px rgba(53,216,106,.045);
+        transition:transform .25s cubic-bezier(.2,.75,.2,1),box-shadow .25s ease;
+    }
+    .home-section-management .member-card::before{
+        content:"";
+        position:absolute;
+        inset:0;
+        z-index:-1;
+        pointer-events:none;
+        border-radius:inherit;
+        background:
+            radial-gradient(circle at 100% 0%,rgba(22,141,255,.09),transparent 35%),
+            radial-gradient(circle at 0% 100%,rgba(53,216,106,.08),transparent 38%);
+    }
+    .home-section-management .member-card::after{
+        content:attr(data-card-number);
+        position:absolute;
+        top:22px;
+        right:22px;
+        z-index:1;
+        color:rgba(53,216,106,.07);
+        font-size:62px;
+        line-height:1;
+        font-weight:900;
+        letter-spacing:-.06em;
+        pointer-events:none;
+    }
+    .home-section-management .member-card:hover{
+        transform:translateY(-4px);
+        box-shadow:0 28px 72px rgba(0,0,0,.42),0 0 34px rgba(53,216,106,.10);
+    }
+    .home-section-management .member-photo{
+        position:relative;
+        z-index:1;
+        width:100% !important;
+        min-height:420px;
+        height:auto !important;
+        aspect-ratio:auto;
+        overflow:hidden;
+        background:#06120d;
+    }
+    .home-section-management .member-photo::after{
+        content:"";
+        position:absolute;
+        inset:0;
+        pointer-events:none;
+        background:linear-gradient(90deg,transparent 68%,rgba(3,13,9,.38) 100%);
+    }
+    .home-section-management .member-photo img{
+        width:100% !important;
+        height:100% !important;
+        object-fit:cover;
+        transition:transform .55s cubic-bezier(.2,.75,.2,1);
+    }
+    .home-section-management .member-card:hover .member-photo img{transform:scale(1.025)}
+    .home-section-management .member-body{
+        position:relative;
+        z-index:2;
+        width:auto !important;
+        min-width:0;
+        min-height:0;
+        height:100% !important;
+        padding:38px 34px 30px !important;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+    }
+    .home-section-management .member-body::before{
+        content:"";
+        position:absolute;
+        left:0;
+        top:13%;
+        bottom:13%;
+        width:1px;
+        background:linear-gradient(180deg,transparent,rgba(53,216,106,.45),rgba(22,141,255,.30),transparent);
+    }
+    .home-section-management .member-body h3{
+        max-width:88%;
+        margin:0;
+        color:transparent;
+        background:linear-gradient(105deg,#35d86a 0%,#8cf1a8 40%,#33bfff 100%);
+        -webkit-background-clip:text;
+        background-clip:text;
+        font-size:clamp(25px,2.1vw,34px);
+        line-height:1.12;
+        font-weight:850;
+        letter-spacing:-.035em;
+    }
+    .home-section-management .member-role{
+        margin-top:10px;
+        color:#55e58a;
+        font-size:11px;
+        font-weight:850;
+        letter-spacing:.19em;
+    }
+    .home-section-management .member-contacts{
+        margin-top:20px;
+        padding:16px 0;
+        border-top:1px solid rgba(53,216,106,.12);
+        border-bottom:1px solid rgba(53,216,106,.08);
+        display:grid;
+        gap:10px;
+    }
+    .home-section-management .member-contact{
+        color:#b7c9c0;
+        font-size:12px;
+        line-height:1.45;
+    }
+    .home-section-management .member-contact i{
+        width:28px;
+        flex:0 0 28px;
+        height:28px;
+        display:grid;
+        place-items:center;
+        border-radius:8px;
+        background:rgba(53,216,106,.06);
+        border:1px solid rgba(53,216,106,.13);
+        color:#35d86a;
+    }
+    .home-section-management .member-message{
+        margin-top:20px !important;
+        padding-top:0;
+        border-top:0;
+        color:#a5b9ae !important;
+        font-size:13px !important;
+        line-height:1.78 !important;
+        -webkit-line-clamp:3;
+    }
+    .home-section-management .member-message:before{display:none}
+    .home-section-management .member-more{
+        width:auto;
+        min-height:46px;
+        margin-top:20px;
+        padding:10px 18px;
+        align-self:flex-start;
+        justify-content:center;
+        gap:8px;
+        border:1px solid rgba(53,216,106,.24);
+        border-radius:12px;
+        background:linear-gradient(135deg,rgba(53,216,106,.075),rgba(22,141,255,.035));
+        color:#dff8e7;
+        font-size:11px;
+    }
+    .home-section-management .member-more:hover{
+        border-color:rgba(53,216,106,.50);
+        background:linear-gradient(135deg,rgba(53,216,106,.15),rgba(22,141,255,.065));
+        box-shadow:0 10px 25px rgba(0,0,0,.24),0 0 18px rgba(53,216,106,.06);
+    }
+}
+@media (min-width:992px) and (max-width:1100px){
+    .home-section-management .member-card{min-height:360px !important}
+    .home-section-management .member-photo{min-height:360px}
+    .home-section-management .member-body{padding:28px 24px !important}
+    .home-section-management .member-body h3{font-size:24px}
+    .home-section-management .member-more{width:100%}
+}
+
 /* Homepage motion + responsive polish */
 .home-slider{isolation:isolate;animation:homeRise .8s cubic-bezier(.2,.7,.2,1) both}
 .home-slider:before{content:"";position:absolute;inset:-18px -10px auto;height:70%;z-index:-1;border-radius:40px;background:radial-gradient(circle at 50% 35%,rgba(72,216,241,.16),transparent 62%);filter:blur(22px);animation:heroGlow 7s ease-in-out infinite}
@@ -3272,7 +3452,7 @@ main.shell{
 <div class="management-grid">
 @if($homeManagement->isNotEmpty())
 @foreach($homeManagement as $member)
-<article class="member-card" data-home-profile="{{ $member->id }}">
+<article class="member-card" data-home-profile="{{ $member->id }}" data-card-number="{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}">
 <div class="member-photo">@if($member->image_path)<img src="{{ asset('storage/'.$member->image_path) }}" alt="{{ $member->title }}" loading="lazy">@else<i class="fa-solid fa-user"></i>@endif</div>
 <div class="member-body">
 <h3>{{ $member->title }}</h3>
