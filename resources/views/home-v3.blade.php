@@ -1400,13 +1400,13 @@ img{max-width:100%}
         grid-area:identity;
         display:grid;
         grid-template-columns:112px minmax(0,1fr);
-        grid-template-rows:1fr auto;
-        column-gap:14px;
+        grid-template-rows:1fr;
+        column-gap:16px;
         align-items:center;
         width:100%;
         min-width:0;
         min-height:0;
-        padding:54px 14px 18px;
+        padding:48px 16px 22px;
         box-sizing:border-box;
         border:0;
         border-bottom:1px solid rgba(67,220,145,.14);
@@ -1420,7 +1420,7 @@ img{max-width:100%}
 
     .home-v3 .home-profile-panel > .home-profile-identity > .home-profile-photo{
         grid-column:1;
-        grid-row:1 / 3;
+        grid-row:1;
         width:112px;
         min-width:112px;
         max-width:112px;
@@ -1455,9 +1455,9 @@ img{max-width:100%}
         width:100%;
         min-width:0;
         margin:0;
-        padding:0 42px 0 0;
+        padding:0 34px 0 0;
         text-align:left;
-        align-self:end;
+        align-self:center;
         overflow:hidden;
     }
 
@@ -1486,13 +1486,13 @@ img{max-width:100%}
 
     .home-v3 .home-profile-contacts{
         grid-column:2;
-        grid-row:2;
+        grid-row:1;
         width:100%;
         min-width:0;
         display:grid;
-        gap:6px;
-        margin:9px 0 0;
-        padding:8px 0 0;
+        gap:7px;
+        margin:10px 0 0;
+        padding:10px 0 0;
         border-top:1px solid rgba(65,220,142,.15);
         overflow:hidden;
     }
@@ -1548,8 +1548,8 @@ img{max-width:100%}
     .home-v3 .home-profile-close{
         position:absolute;
         top:12px;
-        left:12px;
-        right:auto;
+        right:12px;
+        left:auto;
         width:38px;
         height:38px;
         z-index:30;
@@ -1634,9 +1634,9 @@ img{max-width:100%}
 
 /* EXTRA-NARROW PHONES */
 @media (max-width:380px){
-    .home-profile-identity{grid-template-columns:90px minmax(0,1fr);column-gap:10px;padding:20px 11px 12px}
+    .home-profile-identity{grid-template-columns:90px minmax(0,1fr);column-gap:10px;padding:42px 11px 14px}
     .home-profile-photo{width:90px;min-width:90px;max-width:90px;height:113px}
-    .home-profile-identity-copy{padding-right:36px}
+    .home-profile-identity-copy{padding-right:30px}
     .home-profile-title{font-size:17px}
     .home-profile-role{font-size:7px}
     .home-profile-contacts{gap:5px;margin-top:7px;padding-top:7px}
@@ -1713,8 +1713,8 @@ img{max-width:100%}
 .home-profile-modal.home-profile-mobile .home-profile-close{
     position:absolute !important;
     top:12px !important;
-    left:12px !important;
-    right:auto !important;
+    right:12px !important;
+    left:auto !important;
     width:38px !important;
     height:38px !important;
     z-index:60 !important;
