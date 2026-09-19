@@ -3562,7 +3562,6 @@ main.shell{
 })();
 </script>
 
-</style>
 <style>
 /* === FINAL STATIC HOMEPAGE MODE ===
    Professional visual design stays intact; motion is disabled for reliable
