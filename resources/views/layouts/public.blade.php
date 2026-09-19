@@ -35,106 +35,6 @@
     </style>
     @if(request()->routeIs('home'))
         <style>
-            @media (max-width: 650px) {
-                .home-profile-modal .home-profile-links > .home-profile-link[href^="tel:"],
-                .home-profile-modal .home-profile-links > .home-profile-link[href^="mailto:"] { display:none!important; }
-                .home-profile-modal .home-profile-links { grid-template-columns:1fr!important;width:100%;max-width:100%;margin-inline:auto; }
-                .home-profile-modal .home-profile-links > .home-profile-link.primary { grid-column:1/-1!important;width:100%;min-height:44px;margin-inline:auto; }
-            }
-
-            /* Mobile + tablet message viewer polish: keep the identity block vertically centered with the photo. */
-            @media (max-width: 1099px) {
-                .home-profile-modal .home-profile-kicker { display:none!important; }
-                .home-profile-modal .home-profile-panel { align-items:center!important; }
-                .home-profile-modal .home-profile-photo { align-self:center!important; }
-                .home-profile-modal .home-profile-info { align-self:center!important; }
-                .home-profile-modal .home-profile-head { align-items:center!important; }
-                .home-profile-modal .home-profile-head > div { align-self:center!important; }
-                .home-profile-modal .home-profile-title,
-                .home-profile-modal .home-profile-role,
-                .home-profile-modal .home-profile-contact-mobile { position:relative; }
-            }
-
-            /* The message area is the only scrolling surface on mobile/tablet. */
-            @media (max-width: 1099px) {
-                .home-profile-modal { overflow:hidden!important; touch-action:none; }
-                .home-profile-modal .home-profile-panel {
-                    display:grid!important;
-                    grid-template-columns:minmax(120px,32%) minmax(0,68%)!important;
-                    grid-template-rows:auto minmax(0,1fr) auto!important;
-                    min-height:0!important;
-                    overflow:hidden!important;
-                    touch-action:manipulation;
-                }
-                .home-profile-modal .home-profile-photo {
-                    grid-column:1!important;
-                    grid-row:1!important;
-                    align-self:center!important;
-                    justify-self:center!important;
-                    width:100%!important;
-                    height:auto!important;
-                    min-height:0!important;
-                    border:0!important;
-                }
-                .home-profile-modal .home-profile-photo img {
-                    width:100%!important;
-                    height:auto!important;
-                    max-height:none!important;
-                    aspect-ratio:4 / 5!important;
-                    object-fit:cover!important;
-                }
-                .home-profile-modal .home-profile-info { display:contents!important; }
-                .home-profile-modal .home-profile-head {
-                    grid-column:2!important;
-                    grid-row:1!important;
-                    align-self:center!important;
-                    min-width:0!important;
-                    display:block!important;
-                }
-                .home-profile-modal .home-profile-divider {
-                    grid-column:1 / -1!important;
-                    grid-row:2!important;
-                    align-self:start!important;
-                    z-index:0!important;
-                }
-                .home-profile-modal .home-profile-scroll {
-                    grid-column:1 / -1!important;
-                    grid-row:2!important;
-                    min-height:0!important;
-                    height:auto!important;
-                    overflow-y:auto!important;
-                    overflow-x:hidden!important;
-                    position:relative!important;
-                    z-index:1!important;
-                    overscroll-behavior:contain!important;
-                    -webkit-overflow-scrolling:touch!important;
-                    touch-action:pan-y!important;
-                    overflow-anchor:none;
-                }
-                .home-profile-modal .home-profile-footer {
-                    grid-column:1 / -1!important;
-                    grid-row:3!important;
-                    position:relative!important;
-                    z-index:3!important;
-                }
-            }
-
-            /* Keep the same compact horizontal identity layout on narrow phones; only the message box scrolls. */
-            @media (max-width: 650px) {
-                .home-profile-modal { padding:12px!important; align-items:center!important; }
-                .home-profile-modal .home-profile-panel {
-                    width:100%!important;
-                    max-width:720px!important;
-                    height:min(90svh,720px)!important;
-                    max-height:calc(100svh - 24px)!important;
-                    border-radius:22px!important;
-                }
-                .home-profile-modal .home-profile-photo { padding:14px 0 14px 16px!important; }
-                .home-profile-modal .home-profile-head { padding:25px 58px 12px 14px!important; }
-                .home-profile-modal .home-profile-scroll { margin:14px 16px 12px!important; padding:13px 13px 18px!important; }
-                .home-profile-modal .home-profile-footer { padding:0 16px calc(12px + env(safe-area-inset-bottom))!important; }
-            }
-
             /* Desktop homepage only: use the entire content area for two wide leadership cards. */
             @media (min-width: 992px) {
                 html body main.shell.home-v3 .home-section-management .management-grid {
@@ -176,6 +76,7 @@
                     padding:22px !important;
                 }
             }
+
         </style>
     @endif
     <style id="ff-global-framework">
