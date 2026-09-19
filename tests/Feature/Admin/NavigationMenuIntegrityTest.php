@@ -288,4 +288,57 @@ class NavigationMenuIntegrityTest extends TestCase
             ->assertDontSee('/internal-leadership');
     }
 
+    public function test_profile_folder_menu_label_can_be_customized_without_breaking_live_destination(): void
+    {
+        $user = $this->navigationAdmin();
+        $canonical = ManagementProfileFolder::query()->where('slug', 'board-of-directors')->firstOrFail();
+
+        $folder = ManagementProfileFolder::create([
+            'name' => 'Executive Committee',
+            'slug' => 'executive-committee',
+            'status' => 'published',
+            'sort_order' => $canonical->sort_order + 10,
+        ]);
+
+        $item = NavigationMenuItem::create([
+            'menu' => 'main',
+            'parent_id' => null,
+            'label' => 'Executive Committee',
+            'url' => '/executive-committee',
+            'route_name' => 'management.folder',
+            'target' => '_self',
+            'is_visible' => true,
+            'sort_order' => 20,
+            'source_key' => 'management_folder:'.$folder->id,
+            'source_type' => 'folder',
+            'area' => 'public',
+        ]);
+
+        $response = $this->actingAs($user)->patch(route('admin.menu-builder.update', $item), [
+            'label' => 'Leadership Team',
+            'parent_id' => '',
+            'target' => '_self',
+            'icon' => '',
+            'is_visible' => '1',
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('navigation_menu_items', [
+            'id' => $item->id,
+            'label' => 'Leadership Team',
+            'label_override' => 'Leadership Team',
+            'url' => '/executive-committee',
+            'route_name' => 'management.folder',
+            'source_key' => 'management_folder:'.$folder->id,
+            'source_type' => 'folder',
+        ]);
+
+        $tree = app(PublicNavigationService::class)->tree('main');
+        $resolved = $tree->firstWhere('id', $item->id);
+
+        $this->assertNotNull($resolved);
+        $this->assertSame('Leadership Team', $resolved->displayLabel());
+        $this->assertSame('/executive-committee', $resolved->url);
+    }
+
 }
