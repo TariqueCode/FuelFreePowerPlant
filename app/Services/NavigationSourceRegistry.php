@@ -31,6 +31,7 @@ class NavigationSourceRegistry
     private array $routeIndex = [];
     private array $canonicalCmsCache = [];
     private ?bool $aboutPagePublished = null;
+    private ?int $canonicalManagementFolderId = null;
 
     public function available(string $area = 'public', string $menu = 'main'): Collection
     {
@@ -213,13 +214,13 @@ class NavigationSourceRegistry
 
     private function isCanonicalManagementFolder(ManagementProfileFolder $folder): bool
     {
-        $canonicalId = ManagementProfileFolder::query()
+        $canonicalId = $this->canonicalManagementFolderId ??= (int) (ManagementProfileFolder::query()
             ->where('status', 'published')
             ->orderBy('sort_order')
             ->orderBy('id')
-            ->value('id');
+            ->value('id') ?? 0);
 
-        return $canonicalId !== null && (int) $canonicalId === (int) $folder->id;
+        return $canonicalId > 0 && $canonicalId === (int) $folder->id;
     }
 
     private function managementFolderSource(ManagementProfileFolder $folder): array
