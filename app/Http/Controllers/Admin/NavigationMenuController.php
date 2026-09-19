@@ -28,7 +28,29 @@ class NavigationMenuController extends Controller
         // The builder must reflect only destinations that are currently real and permitted.
         // Folders and manually entered links are independent of the live source registry.
         $all = $all->filter(function (NavigationMenuItem $item) use ($registry, $area): bool {
-            if ($item->source_type === 'folder' || $item->source_type === 'external_link') {
+            if ($item->source_type === 'folder') {
+                if (str_starts_with((string) $item->source_key, 'management_folder:')) {
+                    $source = $registry->resolveAny((string) $item->source_key, $area);
+                    if (! $source) {
+                        return false;
+                    }
+
+                    if ($item->label_override !== null && trim((string) $item->label_override) !== '') {
+                        $item->label = (string) $item->label_override;
+                    } else {
+                        $item->label = $source['label'];
+                    }
+                    $item->url = $source['url'];
+                    $item->route_name = $source['route_name'];
+                    $item->permission_key = $source['permission'] ?? null;
+                    $item->source_key = $source['key'];
+                    $item->source_type = $source['type'];
+                }
+
+                return true;
+            }
+
+            if ($item->source_type === 'external_link') {
                 return true;
             }
 
