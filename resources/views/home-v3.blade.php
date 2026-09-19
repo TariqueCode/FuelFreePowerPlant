@@ -495,13 +495,6 @@ img{max-width:100%}
  const contacts=document.getElementById('homeProfileContacts');
  const addContact=document.getElementById('homeProfileAddContact');
  const close=document.getElementById('homeProfileClose');
- const syncProfileMobileMode=()=>{
-   const mobile=window.matchMedia('(max-width: 650px)').matches;
-   modal.classList.toggle('home-profile-mobile',mobile);
- };
- syncProfileMobileMode();
- window.addEventListener('resize',syncProfileMobileMode,{passive:true});
-
  const buttons=[...document.querySelectorAll('.home-section-management .member-more')];
  let lastTrigger=null;
  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -1294,73 +1287,280 @@ img{max-width:100%}
 
 
 <style>
-/* EXECUTIVE PROFILE VIEWER — isolated responsive architecture */
+/* EXECUTIVE PROFILE VIEWER — clean responsive architecture */
 .home-profile-modal{
-    position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;
-    padding:24px;box-sizing:border-box;background:rgba(0,5,8,.88);
+    position:fixed;
+    inset:0;
+    z-index:9998;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    box-sizing:border-box;
+    background:rgba(0,5,8,.88);
     backdrop-filter:blur(18px) saturate(120%);
 }
 .home-profile-modal.open{display:flex}
+
 .home-profile-panel{
-    position:relative;width:min(1120px,calc(100vw - 48px));height:min(720px,calc(100vh - 48px));
-    display:grid;grid-template-columns:minmax(280px,34%) minmax(0,66%);grid-template-rows:minmax(0,1fr) auto;
-    min-width:0;min-height:0;overflow:hidden;box-sizing:border-box;
-    border:1px solid transparent;border-radius:28px;
-    background:linear-gradient(#04140d,#04140d) padding-box,
-      linear-gradient(135deg,#35e08a,#18d8c4 45%,#168dff) border-box;
+    position:relative;
+    width:min(1120px,calc(100vw - 48px));
+    height:min(720px,calc(100vh - 48px));
+    display:grid;
+    grid-template-columns:minmax(280px,34%) minmax(0,66%);
+    grid-template-rows:minmax(0,1fr) auto;
+    min-width:0;
+    min-height:0;
+    overflow:hidden;
+    box-sizing:border-box;
+    border:1px solid transparent;
+    border-radius:28px;
+    background:
+        linear-gradient(#04140d,#04140d) padding-box,
+        linear-gradient(135deg,#35e08a,#18d8c4 45%,#168dff) border-box;
     box-shadow:0 45px 130px rgba(0,0,0,.72),0 0 90px rgba(30,206,137,.10);
 }
+
+/* Desktop identity */
 .home-profile-identity{
-    grid-column:1;grid-row:1;min-width:0;min-height:0;box-sizing:border-box;
-    padding:34px 28px 28px;display:flex;flex-direction:column;align-items:center;overflow:hidden;
-    background:radial-gradient(380px 360px at 50% 5%,rgba(44,214,117,.09),transparent 72%),linear-gradient(180deg,rgba(8,37,23,.72),rgba(2,15,9,.96));
+    grid-column:1;
+    grid-row:1;
+    min-width:0;
+    min-height:0;
+    box-sizing:border-box;
+    padding:34px 28px 28px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    overflow:hidden;
+    background:
+        radial-gradient(380px 360px at 50% 5%,rgba(44,214,117,.09),transparent 72%),
+        linear-gradient(180deg,rgba(8,37,23,.72),rgba(2,15,9,.96));
     border-right:1px solid rgba(74,218,129,.14);
 }
-.home-profile-kicker{align-self:flex-start;margin-bottom:20px;color:#58e58d;font-size:9px;font-weight:800;letter-spacing:.22em;text-transform:uppercase}
+.home-profile-kicker{
+    align-self:flex-start;
+    margin-bottom:20px;
+    color:#58e58d;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+}
 .home-profile-photo{
-    width:min(210px,82%);aspect-ratio:4/5;display:grid;place-items:center;overflow:hidden;flex:0 0 auto;
-    border-radius:16px;background:#06150d;border:1px solid rgba(64,220,121,.42);box-shadow:0 0 0 4px rgba(64,220,121,.035),0 22px 55px rgba(0,0,0,.38);
+    width:min(210px,82%);
+    aspect-ratio:4/5;
+    display:grid;
+    place-items:center;
+    overflow:hidden;
+    flex:0 0 auto;
+    border-radius:16px;
+    background:#06150d;
+    border:1px solid rgba(64,220,121,.42);
+    box-shadow:0 0 0 4px rgba(64,220,121,.035),0 22px 55px rgba(0,0,0,.38);
 }
-.home-profile-photo img{width:100%;height:100%;display:block;object-fit:cover;object-position:center top}
-.home-profile-photo-placeholder{display:grid;place-items:center;width:100%;height:100%;color:#58e58d;font-size:48px}
-.home-profile-identity-copy{width:100%;margin-top:20px;text-align:center;min-width:0}
-.home-profile-title{margin:0;color:#f1f8f3;font-size:clamp(23px,2vw,30px);line-height:1.15;letter-spacing:-.035em;overflow-wrap:anywhere}
-.home-profile-role{margin-top:8px;color:#65e895;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
-.home-profile-contacts{width:100%;display:grid;gap:8px;margin-top:22px;padding-top:18px;border-top:1px solid rgba(74,218,129,.13);min-width:0}
-.home-profile-contact{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:9px;min-width:0;color:#b9d1c1;text-decoration:none}
-.home-profile-contact>i{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(74,218,129,.15);border-radius:10px;background:rgba(74,218,129,.045);color:#63e996;font-size:12px}
-.home-profile-contact span{min-width:0;display:grid;gap:2px}
-.home-profile-contact small{color:#5ed98a;font-size:7px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
-.home-profile-contact strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#cfe2d5;font-size:10px;line-height:1.45;font-weight:600}
+.home-profile-photo img{
+    width:100%;
+    height:100%;
+    display:block;
+    object-fit:cover;
+    object-position:center top;
+}
+.home-profile-photo-placeholder{
+    display:grid;
+    place-items:center;
+    width:100%;
+    height:100%;
+    color:#58e58d;
+    font-size:48px;
+}
+.home-profile-identity-copy{
+    width:100%;
+    margin-top:20px;
+    text-align:center;
+    min-width:0;
+}
+.home-profile-title{
+    margin:0;
+    color:#f1f8f3;
+    font-size:clamp(23px,2vw,30px);
+    line-height:1.15;
+    letter-spacing:-.035em;
+    overflow-wrap:anywhere;
+}
+.home-profile-role{
+    margin-top:8px;
+    color:#65e895;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+}
+.home-profile-contacts{
+    width:100%;
+    display:grid;
+    gap:8px;
+    margin-top:22px;
+    padding-top:18px;
+    border-top:1px solid rgba(74,218,129,.13);
+    min-width:0;
+}
+.home-profile-contact{
+    display:grid;
+    grid-template-columns:34px minmax(0,1fr);
+    align-items:center;
+    gap:9px;
+    min-width:0;
+    color:#b9d1c1;
+    text-decoration:none;
+}
+.home-profile-contact>i{
+    width:34px;
+    height:34px;
+    display:grid;
+    place-items:center;
+    border:1px solid rgba(74,218,129,.15);
+    border-radius:10px;
+    background:rgba(74,218,129,.045);
+    color:#63e996;
+    font-size:12px;
+}
+.home-profile-contact span{
+    min-width:0;
+    display:grid;
+    gap:2px;
+}
+.home-profile-contact small{
+    color:#5ed98a;
+    font-size:7px;
+    font-weight:800;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+}
+.home-profile-contact strong{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:#cfe2d5;
+    font-size:10px;
+    line-height:1.45;
+    font-weight:600;
+}
+
+/* Desktop message */
 .home-profile-message-pane{
-    grid-column:2;grid-row:1;position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;
-    box-sizing:border-box;padding:38px 44px 10px;overflow:hidden;
-    background:radial-gradient(600px 500px at 100% 100%,rgba(31,157,208,.055),transparent 70%),linear-gradient(145deg,#061b10 0%,#03140b 56%,#020c07 100%);
+    grid-column:2;
+    grid-row:1;
+    position:relative;
+    min-width:0;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    box-sizing:border-box;
+    padding:38px 44px 10px;
+    overflow:hidden;
+    background:
+        radial-gradient(600px 500px at 100% 100%,rgba(31,157,208,.055),transparent 70%),
+        linear-gradient(145deg,#061b10 0%,#03140b 56%,#020c07 100%);
 }
-.home-profile-close{position:absolute;top:22px;right:22px;z-index:3;width:42px;height:42px;border:1px solid rgba(74,218,129,.18);border-radius:12px;background:rgba(74,218,129,.045);color:#86eba8;cursor:pointer}
-.home-profile-message-head{padding-right:58px;min-width:0}
-.home-profile-section-title{margin:0;color:#63e996;font-size:10px;font-weight:800;letter-spacing:.19em;text-transform:uppercase}
-.home-profile-message-rule{width:54px;height:3px;margin-top:10px;border-radius:99px;background:linear-gradient(90deg,#55e58a,#29c7ff)}
-.home-profile-scroll{min-height:0;flex:1;overflow:auto;margin-top:25px;padding:0 18px 0 0;scrollbar-width:thin;scrollbar-color:rgba(74,218,129,.25) transparent}
+.home-profile-close{
+    position:absolute;
+    top:22px;
+    right:22px;
+    z-index:20;
+    width:42px;
+    height:42px;
+    display:grid;
+    place-items:center;
+    border:1px solid rgba(43,177,255,.48);
+    border-radius:12px;
+    background:rgba(8,55,76,.42);
+    color:#f2fbff;
+    cursor:pointer;
+    font-size:16px;
+}
+.home-profile-message-head{
+    padding-right:58px;
+    min-width:0;
+}
+.home-profile-section-title{
+    margin:0;
+    color:#63e996;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.19em;
+    text-transform:uppercase;
+}
+.home-profile-message-rule{
+    width:54px;
+    height:3px;
+    margin-top:10px;
+    border-radius:99px;
+    background:linear-gradient(90deg,#55e58a,#29c7ff);
+}
+.home-profile-scroll{
+    min-width:0;
+    min-height:0;
+    flex:1 1 auto;
+    overflow:auto;
+    margin-top:25px;
+    padding:0 18px 0 0;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(74,218,129,.25) transparent;
+}
 .home-profile-scroll::-webkit-scrollbar{width:6px}
-.home-profile-scroll::-webkit-scrollbar-thumb{background:rgba(74,218,129,.25);border-radius:99px}
-.home-profile-message{max-width:780px;color:#b9cfc0;font-size:14px;line-height:1.9;overflow-wrap:anywhere}
+.home-profile-scroll::-webkit-scrollbar-thumb{
+    background:rgba(74,218,129,.25);
+    border-radius:99px;
+}
+.home-profile-message{
+    width:100%;
+    max-width:780px;
+    color:#b9cfc0;
+    font-size:14px;
+    line-height:1.9;
+    overflow-wrap:anywhere;
+}
 .home-profile-message p{margin:0 0 18px}
 .home-profile-message p:last-child{margin-bottom:0}
-.home-profile-message p:first-child{color:#e2eee5;font-size:17px;line-height:1.65}
+.home-profile-message p:first-child{
+    color:#e2eee5;
+    font-size:17px;
+    line-height:1.65;
+}
+
+/* Desktop contact */
 .home-profile-add-contact{
-    grid-column:1;grid-row:2;width:calc(100% - 48px);min-height:58px;margin:0 24px 18px;
-    display:flex;align-items:center;justify-content:center;gap:11px;box-sizing:border-box;
-    border:1px solid transparent;border-radius:15px;
-    background:linear-gradient(120deg,rgba(21,119,84,.45),rgba(7,73,108,.42)) padding-box,linear-gradient(105deg,#2eea8b,#12d6cb 48%,#168dff) border-box;
-    color:#f4fff8;text-decoration:none;font-size:15px;font-weight:850;
+    grid-column:1;
+    grid-row:2;
+    width:calc(100% - 48px);
+    min-height:58px;
+    margin:0 24px 18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:11px;
+    box-sizing:border-box;
+    border:1px solid transparent;
+    border-radius:15px;
+    background:
+        linear-gradient(120deg,rgba(21,119,84,.45),rgba(7,73,108,.42)) padding-box,
+        linear-gradient(105deg,#2eea8b,#12d6cb 48%,#168dff) border-box;
+    color:#f4fff8;
+    text-decoration:none;
+    font-size:15px;
+    font-weight:850;
 }
 .home-profile-add-contact i{color:#27e6f1;font-size:20px}
 
-/* TABLET — retain desktop two-column composition. */
+/* Tablet — remains desktop composition */
 @media (max-width:900px) and (min-width:651px){
     .home-profile-modal{padding:18px}
-    .home-profile-panel{width:min(960px,calc(100vw - 36px));height:min(680px,calc(100vh - 36px));grid-template-columns:minmax(235px,33%) minmax(0,67%)}
+    .home-profile-panel{
+        width:min(960px,calc(100vw - 36px));
+        height:min(680px,calc(100vh - 36px));
+        grid-template-columns:minmax(235px,33%) minmax(0,67%);
+    }
     .home-profile-identity{padding:28px 20px 22px}
     .home-profile-photo{width:min(175px,84%)}
     .home-profile-message-pane{padding:30px 28px 10px}
@@ -1368,7 +1568,7 @@ img{max-width:100%}
     .home-profile-message p:first-child{font-size:15px}
 }
 
-/* MOBILE — independent reference-matched composition. */
+/* MOBILE — completely independent single-column composition */
 @media (max-width:650px){
     .home-v3 .home-profile-modal{
         padding:10px;
@@ -1377,66 +1577,63 @@ img{max-width:100%}
         overflow:hidden;
         background:rgba(0,5,9,.94);
     }
+
     .home-v3 .home-profile-panel{
         width:min(430px,calc(100vw - 20px));
         height:min(94svh,820px);
         max-height:calc(100svh - 20px);
-        min-width:0;
-        min-height:0;
         display:grid;
         grid-template-columns:minmax(0,1fr);
         grid-template-rows:auto minmax(0,1fr) auto;
-        grid-template-areas:
-            "identity"
-            "message"
-            "contact";
-        gap:0;
+        grid-template-areas:"identity" "message" "contact";
+        min-width:0;
+        min-height:0;
         overflow:hidden;
         border-radius:22px;
-        box-sizing:border-box;
     }
 
+    /* Header: photo + one vertically centered information column */
     .home-v3 .home-profile-panel > .home-profile-identity{
         grid-area:identity;
         display:grid;
-        grid-template-columns:112px minmax(0,1fr);
-        grid-template-rows:1fr;
-        column-gap:16px;
+        grid-template-columns:96px minmax(0,1fr);
+        grid-template-rows:auto auto;
+        column-gap:14px;
+        align-content:center;
         align-items:center;
         width:100%;
         min-width:0;
         min-height:0;
-        padding:48px 16px 22px;
+        padding:46px 14px 20px;
         box-sizing:border-box;
         border:0;
         border-bottom:1px solid rgba(67,220,145,.14);
         overflow:hidden;
-        background:radial-gradient(420px 230px at 0% 0%,rgba(45,226,131,.11),transparent 68%),linear-gradient(180deg,rgba(7,34,22,.82),rgba(2,15,10,.98));
+        background:
+            radial-gradient(420px 230px at 0% 0%,rgba(45,226,131,.11),transparent 68%),
+            linear-gradient(180deg,rgba(7,34,22,.82),rgba(2,15,10,.98));
     }
 
-    .home-v3 .home-profile-kicker{
-        display:none;
-    }
+    .home-v3 .home-profile-kicker{display:none}
 
     .home-v3 .home-profile-panel > .home-profile-identity > .home-profile-photo{
         grid-column:1;
-        grid-row:1;
-        width:112px;
-        min-width:112px;
-        max-width:112px;
-        height:140px;
-        aspect-ratio:auto;
-        justify-self:start;
+        grid-row:1 / 3;
+        width:96px;
+        min-width:96px;
+        max-width:96px;
+        height:120px;
         align-self:center;
+        justify-self:start;
         padding:3px;
         box-sizing:border-box;
-        border-radius:18px;
-        border:1px solid rgba(88,229,141,.72);
+        border-radius:17px;
+        border:1px solid rgba(88,229,141,.76);
         background:linear-gradient(145deg,rgba(62,230,137,.20),rgba(18,141,255,.13));
         box-shadow:
             0 0 0 1px rgba(42,224,154,.12),
-            0 12px 32px rgba(0,0,0,.42),
-            0 0 26px rgba(53,216,106,.10);
+            0 12px 30px rgba(0,0,0,.42),
+            0 0 24px rgba(53,216,106,.10);
     }
 
     .home-v3 .home-profile-panel > .home-profile-identity > .home-profile-photo img{
@@ -1445,7 +1642,7 @@ img{max-width:100%}
         display:block;
         object-fit:cover;
         object-position:center top;
-        border-radius:14px;
+        border-radius:13px;
         filter:saturate(1.04) contrast(1.03);
     }
 
@@ -1455,9 +1652,9 @@ img{max-width:100%}
         width:100%;
         min-width:0;
         margin:0;
-        padding:0 34px 0 0;
+        padding:0 38px 0 0;
         text-align:left;
-        align-self:center;
+        align-self:end;
         overflow:hidden;
     }
 
@@ -1465,17 +1662,18 @@ img{max-width:100%}
         width:100%;
         min-width:0;
         margin:0;
-        font-size:clamp(18px,5.3vw,24px);
+        color:#f1f8f3;
+        font-size:clamp(18px,5.1vw,23px);
         line-height:1.12;
-        letter-spacing:-.03em;
+        letter-spacing:-.025em;
         white-space:normal;
         word-break:normal;
         overflow-wrap:normal;
-        hyphens:none;
     }
 
     .home-v3 .home-profile-role{
-        margin-top:6px;
+        margin-top:5px;
+        color:#65e895;
         font-size:8px;
         line-height:1.3;
         letter-spacing:.14em;
@@ -1486,65 +1684,59 @@ img{max-width:100%}
 
     .home-v3 .home-profile-contacts{
         grid-column:2;
-        grid-row:1;
+        grid-row:2;
         width:100%;
         min-width:0;
         display:grid;
-        gap:7px;
-        margin:10px 0 0;
-        padding:10px 0 0;
+        gap:5px;
+        margin:7px 0 0;
+        padding:7px 38px 0 0;
         border-top:1px solid rgba(65,220,142,.15);
         overflow:hidden;
     }
 
     .home-v3 .home-profile-contact{
         display:grid;
-        grid-template-columns:29px minmax(0,1fr);
+        grid-template-columns:28px minmax(0,1fr);
         gap:7px;
         width:100%;
         min-width:0;
         align-items:center;
     }
 
-    .home-v3 .home-profile-contact > i{
-        width:29px;
-        height:29px;
+    .home-v3 .home-profile-contact>i{
+        width:28px;
+        height:28px;
         border-radius:9px;
         font-size:10px;
     }
 
-    .home-v3 .home-profile-contact span,
-    .home-v3 .home-profile-contact strong{
+    .home-v3 .home-profile-contact span{
         min-width:0;
         max-width:100%;
-        overflow:hidden;
+        display:grid;
+        gap:1px;
+    }
+
+    .home-v3 .home-profile-contact small{
+        color:#5ed98a;
+        font-size:5.8px;
+        line-height:1;
+        letter-spacing:.13em;
     }
 
     .home-v3 .home-profile-contact strong{
-        font-size:7.5px;
-        line-height:1.3;
+        min-width:0;
+        max-width:100%;
+        color:#cfe2d5;
+        font-size:7.6px;
+        line-height:1.25;
+        overflow:hidden;
         text-overflow:ellipsis;
         white-space:nowrap;
     }
 
-    .home-v3 .home-profile-panel > .home-profile-message-pane{
-        grid-area:message;
-        position:static;
-        width:calc(100% - 28px);
-        min-width:0;
-        min-height:0;
-        margin:10px 14px;
-        padding:24px 14px 10px;
-        box-sizing:border-box;
-        display:flex;
-        flex-direction:column;
-        position:relative;
-        overflow:hidden;
-        border:1px solid rgba(43,177,255,.24);
-        border-radius:18px;
-        background:linear-gradient(145deg,rgba(3,28,19,.86),rgba(2,16,11,.92));
-    }
-
+    /* Close belongs to the modal, never to the message panel */
     .home-v3 .home-profile-close{
         position:absolute;
         top:12px;
@@ -1552,31 +1744,50 @@ img{max-width:100%}
         left:auto;
         width:38px;
         height:38px;
-        z-index:30;
+        z-index:50;
+        border:1px solid rgba(43,177,255,.52);
         border-radius:11px;
-        border-color:rgba(43,177,255,.48);
-        background:rgba(8,55,76,.42);
+        background:rgba(4,30,38,.78);
         color:#f2fbff;
         font-size:15px;
-        box-shadow:0 8px 20px rgba(0,0,0,.28);
+        display:grid;
+        place-items:center;
+        box-shadow:0 8px 20px rgba(0,0,0,.30),0 0 16px rgba(22,141,255,.08);
+    }
+
+    /* Message is its own flexible card */
+    .home-v3 .home-profile-panel > .home-profile-message-pane{
+        grid-area:message;
+        width:calc(100% - 28px);
+        min-width:0;
+        min-height:0;
+        margin:10px 14px;
+        padding:21px 14px 10px;
+        box-sizing:border-box;
+        display:flex;
+        flex-direction:column;
+        overflow:hidden;
+        border:1px solid rgba(43,177,255,.24);
+        border-radius:18px;
+        background:linear-gradient(145deg,rgba(3,28,19,.86),rgba(2,16,11,.94));
     }
 
     .home-v3 .home-profile-message-head{
         width:100%;
         min-width:0;
-        padding-right:48px;
+        padding-right:44px;
     }
 
     .home-v3 .home-profile-section-title{
-        font-size:8px;
+        font-size:7.5px;
         line-height:1.4;
         letter-spacing:.16em;
     }
 
     .home-v3 .home-profile-message-rule{
-        width:54px;
-        height:4px;
-        margin-top:9px;
+        width:48px;
+        height:3px;
+        margin-top:8px;
     }
 
     .home-v3 .home-profile-scroll{
@@ -1584,8 +1795,8 @@ img{max-width:100%}
         min-width:0;
         min-height:0;
         flex:1 1 auto;
-        margin-top:18px;
-        padding:0 10px 4px 0;
+        margin-top:15px;
+        padding:0 8px 3px 0;
         overflow-y:auto;
         overflow-x:hidden;
         touch-action:pan-y;
@@ -1594,230 +1805,74 @@ img{max-width:100%}
 
     .home-v3 .home-profile-message{
         width:100%;
-        min-width:0;
         max-width:none;
+        min-width:0;
         color:#b9d1e0;
         font-size:11.5px;
-        line-height:1.72;
+        line-height:1.68;
         overflow-wrap:anywhere;
     }
 
-    .home-v3 .home-profile-message p{
-        margin:0 0 14px;
-    }
-
+    .home-v3 .home-profile-message p{margin:0 0 13px}
     .home-v3 .home-profile-message p:first-child{
         color:#f0f7fb;
-        font-size:14px;
-        line-height:1.5;
+        font-size:13.5px;
+        line-height:1.48;
     }
+    .home-v3 .home-profile-message p:last-child{margin-bottom:0}
 
-    .home-v3 .home-profile-message p:last-child{
-        margin-bottom:0;
-    }
-
+    /* Contact action */
     .home-v3 .home-profile-panel > .home-profile-add-contact{
         grid-area:contact;
         width:calc(100% - 28px);
-        min-height:52px;
-        margin:0 14px 13px;
+        min-height:50px;
+        margin:0 14px 12px;
         box-sizing:border-box;
         border-radius:14px;
         font-size:13px;
-        gap:10px;
+        gap:9px;
     }
-
-    .home-v3 .home-profile-add-contact i{
-        font-size:18px;
-    }
+    .home-v3 .home-profile-add-contact i{font-size:18px}
 }
 
 /* EXTRA-NARROW PHONES */
 @media (max-width:380px){
-    .home-profile-identity{grid-template-columns:90px minmax(0,1fr);column-gap:10px;padding:42px 11px 14px}
-    .home-profile-photo{width:90px;min-width:90px;max-width:90px;height:113px}
-    .home-profile-identity-copy{padding-right:30px}
-    .home-profile-title{font-size:17px}
-    .home-profile-role{font-size:7px}
-    .home-profile-contacts{gap:5px;margin-top:7px;padding-top:7px}
-    .home-profile-contact{grid-template-columns:26px minmax(0,1fr);gap:6px}
-    .home-profile-contact>i{width:26px;height:26px}
-    .home-profile-contact small{font-size:5px}
-    .home-profile-contact strong{font-size:6.7px}
-    .home-profile-message-pane{margin:8px 11px;padding:20px 11px 7px}
-    .home-profile-scroll{margin-top:15px;padding-right:8px}
-    .home-profile-message{font-size:10.5px;line-height:1.68}
-    .home-profile-message p:first-child{font-size:13px}
-    .home-profile-add-contact{width:calc(100% - 22px);margin:0 11px 10px;min-height:49px;font-size:12px}
+    .home-v3 .home-profile-panel > .home-profile-identity{
+        grid-template-columns:86px minmax(0,1fr);
+        column-gap:10px;
+        padding:42px 11px 14px;
+    }
+    .home-v3 .home-profile-panel > .home-profile-identity > .home-profile-photo{
+        width:86px;
+        min-width:86px;
+        max-width:86px;
+        height:108px;
+        border-radius:15px;
+    }
+    .home-v3 .home-profile-identity-copy{padding-right:30px}
+    .home-v3 .home-profile-title{font-size:17px}
+    .home-v3 .home-profile-role{font-size:7px}
+    .home-v3 .home-profile-contacts{
+        gap:4px;
+        margin-top:6px;
+        padding-top:6px;
+        padding-right:30px;
+    }
+    .home-v3 .home-profile-contact{grid-template-columns:25px minmax(0,1fr);gap:6px}
+    .home-v3 .home-profile-contact>i{width:25px;height:25px}
+    .home-v3 .home-profile-contact small{font-size:5.2px}
+    .home-v3 .home-profile-contact strong{font-size:6.6px}
+    .home-v3 .home-profile-message-pane{margin:8px 11px;padding:19px 11px 7px}
+    .home-v3 .home-profile-scroll{margin-top:13px;padding-right:7px}
+    .home-v3 .home-profile-message{font-size:10.3px;line-height:1.65}
+    .home-v3 .home-profile-message p:first-child{font-size:12.5px}
+    .home-v3 .home-profile-panel > .home-profile-add-contact{
+        width:calc(100% - 22px);
+        margin:0 11px 10px;
+        min-height:48px;
+        font-size:12px;
+    }
 }
-
-/* FINAL MOBILE PROFILE LOCK — runtime scoped, independent of viewport stylesheet order. */
-.home-profile-modal.home-profile-mobile .home-profile-panel{
-    width:min(430px,calc(100vw - 20px)) !important;
-    height:min(94svh,820px) !important;
-    max-height:calc(100svh - 20px) !important;
-    display:grid !important;
-    grid-template-columns:minmax(0,1fr) !important;
-    grid-template-rows:auto minmax(0,1fr) auto !important;
-    grid-template-areas:"identity" "message" "contact" !important;
-    min-width:0 !important;
-    min-height:0 !important;
-    overflow:hidden !important;
-    border-radius:22px !important;
-}
-.home-profile-modal.home-profile-mobile .home-profile-identity{
-    grid-column:1 !important;
-    grid-row:1 !important;
-    grid-area:identity !important;
-    display:grid !important;
-    grid-template-columns:112px minmax(0,1fr) !important;
-    grid-template-rows:1fr auto !important;
-    column-gap:14px !important;
-    align-items:center !important;
-    width:100% !important;
-    min-width:0 !important;
-    min-height:0 !important;
-    padding:54px 14px 18px !important;
-    box-sizing:border-box !important;
-    border-right:0 !important;
-    border-bottom:1px solid rgba(67,220,145,.14) !important;
-    overflow:hidden !important;
-}
-.home-profile-modal.home-profile-mobile .home-profile-kicker{display:none !important}
-.home-profile-modal.home-profile-mobile .home-profile-photo{
-    grid-column:1 !important;
-    grid-row:1 / 3 !important;
-    width:112px !important;
-    min-width:112px !important;
-    max-width:112px !important;
-    height:140px !important;
-    aspect-ratio:auto !important;
-    justify-self:start !important;
-    align-self:center !important;
-    padding:3px !important;
-    box-sizing:border-box !important;
-    border-radius:18px !important;
-    border:1px solid rgba(88,229,141,.72) !important;
-    background:linear-gradient(145deg,rgba(62,230,137,.20),rgba(18,141,255,.13)) !important;
-    box-shadow:0 0 0 1px rgba(42,224,154,.12),0 12px 32px rgba(0,0,0,.42),0 0 26px rgba(53,216,106,.10) !important;
-}
-.home-profile-modal.home-profile-mobile .home-profile-photo img{
-    width:100% !important;
-    height:100% !important;
-    display:block !important;
-    object-fit:cover !important;
-    object-position:center top !important;
-    border-radius:14px !important;
-    filter:saturate(1.04) contrast(1.03) !important;
-}
-.home-profile-modal.home-profile-mobile .home-profile-close{
-    position:absolute !important;
-    top:12px !important;
-    right:12px !important;
-    left:auto !important;
-    width:38px !important;
-    height:38px !important;
-    z-index:60 !important;
-    border:1px solid rgba(43,177,255,.52) !important;
-    border-radius:11px !important;
-    background:rgba(4,30,38,.78) !important;
-    color:#f2fbff !important;
-    font-size:15px !important;
-    display:grid !important;
-    place-items:center !important;
-    box-shadow:0 8px 20px rgba(0,0,0,.30),0 0 16px rgba(22,141,255,.08) !important;
-}
-
-.home-profile-modal.home-profile-mobile .home-profile-identity-copy{
-    grid-column:2 !important;
-    grid-row:1 !important;
-    width:100% !important;
-    min-width:0 !important;
-    margin:0 !important;
-    padding:0 42px 0 0 !important;
-    text-align:left !important;
-    align-self:end !important;
-    overflow:hidden !important;
-}
-.home-profile-modal.home-profile-mobile .home-profile-title{
-    width:100% !important;
-    min-width:0 !important;
-    white-space:normal !important;
-    word-break:normal !important;
-    overflow-wrap:normal !important;
-    hyphens:none !important;
-    font-size:clamp(18px,5.3vw,24px) !important;
-    line-height:1.12 !important;
-}
-.home-profile-modal.home-profile-mobile .home-profile-role{
-    margin-top:6px !important;
-    font-size:8px !important;
-    line-height:1.3 !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-}
-.home-profile-modal.home-profile-mobile .home-profile-contacts{
-    grid-column:2 !important;
-    grid-row:2 !important;
-    width:100% !important;
-    min-width:0 !important;
-    display:grid !important;
-    gap:6px !important;
-    margin:9px 0 0 !important;
-    padding:8px 0 0 !important;
-    overflow:hidden !important;
-}
-.home-profile-modal.home-profile-mobile .home-profile-contact{
-    display:grid !important;
-    grid-template-columns:29px minmax(0,1fr) !important;
-    gap:7px !important;
-    width:100% !important;
-    min-width:0 !important;
-}
-.home-profile-modal.home-profile-mobile .home-profile-message-pane{
-    grid-column:1 !important;
-    grid-row:2 !important;
-    grid-area:message !important;
-    width:calc(100% - 28px) !important;
-    min-width:0 !important;
-    min-height:0 !important;
-    margin:10px 14px !important;
-    padding:24px 14px 10px !important;
-    box-sizing:border-box !important;
-    display:flex !important;
-    flex-direction:column !important;
-    position:relative !important;
-    overflow:hidden !important;
-    border:1px solid rgba(43,177,255,.24) !important;
-    border-radius:18px !important;
-}
-.home-profile-modal.home-profile-mobile .home-profile-scroll{
-    width:100% !important;
-    min-width:0 !important;
-    min-height:0 !important;
-    flex:1 1 auto !important;
-    margin-top:18px !important;
-    padding:0 10px 4px 0 !important;
-    overflow-y:auto !important;
-    overflow-x:hidden !important;
-}
-.home-profile-modal.home-profile-mobile .home-profile-message{
-    width:100% !important;
-    max-width:none !important;
-    min-width:0 !important;
-    overflow-wrap:anywhere !important;
-}
-.home-profile-modal.home-profile-mobile .home-profile-add-contact{
-    grid-column:1 !important;
-    grid-row:3 !important;
-    grid-area:contact !important;
-    width:calc(100% - 28px) !important;
-    min-height:52px !important;
-    margin:0 14px 13px !important;
-    box-sizing:border-box !important;
-}
-
 </style>
 
 @endsection
