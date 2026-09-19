@@ -1336,7 +1336,7 @@ img{max-width:100%}
 .home-profile-scroll::-webkit-scrollbar{width:6px}.home-profile-scroll::-webkit-scrollbar-thumb{background:rgba(74,218,129,.25);border-radius:99px}
 .home-profile-message{max-width:780px;color:#b9cfc0;font-size:14px;line-height:1.9}.home-profile-message p{margin:0 0 18px}.home-profile-message p:last-child{margin-bottom:0}.home-profile-message p:first-child{color:#e2eee5;font-size:17px;line-height:1.65}
 .home-profile-add-contact{
-    grid-column:1 / -1;grid-row:2;width:calc(100% - 48px);min-height:58px;margin:0 24px 18px;
+    grid-column:1;grid-row:2;width:calc(100% - 48px);min-height:58px;margin:0 24px 18px;
     display:flex;align-items:center;justify-content:center;gap:11px;box-sizing:border-box;
     border:1px solid transparent;border-radius:15px;
     background:linear-gradient(120deg,rgba(21,119,84,.45),rgba(7,73,108,.42)) padding-box,linear-gradient(105deg,#2eea8b,#12d6cb 48%,#168dff) border-box;
