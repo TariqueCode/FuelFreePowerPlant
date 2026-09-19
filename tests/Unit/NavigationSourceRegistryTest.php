@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Models\ManagementProfileFolder;
 use App\Models\NavigationMenuItem;
 use App\Models\User;
 use App\Services\NavigationSourceRegistry;
@@ -148,4 +149,48 @@ class NavigationSourceRegistryTest extends TestCase
         $this->assertNull($registry->resolveAny('route:webmail.host.login', 'public'));
         $this->assertNull($registry->resolveAny('route:webmail.host.inbox', 'public'));
     }
+    public function test_published_secondary_profile_folder_is_available_as_a_live_navigation_source(): void
+    {
+        $canonical = ManagementProfileFolder::query()->where('slug', 'board-of-directors')->firstOrFail();
+
+        $folder = ManagementProfileFolder::create([
+            'name' => 'Executive Committee',
+            'slug' => 'executive-committee',
+            'status' => 'published',
+            'sort_order' => $canonical->sort_order + 10,
+        ]);
+
+        $registry = app(NavigationSourceRegistry::class);
+        $source = $registry->resolveAny('management_folder:'.$folder->id, 'public');
+
+        $this->assertNotNull($source);
+        $this->assertSame('folder', $source['type']);
+        $this->assertSame('Executive Committee', $source['label']);
+        $this->assertSame('/executive-committee', $source['url']);
+        $this->assertSame('management.folder', $source['route_name']);
+
+        $available = $registry->available('public', 'main');
+        $this->assertTrue($available->contains('key', 'management_folder:'.$folder->id));
+        $this->assertFalse($available->contains('key', 'management_folder:'.$canonical->id));
+    }
+
+    public function test_draft_profile_folder_is_not_a_public_navigation_source(): void
+    {
+        $canonical = ManagementProfileFolder::query()->where('slug', 'board-of-directors')->firstOrFail();
+
+        $folder = ManagementProfileFolder::create([
+            'name' => 'Internal Leadership',
+            'slug' => 'internal-leadership',
+            'status' => 'draft',
+            'sort_order' => $canonical->sort_order + 10,
+        ]);
+
+        $registry = app(NavigationSourceRegistry::class);
+
+        $this->assertNull($registry->resolveAny('management_folder:'.$folder->id, 'public'));
+        $this->assertFalse(
+            $registry->available('public', 'main')->contains('key', 'management_folder:'.$folder->id)
+        );
+    }
+
 }
