@@ -1287,32 +1287,32 @@ img{max-width:100%}
 
 
 <style>
-/* FINAL RESPONSIVE EXECUTIVE PROFILE VIEWER
-   Desktop, tablet and mobile share one stable grid architecture. */
+/* EXECUTIVE PROFILE VIEWER — isolated responsive architecture */
 .home-profile-modal{
     position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;
-    padding:24px;background:rgba(0,5,8,.88);backdrop-filter:blur(18px) saturate(120%);
+    padding:24px;box-sizing:border-box;background:rgba(0,5,8,.88);
+    backdrop-filter:blur(18px) saturate(120%);
 }
 .home-profile-modal.open{display:flex}
 .home-profile-panel{
     position:relative;width:min(1120px,calc(100vw - 48px));height:min(720px,calc(100vh - 48px));
     display:grid;grid-template-columns:minmax(280px,34%) minmax(0,66%);grid-template-rows:minmax(0,1fr) auto;
-    overflow:hidden;box-sizing:border-box;border:1px solid transparent;border-radius:28px;
+    min-width:0;min-height:0;overflow:hidden;box-sizing:border-box;
+    border:1px solid transparent;border-radius:28px;
     background:linear-gradient(#04140d,#04140d) padding-box,
       linear-gradient(135deg,#35e08a,#18d8c4 45%,#168dff) border-box;
     box-shadow:0 45px 130px rgba(0,0,0,.72),0 0 90px rgba(30,206,137,.10);
 }
 .home-profile-identity{
     grid-column:1;grid-row:1;min-width:0;min-height:0;box-sizing:border-box;
-    padding:34px 28px 28px;display:flex;flex-direction:column;align-items:center;
-    overflow:hidden;background:radial-gradient(380px 360px at 50% 5%,rgba(44,214,117,.09),transparent 72%),linear-gradient(180deg,rgba(8,37,23,.72),rgba(2,15,9,.96));
+    padding:34px 28px 28px;display:flex;flex-direction:column;align-items:center;overflow:hidden;
+    background:radial-gradient(380px 360px at 50% 5%,rgba(44,214,117,.09),transparent 72%),linear-gradient(180deg,rgba(8,37,23,.72),rgba(2,15,9,.96));
     border-right:1px solid rgba(74,218,129,.14);
 }
 .home-profile-kicker{align-self:flex-start;margin-bottom:20px;color:#58e58d;font-size:9px;font-weight:800;letter-spacing:.22em;text-transform:uppercase}
 .home-profile-photo{
-    width:min(210px,82%);aspect-ratio:4/5;display:grid;place-items:center;overflow:hidden;
-    flex:0 0 auto;border-radius:16px;background:#06150d;border:1px solid rgba(64,220,121,.42);
-    box-shadow:0 0 0 4px rgba(64,220,121,.035),0 22px 55px rgba(0,0,0,.38);
+    width:min(210px,82%);aspect-ratio:4/5;display:grid;place-items:center;overflow:hidden;flex:0 0 auto;
+    border-radius:16px;background:#06150d;border:1px solid rgba(64,220,121,.42);box-shadow:0 0 0 4px rgba(64,220,121,.035),0 22px 55px rgba(0,0,0,.38);
 }
 .home-profile-photo img{width:100%;height:100%;display:block;object-fit:cover;object-position:center top}
 .home-profile-photo-placeholder{display:grid;place-items:center;width:100%;height:100%;color:#58e58d;font-size:48px}
@@ -1322,433 +1322,140 @@ img{max-width:100%}
 .home-profile-contacts{width:100%;display:grid;gap:8px;margin-top:22px;padding-top:18px;border-top:1px solid rgba(74,218,129,.13);min-width:0}
 .home-profile-contact{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:9px;min-width:0;color:#b9d1c1;text-decoration:none}
 .home-profile-contact>i{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(74,218,129,.15);border-radius:10px;background:rgba(74,218,129,.045);color:#63e996;font-size:12px}
-.home-profile-contact span{min-width:0;display:grid;gap:2px}.home-profile-contact small{color:#5ed98a;font-size:7px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.home-profile-contact strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#cfe2d5;font-size:10px;line-height:1.45;font-weight:600}
+.home-profile-contact span{min-width:0;display:grid;gap:2px}
+.home-profile-contact small{color:#5ed98a;font-size:7px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.home-profile-contact strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#cfe2d5;font-size:10px;line-height:1.45;font-weight:600}
 .home-profile-message-pane{
     grid-column:2;grid-row:1;position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;
-    box-sizing:border-box;padding:38px 44px 28px;overflow:hidden;
+    box-sizing:border-box;padding:38px 44px 10px;overflow:hidden;
     background:radial-gradient(600px 500px at 100% 100%,rgba(31,157,208,.055),transparent 70%),linear-gradient(145deg,#061b10 0%,#03140b 56%,#020c07 100%);
 }
 .home-profile-close{position:absolute;top:22px;right:22px;z-index:3;width:42px;height:42px;border:1px solid rgba(74,218,129,.18);border-radius:12px;background:rgba(74,218,129,.045);color:#86eba8;cursor:pointer}
-.home-profile-close:hover{background:rgba(74,218,129,.10);border-color:rgba(74,218,129,.38)}
-.home-profile-message-head{padding-right:58px;min-width:0}.home-profile-section-title{margin:0;color:#63e996;font-size:10px;font-weight:800;letter-spacing:.19em;text-transform:uppercase}
+.home-profile-message-head{padding-right:58px;min-width:0}
+.home-profile-section-title{margin:0;color:#63e996;font-size:10px;font-weight:800;letter-spacing:.19em;text-transform:uppercase}
 .home-profile-message-rule{width:54px;height:3px;margin-top:10px;border-radius:99px;background:linear-gradient(90deg,#55e58a,#29c7ff)}
-.home-profile-scroll{min-height:0;flex:1;overflow:auto;margin-top:25px;padding:0 18px 10px 0;scrollbar-width:thin;scrollbar-color:rgba(74,218,129,.25) transparent}
-.home-profile-scroll::-webkit-scrollbar{width:6px}.home-profile-scroll::-webkit-scrollbar-thumb{background:rgba(74,218,129,.25);border-radius:99px}
-.home-profile-message{max-width:780px;color:#b9cfc0;font-size:14px;line-height:1.9}.home-profile-message p{margin:0 0 18px}.home-profile-message p:last-child{margin-bottom:0}.home-profile-message p:first-child{color:#e2eee5;font-size:17px;line-height:1.65}
+.home-profile-scroll{min-height:0;flex:1;overflow:auto;margin-top:25px;padding:0 18px 0 0;scrollbar-width:thin;scrollbar-color:rgba(74,218,129,.25) transparent}
+.home-profile-scroll::-webkit-scrollbar{width:6px}
+.home-profile-scroll::-webkit-scrollbar-thumb{background:rgba(74,218,129,.25);border-radius:99px}
+.home-profile-message{max-width:780px;color:#b9cfc0;font-size:14px;line-height:1.9;overflow-wrap:anywhere}
+.home-profile-message p{margin:0 0 18px}
+.home-profile-message p:last-child{margin-bottom:0}
+.home-profile-message p:first-child{color:#e2eee5;font-size:17px;line-height:1.65}
 .home-profile-add-contact{
     grid-column:1;grid-row:2;width:calc(100% - 48px);min-height:58px;margin:0 24px 18px;
     display:flex;align-items:center;justify-content:center;gap:11px;box-sizing:border-box;
     border:1px solid transparent;border-radius:15px;
     background:linear-gradient(120deg,rgba(21,119,84,.45),rgba(7,73,108,.42)) padding-box,linear-gradient(105deg,#2eea8b,#12d6cb 48%,#168dff) border-box;
     color:#f4fff8;text-decoration:none;font-size:15px;font-weight:850;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 12px 32px rgba(0,0,0,.30);
 }
 .home-profile-add-contact i{color:#27e6f1;font-size:20px}
-@media(max-width:900px) and (min-width:651px){
+
+/* TABLET — retain desktop two-column composition. */
+@media (max-width:900px) and (min-width:651px){
     .home-profile-modal{padding:18px}
     .home-profile-panel{width:min(960px,calc(100vw - 36px));height:min(680px,calc(100vh - 36px));grid-template-columns:minmax(235px,33%) minmax(0,67%)}
     .home-profile-identity{padding:28px 20px 22px}
     .home-profile-photo{width:min(175px,84%)}
-    .home-profile-message-pane{padding:30px 28px 22px}
-    .home-profile-message{font-size:13px;line-height:1.8}.home-profile-message p:first-child{font-size:15px}
+    .home-profile-message-pane{padding:30px 28px 10px}
+    .home-profile-message{font-size:13px;line-height:1.8}
+    .home-profile-message p:first-child{font-size:15px}
 }
-@media(max-width:650px){
+
+/* MOBILE — completely independent single-column composition. */
+@media (max-width:650px){
     .home-profile-modal{
-        padding:10px !important;align-items:center !important;justify-content:center !important;
-        background:rgba(0,5,9,.92) !important;backdrop-filter:blur(16px) saturate(125%) !important;
+        padding:10px;align-items:center;justify-content:center;background:rgba(0,5,9,.94);
+        backdrop-filter:blur(16px) saturate(125%);
     }
     .home-profile-panel{
-        width:min(430px,calc(100vw - 20px)) !important;
-        height:min(94svh,820px) !important;max-height:calc(100svh - 20px) !important;
-        display:grid !important;grid-template-columns:1fr !important;grid-template-rows:auto minmax(0,1fr) auto !important;
-        overflow:hidden !important;border-radius:22px !important;
-        border:1px solid transparent !important;
-        background:linear-gradient(145deg,#041b12,#02120b 62%,#020b07) padding-box,linear-gradient(135deg,#35e68a,#14d7c8 45%,#168dff) border-box !important;
-        box-shadow:0 30px 90px rgba(0,0,0,.74),0 0 65px rgba(25,208,150,.09) !important;
+        width:min(430px,calc(100vw - 20px));height:min(94svh,820px);max-height:calc(100svh - 20px);
+        display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;
+        min-width:0;min-height:0;overflow:hidden;border-radius:22px;
     }
     .home-profile-identity{
-        grid-column:1 !important;grid-row:1 !important;width:100% !important;min-width:0 !important;
-        display:grid !important;grid-template-columns:minmax(84px,28%) minmax(0,1fr) !important;
-        grid-template-rows:auto auto auto !important;column-gap:12px !important;align-items:center !important;
-        padding:17px 14px 14px !important;box-sizing:border-box !important;
-        border-right:0 !important;border-bottom:1px solid rgba(67,220,145,.14) !important;
-        background:radial-gradient(420px 230px at 0% 0%,rgba(45,226,131,.11),transparent 68%),linear-gradient(180deg,rgba(7,34,22,.82),rgba(2,15,10,.98)) !important;
-    }
-    .home-profile-kicker{grid-column:1/-1 !important;grid-row:1 !important;margin:0 0 8px !important;font-size:7px !important;letter-spacing:.18em !important}
-    .home-profile-photo{
-        grid-column:1 !important;grid-row:2 / 4 !important;width:100% !important;max-width:116px !important;height:auto !important;aspect-ratio:4/5 !important;
-        justify-self:start !important;align-self:center !important;border-radius:13px !important;border:1px solid rgba(56,232,144,.62) !important;
-        box-shadow:0 0 0 3px rgba(56,232,144,.035),0 15px 35px rgba(0,0,0,.35) !important;
-    }
-    .home-profile-identity-copy{grid-column:2 !important;grid-row:2 !important;width:100% !important;min-width:0 !important;margin:0 !important;align-self:end !important;text-align:left !important}
-    .home-profile-title{margin:0 !important;color:#f4fbf7 !important;font-size:clamp(17px,5vw,23px) !important;line-height:1.12 !important;letter-spacing:-.03em !important;overflow-wrap:break-word !important;word-break:normal !important}
-    .home-profile-role{margin-top:5px !important;color:#31e9b1 !important;font-size:7px !important;line-height:1.3 !important;font-weight:900 !important;letter-spacing:.13em !important}
-    .home-profile-contacts{
-        grid-column:2 !important;grid-row:3 !important;width:100% !important;display:grid !important;grid-template-columns:1fr !important;gap:5px !important;
-        margin:7px 0 0 !important;padding:7px 0 0 !important;border-top:1px solid rgba(65,220,142,.15) !important;align-self:start !important;
-    }
-    .home-profile-contact{grid-template-columns:27px minmax(0,1fr) !important;gap:6px !important}
-    .home-profile-contact>i{width:27px !important;height:27px !important;border-radius:8px !important;font-size:9px !important}
-    .home-profile-contact small{font-size:5px !important;letter-spacing:.12em !important}
-    .home-profile-contact strong{font-size:7px !important;line-height:1.25 !important}
-    .home-profile-message-pane{
-        grid-column:1 !important;grid-row:2 !important;width:100% !important;min-width:0 !important;min-height:0 !important;
-        display:flex !important;flex-direction:column !important;padding:17px 14px 10px !important;overflow:hidden !important;
-        background:radial-gradient(500px 360px at 100% 100%,rgba(17,130,255,.055),transparent 70%),linear-gradient(145deg,#061b11,#03140b 58%,#020c07) !important;
-    }
-    .home-profile-close{top:11px !important;right:11px !important;width:36px !important;height:36px !important;border-radius:10px !important;border-color:rgba(43,177,255,.42) !important;background:rgba(9,54,76,.34) !important;color:#f2fbff !important;font-size:14px !important}
-    .home-profile-message-head{padding-right:45px !important}.home-profile-section-title{font-size:8px !important;letter-spacing:.16em !important}
-    .home-profile-message-rule{width:50px !important;height:3px !important;margin-top:8px !important}
-    .home-profile-scroll{margin-top:16px !important;padding:0 8px 12px 0 !important;overflow-y:auto !important;overflow-x:hidden !important;touch-action:pan-y !important}
-    .home-profile-message{width:100% !important;max-width:none !important;color:#b9d1e0 !important;font-size:11px !important;line-height:1.72 !important}
-    .home-profile-message p{margin:0 0 13px !important}.home-profile-message p:first-child{color:#f0f7fb !important;font-size:14px !important;line-height:1.5 !important}
-    .home-profile-add-contact{
-        grid-column:1 !important;grid-row:3 !important;width:calc(100% - 28px) !important;min-height:50px !important;margin:0 14px 12px !important;
-        display:flex !important;align-items:center !important;justify-content:center !important;gap:9px !important;box-sizing:border-box !important;
-        border:1px solid transparent !important;border-radius:13px !important;
-        background:linear-gradient(120deg,rgba(21,119,84,.45),rgba(7,73,108,.42)) padding-box,linear-gradient(105deg,#2eea8b,#12d6cb 48%,#168dff) border-box !important;
-        color:#f4fff8 !important;text-decoration:none !important;font-size:13px !important;font-weight:850 !important;
-    }
-    .home-profile-add-contact i{color:#27e6f1 !important;font-size:17px !important}
-}
-@media(max-width:380px){
-    .home-profile-panel{height:min(96svh,800px) !important}
-    .home-profile-identity{grid-template-columns:minmax(76px,27%) minmax(0,1fr) !important;column-gap:9px !important;padding:15px 11px 12px !important}
-    .home-profile-title{font-size:16px !important;line-height:1.12 !important}
-    .home-profile-role{font-size:6.5px !important}
-    .home-profile-contacts{gap:4px !important;margin-top:5px !important;padding-top:6px !important}
-    .home-profile-contact{grid-template-columns:24px minmax(0,1fr) !important;gap:5px !important}
-    .home-profile-contact>i{width:24px !important;height:24px !important;font-size:8px !important}
-    .home-profile-contact small{font-size:4.5px !important}.home-profile-contact strong{font-size:6.5px !important}
-    .home-profile-message-pane{padding:15px 11px 8px !important}.home-profile-message{font-size:10.5px !important}
-    .home-profile-message p:first-child{font-size:13px !important}.home-profile-add-contact{width:calc(100% - 22px) !important;margin-left:11px !important;margin-right:11px !important;min-height:48px !important;font-size:12px !important}
-}
-@media(prefers-reduced-motion:reduce){
-    .home-profile-modal,.home-profile-panel{scroll-behavior:auto}
-}
-
-/* FINAL PROFILE VIEWER POLISH — content-fit spacing + robust mobile geometry */
-@media(min-width:651px){
-    .home-profile-message-pane{
-        padding-bottom:10px !important;
-    }
-    .home-profile-scroll{
-        margin-bottom:0 !important;
-        padding-bottom:0 !important;
-    }
-}
-@media(max-width:650px){
-    .home-profile-identity{
-        grid-template-columns:104px minmax(0,1fr) !important;
-        grid-template-rows:auto auto auto !important;
-        column-gap:12px !important;
-        padding:17px 14px 14px !important;
-    }
-    .home-profile-photo{
-        width:104px !important;
-        max-width:104px !important;
-        min-width:104px !important;
-        height:130px !important;
-        aspect-ratio:auto !important;
-        grid-row:2 / 4 !important;
-        grid-column:1 !important;
-        display:grid !important;
-        overflow:hidden !important;
-    }
-    .home-profile-photo img{
-        width:100% !important;
-        height:100% !important;
-        min-width:0 !important;
-        display:block !important;
-        object-fit:cover !important;
-        object-position:center top !important;
-    }
-    .home-profile-identity-copy{
-        width:100% !important;
-        max-width:none !important;
-        min-width:0 !important;
-        grid-column:2 !important;
-        grid-row:2 !important;
-        overflow:hidden !important;
-    }
-    .home-profile-title{
-        width:100% !important;
-        max-width:none !important;
-        min-width:0 !important;
-        white-space:normal !important;
-        word-break:normal !important;
-        overflow-wrap:normal !important;
-        hyphens:none !important;
-        font-size:clamp(18px,5.2vw,24px) !important;
-        line-height:1.12 !important;
-    }
-    .home-profile-role{
-        white-space:nowrap !important;
-        overflow:hidden !important;
-        text-overflow:ellipsis !important;
-    }
-    .home-profile-contacts{
-        width:100% !important;
-        max-width:none !important;
-        min-width:0 !important;
-        grid-column:2 !important;
-        grid-row:3 !important;
-        overflow:hidden !important;
-    }
-    .home-profile-contact{
-        min-width:0 !important;
-        width:100% !important;
-    }
-    .home-profile-contact span,
-    .home-profile-contact strong{
-        min-width:0 !important;
-        max-width:100% !important;
-    }
-    .home-profile-message-pane{
-        padding-bottom:6px !important;
-    }
-    .home-profile-scroll{
-        margin-bottom:0 !important;
-        padding-bottom:4px !important;
-    }
-    .home-profile-message{
-        min-width:0 !important;
-        overflow-wrap:anywhere !important;
-    }
-}
-@media(max-width:380px){
-    .home-profile-identity{
-        grid-template-columns:84px minmax(0,1fr) !important;
-        column-gap:9px !important;
-        padding:15px 11px 12px !important;
-    }
-    .home-profile-photo{
-        width:84px !important;
-        min-width:84px !important;
-        max-width:84px !important;
-        height:105px !important;
-    }
-    .home-profile-title{
-        font-size:17px !important;
-        line-height:1.13 !important;
-    }
-    .home-profile-role{font-size:6.5px !important}
-    .home-profile-contacts{
-        gap:4px !important;
-        margin-top:5px !important;
-        padding-top:6px !important;
-    }
-    .home-profile-contact{grid-template-columns:24px minmax(0,1fr) !important;gap:5px !important}
-    .home-profile-contact>i{width:24px !important;height:24px !important}
-    .home-profile-contact small{font-size:4.5px !important}
-    .home-profile-contact strong{font-size:6.5px !important}
-}
-
-/* MOBILE PROFILE VIEWER — reference-matched premium layout */
-@media(max-width:650px){
-    .home-profile-panel{
-        width:min(430px,calc(100vw - 20px)) !important;
-        height:min(94svh,820px) !important;
-        max-height:calc(100svh - 20px) !important;
-        grid-template-rows:auto minmax(0,1fr) auto !important;
-        border-radius:22px !important;
-    }
-
-    /* Header: photo left, identity + contacts right, close at panel corner. */
-    .home-profile-identity{
-        position:relative !important;
-        grid-row:1 !important;
-        display:grid !important;
-        grid-template-columns:116px minmax(0,1fr) !important;
-        grid-template-rows:auto auto auto !important;
-        column-gap:14px !important;
-        align-items:center !important;
-        padding:32px 14px 16px !important;
-        border-bottom:1px solid rgba(67,220,145,.14) !important;
+        grid-column:1;grid-row:1;display:grid;
+        grid-template-columns:104px minmax(0,1fr);grid-template-rows:auto auto auto;
+        column-gap:12px;align-items:center;min-width:0;min-height:0;
+        padding:24px 14px 14px;border:0;border-bottom:1px solid rgba(67,220,145,.14);
+        background:radial-gradient(420px 230px at 0% 0%,rgba(45,226,131,.11),transparent 68%),linear-gradient(180deg,rgba(7,34,22,.82),rgba(2,15,10,.98));
     }
     .home-profile-kicker{
-        grid-column:1/-1 !important;
-        grid-row:1 !important;
-        visibility:hidden !important;
-        height:7px !important;
-        margin:0 0 2px !important;
+        grid-column:1/-1;grid-row:1;height:1px;visibility:hidden;margin:0;
     }
     .home-profile-photo{
-        grid-column:1 !important;
-        grid-row:2 / 4 !important;
-        width:116px !important;
-        min-width:116px !important;
-        max-width:116px !important;
-        height:145px !important;
-        aspect-ratio:auto !important;
-        justify-self:start !important;
-        align-self:center !important;
-        border-radius:16px !important;
+        grid-column:1;grid-row:2/4;width:104px;min-width:104px;max-width:104px;height:130px;
+        aspect-ratio:auto;justify-self:start;align-self:center;border-radius:15px;
     }
+    .home-profile-photo img{width:100%;height:100%;object-fit:cover;object-position:center top}
     .home-profile-identity-copy{
-        grid-column:2 !important;
-        grid-row:2 !important;
-        width:100% !important;
-        min-width:0 !important;
-        margin:0 !important;
-        align-self:end !important;
-        text-align:left !important;
-        padding-right:42px !important;
+        grid-column:2;grid-row:2;width:100%;min-width:0;margin:0;text-align:left;align-self:end;
+        padding-right:42px;overflow:hidden;
     }
     .home-profile-title{
-        font-size:clamp(18px,5.35vw,24px) !important;
-        line-height:1.12 !important;
-        letter-spacing:-.03em !important;
-        white-space:normal !important;
-        overflow-wrap:normal !important;
-        word-break:normal !important;
-        hyphens:none !important;
+        width:100%;min-width:0;margin:0;font-size:clamp(18px,5.2vw,24px);line-height:1.12;
+        letter-spacing:-.03em;white-space:normal;word-break:normal;overflow-wrap:normal;hyphens:none;
     }
     .home-profile-role{
-        margin-top:6px !important;
-        font-size:8px !important;
-        line-height:1.3 !important;
-        letter-spacing:.14em !important;
-        white-space:nowrap !important;
-        overflow:hidden !important;
-        text-overflow:ellipsis !important;
+        margin-top:6px;font-size:8px;line-height:1.3;letter-spacing:.14em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     }
     .home-profile-contacts{
-        grid-column:2 !important;
-        grid-row:3 !important;
-        width:100% !important;
-        min-width:0 !important;
-        gap:6px !important;
-        margin:9px 0 0 !important;
-        padding:8px 0 0 !important;
-        border-top:1px solid rgba(65,220,142,.15) !important;
-        overflow:hidden !important;
+        grid-column:2;grid-row:3;width:100%;min-width:0;display:grid;gap:6px;margin:9px 0 0;padding:8px 0 0;
+        border-top:1px solid rgba(65,220,142,.15);overflow:hidden;
     }
-    .home-profile-contact{
-        grid-template-columns:29px minmax(0,1fr) !important;
-        gap:7px !important;
-        min-width:0 !important;
-        width:100% !important;
-    }
-    .home-profile-contact>i{
-        width:29px !important;
-        height:29px !important;
-        border-radius:9px !important;
-        font-size:10px !important;
-    }
-    .home-profile-contact small{font-size:5.5px !important}
-    .home-profile-contact strong{
-        min-width:0 !important;
-        max-width:100% !important;
-        font-size:7.5px !important;
-        line-height:1.3 !important;
-    }
-
-    /* Close belongs to the modal, not the message column. */
+    .home-profile-contact{grid-template-columns:29px minmax(0,1fr);gap:7px;width:100%;min-width:0}
+    .home-profile-contact>i{width:29px;height:29px;border-radius:9px;font-size:10px}
+    .home-profile-contact small{font-size:5.5px}
+    .home-profile-contact strong{min-width:0;max-width:100%;font-size:7.5px;line-height:1.3}
+    
     .home-profile-message-pane{
-        position:static !important;
-        grid-column:1 !important;
-        grid-row:2 !important;
-        width:auto !important;
-        margin:0 14px 10px !important;
-        min-height:0 !important;
-        padding:24px 14px 10px !important;
-        border:1px solid rgba(43,177,255,.24) !important;
-        border-radius:18px !important;
-        background:linear-gradient(145deg,rgba(3,28,19,.86),rgba(2,16,11,.92)) !important;
-        overflow:hidden !important;
+        grid-column:1;grid-row:2;position:relative;width:auto;min-width:0;min-height:0;
+        display:flex;flex-direction:column;margin:10px 14px;
+        padding:22px 14px 8px;border:1px solid rgba(43,177,255,.24);border-radius:18px;overflow:hidden;
+        background:linear-gradient(145deg,rgba(3,28,19,.86),rgba(2,16,11,.92));
     }
     .home-profile-close{
-        position:absolute !important;
-        top:12px !important;
-        right:12px !important;
-        width:38px !important;
-        height:38px !important;
-        z-index:20 !important;
-        border-radius:11px !important;
-        border-color:rgba(43,177,255,.48) !important;
-        background:rgba(8,55,76,.42) !important;
-        color:#f2fbff !important;
-        font-size:15px !important;
+        top:11px;right:11px;width:38px;height:38px;border-radius:11px;
+        border-color:rgba(43,177,255,.48);background:rgba(8,55,76,.42);color:#f2fbff;font-size:15px;
     }
-    .home-profile-message-head{padding-right:48px !important}
-    .home-profile-section-title{
-        font-size:8px !important;
-        letter-spacing:.16em !important;
-    }
-    .home-profile-message-rule{
-        width:54px !important;
-        height:4px !important;
-        margin-top:9px !important;
-    }
+    .home-profile-message-head{padding-right:48px}
+    .home-profile-section-title{font-size:8px;letter-spacing:.16em}
+    .home-profile-message-rule{width:54px;height:4px;margin-top:9px}
     .home-profile-scroll{
-        min-height:0 !important;
-        flex:1 1 auto !important;
-        margin-top:18px !important;
-        padding:0 10px 4px 0 !important;
-        overflow-y:auto !important;
-        overflow-x:hidden !important;
-        scrollbar-width:thin !important;
-        touch-action:pan-y !important;
+        min-width:0;min-height:0;flex:1 1 auto;margin-top:18px;padding:0 10px 4px 0;
+        overflow-y:auto;overflow-x:hidden;touch-action:pan-y;scrollbar-width:thin;
     }
     .home-profile-message{
-        width:100% !important;
-        max-width:none !important;
-        color:#b9d1e0 !important;
-        font-size:11.5px !important;
-        line-height:1.72 !important;
-        overflow-wrap:anywhere !important;
+        width:100%;max-width:none;min-width:0;color:#b9d1e0;font-size:11.5px;line-height:1.72;
+        overflow-wrap:anywhere;
     }
-    .home-profile-message p{
-        margin:0 0 14px !important;
-    }
-    .home-profile-message p:first-child{
-        color:#f0f7fb !important;
-        font-size:14px !important;
-        line-height:1.5 !important;
-    }
-    .home-profile-message p:last-child{margin-bottom:0 !important}
-
+    .home-profile-message p{margin:0 0 14px}
+    .home-profile-message p:first-child{color:#f0f7fb;font-size:14px;line-height:1.5}
+    .home-profile-message p:last-child{margin-bottom:0}
     .home-profile-add-contact{
-        grid-column:1 !important;
-        grid-row:3 !important;
-        width:calc(100% - 28px) !important;
-        min-height:52px !important;
-        margin:0 14px 13px !important;
-        border-radius:14px !important;
-        font-size:13px !important;
-        gap:10px !important;
+        grid-column:1;grid-row:3;width:calc(100% - 28px);min-height:52px;margin:0 14px 13px;
+        border-radius:14px;font-size:13px;gap:10px;
     }
-    .home-profile-add-contact i{font-size:18px !important}
+    .home-profile-add-contact i{font-size:18px}
 }
 
-@media(max-width:380px){
-    .home-profile-identity{
-        grid-template-columns:96px minmax(0,1fr) !important;
-        column-gap:10px !important;
-        padding:28px 11px 13px !important;
-    }
-    .home-profile-photo{
-        width:96px !important;
-        min-width:96px !important;
-        max-width:96px !important;
-        height:120px !important;
-    }
-    .home-profile-identity-copy{padding-right:38px !important}
-    .home-profile-title{font-size:17px !important}
-    .home-profile-role{font-size:7px !important}
-    .home-profile-contacts{gap:5px !important;margin-top:7px !important;padding-top:7px !important}
-    .home-profile-contact{grid-template-columns:26px minmax(0,1fr) !important;gap:6px !important}
-    .home-profile-contact>i{width:26px !important;height:26px !important}
-    .home-profile-contact small{font-size:5px !important}
-    .home-profile-contact strong{font-size:6.7px !important}
-    .home-profile-message-pane{margin:0 11px 8px !important;padding:21px 11px 8px !important;border-radius:16px !important}
-    .home-profile-scroll{margin-top:15px !important;padding-right:8px !important}
-    .home-profile-message{font-size:10.5px !important;line-height:1.68 !important}
-    .home-profile-message p:first-child{font-size:13px !important}
-    .home-profile-add-contact{width:calc(100% - 22px) !important;margin:0 11px 10px !important;min-height:49px !important;font-size:12px !important}
+/* EXTRA-NARROW PHONES */
+@media (max-width:380px){
+    .home-profile-identity{grid-template-columns:90px minmax(0,1fr);column-gap:10px;padding:20px 11px 12px}
+    .home-profile-photo{width:90px;min-width:90px;max-width:90px;height:113px}
+    .home-profile-identity-copy{padding-right:36px}
+    .home-profile-title{font-size:17px}
+    .home-profile-role{font-size:7px}
+    .home-profile-contacts{gap:5px;margin-top:7px;padding-top:7px}
+    .home-profile-contact{grid-template-columns:26px minmax(0,1fr);gap:6px}
+    .home-profile-contact>i{width:26px;height:26px}
+    .home-profile-contact small{font-size:5px}
+    .home-profile-contact strong{font-size:6.7px}
+    .home-profile-message-pane{margin:8px 11px;padding:20px 11px 7px}
+    .home-profile-scroll{margin-top:15px;padding-right:8px}
+    .home-profile-message{font-size:10.5px;line-height:1.68}
+    .home-profile-message p:first-child{font-size:13px}
+    .home-profile-add-contact{width:calc(100% - 22px);margin:0 11px 10px;min-height:49px;font-size:12px}
 }
-
 </style>
 
 @endsection
