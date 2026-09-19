@@ -1399,14 +1399,14 @@ img{max-width:100%}
     .home-v3 .home-profile-panel > .home-profile-identity{
         grid-area:identity;
         display:grid;
-        grid-template-columns:104px minmax(0,1fr);
+        grid-template-columns:112px minmax(0,1fr);
         grid-template-rows:1fr auto;
         column-gap:14px;
         align-items:center;
         width:100%;
         min-width:0;
         min-height:0;
-        padding:30px 14px 18px;
+        padding:54px 14px 18px;
         box-sizing:border-box;
         border:0;
         border-bottom:1px solid rgba(67,220,145,.14);
@@ -1421,14 +1421,32 @@ img{max-width:100%}
     .home-v3 .home-profile-panel > .home-profile-identity > .home-profile-photo{
         grid-column:1;
         grid-row:1 / 3;
-        width:104px;
-        min-width:104px;
-        max-width:104px;
-        height:130px;
+        width:112px;
+        min-width:112px;
+        max-width:112px;
+        height:140px;
         aspect-ratio:auto;
         justify-self:start;
         align-self:center;
-        border-radius:16px;
+        padding:3px;
+        box-sizing:border-box;
+        border-radius:18px;
+        border:1px solid rgba(88,229,141,.72);
+        background:linear-gradient(145deg,rgba(62,230,137,.20),rgba(18,141,255,.13));
+        box-shadow:
+            0 0 0 1px rgba(42,224,154,.12),
+            0 12px 32px rgba(0,0,0,.42),
+            0 0 26px rgba(53,216,106,.10);
+    }
+
+    .home-v3 .home-profile-panel > .home-profile-identity > .home-profile-photo img{
+        width:100%;
+        height:100%;
+        display:block;
+        object-fit:cover;
+        object-position:center top;
+        border-radius:14px;
+        filter:saturate(1.04) contrast(1.03);
     }
 
     .home-v3 .home-profile-identity-copy{
@@ -1511,6 +1529,7 @@ img{max-width:100%}
 
     .home-v3 .home-profile-panel > .home-profile-message-pane{
         grid-area:message;
+        position:static;
         width:calc(100% - 28px);
         min-width:0;
         min-height:0;
@@ -1529,15 +1548,17 @@ img{max-width:100%}
     .home-v3 .home-profile-close{
         position:absolute;
         top:12px;
-        right:12px;
+        left:12px;
+        right:auto;
         width:38px;
         height:38px;
-        z-index:20;
+        z-index:30;
         border-radius:11px;
         border-color:rgba(43,177,255,.48);
         background:rgba(8,55,76,.42);
         color:#f2fbff;
         font-size:15px;
+        box-shadow:0 8px 20px rgba(0,0,0,.28);
     }
 
     .home-v3 .home-profile-message-head{
@@ -1649,14 +1670,14 @@ img{max-width:100%}
     grid-row:1 !important;
     grid-area:identity !important;
     display:grid !important;
-    grid-template-columns:104px minmax(0,1fr) !important;
+    grid-template-columns:112px minmax(0,1fr) !important;
     grid-template-rows:1fr auto !important;
     column-gap:14px !important;
     align-items:center !important;
     width:100% !important;
     min-width:0 !important;
     min-height:0 !important;
-    padding:30px 14px 18px !important;
+    padding:54px 14px 18px !important;
     box-sizing:border-box !important;
     border-right:0 !important;
     border-bottom:1px solid rgba(67,220,145,.14) !important;
@@ -1666,14 +1687,40 @@ img{max-width:100%}
 .home-profile-modal.home-profile-mobile .home-profile-photo{
     grid-column:1 !important;
     grid-row:1 / 3 !important;
-    width:104px !important;
-    min-width:104px !important;
-    max-width:104px !important;
-    height:130px !important;
+    width:112px !important;
+    min-width:112px !important;
+    max-width:112px !important;
+    height:140px !important;
     aspect-ratio:auto !important;
     justify-self:start !important;
     align-self:center !important;
+    padding:3px !important;
+    box-sizing:border-box !important;
+    border-radius:18px !important;
+    border:1px solid rgba(88,229,141,.72) !important;
+    background:linear-gradient(145deg,rgba(62,230,137,.20),rgba(18,141,255,.13)) !important;
+    box-shadow:0 0 0 1px rgba(42,224,154,.12),0 12px 32px rgba(0,0,0,.42),0 0 26px rgba(53,216,106,.10) !important;
 }
+.home-profile-modal.home-profile-mobile .home-profile-photo img{
+    width:100% !important;
+    height:100% !important;
+    display:block !important;
+    object-fit:cover !important;
+    object-position:center top !important;
+    border-radius:14px !important;
+    filter:saturate(1.04) contrast(1.03) !important;
+}
+.home-profile-modal.home-profile-mobile .home-profile-close{
+    position:absolute !important;
+    top:12px !important;
+    left:12px !important;
+    right:auto !important;
+    width:38px !important;
+    height:38px !important;
+    z-index:30 !important;
+    box-shadow:0 8px 20px rgba(0,0,0,.28) !important;
+}
+
 .home-profile-modal.home-profile-mobile .home-profile-identity-copy{
     grid-column:2 !important;
     grid-row:1 !important;
@@ -1723,6 +1770,7 @@ img{max-width:100%}
 }
 .home-profile-modal.home-profile-mobile .home-profile-message-pane{
     grid-column:1 !important;
+    position:static !important;
     grid-row:2 !important;
     grid-area:message !important;
     width:calc(100% - 28px) !important;
