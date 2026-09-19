@@ -1592,6 +1592,44 @@ img{max-width:100%}
         border-radius:22px;
     }
 
+    /* Mobile structural reset: use flex instead of inherited desktop grid placement. */
+    .home-profile-panel{
+        display:flex !important;
+        flex-direction:column !important;
+        width:min(430px,calc(100vw - 20px)) !important;
+        height:min(94svh,820px) !important;
+        max-height:calc(100svh - 20px) !important;
+        min-width:0 !important;
+        min-height:0 !important;
+        overflow:hidden !important;
+    }
+    .home-profile-panel > .home-profile-identity{
+        order:1 !important;
+        flex:0 0 auto !important;
+        width:100% !important;
+        height:auto !important;
+        min-height:150px !important;
+        max-height:185px !important;
+        grid-column:auto !important;
+        grid-row:auto !important;
+    }
+    .home-profile-panel > .home-profile-message-pane{
+        order:2 !important;
+        flex:1 1 auto !important;
+        width:calc(100% - 28px) !important;
+        height:auto !important;
+        min-height:0 !important;
+        max-height:none !important;
+        grid-column:auto !important;
+        grid-row:auto !important;
+    }
+    .home-profile-panel > .home-profile-add-contact{
+        order:3 !important;
+        flex:0 0 auto !important;
+        grid-column:auto !important;
+        grid-row:auto !important;
+    }
+
     /* Header: photo + one vertically centered information column */
     .home-profile-panel > .home-profile-identity{
         grid-area:identity;
