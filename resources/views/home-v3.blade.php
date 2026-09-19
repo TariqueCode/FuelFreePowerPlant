@@ -1543,6 +1543,211 @@ img{max-width:100%}
     .home-profile-contact small{font-size:4.5px !important}
     .home-profile-contact strong{font-size:6.5px !important}
 }
+
+/* MOBILE PROFILE VIEWER — reference-matched premium layout */
+@media(max-width:650px){
+    .home-profile-panel{
+        width:min(430px,calc(100vw - 20px)) !important;
+        height:min(94svh,820px) !important;
+        max-height:calc(100svh - 20px) !important;
+        grid-template-rows:auto minmax(0,1fr) auto !important;
+        border-radius:22px !important;
+    }
+
+    /* Header: photo left, identity + contacts right, close at panel corner. */
+    .home-profile-identity{
+        position:relative !important;
+        grid-row:1 !important;
+        display:grid !important;
+        grid-template-columns:116px minmax(0,1fr) !important;
+        grid-template-rows:auto auto auto !important;
+        column-gap:14px !important;
+        align-items:center !important;
+        padding:32px 14px 16px !important;
+        border-bottom:1px solid rgba(67,220,145,.14) !important;
+    }
+    .home-profile-kicker{
+        grid-column:1/-1 !important;
+        grid-row:1 !important;
+        visibility:hidden !important;
+        height:7px !important;
+        margin:0 0 2px !important;
+    }
+    .home-profile-photo{
+        grid-column:1 !important;
+        grid-row:2 / 4 !important;
+        width:116px !important;
+        min-width:116px !important;
+        max-width:116px !important;
+        height:145px !important;
+        aspect-ratio:auto !important;
+        justify-self:start !important;
+        align-self:center !important;
+        border-radius:16px !important;
+    }
+    .home-profile-identity-copy{
+        grid-column:2 !important;
+        grid-row:2 !important;
+        width:100% !important;
+        min-width:0 !important;
+        margin:0 !important;
+        align-self:end !important;
+        text-align:left !important;
+        padding-right:42px !important;
+    }
+    .home-profile-title{
+        font-size:clamp(18px,5.35vw,24px) !important;
+        line-height:1.12 !important;
+        letter-spacing:-.03em !important;
+        white-space:normal !important;
+        overflow-wrap:normal !important;
+        word-break:normal !important;
+        hyphens:none !important;
+    }
+    .home-profile-role{
+        margin-top:6px !important;
+        font-size:8px !important;
+        line-height:1.3 !important;
+        letter-spacing:.14em !important;
+        white-space:nowrap !important;
+        overflow:hidden !important;
+        text-overflow:ellipsis !important;
+    }
+    .home-profile-contacts{
+        grid-column:2 !important;
+        grid-row:3 !important;
+        width:100% !important;
+        min-width:0 !important;
+        gap:6px !important;
+        margin:9px 0 0 !important;
+        padding:8px 0 0 !important;
+        border-top:1px solid rgba(65,220,142,.15) !important;
+        overflow:hidden !important;
+    }
+    .home-profile-contact{
+        grid-template-columns:29px minmax(0,1fr) !important;
+        gap:7px !important;
+        min-width:0 !important;
+        width:100% !important;
+    }
+    .home-profile-contact>i{
+        width:29px !important;
+        height:29px !important;
+        border-radius:9px !important;
+        font-size:10px !important;
+    }
+    .home-profile-contact small{font-size:5.5px !important}
+    .home-profile-contact strong{
+        min-width:0 !important;
+        max-width:100% !important;
+        font-size:7.5px !important;
+        line-height:1.3 !important;
+    }
+
+    /* Close belongs to the modal, not the message column. */
+    .home-profile-message-pane{
+        position:static !important;
+        grid-row:2 !important;
+        width:auto !important;
+        margin:0 14px 10px !important;
+        min-height:0 !important;
+        padding:24px 14px 10px !important;
+        border:1px solid rgba(43,177,255,.24) !important;
+        border-radius:18px !important;
+        background:linear-gradient(145deg,rgba(3,28,19,.86),rgba(2,16,11,.92)) !important;
+        overflow:hidden !important;
+    }
+    .home-profile-close{
+        position:absolute !important;
+        top:12px !important;
+        right:12px !important;
+        width:38px !important;
+        height:38px !important;
+        z-index:20 !important;
+        border-radius:11px !important;
+        border-color:rgba(43,177,255,.48) !important;
+        background:rgba(8,55,76,.42) !important;
+        color:#f2fbff !important;
+        font-size:15px !important;
+    }
+    .home-profile-message-head{padding-right:48px !important}
+    .home-profile-section-title{
+        font-size:8px !important;
+        letter-spacing:.16em !important;
+    }
+    .home-profile-message-rule{
+        width:54px !important;
+        height:4px !important;
+        margin-top:9px !important;
+    }
+    .home-profile-scroll{
+        min-height:0 !important;
+        flex:1 1 auto !important;
+        margin-top:18px !important;
+        padding:0 10px 4px 0 !important;
+        overflow-y:auto !important;
+        overflow-x:hidden !important;
+        scrollbar-width:thin !important;
+        touch-action:pan-y !important;
+    }
+    .home-profile-message{
+        width:100% !important;
+        max-width:none !important;
+        color:#b9d1e0 !important;
+        font-size:11.5px !important;
+        line-height:1.72 !important;
+        overflow-wrap:anywhere !important;
+    }
+    .home-profile-message p{
+        margin:0 0 14px !important;
+    }
+    .home-profile-message p:first-child{
+        color:#f0f7fb !important;
+        font-size:14px !important;
+        line-height:1.5 !important;
+    }
+    .home-profile-message p:last-child{margin-bottom:0 !important}
+
+    .home-profile-add-contact{
+        grid-column:1 !important;
+        grid-row:3 !important;
+        width:calc(100% - 28px) !important;
+        min-height:52px !important;
+        margin:0 14px 13px !important;
+        border-radius:14px !important;
+        font-size:13px !important;
+        gap:10px !important;
+    }
+    .home-profile-add-contact i{font-size:18px !important}
+}
+
+@media(max-width:380px){
+    .home-profile-identity{
+        grid-template-columns:96px minmax(0,1fr) !important;
+        column-gap:10px !important;
+        padding:28px 11px 13px !important;
+    }
+    .home-profile-photo{
+        width:96px !important;
+        min-width:96px !important;
+        max-width:96px !important;
+        height:120px !important;
+    }
+    .home-profile-identity-copy{padding-right:38px !important}
+    .home-profile-title{font-size:17px !important}
+    .home-profile-role{font-size:7px !important}
+    .home-profile-contacts{gap:5px !important;margin-top:7px !important;padding-top:7px !important}
+    .home-profile-contact{grid-template-columns:26px minmax(0,1fr) !important;gap:6px !important}
+    .home-profile-contact>i{width:26px !important;height:26px !important}
+    .home-profile-contact small{font-size:5px !important}
+    .home-profile-contact strong{font-size:6.7px !important}
+    .home-profile-message-pane{margin:0 11px 8px !important;padding:21px 11px 8px !important;border-radius:16px !important}
+    .home-profile-scroll{margin-top:15px !important;padding-right:8px !important}
+    .home-profile-message{font-size:10.5px !important;line-height:1.68 !important}
+    .home-profile-message p:first-child{font-size:13px !important}
+    .home-profile-add-contact{width:calc(100% - 22px) !important;margin:0 11px 10px !important;min-height:49px !important;font-size:12px !important}
+}
+
 </style>
 
 @endsection
