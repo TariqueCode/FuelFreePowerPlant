@@ -3289,6 +3289,7 @@ main.shell{
     }
 }
 
+</style>
 <style>
 /* === HOMEPAGE MANAGEMENT PROFILE CARD V4 === */
 .home-v3 .home-section-management .management-grid{width:100%!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:clamp(12px,1.8vw,20px)!important;align-items:stretch!important}
@@ -3384,6 +3385,7 @@ main.shell{
         padding: 8px 15px !important;
     }
 }
+</style>
 <style>
 /* === HOMEPAGE MANAGEMENT PROFILE ACCESSIBILITY POLISH === */
 /* Larger reading sizes for older users; layout and controls remain unchanged. */
@@ -3560,6 +3562,7 @@ main.shell{
 })();
 </script>
 
+</style>
 <style>
 /* === FINAL STATIC HOMEPAGE MODE ===
    Professional visual design stays intact; motion is disabled for reliable
