@@ -35,8 +35,25 @@ class PublicNavigationService
         $valid = $items->filter(function (NavigationMenuItem $item) use ($registry): bool {
             if ($item->source_type === 'folder') {
                 if (Str::startsWith((string) $item->source_key, 'management_folder:')) {
-                    return $registry->resolveAny((string) $item->source_key, 'public') !== null;
+                    $source = $registry->resolveAny((string) $item->source_key, 'public');
+                    if (! $source) {
+                        return false;
+                    }
+
+                    if ($item->label_override !== null && trim((string) $item->label_override) !== '') {
+                        $item->label = (string) $item->label_override;
+                    } else {
+                        $item->label = $source['label'];
+                    }
+                    $item->url = $source['url'];
+                    $item->route_name = $source['route_name'];
+                    $item->permission_key = $source['permission'] ?? null;
+                    $item->setAttribute('source_key', $source['key']);
+                    $item->setAttribute('source_type', $source['type']);
+
+                    return true;
                 }
+
                 return trim((string) $item->label) !== '';
             }
 
