@@ -1361,81 +1361,247 @@ img{max-width:100%}
     .home-profile-message p:first-child{font-size:15px}
 }
 
-/* MOBILE — completely independent single-column composition. */
+/* MOBILE — independent reference-matched composition. */
 @media (max-width:650px){
-    .home-profile-modal{
-        padding:10px;align-items:center;justify-content:center;background:rgba(0,5,9,.94);
-        backdrop-filter:blur(16px) saturate(125%);
+    .home-v3 .home-profile-modal{
+        padding:10px;
+        align-items:center;
+        justify-content:center;
+        overflow:hidden;
+        background:rgba(0,5,9,.94);
     }
-    .home-profile-panel{
-        width:min(430px,calc(100vw - 20px));height:min(94svh,820px);max-height:calc(100svh - 20px);
-        display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;
-        min-width:0;min-height:0;overflow:hidden;border-radius:22px;
+    .home-v3 .home-profile-panel{
+        width:min(430px,calc(100vw - 20px));
+        height:min(94svh,820px);
+        max-height:calc(100svh - 20px);
+        min-width:0;
+        min-height:0;
+        display:grid;
+        grid-template-columns:minmax(0,1fr);
+        grid-template-rows:auto minmax(0,1fr) auto;
+        grid-template-areas:
+            "identity"
+            "message"
+            "contact";
+        gap:0;
+        overflow:hidden;
+        border-radius:22px;
+        box-sizing:border-box;
     }
-    .home-profile-identity{
-        grid-column:1;grid-row:1;display:grid;
-        grid-template-columns:104px minmax(0,1fr);grid-template-rows:auto auto auto;
-        column-gap:12px;align-items:center;min-width:0;min-height:0;
-        padding:24px 14px 14px;border:0;border-bottom:1px solid rgba(67,220,145,.14);
+
+    .home-v3 .home-profile-panel > .home-profile-identity{
+        grid-area:identity;
+        display:grid;
+        grid-template-columns:104px minmax(0,1fr);
+        grid-template-rows:1fr auto;
+        column-gap:14px;
+        align-items:center;
+        width:100%;
+        min-width:0;
+        min-height:0;
+        padding:30px 14px 18px;
+        box-sizing:border-box;
+        border:0;
+        border-bottom:1px solid rgba(67,220,145,.14);
+        overflow:hidden;
         background:radial-gradient(420px 230px at 0% 0%,rgba(45,226,131,.11),transparent 68%),linear-gradient(180deg,rgba(7,34,22,.82),rgba(2,15,10,.98));
     }
-    .home-profile-kicker{
-        grid-column:1/-1;grid-row:1;height:1px;visibility:hidden;margin:0;
+
+    .home-v3 .home-profile-kicker{
+        display:none;
     }
-    .home-profile-photo{
-        grid-column:1;grid-row:2/4;width:104px;min-width:104px;max-width:104px;height:130px;
-        aspect-ratio:auto;justify-self:start;align-self:center;border-radius:15px;
+
+    .home-v3 .home-profile-panel > .home-profile-identity > .home-profile-photo{
+        grid-column:1;
+        grid-row:1 / 3;
+        width:104px;
+        min-width:104px;
+        max-width:104px;
+        height:130px;
+        aspect-ratio:auto;
+        justify-self:start;
+        align-self:center;
+        border-radius:16px;
     }
-    .home-profile-photo img{width:100%;height:100%;object-fit:cover;object-position:center top}
-    .home-profile-identity-copy{
-        grid-column:2;grid-row:2;width:100%;min-width:0;margin:0;text-align:left;align-self:end;
-        padding-right:42px;overflow:hidden;
+
+    .home-v3 .home-profile-identity-copy{
+        grid-column:2;
+        grid-row:1;
+        width:100%;
+        min-width:0;
+        margin:0;
+        padding:0 42px 0 0;
+        text-align:left;
+        align-self:end;
+        overflow:hidden;
     }
-    .home-profile-title{
-        width:100%;min-width:0;margin:0;font-size:clamp(18px,5.2vw,24px);line-height:1.12;
-        letter-spacing:-.03em;white-space:normal;word-break:normal;overflow-wrap:normal;hyphens:none;
+
+    .home-v3 .home-profile-title{
+        width:100%;
+        min-width:0;
+        margin:0;
+        font-size:clamp(18px,5.3vw,24px);
+        line-height:1.12;
+        letter-spacing:-.03em;
+        white-space:normal;
+        word-break:normal;
+        overflow-wrap:normal;
+        hyphens:none;
     }
-    .home-profile-role{
-        margin-top:6px;font-size:8px;line-height:1.3;letter-spacing:.14em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+
+    .home-v3 .home-profile-role{
+        margin-top:6px;
+        font-size:8px;
+        line-height:1.3;
+        letter-spacing:.14em;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
     }
-    .home-profile-contacts{
-        grid-column:2;grid-row:3;width:100%;min-width:0;display:grid;gap:6px;margin:9px 0 0;padding:8px 0 0;
-        border-top:1px solid rgba(65,220,142,.15);overflow:hidden;
+
+    .home-v3 .home-profile-contacts{
+        grid-column:2;
+        grid-row:2;
+        width:100%;
+        min-width:0;
+        display:grid;
+        gap:6px;
+        margin:9px 0 0;
+        padding:8px 0 0;
+        border-top:1px solid rgba(65,220,142,.15);
+        overflow:hidden;
     }
-    .home-profile-contact{grid-template-columns:29px minmax(0,1fr);gap:7px;width:100%;min-width:0}
-    .home-profile-contact>i{width:29px;height:29px;border-radius:9px;font-size:10px}
-    .home-profile-contact small{font-size:5.5px}
-    .home-profile-contact strong{min-width:0;max-width:100%;font-size:7.5px;line-height:1.3}
-    
-    .home-profile-message-pane{
-        grid-column:1;grid-row:2;position:relative;width:auto;min-width:0;min-height:0;
-        display:flex;flex-direction:column;margin:10px 14px;
-        padding:22px 14px 8px;border:1px solid rgba(43,177,255,.24);border-radius:18px;overflow:hidden;
+
+    .home-v3 .home-profile-contact{
+        display:grid;
+        grid-template-columns:29px minmax(0,1fr);
+        gap:7px;
+        width:100%;
+        min-width:0;
+        align-items:center;
+    }
+
+    .home-v3 .home-profile-contact > i{
+        width:29px;
+        height:29px;
+        border-radius:9px;
+        font-size:10px;
+    }
+
+    .home-v3 .home-profile-contact span,
+    .home-v3 .home-profile-contact strong{
+        min-width:0;
+        max-width:100%;
+        overflow:hidden;
+    }
+
+    .home-v3 .home-profile-contact strong{
+        font-size:7.5px;
+        line-height:1.3;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+    }
+
+    .home-v3 .home-profile-panel > .home-profile-message-pane{
+        grid-area:message;
+        width:calc(100% - 28px);
+        min-width:0;
+        min-height:0;
+        margin:10px 14px;
+        padding:24px 14px 10px;
+        box-sizing:border-box;
+        display:flex;
+        flex-direction:column;
+        position:relative;
+        overflow:hidden;
+        border:1px solid rgba(43,177,255,.24);
+        border-radius:18px;
         background:linear-gradient(145deg,rgba(3,28,19,.86),rgba(2,16,11,.92));
     }
-    .home-profile-close{
-        top:11px;right:11px;width:38px;height:38px;border-radius:11px;
-        border-color:rgba(43,177,255,.48);background:rgba(8,55,76,.42);color:#f2fbff;font-size:15px;
+
+    .home-v3 .home-profile-close{
+        position:absolute;
+        top:12px;
+        right:12px;
+        width:38px;
+        height:38px;
+        z-index:20;
+        border-radius:11px;
+        border-color:rgba(43,177,255,.48);
+        background:rgba(8,55,76,.42);
+        color:#f2fbff;
+        font-size:15px;
     }
-    .home-profile-message-head{padding-right:48px}
-    .home-profile-section-title{font-size:8px;letter-spacing:.16em}
-    .home-profile-message-rule{width:54px;height:4px;margin-top:9px}
-    .home-profile-scroll{
-        min-width:0;min-height:0;flex:1 1 auto;margin-top:18px;padding:0 10px 4px 0;
-        overflow-y:auto;overflow-x:hidden;touch-action:pan-y;scrollbar-width:thin;
+
+    .home-v3 .home-profile-message-head{
+        width:100%;
+        min-width:0;
+        padding-right:48px;
     }
-    .home-profile-message{
-        width:100%;max-width:none;min-width:0;color:#b9d1e0;font-size:11.5px;line-height:1.72;
+
+    .home-v3 .home-profile-section-title{
+        font-size:8px;
+        line-height:1.4;
+        letter-spacing:.16em;
+    }
+
+    .home-v3 .home-profile-message-rule{
+        width:54px;
+        height:4px;
+        margin-top:9px;
+    }
+
+    .home-v3 .home-profile-scroll{
+        width:100%;
+        min-width:0;
+        min-height:0;
+        flex:1 1 auto;
+        margin-top:18px;
+        padding:0 10px 4px 0;
+        overflow-y:auto;
+        overflow-x:hidden;
+        touch-action:pan-y;
+        scrollbar-width:thin;
+    }
+
+    .home-v3 .home-profile-message{
+        width:100%;
+        min-width:0;
+        max-width:none;
+        color:#b9d1e0;
+        font-size:11.5px;
+        line-height:1.72;
         overflow-wrap:anywhere;
     }
-    .home-profile-message p{margin:0 0 14px}
-    .home-profile-message p:first-child{color:#f0f7fb;font-size:14px;line-height:1.5}
-    .home-profile-message p:last-child{margin-bottom:0}
-    .home-profile-add-contact{
-        grid-column:1;grid-row:3;width:calc(100% - 28px);min-height:52px;margin:0 14px 13px;
-        border-radius:14px;font-size:13px;gap:10px;
+
+    .home-v3 .home-profile-message p{
+        margin:0 0 14px;
     }
-    .home-profile-add-contact i{font-size:18px}
+
+    .home-v3 .home-profile-message p:first-child{
+        color:#f0f7fb;
+        font-size:14px;
+        line-height:1.5;
+    }
+
+    .home-v3 .home-profile-message p:last-child{
+        margin-bottom:0;
+    }
+
+    .home-v3 .home-profile-panel > .home-profile-add-contact{
+        grid-area:contact;
+        width:calc(100% - 28px);
+        min-height:52px;
+        margin:0 14px 13px;
+        box-sizing:border-box;
+        border-radius:14px;
+        font-size:13px;
+        gap:10px;
+    }
+
+    .home-v3 .home-profile-add-contact i{
+        font-size:18px;
+    }
 }
 
 /* EXTRA-NARROW PHONES */
