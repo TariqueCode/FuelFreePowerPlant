@@ -1,17 +1,17 @@
 @php
     $seo = config('fuelfree.seo', []);
-    $siteName = config('fuelfree.company.name', 'FuelFree PowerPlant Limited');
+    $siteName = $publicName ?? config('fuelfree.company.name', 'FuelFree PowerPlant Limited');
     $configuredDomain = trim((string) config('fuelfree.company.domain', request()->getHost()));
     $baseUrl = rtrim(
         preg_match('/^https?:\/\//i', $configuredDomain) ? $configuredDomain : 'https://' . $configuredDomain,
         '/'
     );
     $path = trim((string) request()->path(), '/');
-    $canonicalUrl = $baseUrl . ($path === '' ? '/' : '/' . $path);
-    $pageTitle = trim((string) $__env->yieldContent('title', $siteName));
-    $description = trim((string) $__env->yieldContent('meta_description', config('fuelfree.company.tagline', '')));
-    $robots = trim((string) $__env->yieldContent('meta_robots', 'index,follow'));
-    $ogImage = trim((string) $__env->yieldContent('og_image', ''));
+    $canonicalUrl = $canonicalUrl ?? ($baseUrl . ($path === '' ? '/' : '/' . $path));
+    $pageTitle = trim((string) ($metaTitle ?? $__env->yieldContent('title', $siteName)));
+    $description = trim((string) ($metaDescription ?? $__env->yieldContent('meta_description', config('fuelfree.company.tagline', ''))));
+    $robots = trim((string) ($metaRobots ?? $__env->yieldContent('meta_robots', 'index,follow')));
+    $ogImage = trim((string) ($metaImage ?? $__env->yieldContent('og_image', '')));
     if ($ogImage !== '' && !str_starts_with($ogImage, 'http://') && !str_starts_with($ogImage, 'https://')) {
         $ogImage = $baseUrl . '/' . ltrim($ogImage, '/');
     }

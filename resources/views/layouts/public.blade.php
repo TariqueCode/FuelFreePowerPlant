@@ -44,49 +44,9 @@
         $metaRobots = $metaRobots ?? 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
         $publicLogoUrl = $publicLogo ? (preg_match('/^https?:\\/\\//i', (string) $publicLogo) ? $publicLogo : asset(ltrim((string) $publicLogo, '/'))) : route('favicon');
         $metaImage = $metaImage ?? $publicLogoUrl;
-        $organizationSchema = [
-            '@context' => 'https://schema.org',
-            '@type' => 'Organization',
-            'name' => $publicName,
-            'url' => preg_match('/^https?:\/\//i', (string) ($brand['domain'] ?? ''))
-                ? rtrim((string) $brand['domain'], '/')
-                : 'https://' . trim((string) ($brand['domain'] ?? config('fuelfree.company.domain')), '/'),
-            'logo' => $publicLogoUrl,
-            'telephone' => config('fuelfree.footer.phone'),
-            'address' => [
-                '@type' => 'PostalAddress',
-                'streetAddress' => config('fuelfree.footer.address'),
-                'addressCountry' => 'BD',
-            ],
-        ];
-        $websiteSchema = [
-            '@context' => 'https://schema.org',
-            '@type' => 'WebSite',
-            'name' => $publicName,
-            'url' => $canonicalUrl,
-        ];
     @endphp
     <title>{{ $metaTitle }}</title>
-    <meta name="description" content="{{ $metaDescription }}">
-    <meta name="robots" content="{{ $metaRobots }}">
-    <link rel="canonical" href="{{ $canonicalUrl }}">
-    <meta name="theme-color" content="#020906">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="{{ $publicName }}">
-    <meta property="og:title" content="{{ $metaTitle }}">
-    <meta property="og:description" content="{{ $metaDescription }}">
-    <meta property="og:url" content="{{ $canonicalUrl }}">
-    <meta property="og:image" content="{{ $metaImage }}">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ $metaTitle }}">
-    <meta name="twitter:description" content="{{ $metaDescription }}">
-    <meta name="twitter:image" content="{{ $metaImage }}">
-    @if($routeName === 'home' || $routeName === 'site.about')
-        <script type="application/ld+json">{!! json_encode($organizationSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
-    @endif
-    @if($routeName === 'home')
-        <script type="application/ld+json">{!! json_encode($websiteSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
-    @endif
+    @include('partials.public-seo')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     @php($faviconVersion = $publicLogo ? sha1((string) $publicLogo) : 'default-v1')
     <link rel="icon" href="{{ route('favicon') }}?v={{ $faviconVersion }}">
