@@ -74,7 +74,7 @@ class SeoSettingsTest extends TestCase
             ->assertOk()
             ->assertHeader('Content-Type', 'text/plain; charset=UTF-8')
             ->assertSeeText('User-agent: *')
-            ->assertSeeText('Sitemap: ' . rtrim(config('fuelfree.company.domain'), '/') . '/sitemap.xml');
+            ->assertSeeText('Sitemap: https://' . trim(config('fuelfree.company.domain'), '/') . '/sitemap.xml');
     }
 
     public function test_sitemap_and_indexnow_endpoints_are_public_and_indexnow_key_is_exact(): void
