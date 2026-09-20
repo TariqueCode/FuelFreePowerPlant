@@ -36,12 +36,14 @@ class AppServiceProvider extends ServiceProvider
             if (str_contains($template, '<head')) {
                 $isPublicLayout = str_contains($template, 'layouts.public') || str_contains($template, '@yield(\'title\', $publicName)');
                 if ($isPublicLayout) {
-                    $template = str_replace('</head>', "    @include('partials.public-seo')\n</head>", $template);
+                    $template = str_replace('</head>', "    @include('partials.public-seo')
+</head>", $template);
                 }
             }
 
             if (str_contains($template, 'id="seoHelpModal"')) {
-                $template = str_replace('</body>', "@include('partials.admin-seo-help-script')\n</body>", $template);
+                $template = str_replace('</body>', "@include('partials.admin-seo-help-script')
+</body>", $template);
             }
 
             return $template;
@@ -52,6 +54,10 @@ class AppServiceProvider extends ServiceProvider
             $router->get('/admin/news-and-Event', [NewsEventController::class, 'index'])
                 ->middleware(['web', 'auth', 'permission:website.view'])
                 ->name('admin.news_and_event');
+
+            $router->get('/admin/news-and-Event', [NewsEventController::class, 'index'])
+                ->middleware(['web', 'auth', 'permission:website.view'])
+                ->name('admin.news_and_event.index');
 
             $router->get('/admin/documents/folders/{folder}', [ResilientDocumentController::class, 'legacyFolderUrl'])
                 ->whereNumber('folder')
@@ -84,7 +90,6 @@ class AppServiceProvider extends ServiceProvider
 
             $router->fallback([\App\Http\Controllers\ManagementController::class, 'folderFallback'])->name('management.folder');
         });
-
         try {
             if (!Schema::hasTable('system_settings')) return;
             $settings = Cache::rememberForever('fuelfree.system_settings', fn () => SystemSetting::query()->pluck('value','key')->all());
