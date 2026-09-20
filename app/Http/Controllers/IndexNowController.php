@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SystemSetting;
 use Illuminate\Http\Response;
 
 class IndexNowController extends Controller
 {
     public function key(string $key): Response
     {
-        $configuredKey = trim((string) config('fuelfree.seo.indexnow_key', ''));
+        $configuredKey = trim((string) SystemSetting::query()->where('key', 'seo.indexnow_key')->value('value'));
 
         abort_unless($configuredKey !== '' && hash_equals($configuredKey, $key), 404);
 
