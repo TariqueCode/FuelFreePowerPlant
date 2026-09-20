@@ -66,7 +66,7 @@ class SeoSettingsTest extends TestCase
             ->assertOk()
             ->assertSee('<meta name="description"', false)
             ->assertSee('<meta name="robots" content="index,follow', false)
-            ->assertSee('<link rel="canonical" href="' . route('home') . '">', false)
+            ->assertSee('<link rel="canonical" href="https://' . trim(config('fuelfree.company.domain'), '/') . '">', false)
             ->assertSee('application/ld+json', false)
             ->assertSee('"@type":"Organization"', false);
 
@@ -83,7 +83,7 @@ class SeoSettingsTest extends TestCase
             ->assertOk()
             ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
             ->assertSee('<urlset', false)
-            ->assertSee(route('home'), false);
+            ->assertSee('https://' . trim(config('fuelfree.company.domain'), '/') . '/', false);
 
         SystemSetting::updateOrCreate(['key' => 'seo.indexnow_key'], ['value' => 'Abc_1234-Key', 'is_sensitive' => false]);
         Cache::forget('fuelfree.system_settings');
