@@ -1287,7 +1287,7 @@ img{max-width:100%}
 
 
 <style>
-/* EXECUTIVE PROFILE VIEWER — clean responsive architecture */
+/* EXECUTIVE PROFILE VIEWER — audited, isolated responsive architecture */
 .home-profile-modal{
     position:fixed;
     inset:0;
@@ -1306,11 +1306,11 @@ img{max-width:100%}
     position:relative;
     width:min(1120px,calc(100vw - 48px));
     height:min(720px,calc(100vh - 48px));
+    min-width:0;
+    min-height:0;
     display:grid;
     grid-template-columns:minmax(280px,34%) minmax(0,66%);
     grid-template-rows:minmax(0,1fr) auto;
-    min-width:0;
-    min-height:0;
     overflow:hidden;
     box-sizing:border-box;
     border:1px solid transparent;
@@ -1377,8 +1377,8 @@ img{max-width:100%}
 .home-profile-identity-copy{
     width:100%;
     margin-top:20px;
-    text-align:center;
     min-width:0;
+    text-align:center;
 }
 .home-profile-title{
     margin:0;
@@ -1425,11 +1425,7 @@ img{max-width:100%}
     color:#63e996;
     font-size:12px;
 }
-.home-profile-contact span{
-    min-width:0;
-    display:grid;
-    gap:2px;
-}
+.home-profile-contact span{min-width:0;display:grid;gap:2px}
 .home-profile-contact small{
     color:#5ed98a;
     font-size:7px;
@@ -1447,11 +1443,29 @@ img{max-width:100%}
     font-weight:600;
 }
 
+/* Shared close control */
+.home-profile-close{
+    position:absolute;
+    top:22px;
+    right:22px;
+    z-index:50;
+    width:42px;
+    height:42px;
+    display:grid;
+    place-items:center;
+    border:1px solid rgba(43,177,255,.48);
+    border-radius:12px;
+    background:rgba(8,55,76,.42);
+    color:#f2fbff;
+    cursor:pointer;
+    font-size:16px;
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+
 /* Desktop message */
 .home-profile-message-pane{
     grid-column:2;
     grid-row:1;
-    position:relative;
     min-width:0;
     min-height:0;
     display:flex;
@@ -1463,26 +1477,7 @@ img{max-width:100%}
         radial-gradient(600px 500px at 100% 100%,rgba(31,157,208,.055),transparent 70%),
         linear-gradient(145deg,#061b10 0%,#03140b 56%,#020c07 100%);
 }
-.home-profile-close{
-    position:absolute;
-    top:22px;
-    right:22px;
-    z-index:20;
-    width:42px;
-    height:42px;
-    display:grid;
-    place-items:center;
-    border:1px solid rgba(43,177,255,.48);
-    border-radius:12px;
-    background:rgba(8,55,76,.42);
-    color:#f2fbff;
-    cursor:pointer;
-    font-size:16px;
-}
-.home-profile-message-head{
-    padding-right:58px;
-    min-width:0;
-}
+.home-profile-message-head{min-width:0;padding-right:58px}
 .home-profile-section-title{
     margin:0;
     color:#63e996;
@@ -1516,6 +1511,7 @@ img{max-width:100%}
 .home-profile-message{
     width:100%;
     max-width:780px;
+    min-width:0;
     color:#b9cfc0;
     font-size:14px;
     line-height:1.9;
@@ -1529,7 +1525,7 @@ img{max-width:100%}
     line-height:1.65;
 }
 
-/* Desktop contact */
+/* Desktop contact action */
 .home-profile-add-contact{
     grid-column:1;
     grid-row:2;
@@ -1553,7 +1549,7 @@ img{max-width:100%}
 }
 .home-profile-add-contact i{color:#27e6f1;font-size:20px}
 
-/* Tablet — remains desktop composition */
+/* Tablet keeps the desktop composition */
 @media (max-width:900px) and (min-width:651px){
     .home-profile-modal{padding:18px}
     .home-profile-panel{
@@ -1568,7 +1564,10 @@ img{max-width:100%}
     .home-profile-message p:first-child{font-size:15px}
 }
 
-/* MOBILE — completely independent single-column composition */
+/* =========================================================
+   MOBILE — independent composition
+   No desktop grid geometry is inherited here.
+   ========================================================= */
 @media (max-width:650px){
     .home-profile-modal{
         padding:10px;
@@ -1579,354 +1578,22 @@ img{max-width:100%}
     }
 
     .home-profile-panel{
-        width:min(430px,calc(100vw - 20px));
-        height:min(94svh,820px);
-        max-height:calc(100svh - 20px);
-        display:grid;
-        grid-template-columns:minmax(0,1fr);
-        grid-template-rows:auto minmax(0,1fr) auto;
-        grid-template-areas:"identity" "message" "contact";
-        min-width:0;
-        min-height:0;
-        overflow:hidden;
-        border-radius:22px;
-    }
-
-    /* Mobile structural reset: use flex instead of inherited desktop grid placement. */
-    .home-profile-panel{
-        display:flex !important;
-        flex-direction:column !important;
+        position:relative !important;
+        display:block !important;
         width:min(430px,calc(100vw - 20px)) !important;
         height:min(94svh,820px) !important;
         max-height:calc(100svh - 20px) !important;
         min-width:0 !important;
         min-height:0 !important;
         overflow:hidden !important;
-    }
-    .home-profile-panel > .home-profile-identity{
-        order:1 !important;
-        flex:0 0 auto !important;
-        width:100% !important;
-        height:auto !important;
-        min-height:150px !important;
-        max-height:185px !important;
-        grid-column:auto !important;
-        grid-row:auto !important;
-    }
-    .home-profile-panel > .home-profile-message-pane{
-        order:2 !important;
-        flex:1 1 auto !important;
-        width:calc(100% - 28px) !important;
-        height:auto !important;
-        min-height:0 !important;
-        max-height:none !important;
-        grid-column:auto !important;
-        grid-row:auto !important;
-    }
-    .home-profile-panel > .home-profile-add-contact{
-        order:3 !important;
-        flex:0 0 auto !important;
-        grid-column:auto !important;
-        grid-row:auto !important;
+        border-radius:22px;
     }
 
-    /* Header: photo + one vertically centered information column */
-    .home-profile-panel > .home-profile-identity{
-        grid-area:identity;
-        display:grid;
-        grid-template-columns:96px minmax(0,1fr);
-        grid-template-rows:auto auto;
-        column-gap:14px;
-        align-content:center;
-        align-items:center;
-        width:100%;
-        min-width:0;
-        min-height:0;
-        padding:46px 14px 20px;
-        box-sizing:border-box;
-        border:0;
-        border-bottom:1px solid rgba(67,220,145,.14);
-        overflow:hidden;
-        background:
-            radial-gradient(420px 230px at 0% 0%,rgba(45,226,131,.11),transparent 68%),
-            linear-gradient(180deg,rgba(7,34,22,.82),rgba(2,15,10,.98));
-    }
-
-    .home-profile-kicker{display:none}
-
-    .home-profile-panel > .home-profile-identity > .home-profile-photo{
-        grid-column:1;
-        grid-row:1 / 3;
-        width:96px;
-        min-width:96px;
-        max-width:96px;
-        height:120px;
-        align-self:center;
-        justify-self:start;
-        padding:3px;
-        box-sizing:border-box;
-        border-radius:17px;
-        border:1px solid rgba(88,229,141,.76);
-        background:linear-gradient(145deg,rgba(62,230,137,.20),rgba(18,141,255,.13));
-        box-shadow:
-            0 0 0 1px rgba(42,224,154,.12),
-            0 12px 30px rgba(0,0,0,.42),
-            0 0 24px rgba(53,216,106,.10);
-    }
-
-    .home-profile-panel > .home-profile-identity > .home-profile-photo img{
-        width:100%;
-        height:100%;
-        display:block;
-        object-fit:cover;
-        object-position:center top;
-        border-radius:13px;
-        filter:saturate(1.04) contrast(1.03);
-    }
-
-    .home-profile-identity-copy{
-        grid-column:2;
-        grid-row:1;
-        width:100%;
-        min-width:0;
-        margin:0;
-        padding:0 38px 0 0;
-        text-align:left;
-        align-self:end;
-        overflow:hidden;
-    }
-
-    .home-profile-title{
-        width:100%;
-        min-width:0;
-        margin:0;
-        color:#f1f8f3;
-        font-size:clamp(18px,5.1vw,23px);
-        line-height:1.12;
-        letter-spacing:-.025em;
-        white-space:normal;
-        word-break:normal;
-        overflow-wrap:normal;
-    }
-
-    .home-profile-role{
-        margin-top:5px;
-        color:#65e895;
-        font-size:8px;
-        line-height:1.3;
-        letter-spacing:.14em;
-        white-space:nowrap;
-        overflow:hidden;
-        text-overflow:ellipsis;
-    }
-
-    .home-profile-contacts{
-        grid-column:2;
-        grid-row:2;
-        width:100%;
-        min-width:0;
-        display:grid;
-        gap:5px;
-        margin:7px 0 0;
-        padding:7px 38px 0 0;
-        border-top:1px solid rgba(65,220,142,.15);
-        overflow:hidden;
-    }
-
-    .home-profile-contact{
-        display:grid;
-        grid-template-columns:28px minmax(0,1fr);
-        gap:7px;
-        width:100%;
-        min-width:0;
-        align-items:center;
-    }
-
-    .home-profile-contact>i{
-        width:28px;
-        height:28px;
-        border-radius:9px;
-        font-size:10px;
-    }
-
-    .home-profile-contact span{
-        min-width:0;
-        max-width:100%;
-        display:grid;
-        gap:1px;
-    }
-
-    .home-profile-contact small{
-        color:#5ed98a;
-        font-size:5.8px;
-        line-height:1;
-        letter-spacing:.13em;
-    }
-
-    .home-profile-contact strong{
-        min-width:0;
-        max-width:100%;
-        color:#cfe2d5;
-        font-size:7.6px;
-        line-height:1.25;
-        overflow:hidden;
-        text-overflow:ellipsis;
-        white-space:nowrap;
-    }
-
-    /* Close belongs to the modal, never to the message panel */
-    .home-profile-close{
-        position:absolute;
-        top:12px;
-        right:12px;
-        left:auto;
-        width:38px;
-        height:38px;
-        z-index:50;
-        border:1px solid rgba(43,177,255,.52);
-        border-radius:11px;
-        background:rgba(4,30,38,.78);
-        color:#f2fbff;
-        font-size:15px;
-        display:grid;
-        place-items:center;
-        box-shadow:0 8px 20px rgba(0,0,0,.30),0 0 16px rgba(22,141,255,.08);
-    }
-
-    /* Message is its own flexible card */
-    .home-profile-panel > .home-profile-message-pane{
-        grid-area:message;
-        width:calc(100% - 28px);
-        min-width:0;
-        min-height:0;
-        margin:10px 14px;
-        padding:21px 14px 10px;
-        box-sizing:border-box;
-        display:flex;
-        flex-direction:column;
-        overflow:hidden;
-        border:1px solid rgba(43,177,255,.24);
-        border-radius:18px;
-        background:linear-gradient(145deg,rgba(3,28,19,.86),rgba(2,16,11,.94));
-    }
-
-    .home-profile-message-head{
-        width:100%;
-        min-width:0;
-        padding-right:44px;
-    }
-
-    .home-profile-section-title{
-        font-size:7.5px;
-        line-height:1.4;
-        letter-spacing:.16em;
-    }
-
-    .home-profile-message-rule{
-        width:48px;
-        height:3px;
-        margin-top:8px;
-    }
-
-    .home-profile-scroll{
-        width:100%;
-        min-width:0;
-        min-height:0;
-        flex:1 1 auto;
-        margin-top:15px;
-        padding:0 8px 3px 0;
-        overflow-y:auto;
-        overflow-x:hidden;
-        touch-action:pan-y;
-        scrollbar-width:thin;
-    }
-
-    .home-profile-message{
-        width:100%;
-        max-width:none;
-        min-width:0;
-        color:#b9d1e0;
-        font-size:11.5px;
-        line-height:1.68;
-        overflow-wrap:anywhere;
-    }
-
-    .home-profile-message p{margin:0 0 13px}
-    .home-profile-message p:first-child{
-        color:#f0f7fb;
-        font-size:13.5px;
-        line-height:1.48;
-    }
-    .home-profile-message p:last-child{margin-bottom:0}
-
-    /* Contact action */
-    .home-profile-panel > .home-profile-add-contact{
-        grid-area:contact;
-        width:calc(100% - 28px);
-        min-height:50px;
-        margin:0 14px 12px;
-        box-sizing:border-box;
-        border-radius:14px;
-        font-size:13px;
-        gap:9px;
-    }
-    .home-profile-add-contact i{font-size:18px}
-}
-
-/* EXTRA-NARROW PHONES */
-@media (max-width:380px){
-    .home-profile-panel > .home-profile-identity{
-        grid-template-columns:86px minmax(0,1fr);
-        column-gap:10px;
-        padding:42px 11px 14px;
-    }
-    .home-profile-panel > .home-profile-identity > .home-profile-photo{
-        width:86px;
-        min-width:86px;
-        max-width:86px;
-        height:108px;
-        border-radius:15px;
-    }
-    .home-profile-identity-copy{padding-right:30px}
-    .home-profile-title{font-size:17px}
-    .home-profile-role{font-size:7px}
-    .home-profile-contacts{
-        gap:4px;
-        margin-top:6px;
-        padding-top:6px;
-        padding-right:30px;
-    }
-    .home-profile-contact{grid-template-columns:25px minmax(0,1fr);gap:6px}
-    .home-profile-contact>i{width:25px;height:25px}
-    .home-profile-contact small{font-size:5.2px}
-    .home-profile-contact strong{font-size:6.6px}
-    .home-profile-message-pane{margin:8px 11px;padding:19px 11px 7px}
-    .home-profile-scroll{margin-top:13px;padding-right:7px}
-    .home-profile-message{font-size:10.3px;line-height:1.65}
-    .home-profile-message p:first-child{font-size:12.5px}
-    .home-profile-panel > .home-profile-add-contact{
-        width:calc(100% - 22px);
-        margin:0 11px 10px;
-        min-height:48px;
-        font-size:12px;
-    }
-}
-/* MOBILE PROFILE VIEWER — deterministic absolute composition */
-@media (max-width:650px){
-    .home-profile-panel{
-        position:relative !important;
-        display:block !important;
-        width:min(430px,calc(100vw - 20px)) !important;
-        height:min(94svh,820px) !important;
-        max-height:calc(100svh - 20px) !important;
-        overflow:hidden !important;
-    }
-
+    /* Header is a fixed independent region */
     .home-profile-panel > .home-profile-identity{
         position:absolute !important;
-        top:0 !important;
-        left:0 !important;
-        right:0 !important;
+        inset:0 0 auto 0 !important;
+        z-index:2 !important;
         width:100% !important;
         height:145px !important;
         min-height:145px !important;
@@ -1943,10 +1610,13 @@ img{max-width:100%}
         border:0 !important;
         border-bottom:1px solid rgba(67,220,145,.14) !important;
         overflow:hidden !important;
+        background:
+            radial-gradient(420px 230px at 0% 0%,rgba(45,226,131,.11),transparent 68%),
+            linear-gradient(180deg,rgba(7,34,22,.96),rgba(2,15,10,.98)) !important;
     }
+    .home-profile-kicker{display:none !important}
 
     .home-profile-panel > .home-profile-identity > .home-profile-photo{
-        position:relative !important;
         grid-column:1 !important;
         grid-row:1 / 3 !important;
         width:96px !important;
@@ -1958,6 +1628,20 @@ img{max-width:100%}
         margin:0 !important;
         align-self:center !important;
         justify-self:start !important;
+        padding:3px !important;
+        box-sizing:border-box !important;
+        border-radius:17px !important;
+        border:1px solid rgba(88,229,141,.76) !important;
+        background:linear-gradient(145deg,rgba(62,230,137,.20),rgba(18,141,255,.13)) !important;
+        box-shadow:0 0 0 1px rgba(42,224,154,.12),0 12px 30px rgba(0,0,0,.42),0 0 24px rgba(53,216,106,.10) !important;
+    }
+    .home-profile-panel > .home-profile-identity > .home-profile-photo img{
+        width:100% !important;
+        height:100% !important;
+        display:block !important;
+        object-fit:cover !important;
+        object-position:center top !important;
+        border-radius:13px !important;
     }
 
     .home-profile-identity-copy{
@@ -1966,28 +1650,88 @@ img{max-width:100%}
         width:100% !important;
         min-width:0 !important;
         margin:0 !important;
-        padding:0 34px 0 0 !important;
+        padding:0 38px 0 0 !important;
         align-self:end !important;
         text-align:left !important;
+        overflow:hidden !important;
     }
-
+    .home-profile-title{
+        width:100% !important;
+        min-width:0 !important;
+        margin:0 !important;
+        font-size:clamp(18px,5.1vw,23px) !important;
+        line-height:1.12 !important;
+        letter-spacing:-.025em !important;
+        white-space:normal !important;
+        overflow-wrap:anywhere !important;
+    }
+    .home-profile-role{
+        margin-top:5px !important;
+        font-size:8px !important;
+        line-height:1.3 !important;
+        letter-spacing:.14em !important;
+        white-space:nowrap !important;
+        overflow:hidden !important;
+        text-overflow:ellipsis !important;
+    }
     .home-profile-contacts{
         grid-column:2 !important;
         grid-row:2 !important;
         width:100% !important;
         min-width:0 !important;
+        display:grid !important;
+        gap:5px !important;
         margin:7px 0 0 !important;
-        padding:7px 34px 0 0 !important;
+        padding:7px 38px 0 0 !important;
         border-top:1px solid rgba(65,220,142,.15) !important;
         overflow:hidden !important;
     }
+    .home-profile-contact{
+        display:grid !important;
+        grid-template-columns:28px minmax(0,1fr) !important;
+        gap:7px !important;
+        width:100% !important;
+        min-width:0 !important;
+        align-items:center !important;
+    }
+    .home-profile-contact>i{
+        width:28px !important;
+        height:28px !important;
+        border-radius:9px !important;
+        font-size:10px !important;
+    }
+    .home-profile-contact span{min-width:0 !important;max-width:100% !important;display:grid !important;gap:1px !important}
+    .home-profile-contact small{font-size:5.8px !important;line-height:1 !important}
+    .home-profile-contact strong{
+        min-width:0 !important;
+        max-width:100% !important;
+        font-size:7.6px !important;
+        line-height:1.25 !important;
+        overflow:hidden !important;
+        text-overflow:ellipsis !important;
+        white-space:nowrap !important;
+    }
 
+    /* Close always belongs to the panel, not the message */
+    .home-profile-close{
+        top:11px !important;
+        right:11px !important;
+        left:auto !important;
+        width:36px !important;
+        height:36px !important;
+        z-index:20 !important;
+        border-radius:11px !important;
+        font-size:15px !important;
+    }
+
+    /* Message occupies the entire middle region */
     .home-profile-panel > .home-profile-message-pane{
         position:absolute !important;
         top:155px !important;
         left:14px !important;
         right:14px !important;
         bottom:68px !important;
+        z-index:1 !important;
         width:auto !important;
         height:auto !important;
         min-width:0 !important;
@@ -1999,20 +1743,51 @@ img{max-width:100%}
         display:flex !important;
         flex-direction:column !important;
         overflow:hidden !important;
+        border:1px solid rgba(43,177,255,.24) !important;
+        border-radius:18px !important;
+        background:linear-gradient(145deg,rgba(3,28,19,.92),rgba(2,16,11,.97)) !important;
     }
-
-    .home-profile-panel > .home-profile-message-pane .home-profile-scroll{
+    .home-profile-message-head{
+        width:100% !important;
+        min-width:0 !important;
+        padding-right:44px !important;
+    }
+    .home-profile-section-title{font-size:7.5px !important;line-height:1.4 !important}
+    .home-profile-message-rule{width:48px !important;height:3px !important;margin-top:8px !important}
+    .home-profile-scroll{
+        width:100% !important;
+        min-width:0 !important;
         min-height:0 !important;
         flex:1 1 auto !important;
+        margin-top:15px !important;
+        padding:0 8px 3px 0 !important;
         overflow-y:auto !important;
         overflow-x:hidden !important;
+        touch-action:pan-y !important;
+        -webkit-overflow-scrolling:touch !important;
     }
+    .home-profile-message{
+        width:100% !important;
+        max-width:none !important;
+        min-width:0 !important;
+        font-size:11.5px !important;
+        line-height:1.68 !important;
+        overflow-wrap:anywhere !important;
+    }
+    .home-profile-message p{margin:0 0 13px !important}
+    .home-profile-message p:first-child{
+        font-size:13.5px !important;
+        line-height:1.48 !important;
+    }
+    .home-profile-message p:last-child{margin-bottom:0 !important}
 
+    /* Contact action is always a compact bottom action */
     .home-profile-panel > .home-profile-add-contact{
         position:absolute !important;
         left:14px !important;
         right:14px !important;
         bottom:12px !important;
+        z-index:3 !important;
         width:auto !important;
         height:48px !important;
         min-height:48px !important;
@@ -2022,17 +1797,19 @@ img{max-width:100%}
         display:flex !important;
         align-items:center !important;
         justify-content:center !important;
+        border-radius:14px !important;
+        font-size:13px !important;
+        gap:9px !important;
     }
-
-    .home-profile-close{
-        top:11px !important;
-        right:11px !important;
-        width:36px !important;
-        height:36px !important;
-    }
+    .home-profile-add-contact i{font-size:18px !important}
 }
 
+/* Small phones */
 @media (max-width:380px){
+    .home-profile-panel{
+        width:calc(100vw - 20px) !important;
+        height:min(94svh,760px) !important;
+    }
     .home-profile-panel > .home-profile-identity{
         height:136px !important;
         min-height:136px !important;
@@ -2048,9 +1825,21 @@ img{max-width:100%}
         height:104px !important;
         min-height:104px !important;
         max-height:104px !important;
+        border-radius:15px !important;
     }
     .home-profile-identity-copy{padding-right:28px !important}
-    .home-profile-contacts{padding-right:28px !important}
+    .home-profile-title{font-size:17px !important}
+    .home-profile-role{font-size:7px !important}
+    .home-profile-contacts{
+        gap:4px !important;
+        margin-top:6px !important;
+        padding-top:6px !important;
+        padding-right:28px !important;
+    }
+    .home-profile-contact{grid-template-columns:25px minmax(0,1fr) !important;gap:6px !important}
+    .home-profile-contact>i{width:25px !important;height:25px !important}
+    .home-profile-contact small{font-size:5.2px !important}
+    .home-profile-contact strong{font-size:6.6px !important}
     .home-profile-panel > .home-profile-message-pane{
         top:146px !important;
         left:11px !important;
@@ -2058,6 +1847,9 @@ img{max-width:100%}
         bottom:66px !important;
         padding:17px 11px 8px !important;
     }
+    .home-profile-scroll{margin-top:13px !important;padding-right:7px !important}
+    .home-profile-message{font-size:10.3px !important;line-height:1.65 !important}
+    .home-profile-message p:first-child{font-size:12.5px !important}
     .home-profile-panel > .home-profile-add-contact{
         left:11px !important;
         right:11px !important;
@@ -2065,6 +1857,7 @@ img{max-width:100%}
         height:48px !important;
         min-height:48px !important;
         max-height:48px !important;
+        font-size:12px !important;
     }
 }
 </style>
