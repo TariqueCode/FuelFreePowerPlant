@@ -1580,6 +1580,9 @@ img{max-width:100%}
     .home-profile-panel{
         position:relative !important;
         display:block !important;
+        grid-template-columns:none !important;
+        grid-template-rows:none !important;
+        grid-template-areas:none !important;
         width:min(430px,calc(100vw - 20px)) !important;
         height:min(94svh,820px) !important;
         max-height:calc(100svh - 20px) !important;
@@ -1732,6 +1735,8 @@ img{max-width:100%}
         right:14px !important;
         bottom:68px !important;
         z-index:1 !important;
+        grid-column:auto !important;
+        grid-row:auto !important;
         width:auto !important;
         height:auto !important;
         min-width:0 !important;
