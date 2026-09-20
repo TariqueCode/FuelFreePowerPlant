@@ -35,7 +35,10 @@
             'site.career' => 'Explore career opportunities and join ' . $publicName . ' in building a cleaner energy future.',
             'contact' => 'Contact ' . $publicName . ' for clean energy technology, projects, partnerships and business inquiries.',
         ];
-        $metaDescription = trim((string) ($metaDescription ?? ($routeDescriptions[$routeName] ?? ($publicName . ' — ' . ($publicBrand['tagline'] ?? config('fuelfree.company.tagline'))))));
+        $publicTagline = is_object($publicBrand)
+            ? (string) ($publicBrand->get('tagline') ?: config('fuelfree.company.tagline'))
+            : (string) ($publicBrand['tagline'] ?? config('fuelfree.company.tagline'));
+        $metaDescription = trim((string) ($metaDescription ?? ($routeDescriptions[$routeName] ?? ($publicName . ' — ' . $publicTagline))));
         $metaDescription = IlluminateSupportStr::limit(preg_replace('/\\s+/u', ' ', strip_tags($metaDescription)), 160, '');
         $canonicalUrl = $canonicalUrl ?? request()->url();
         $metaRobots = $metaRobots ?? 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
@@ -45,7 +48,9 @@
             '@context' => 'https://schema.org',
             '@type' => 'Organization',
             'name' => $publicName,
-            'url' => rtrim((string) ($brand['domain'] ?? config('fuelfree.company.domain')), '/'),
+            'url' => preg_match('/^https?:\/\//i', (string) ($brand['domain'] ?? ''))
+                ? rtrim((string) $brand['domain'], '/')
+                : 'https://' . trim((string) ($brand['domain'] ?? config('fuelfree.company.domain')), '/'),
             'logo' => $publicLogoUrl,
             'telephone' => config('fuelfree.footer.phone'),
             'address' => [
