@@ -204,7 +204,6 @@ class NavigationSourceRegistry
         if (array_key_exists($name, $friendly)) return $friendly[$name];
         if ($name === 'admin.profile-builder.index') return 'Profile Builder';
         if ($name === 'admin.cms.index') return 'Page Builder';
-        if ($name === 'admin.header-footer.index') return 'Header & Footer';
         $action = (string) ($route->getActionName() ?? ''); $controller = Str::before(Str::afterLast($action, '\\'), '@');
         if ($controller === 'PublicSiteController') { $section = $route->defaults['section'] ?? null; if (is_string($section) && trim($section) !== '') return $this->humanizeNavigationLabel($section); $segment = trim(ltrim($route->uri(), '/')); if ($segment !== '' && ! str_contains($segment, '/')) return $this->humanizeNavigationLabel($segment); }
         $label = Str::headline(Str::replace(['admin.', '.index', '.'], ['admin ', '', ' '], $name));

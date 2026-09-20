@@ -58,7 +58,6 @@ class DashboardNavigationService
         if ($website?->getKey() !== null) {
             $addVirtualRoute('route:admin.profile-builder.index', 'Profile Builder', 'fa-user-tie', 3, (int) $website->getKey());
             $addVirtualRoute('route:admin.cms.index', 'Page Builder', 'fa-file-lines', 6, (int) $website->getKey());
-            $addVirtualRoute('route:admin.header-footer.index', 'Header & Footer', 'fa-window-maximize', 9, (int) $website->getKey());
         }
         $valid = $valid->concat($virtual)->sortBy(fn (NavigationMenuItem $item): array => [(int) ($item->parent_id ?? 0), (int) $item->sort_order, (int) $item->getKey()])->values();
         $children = $valid->groupBy(fn (NavigationMenuItem $item) => $item->parent_id ?? 0);
