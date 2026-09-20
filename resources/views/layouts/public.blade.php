@@ -21,7 +21,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     @php
         $routeName = (string) optional(request()->route())->getName();
-        $metaTitle = trim((string) ($metaTitle ?? View::yieldContent('title') ?: $publicName));
+        $metaTitle = trim((string) ($metaTitle ?? $__env->yieldContent('title') ?: $publicName));
         $routeDescriptions = [
             'home' => $publicName . ' develops fuel-free flywheel-based clean energy technology and sustainable power solutions for a cleaner, smarter future.',
             'site.about' => 'Learn about ' . $publicName . ', its mission, leadership, clean energy technology and approach to sustainable power generation.',
