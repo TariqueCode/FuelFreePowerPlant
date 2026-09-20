@@ -39,7 +39,7 @@
             ? (string) ($publicBrand->get('tagline') ?: config('fuelfree.company.tagline'))
             : (string) ($publicBrand['tagline'] ?? config('fuelfree.company.tagline'));
         $metaDescription = trim((string) ($metaDescription ?? ($routeDescriptions[$routeName] ?? ($publicName . ' — ' . $publicTagline))));
-        $metaDescription = IlluminateSupportStr::limit(preg_replace('/\\s+/u', ' ', strip_tags($metaDescription)), 160, '');
+        $metaDescription = \Illuminate\Support\Str::limit(preg_replace('/\\s+/u', ' ', strip_tags($metaDescription)), 160, '');
         $canonicalUrl = $canonicalUrl ?? request()->url();
         $metaRobots = $metaRobots ?? 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
         $publicLogoUrl = $publicLogo ? (preg_match('/^https?:\\/\\//i', (string) $publicLogo) ? $publicLogo : asset(ltrim((string) $publicLogo, '/'))) : route('favicon');
