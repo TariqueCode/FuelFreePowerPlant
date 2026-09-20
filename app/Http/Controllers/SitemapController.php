@@ -17,17 +17,23 @@ class SitemapController extends Controller
             '/'
         );
 
+        $absoluteRoute = static function (string $routeName, array $parameters = []) use ($baseUrl): string {
+            $path = parse_url(route($routeName, $parameters), PHP_URL_PATH) ?: '/';
+
+            return $baseUrl . '/' . ltrim($path, '/');
+        };
+
         $urls = collect([
-            ['loc' => route('home')],
-            ['loc' => route('site.about')],
-            ['loc' => route('site.plants')],
-            ['loc' => route('site.future-project')],
-            ['loc' => route('site.solutions')],
-            ['loc' => route('site.gallery')],
-            ['loc' => route('site.career')],
-            ['loc' => route('news.index')],
-            ['loc' => route('sustainability')],
-            ['loc' => route('contact')],
+            ['loc' => $absoluteRoute('home')],
+            ['loc' => $absoluteRoute('site.about')],
+            ['loc' => $absoluteRoute('site.plants')],
+            ['loc' => $absoluteRoute('site.future-project')],
+            ['loc' => $absoluteRoute('site.solutions')],
+            ['loc' => $absoluteRoute('site.gallery')],
+            ['loc' => $absoluteRoute('site.career')],
+            ['loc' => $absoluteRoute('news.index')],
+            ['loc' => $absoluteRoute('sustainability')],
+            ['loc' => $absoluteRoute('contact')],
         ]);
 
         foreach (ManagementProfileFolder::query()->where('status', 'published')->whereNotNull('slug')->orderBy('sort_order')->orderBy('id')->get(['slug', 'updated_at']) as $folder) {
@@ -39,21 +45,21 @@ class SitemapController extends Controller
 
         foreach (CmsPage::query()->where('is_published', true)->whereNotIn('slug', ['about-us'])->get(['slug', 'updated_at']) as $page) {
             $urls->push([
-                'loc' => route('cms.page', ['slug' => $page->slug]),
+                'loc' => $absoluteRoute('cms.page', ['slug' => $page->slug]),
                 'lastmod' => optional($page->updated_at)->toAtomString(),
             ]);
         }
 
         foreach (SiteContentItem::query()->published()->whereIn('type', ['news', 'announcement'])->whereNotNull('slug')->get(['slug', 'updated_at']) as $item) {
             $urls->push([
-                'loc' => route('news.show', ['slug' => $item->slug]),
+                'loc' => $absoluteRoute('news.show', ['slug' => $item->slug]),
                 'lastmod' => optional($item->updated_at)->toAtomString(),
             ]);
         }
 
         foreach (SiteContentItem::query()->where('type', 'gallery')->where('status', 'published')->whereNotNull('slug')->get(['slug', 'updated_at']) as $item) {
             $urls->push([
-                'loc' => route('gallery.show', ['item' => $item->slug]),
+                'loc' => $absoluteRoute('gallery.show', ['item' => $item->slug]),
                 'lastmod' => optional($item->updated_at)->toAtomString(),
             ]);
         }
@@ -61,7 +67,7 @@ class SitemapController extends Controller
         $xml = '<?xml version="1.0" encoding="UTF-8"?>';
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
         foreach ($urls->unique('loc') as $url) {
-            $loc = str_replace(request()->getSchemeAndHttpHost(), $baseUrl, $url['loc']);
+            $loc = $url['loc'];
             $xml .= '<url><loc>' . htmlspecialchars($loc, ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</loc>';
             if (!empty($url['lastmod'])) {
                 $xml .= '<lastmod>' . htmlspecialchars($url['lastmod'], ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</lastmod>';
