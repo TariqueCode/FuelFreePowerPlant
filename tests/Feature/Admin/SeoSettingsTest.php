@@ -34,7 +34,7 @@ class SeoSettingsTest extends TestCase
             ->get(route('admin.settings.seo'))
             ->assertOk()
             ->assertSeeText('SEO & Integrations')
-            ->assertSeeText('Setup Help')
+            ->assertSeeText('Full Help Page')
             ->assertSee('Google Search Console verification');
     }
 
@@ -66,7 +66,7 @@ class SeoSettingsTest extends TestCase
             ->assertOk()
             ->assertSee('<meta name="description"', false)
             ->assertSee('<meta name="robots" content="index,follow', false)
-            ->assertSee('<link rel="canonical" href="https://' . trim(config('fuelfree.company.domain'), '/') . '">', false)
+            ->assertSee('<link rel="canonical" href="https://' . trim(config('fuelfree.company.domain'), '/') . '/">', false)
             ->assertSee('application/ld+json', false)
             ->assertSee('"@type":"Organization"', false);
 
