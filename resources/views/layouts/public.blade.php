@@ -19,7 +19,69 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>@yield('title', $publicName)</title>
+    @php
+        $routeName = (string) optional(request()->route())->getName();
+        $metaTitle = trim((string) ($metaTitle ?? View::yieldContent('title') ?: $publicName));
+        $routeDescriptions = [
+            'home' => $publicName . ' develops fuel-free flywheel-based clean energy technology and sustainable power solutions for a cleaner, smarter future.',
+            'site.about' => 'Learn about ' . $publicName . ', its mission, leadership, clean energy technology and approach to sustainable power generation.',
+            'site.plants' => 'Explore ' . $publicName . ' projects, power plants and clean energy initiatives focused on fuel-free power generation.',
+            'site.future-project' => 'Explore future projects and planned clean energy initiatives from ' . $publicName . '.',
+            'site.solutions' => 'Explore fuel-free energy solutions and clean power technology from ' . $publicName . '.',
+            'site.gallery' => 'View the ' . $publicName . ' gallery featuring projects, people, facilities and company activities.',
+            'management' => 'Meet the Board of Directors and leadership team of ' . $publicName . '.',
+            'news.index' => 'Read news, notices and updates from ' . $publicName . '.',
+            'sustainability' => 'Learn about sustainability, clean energy and environmental goals at ' . $publicName . '.',
+            'site.career' => 'Explore career opportunities and join ' . $publicName . ' in building a cleaner energy future.',
+            'contact' => 'Contact ' . $publicName . ' for clean energy technology, projects, partnerships and business inquiries.',
+        ];
+        $metaDescription = trim((string) ($metaDescription ?? ($routeDescriptions[$routeName] ?? ($publicName . ' — ' . ($publicBrand['tagline'] ?? config('fuelfree.company.tagline'))))));
+        $metaDescription = IlluminateSupportStr::limit(preg_replace('/\\s+/u', ' ', strip_tags($metaDescription)), 160, '');
+        $canonicalUrl = $canonicalUrl ?? request()->url();
+        $metaRobots = $metaRobots ?? 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
+        $publicLogoUrl = $publicLogo ? (preg_match('/^https?:\\/\\//i', (string) $publicLogo) ? $publicLogo : asset(ltrim((string) $publicLogo, '/'))) : route('favicon');
+        $metaImage = $metaImage ?? $publicLogoUrl;
+        $organizationSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Organization',
+            'name' => $publicName,
+            'url' => rtrim((string) ($brand['domain'] ?? config('fuelfree.company.domain')), '/'),
+            'logo' => $publicLogoUrl,
+            'telephone' => config('fuelfree.footer.phone'),
+            'address' => [
+                '@type' => 'PostalAddress',
+                'streetAddress' => config('fuelfree.footer.address'),
+                'addressCountry' => 'BD',
+            ],
+        ];
+        $websiteSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'WebSite',
+            'name' => $publicName,
+            'url' => $canonicalUrl,
+        ];
+    @endphp
+    <title>{{ $metaTitle }}</title>
+    <meta name="description" content="{{ $metaDescription }}">
+    <meta name="robots" content="{{ $metaRobots }}">
+    <link rel="canonical" href="{{ $canonicalUrl }}">
+    <meta name="theme-color" content="#020906">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ $publicName }}">
+    <meta property="og:title" content="{{ $metaTitle }}">
+    <meta property="og:description" content="{{ $metaDescription }}">
+    <meta property="og:url" content="{{ $canonicalUrl }}">
+    <meta property="og:image" content="{{ $metaImage }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $metaTitle }}">
+    <meta name="twitter:description" content="{{ $metaDescription }}">
+    <meta name="twitter:image" content="{{ $metaImage }}">
+    @if($routeName === 'home' || $routeName === 'site.about')
+        <script type="application/ld+json">{!! json_encode($organizationSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
+    @endif
+    @if($routeName === 'home')
+        <script type="application/ld+json">{!! json_encode($websiteSchema, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}</script>
+    @endif
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     @php($faviconVersion = $publicLogo ? sha1((string) $publicLogo) : 'default-v1')
     <link rel="icon" href="{{ route('favicon') }}?v={{ $faviconVersion }}">
