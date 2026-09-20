@@ -31,11 +31,35 @@ use App\Http\Controllers\ManagementController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicSiteController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SustainabilityController;
 use App\Http\Controllers\WebmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/favicon.ico', FaviconController::class)->name('favicon');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('/robots.txt', function () {
+    $domain = trim((string) config('fuelfree.company.domain', request()->getHost()), '/');
+    $baseUrl = preg_match('/^https?:\/\//i', $domain) ? rtrim($domain, '/') : 'https://' . $domain;
+
+    return response(
+        "User-agent: *\n"
+        . "Allow: /\n"
+        . "Disallow: /admin\n"
+        . "Disallow: /dashboard\n"
+        . "Disallow: /profile\n"
+        . "Disallow: /login\n"
+        . "Disallow: /mail\n"
+        . "Disallow: /portal\n"
+        . "Disallow: /shared/documents/\n"
+        . "Sitemap: " . $baseUrl . "/sitemap.xml\n",
+        200,
+        [
+            'Content-Type' => 'text/plain; charset=UTF-8',
+            'Cache-Control' => 'public, max-age=86400',
+        ]
+    );
+})->name('robots.txt');
 Route::get('/', HomeController::class)->name('home');
 Route::get('/about-us', [PublicSiteController::class,'show'])->defaults('section','about-us')->name('site.about');
 Route::get('/plants', [PublicSiteController::class,'show'])->defaults('section','plants')->name('site.plants');
