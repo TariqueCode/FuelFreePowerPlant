@@ -60,6 +60,23 @@ class SeoSettingsTest extends TestCase
         ])->assertSessionHasErrors(['seo.ga4_measurement_id', 'seo.indexnow_key']);
     }
 
+    public function test_public_seo_baseline_is_rendered_and_robots_points_to_sitemap(): void
+    {
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('<meta name="description"', false)
+            ->assertSee('<meta name="robots" content="index,follow', false)
+            ->assertSee('<link rel="canonical" href="' . route('home') . '">', false)
+            ->assertSee('application/ld+json', false)
+            ->assertSee('"@type":"Organization"', false);
+
+        $this->get(route('robots.txt'))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'text/plain; charset=UTF-8')
+            ->assertSeeText('User-agent: *')
+            ->assertSeeText('Sitemap: ' . rtrim(config('fuelfree.company.domain'), '/') . '/sitemap.xml');
+    }
+
     public function test_sitemap_and_indexnow_endpoints_are_public_and_indexnow_key_is_exact(): void
     {
         $this->get(route('sitemap'))
