@@ -38,7 +38,7 @@ class NewsEventController extends Controller
         $data['published_at'] = $data['status'] === 'published' ? now() : null;
         $item = SiteContentItem::create($data);
         $this->applyThumbnail($item, $request);
-        return redirect()->route('admin.news_and_event')->with('status', 'News & Event created successfully.');
+        return redirect()->route('admin.news_and_event.index')->with('status', 'News & Event created successfully.');
     }
 
     public function edit(SiteContentItem $item): View
@@ -56,7 +56,7 @@ class NewsEventController extends Controller
         $data['published_at'] = $data['status'] === 'published' ? ($item->published_at ?: now()) : null;
         $item->update($data);
         $this->applyThumbnail($item, $request);
-        return redirect()->route('admin.news_and_event')->with('status', 'News & Event updated successfully.');
+        return redirect()->route('admin.news_and_event.index')->with('status', 'News & Event updated successfully.');
     }
 
     public function toggle(SiteContentItem $item): RedirectResponse

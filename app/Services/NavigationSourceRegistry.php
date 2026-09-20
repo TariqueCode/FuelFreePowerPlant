@@ -22,6 +22,7 @@ class NavigationSourceRegistry
 
     private const BUILDER_ROUTE_ALIASES = [
         'admin.profile-builder.index' => ['admin.profile-builder.index', 'Profile Builder'],
+        'admin.management.index' => ['admin.profile-builder.index', 'Profile Builder'],
         'admin.cms.index' => ['admin.cms.index', 'Page Builder'],
         'admin.navigation.index' => ['admin.menu-builder.index', 'Menu Builder'],
         'admin.site-content.index' => ['admin.news_and_event', 'News & Event'],

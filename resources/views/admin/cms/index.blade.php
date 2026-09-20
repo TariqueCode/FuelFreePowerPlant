@@ -50,6 +50,10 @@
                                 <span aria-hidden="true"></span>
                             </button>
                         </form>
+                        <form method="POST" action="{{ $page->duplicate_url }}" class="pbi-duplicate-form" style="margin:0">
+                            @csrf
+                            <button class="pbi-delete" type="submit" aria-label="Duplicate {{ $page->title }}" title="Duplicate"><i class="fa-regular fa-copy"></i></button>
+                        </form>
                         <form method="POST" action="{{ $page->delete_url }}" class="pbi-delete-form" onsubmit="return confirm('Delete this page? This cannot be undone.');">
                             @csrf @method('DELETE')
                             <button class="pbi-delete" type="submit" aria-label="Delete {{ $page->title }}" title="Delete"><i class="fa-regular fa-trash-can"></i></button>
