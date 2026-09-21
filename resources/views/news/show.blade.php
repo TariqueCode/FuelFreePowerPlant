@@ -1,5 +1,6 @@
 @extends('layouts.public')
 @php($siteName = $brand['name'] ?? config('fuelfree.company.name'))
+@php($metaImage = !empty($article->image_path) ? asset('storage/'.ltrim((string) $article->image_path, '/')) : null)
 @section('title', ($article->meta_title ?: $article->title).' — '.$siteName)
 @if($article->excerpt)
 @section('meta_description', $article->excerpt)
