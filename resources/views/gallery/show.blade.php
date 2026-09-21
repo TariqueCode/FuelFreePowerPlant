@@ -3,6 +3,7 @@
 @php
     $siteName=$brand['name'] ?? config('fuelfree.company.name');
     $media=$item->galleryMedia;
+    $metaImage=$media->first()?->path ? asset('storage/'.ltrim((string) $media->first()->path,'/')) : null;
 @endphp
 
 @section('title', $item->title.' — '.$siteName)
