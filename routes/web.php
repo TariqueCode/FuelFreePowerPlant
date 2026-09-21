@@ -31,10 +31,12 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\SustainabilityController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\WebmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/favicon.ico', FaviconController::class)->name('favicon');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('/robots.txt', function () {
     $domain = trim((string) config('fuelfree.company.domain', request()->getHost()), '/');
     $baseUrl = preg_match('/^https?:\/\//i', $domain) ? rtrim($domain, '/') : 'https://' . $domain;
