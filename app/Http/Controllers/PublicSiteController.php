@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CmsPage;
 use App\Models\SiteContentItem;
 use App\Models\SystemSetting;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class PublicSiteController
@@ -15,15 +16,31 @@ class PublicSiteController
         return ['name'=>$settings->get('company.name')?:config('fuelfree.company.name'),'logo_path'=>$settings->get('company.logo_path'),'tagline'=>$settings->get('company.tagline')?:config('fuelfree.company.tagline')];
     }
 
-    public function showCompanyPage(string $slug): View
+    public function showCompanyPage(string $slug): View|RedirectResponse
     {
-        $page = CmsPage::query()->where('is_published', true)->where('slug', $slug)->firstOrFail();
-        return view('site.company-page',['item'=>$page,'brand'=>$this->brand()]);
+        // /pages/{slug} is the canonical Page Builder URL. Keep legacy company
+        // URLs useful while preventing duplicate indexable content.
+        return redirect()->route('cms.page', ['slug' => $slug], 301);
     }
 
-    public function show(string $section): View
+    public function show(string $section): View|RedirectResponse
     {
-        $allowed=['about-us','plants','future-project','career','solutions','gallery'];abort_unless(in_array($section,$allowed,true),404);
+        $allowed=['about-us','plants','future-project','career','solutions','gallery'];
+        abort_unless(in_array($section,$allowed,true),404);
+
+        if (request()->routeIs('site.section')) {
+            $canonicalRoutes = [
+                'about-us' => 'site.about',
+                'plants' => 'site.plants',
+                'future-project' => 'site.future-project',
+                'career' => 'site.career',
+                'solutions' => 'site.solutions',
+                'gallery' => 'site.gallery',
+            ];
+
+            return redirect()->route($canonicalRoutes[$section], [], 301);
+        }
+
         $brand=$this->brand();
         if($section==='gallery'){$galleries=SiteContentItem::query()->where('type','gallery')->where('status','published')->withCount('galleryMedia')->orderBy('sort_order')->latest('created_at')->get();return view('gallery.index',compact('galleries','brand'));}
         if($section==='about-us'){
