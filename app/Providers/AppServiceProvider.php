@@ -88,7 +88,6 @@ class AppServiceProvider extends ServiceProvider
                 ->where('key', '[A-Za-z0-9_-]{8,128}')
                 ->name('indexnow.key');
 
-            $router->fallback([\App\Http\Controllers\ManagementController::class, 'folderFallback'])->name('management.folder');
         });
         try {
             if (!Schema::hasTable('system_settings')) return;
