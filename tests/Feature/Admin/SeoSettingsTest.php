@@ -68,7 +68,10 @@ class SeoSettingsTest extends TestCase
             ->assertSee('<meta name="robots" content="index,follow', false)
             ->assertSee('<link rel="canonical" href="https://' . trim(config('fuelfree.company.domain'), '/') . '/">', false)
             ->assertSee('application/ld+json', false)
-            ->assertSee('"@type":"Organization"', false);
+            ->assertSee('"@type":"Organization"', false)
+            ->assertSee('"@type":"WebPage"', false)
+            ->assertSee('og:image:alt', false)
+            ->assertSee('twitter:image:alt', false);
 
         $this->get(route('robots.txt'))
             ->assertOk()
@@ -88,7 +91,11 @@ class SeoSettingsTest extends TestCase
         SystemSetting::updateOrCreate(['key' => 'seo.indexnow_key'], ['value' => 'Abc_1234-Key', 'is_sensitive' => false]);
         Cache::forget('fuelfree.system_settings');
 
-        $this->get('/indexnow/Abc_1234-Key.txt')->assertOk()->assertSeeText('Abc_1234-Key');
+        $this->get('/indexnow/Abc_1234-Key.txt')
+            ->assertOk()
+            ->assertHeader('Content-Type', 'text/plain; charset=UTF-8')
+            ->assertHeader('X-Robots-Tag', 'noindex, nofollow')
+            ->assertSeeText('Abc_1234-Key');
         $this->get('/indexnow/wrong-key.txt')->assertNotFound();
     }
 }
