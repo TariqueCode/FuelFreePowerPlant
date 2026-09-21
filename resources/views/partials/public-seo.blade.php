@@ -83,6 +83,12 @@
 <link rel="canonical" href="{{ $canonicalUrl }}">
 <meta property="og:type" content="{{ isset($article) ? 'article' : 'website' }}">
 <meta property="og:title" content="{{ $pageTitle }}">
+@if(isset($article) && $article->published_at)
+<meta property="article:published_time" content="{{ $article->published_at->toAtomString() }}">
+@endif
+@if(isset($article) && $article->updated_at)
+<meta property="article:modified_time" content="{{ $article->updated_at->toAtomString() }}">
+@endif
 @if($description !== '')
 <meta property="og:description" content="{{ $description }}">
 @endif
