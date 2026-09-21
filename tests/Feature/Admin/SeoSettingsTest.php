@@ -80,6 +80,17 @@ class SeoSettingsTest extends TestCase
             ->assertSeeText('Sitemap: https://' . trim(config('fuelfree.company.domain'), '/') . '/sitemap.xml');
     }
 
+    public function test_legacy_public_urls_redirect_to_canonical_pages(): void
+    {
+        $this->get('/sections/plants')
+            ->assertMovedPermanently()
+            ->assertRedirect(route('site.plants'));
+
+        $this->get('/company/about-us')
+            ->assertMovedPermanently()
+            ->assertRedirect(route('cms.page', ['slug' => 'about-us']));
+    }
+
     public function test_sitemap_and_indexnow_endpoints_are_public_and_indexnow_key_is_exact(): void
     {
         $this->get(route('sitemap'))
