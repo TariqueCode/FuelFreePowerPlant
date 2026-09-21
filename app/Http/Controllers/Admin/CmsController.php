@@ -153,12 +153,15 @@ class CmsController extends Controller
             'management',
         ];
 
+        $isReservedForNewPage = $ignoreId === null && in_array($slug, $reservedSlugs, true);
+
         while (
-            in_array($slug, $reservedSlugs, true)
+            $isReservedForNewPage
             || CmsPage::where('slug', $slug)
                 ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
                 ->exists()
         ) {
+            $isReservedForNewPage = false;
             $slug = $base . '-' . $counter++;
         }
         return $slug;
