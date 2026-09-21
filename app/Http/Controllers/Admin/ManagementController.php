@@ -127,7 +127,33 @@ class ManagementController extends Controller
 
     private function uniqueFolderSlug(string $name,?int $ignoreId=null): string
     {
-        $base=Str::slug($name)?:'profile-folder';$slug=$base;$counter=2;while(ManagementProfileFolder::query()->where('slug',$slug)->when($ignoreId!==null,fn($q)=>$q->where('id','!=',$ignoreId))->exists())$slug=$base.'-'.($counter++);return $slug;
+        $base=Str::slug($name)?:'profile-folder';
+        $slug=$base;
+        $counter=2;
+        $reservedSlugs=[
+            'about-us',
+            'plants',
+            'future-project',
+            'career',
+            'solutions',
+            'gallery',
+            'news-and-event',
+            'sustainability',
+            'contact',
+            'management',
+        ];
+
+        while(
+            in_array($slug,$reservedSlugs,true)
+            || ManagementProfileFolder::query()
+                ->where('slug',$slug)
+                ->when($ignoreId!==null,fn($q)=>$q->where('id','!=',$ignoreId))
+                ->exists()
+        ) {
+            $slug=$base.'-'.($counter++);
+        }
+
+        return $slug;
     }
 
     private function uniqueMemberSlug(string $name,?int $ignoreId=null): string
