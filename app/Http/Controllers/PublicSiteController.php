@@ -18,8 +18,14 @@ class PublicSiteController
 
     public function showCompanyPage(string $slug): View|RedirectResponse
     {
-        // /pages/{slug} is the canonical Page Builder URL. Keep legacy company
-        // URLs useful while preventing duplicate indexable content.
+        // About Us has a dedicated canonical route and is already included in
+        // the sitemap. Keep the legacy company URL aligned with that canonical
+        // page instead of creating a second /pages/about-us URL.
+        if ($slug === 'about-us') {
+            return redirect()->route('site.about', [], 301);
+        }
+
+        // Other legacy company URLs resolve to their Page Builder canonical URL.
         return redirect()->route('cms.page', ['slug' => $slug], 301);
     }
 
