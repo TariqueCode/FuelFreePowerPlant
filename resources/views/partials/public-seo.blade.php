@@ -15,9 +15,9 @@
     if ($ogImage !== '' && !str_starts_with($ogImage, 'http://') && !str_starts_with($ogImage, 'https://')) {
         $ogImage = $baseUrl . '/' . ltrim($ogImage, '/');
     }
-    $logoUrl = trim((string) config('fuelfree.company.logo_path', ''));
+    $logoUrl = trim((string) ($publicLogoUrl ?? config('fuelfree.company.logo_path', '')));
     if ($logoUrl !== '' && !str_starts_with($logoUrl, 'http://') && !str_starts_with($logoUrl, 'https://')) {
-        $logoUrl = $baseUrl . '/storage/' . ltrim($logoUrl, '/');
+        $logoUrl = $baseUrl . '/' . ltrim($logoUrl, '/');
     }
     $schema = [
         '@context' => 'https://schema.org',
@@ -28,6 +28,14 @@
                 'name' => $siteName,
                 'url' => $baseUrl . '/',
                 'description' => $description !== '' ? $description : config('fuelfree.company.tagline', ''),
+                'logo' => $logoUrl !== '' ? ['@type' => 'ImageObject', 'url' => $logoUrl] : null,
+                'telephone' => config('fuelfree.footer.phone'),
+                'email' => config('fuelfree.footer.email'),
+                'address' => [
+                    '@type' => 'PostalAddress',
+                    'streetAddress' => config('fuelfree.footer.address'),
+                    'addressCountry' => 'BD',
+                ],
             ],
             [
                 '@type' => 'WebSite',
@@ -37,11 +45,18 @@
                 'publisher' => ['@id' => $baseUrl . '/#organization'],
                 'inLanguage' => str_replace('_', '-', app()->getLocale()),
             ],
+            [
+                '@type' => 'WebPage',
+                '@id' => $canonicalUrl . '#webpage',
+                'url' => $canonicalUrl,
+                'name' => $pageTitle,
+                'description' => $description !== '' ? $description : config('fuelfree.company.tagline', ''),
+                'isPartOf' => ['@id' => $baseUrl . '/#website'],
+                'about' => ['@id' => $baseUrl . '/#organization'],
+                'inLanguage' => str_replace('_', '-', app()->getLocale()),
+            ],
         ],
     ];
-    if ($logoUrl !== '') {
-        $schema['@graph'][0]['logo'] = ['@type' => 'ImageObject', 'url' => $logoUrl];
-    }
     if (isset($article)) {
         $articleImage = trim((string) ($article->image_path ?? ''));
         if ($articleImage !== '' && !str_starts_with($articleImage, 'http://') && !str_starts_with($articleImage, 'https://')) {
@@ -75,6 +90,9 @@
 <meta property="og:site_name" content="{{ $siteName }}">
 <meta property="og:locale" content="{{ str_replace('_', '-', app()->getLocale()) }}">
 @if($ogImage !== '')
+<meta property="og:image:alt" content="{{ $pageTitle }}">
+@endif
+@if($ogImage !== '')
 <meta property="og:image" content="{{ $ogImage }}">
 @endif
 <meta name="twitter:card" content="summary_large_image">
@@ -85,6 +103,7 @@
 @endif
 @if($ogImage !== '')
 <meta name="twitter:image" content="{{ $ogImage }}">
+<meta name="twitter:image:alt" content="{{ $pageTitle }}">
 @endif
 @if(!empty($seo['google_verification']))
 <meta name="google-site-verification" content="{{ $seo['google_verification'] }}">
