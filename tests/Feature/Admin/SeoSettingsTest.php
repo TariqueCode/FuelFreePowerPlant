@@ -88,7 +88,11 @@ class SeoSettingsTest extends TestCase
 
         $this->get('/company/about-us')
             ->assertMovedPermanently()
-            ->assertRedirect(route('cms.page', ['slug' => 'about-us']));
+            ->assertRedirect(route('site.about'));
+
+        $this->get('/pages/about-us')
+            ->assertMovedPermanently()
+            ->assertRedirect(route('site.about'));
     }
 
     public function test_sitemap_and_indexnow_endpoints_are_public_and_indexnow_key_is_exact(): void
