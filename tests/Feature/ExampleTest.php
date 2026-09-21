@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\ManagementProfileFolder;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -23,6 +25,9 @@ class ExampleTest extends TestCase
         $response->assertHeader('Content-Type', 'application/xml; charset=UTF-8');
         $this->assertStringContainsString('<urlset', $response->getContent());
         $this->assertStringContainsString('/about-us', $response->getContent());
+        ManagementProfileFolder::create(['name' => 'Legacy About Us', 'slug' => 'about-us', 'status' => 'published', 'sort_order' => 1]);
+        $response = $this->get('/sitemap.xml');
+        $this->assertStringNotContainsString('/about-us</loc>', $response->getContent());
     }
 
     public function test_public_career_page_is_available(): void
