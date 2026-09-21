@@ -8,8 +8,14 @@ use Illuminate\View\View;
 
 class CmsPageController extends Controller
 {
-    public function show(string $slug): View
+    public function show(string $slug): View|RedirectResponse
     {
+        // About Us has a dedicated canonical route. Prevent Page Builder
+        // access from creating a duplicate indexable version of the same page.
+        if ($slug === 'about-us') {
+            return redirect()->route('site.about', [], 301);
+        }
+
         $page = CmsPage::query()
             ->where('slug', $slug)
             ->where('is_published', true)
