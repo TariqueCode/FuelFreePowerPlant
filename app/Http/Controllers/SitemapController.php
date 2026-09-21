@@ -36,7 +36,20 @@ class SitemapController extends Controller
             ['loc' => $absoluteRoute('contact')],
         ]);
 
-        foreach (ManagementProfileFolder::query()->where('status', 'published')->whereNotNull('slug')->orderBy('sort_order')->orderBy('id')->get(['slug', 'updated_at']) as $folder) {
+        $reservedFolderSlugs = [
+            'about-us',
+            'plants',
+            'future-project',
+            'career',
+            'solutions',
+            'gallery',
+            'news-and-event',
+            'sustainability',
+            'contact',
+            'management',
+        ];
+
+        foreach (ManagementProfileFolder::query()->where('status', 'published')->whereNotNull('slug')->whereNotIn('slug', $reservedFolderSlugs)->orderBy('sort_order')->orderBy('id')->get(['slug', 'updated_at']) as $folder) {
             $urls->push([
                 'loc' => $baseUrl . '/' . ltrim($folder->slug, '/'),
                 'lastmod' => optional($folder->updated_at)->toAtomString(),
