@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CmsPage;
 use App\Models\SystemSetting;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class CmsPageController extends Controller
