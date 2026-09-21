@@ -11,6 +11,16 @@ class ManagementProfileViewTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_profile_folder_slug_cannot_claim_a_reserved_public_route(): void
+    {
+        $controller = app(\\App\\Http\\Controllers\\Admin\\ManagementController::class);
+        $method = new \\ReflectionMethod($controller, 'uniqueFolderSlug');
+        $method->setAccessible(true);
+
+        $this->assertSame('about-us-2', $method->invoke($controller, 'About Us'));
+        $this->assertSame('board-of-directors', $method->invoke($controller, 'Board of Directors'));
+    }
+
     public function test_folder_profile_cards_have_a_working_profile_view_target(): void
     {
         $folder = ManagementProfileFolder::create([
