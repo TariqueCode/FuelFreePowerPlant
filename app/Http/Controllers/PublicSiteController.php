@@ -18,11 +18,23 @@ class PublicSiteController
 
     public function showCompanyPage(string $slug): View|RedirectResponse
     {
-        // About Us has a dedicated canonical route and is already included in
-        // the sitemap. Keep the legacy company URL aligned with that canonical
-        // page instead of creating a second /pages/about-us URL.
-        if ($slug === 'about-us') {
-            return redirect()->route('site.about', [], 301);
+        $canonicalRoutes = [
+            'about-us' => 'site.about',
+            'plants' => 'site.plants',
+            'future-project' => 'site.future-project',
+            'career' => 'site.career',
+            'solutions' => 'site.solutions',
+            'gallery' => 'site.gallery',
+            'news-and-event' => 'news.index',
+            'sustainability' => 'sustainability',
+            'contact' => 'contact',
+            'management' => 'management',
+        ];
+
+        // Legacy company URLs for dedicated pages should resolve directly to
+        // their canonical public route instead of creating a CMS redirect hop.
+        if (isset($canonicalRoutes[$slug])) {
+            return redirect()->route($canonicalRoutes[$slug], [], 301);
         }
 
         // Other legacy company URLs resolve to their Page Builder canonical URL.
