@@ -43,7 +43,22 @@ class SitemapController extends Controller
             ]);
         }
 
-        foreach (CmsPage::query()->where('is_published', true)->whereNotIn('slug', ['about-us'])->get(['slug', 'updated_at']) as $page) {
+        // Dedicated public routes own these slugs; excluding them keeps the
+        // sitemap from advertising duplicate /pages/{slug} URLs.
+        $reservedCmsSlugs = [
+            'about-us',
+            'plants',
+            'future-project',
+            'career',
+            'solutions',
+            'gallery',
+            'news-and-event',
+            'sustainability',
+            'contact',
+            'management',
+        ];
+
+        foreach (CmsPage::query()->where('is_published', true)->whereNotIn('slug', $reservedCmsSlugs)->get(['slug', 'updated_at']) as $page) {
             $urls->push([
                 'loc' => $absoluteRoute('cms.page', ['slug' => $page->slug]),
                 'lastmod' => optional($page->updated_at)->toAtomString(),
