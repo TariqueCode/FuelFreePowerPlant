@@ -11,10 +11,23 @@ class CmsPageController extends Controller
 {
     public function show(string $slug): View|RedirectResponse
     {
-        // About Us has a dedicated canonical route. Prevent Page Builder
-        // access from creating a duplicate indexable version of the same page.
-        if ($slug === 'about-us') {
-            return redirect()->route('site.about', [], 301);
+        // Dedicated public pages own these slugs. Keep Page Builder from
+        // exposing duplicate indexable URLs for the same canonical content.
+        $canonicalRoutes = [
+            'about-us' => 'site.about',
+            'plants' => 'site.plants',
+            'future-project' => 'site.future-project',
+            'career' => 'site.career',
+            'solutions' => 'site.solutions',
+            'gallery' => 'site.gallery',
+            'news-and-event' => 'news.index',
+            'sustainability' => 'sustainability',
+            'contact' => 'contact',
+            'management' => 'management',
+        ];
+
+        if (isset($canonicalRoutes[$slug])) {
+            return redirect()->route($canonicalRoutes[$slug], [], 301);
         }
 
         $page = CmsPage::query()
