@@ -31,4 +31,12 @@ class LegacyPowerPlantRemovalTest extends TestCase
         $response->assertDontSee('Our project portfolio');
         $response->assertDontSee('Operational plants');
     }
+
+    public function test_sustainability_page_uses_current_content_models(): void
+    {
+        $this->get(route('sustainability'))
+            ->assertOk()
+            ->assertSeeText('Sustainability')
+            ->assertSeeText('Data unavailable');
+    }
 }
