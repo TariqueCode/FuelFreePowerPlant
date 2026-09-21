@@ -137,7 +137,28 @@ class CmsController extends Controller
         $slug = Str::slug($source) ?: 'page';
         $base = $slug;
         $counter = 2;
-        while (CmsPage::where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+
+        // These slugs are owned by dedicated public routes. New CMS pages
+        // must not claim them and create competing public URLs.
+        $reservedSlugs = [
+            'about-us',
+            'plants',
+            'future-project',
+            'career',
+            'solutions',
+            'gallery',
+            'news-and-event',
+            'sustainability',
+            'contact',
+            'management',
+        ];
+
+        while (
+            in_array($slug, $reservedSlugs, true)
+            || CmsPage::where('slug', $slug)
+                ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+                ->exists()
+        ) {
             $slug = $base . '-' . $counter++;
         }
         return $slug;
