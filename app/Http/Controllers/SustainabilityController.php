@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PowerPlant;
 use App\Models\SiteContentItem;
 use App\Models\SystemSetting;
 use Illuminate\View\View;
 
-class SustainabilityController extends Controller
+class SustainabilityController
 {
     public function __invoke(): View
     {
@@ -18,30 +17,28 @@ class SustainabilityController extends Controller
             'logo_path' => $settings['company.logo_path'] ?? null,
         ];
 
-        $plants = PowerPlant::query()->latest()->get();
+        // The legacy PowerPlant model/table was intentionally removed. Use the
+        // current published Projects & Our Plans content source instead.
+        $plants = SiteContentItem::published()
+            ->where('type', 'plants')
+            ->orderBy('sort_order')
+            ->orderBy('title')
+            ->get(['id', 'title', 'slug', 'excerpt', 'content']);
+
         $content = SiteContentItem::published()
             ->where('type', 'sustainability')
             ->orderBy('sort_order')
             ->latest('published_at')
             ->get();
 
-        $sum = static function ($items, string $field): ?float {
-            $values = $items->pluck($field)->filter(fn ($value) => $value !== null && $value !== '')->map(fn ($value) => (float) $value);
-            return $values->isEmpty() ? null : (float) $values->sum();
-        };
-
-        $average = static function ($items, string $field): ?float {
-            $values = $items->pluck($field)->filter(fn ($value) => $value !== null && $value !== '')->map(fn ($value) => (float) $value);
-            return $values->isEmpty() ? null : (float) $values->avg();
-        };
-
+        // Plant-level engineering metrics are no longer stored in the current
+        // content model, so the sustainability page must not invent them.
         $metrics = [
-            'capacity_mw' => $sum($plants, 'capacity_kw'),
-            'generation_mwh' => $sum($plants, 'annual_generation_mwh'),
-            'co2_tonnes' => $sum($plants, 'co2_reduction_tonnes'),
-            'efficiency' => $average($plants, 'efficiency_percent'),
+            'capacity_mw' => null,
+            'generation_mwh' => null,
+            'co2_tonnes' => null,
+            'efficiency' => null,
         ];
-        $metrics['capacity_mw'] = $metrics['capacity_mw'] === null ? null : $metrics['capacity_mw'] / 1000;
 
         return view('sustainability', compact('brand', 'plants', 'content', 'metrics'));
     }
