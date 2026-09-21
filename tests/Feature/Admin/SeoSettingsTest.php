@@ -86,13 +86,43 @@ class SeoSettingsTest extends TestCase
             ->assertMovedPermanently()
             ->assertRedirect(route('site.plants'));
 
-        $this->get('/company/about-us')
-            ->assertMovedPermanently()
-            ->assertRedirect(route('site.about'));
+        $companyRedirects = [
+            'about-us' => 'site.about',
+            'plants' => 'site.plants',
+            'future-project' => 'site.future-project',
+            'career' => 'site.career',
+            'solutions' => 'site.solutions',
+            'gallery' => 'site.gallery',
+            'news-and-event' => 'news.index',
+            'sustainability' => 'sustainability',
+            'contact' => 'contact',
+            'management' => 'management',
+        ];
 
-        $this->get('/pages/about-us')
-            ->assertMovedPermanently()
-            ->assertRedirect(route('site.about'));
+        foreach ($companyRedirects as $slug => $route) {
+            $this->get('/company/' . $slug)
+                ->assertMovedPermanently()
+                ->assertRedirect(route($route));
+        }
+
+        $pageRedirects = [
+            'about-us' => 'site.about',
+            'plants' => 'site.plants',
+            'future-project' => 'site.future-project',
+            'career' => 'site.career',
+            'solutions' => 'site.solutions',
+            'gallery' => 'site.gallery',
+            'news-and-event' => 'news.index',
+            'sustainability' => 'sustainability',
+            'contact' => 'contact',
+            'management' => 'management',
+        ];
+
+        foreach ($pageRedirects as $slug => $route) {
+            $this->get('/pages/' . $slug)
+                ->assertMovedPermanently()
+                ->assertRedirect(route($route));
+        }
     }
 
     public function test_sitemap_and_indexnow_endpoints_are_public_and_indexnow_key_is_exact(): void
