@@ -18,7 +18,7 @@ class ManagementProfileViewTest extends TestCase
         $method->setAccessible(true);
 
         $this->assertSame('about-us-2', $method->invoke($controller, 'About Us'));
-        $this->assertSame('board-of-directors', $method->invoke($controller, 'Board of Directors'));
+        $this->assertSame('board-of-directors-2', $method->invoke($controller, 'Board of Directors'));
     }
 
     public function test_folder_profile_cards_have_a_working_profile_view_target(): void
