@@ -62,6 +62,59 @@ jobs:
       - name: Run tests
         run: php artisan test
 
+      - name: Prepare browser QA database and account
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+          SESSION_DRIVER: file
+          CACHE_STORE: file
+          QUEUE_CONNECTION: sync
+        run: |
+          php artisan migrate --force
+          php scripts/qa/prepare-navigation-browser-user.php
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --prefix /tmp/ffp-browser-qa --no-audit --no-fund playwright@1.55.0
+          /tmp/ffp-browser-qa/node_modules/.bin/playwright install --with-deps chromium
+
+      - name: Start local Laravel server for browser QA
+        env:
+          APP_URL: http://127.0.0.1:8000
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+          SESSION_DRIVER: file
+          CACHE_STORE: file
+          QUEUE_CONNECTION: sync
+        run: |
+          APP_URL=http://127.0.0.1:8000 DB_CONNECTION=sqlite DB_DATABASE=database/database.sqlite SESSION_DRIVER=file CACHE_STORE=file QUEUE_CONNECTION=sync php artisan serve --host=127.0.0.1 --port=8000 > /tmp/ffp-laravel.log 2>&1 &
+          echo $! > /tmp/ffp-laravel.pid
+          for attempt in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:8000/up >/dev/null; then
+              echo "Local Laravel server is ready."
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/ffp-laravel.log
+          exit 1
+
+      - name: Verify desktop and mobile navigation in Chromium
+        env:
+          PLAYWRIGHT_MODULE: /tmp/ffp-browser-qa/node_modules/playwright
+          NAVIGATION_QA_BASE_URL: http://127.0.0.1:8000
+        run: node scripts/qa/navigation-browser-smoke.cjs
+
+      - name: Upload browser QA diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: navigation-browser-qa-failure
+          path: |
+            /tmp/ffp-navigation-*.png
+            /tmp/ffp-laravel.log
+          if-no-files-found: ignore
+
   deploy:
     needs: quality
     runs-on: ubuntu-latest
@@ -72,6 +125,7 @@ jobs:
           DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           mkdir -p ~/.ssh
@@ -80,13 +134,24 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -p "$DEPLOY_PORT" -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
 
-          ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" 'bash -s' <<'REMOTE'
+          ssh -i ~/.ssh/deploy_key -p "$DEPLOY_PORT" -o BatchMode=yes -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_SHA='$DEPLOY_SHA' bash -s" <<'REMOTE'
           set -euo pipefail
           cd /home/fuelfree/public_html
 
-          echo "==> Syncing application code"
+          echo "==> Verifying deployment commit consistency"
           git fetch origin main
-          git reset --hard origin/main
+          if [ -z "$DEPLOY_SHA" ]; then
+              echo "ERROR: Deployment commit SHA is missing."
+              exit 1
+          fi
+          REMOTE_MAIN_SHA="$(git rev-parse origin/main)"
+          if [ "$REMOTE_MAIN_SHA" != "$DEPLOY_SHA" ]; then
+              echo "ERROR: Refusing stale deployment. Workflow SHA=$DEPLOY_SHA; origin/main=$REMOTE_MAIN_SHA"
+              exit 1
+          fi
+          git cat-file -e "$DEPLOY_SHA^{commit}"
+          git reset --hard "$DEPLOY_SHA"
+          echo "Deploying exact verified commit: $(git rev-parse HEAD)"
 
           echo "==> Selecting CloudLinux PHP 8.4 CLI"
           PHP_BIN=/opt/alt/php84/usr/bin/php
