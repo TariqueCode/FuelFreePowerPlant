@@ -52,6 +52,34 @@ class NavigationSourceRegistryTest extends TestCase
         $this->assertFalse($sources->contains('key', 'route:admin.navigation.internal'));
     }
 
+    public function test_legacy_builder_aliases_resolve_to_canonical_destinations(): void
+    {
+        $registry = app(NavigationSourceRegistry::class);
+
+        $cases = [
+            ['route:admin.management.index', 'admin.profile-builder.index', 'Profile Builder', 'website.view'],
+            ['route:admin.page-builder.index', 'admin.cms.index', 'Page Builder', 'cms.view'],
+            ['route:admin.navigation.index', 'admin.menu-builder.index', 'Menu Builder', 'website.view'],
+            ['route:admin.menu-builder.index', 'admin.menu-builder.index', 'Menu Builder', 'website.view'],
+            ['route:admin.site-content.index', 'admin.news_and_event.index', 'News & Event', 'website.view'],
+        ];
+
+        foreach ($cases as [$sourceKey, $routeName, $label, $permission]) {
+            $source = $registry->resolveAny($sourceKey, 'dashboard');
+
+            $this->assertNotNull($source, $sourceKey);
+            $this->assertSame($label, $source['label']);
+            $this->assertSame(parse_url(route($routeName), PHP_URL_PATH), $source['url']);
+            $this->assertSame($routeName, $source['route_name']);
+            $this->assertSame($permission, $source['permission']);
+        }
+
+        $available = $registry->available('dashboard', 'dashboard');
+        $this->assertFalse($available->contains('key', 'route:admin.profile-builder.index'));
+        $this->assertFalse($available->contains('key', 'route:admin.cms.index'));
+        $this->assertFalse($available->contains('key', 'route:admin.menu-builder.index'));
+    }
+
     public function test_legacy_resources_are_never_available_as_navigation_sources(): void
     {
         $user = User::factory()->create();
