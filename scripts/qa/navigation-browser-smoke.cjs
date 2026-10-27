@@ -34,22 +34,48 @@ async function clickDestination(page, label, path) {
     const link = page.locator('.sidebar a[href]').filter({ hasText: label }).first();
     assert.equal(await link.count(), 1, label + ' navigation link must exist');
 
-    const responsePromise = page.waitForResponse(response =>
-        response.request().isNavigationRequest()
-        && new URL(response.url()).pathname.replace(/\/+$/, '') === path.replace(/\/+$/, ''),
-    { timeout: 15000 });
+    const linkInfo = await link.evaluate(element => ({
+        href: element.href,
+        target: element.target || '_self',
+        html: element.outerHTML,
+    }));
+    const expectedPath = path.replace(/\/+$/, '');
+    const linkPath = new URL(linkInfo.href).pathname.replace(/\/+$/, '');
 
-    await link.click();
-    const response = await responsePromise;
-    assert.equal(response.status(), 200, label + ' destination should return HTTP 200');
-    await page.waitForLoadState('domcontentloaded');
+    assert.equal(linkPath, expectedPath, label + ' anchor must point to its canonical destination');
     assert.equal(
-        new URL(page.url()).pathname.replace(/\/+$/, ''),
-        path.replace(/\/+$/, ''),
-        label + ' click should navigate to ' + path,
+        linkInfo.target,
+        '_self',
+        label + ' is an internal admin destination and must not open a separate tab',
     );
-}
 
+    try {
+        const [response] = await Promise.all([
+            page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 15000 }),
+            link.click(),
+        ]);
+
+        assert.ok(
+            response,
+            label + ' click did not trigger a document navigation; href=' + linkInfo.href,
+        );
+        assert.equal(response.status(), 200, label + ' destination should return HTTP 200');
+        assert.equal(
+            new URL(page.url()).pathname.replace(/\/+$/, ''),
+            expectedPath,
+            label + ' click should navigate to ' + expectedPath,
+        );
+    } catch (error) {
+        console.error(
+            'Navigation diagnostic for ' + label
+            + ': href=' + linkInfo.href
+            + ', target=' + linkInfo.target
+            + ', current=' + page.url()
+            + ', html=' + linkInfo.html,
+        );
+        throw error;
+    }
+}
 async function verifyDesktop(browser) {
     const context = await browser.newContext({ viewport: { width: 1365, height: 900 } });
     const page = await context.newPage();
