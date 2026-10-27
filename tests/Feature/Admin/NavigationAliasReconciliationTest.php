@@ -12,20 +12,43 @@ class NavigationAliasReconciliationTest extends TestCase
 
     public function test_migration_canonicalizes_builder_aliases_and_reparents_duplicate_children(): void
     {
-        $website = NavigationMenuItem::create([
-            'menu' => 'dashboard',
-            'parent_id' => null,
-            'label' => 'Website',
-            'url' => '#',
-            'route_name' => null,
-            'target' => '_self',
-            'is_visible' => true,
-            'sort_order' => 10,
-            'source_key' => null,
-            'source_type' => 'folder',
-            'area' => 'dashboard',
-            'permission_key' => null,
-        ]);
+        NavigationMenuItem::query()
+            ->where('menu', 'dashboard')
+            ->where(function ($query): void {
+                $query->whereIn('source_key', [
+                    'route:admin.management.index',
+                    'route:admin.profile-builder.index',
+                ])->orWhereIn('route_name', [
+                    'admin.management.index',
+                    'admin.profile-builder.index',
+                ]);
+            })
+            ->delete();
+
+        $website = NavigationMenuItem::query()
+            ->where('menu', 'dashboard')
+            ->where('area', 'dashboard')
+            ->where('source_type', 'folder')
+            ->where('label', 'Website')
+            ->where('is_visible', true)
+            ->first();
+
+        if (! $website) {
+            $website = NavigationMenuItem::create([
+                'menu' => 'dashboard',
+                'parent_id' => null,
+                'label' => 'Website',
+                'url' => '#',
+                'route_name' => null,
+                'target' => '_self',
+                'is_visible' => true,
+                'sort_order' => 10,
+                'source_key' => null,
+                'source_type' => 'folder',
+                'area' => 'dashboard',
+                'permission_key' => null,
+            ]);
+        }
 
         $legacy = NavigationMenuItem::create([
             'menu' => 'dashboard',
