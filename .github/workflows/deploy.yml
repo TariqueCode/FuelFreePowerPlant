@@ -263,6 +263,30 @@ jobs:
               fwrite(STDERR, "ERROR: orphaned navigation parent references remain: ".$orphans."\n");
               exit(1);
           }
+          $rows = \Illuminate\Support\Facades\DB::table("navigation_menu_items")->get(["id", "menu", "parent_id"]);
+          $menuById = [];
+          $parentById = [];
+          foreach ($rows as $row) {
+              $menuById[(int) $row->id] = (string) $row->menu;
+              $parentById[(int) $row->id] = $row->parent_id === null ? null : (int) $row->parent_id;
+          }
+          foreach ($rows as $row) {
+              $menu = (string) $row->menu;
+              $seen = [];
+              $cursor = (int) $row->id;
+              while (isset($parentById[$cursor]) && $parentById[$cursor] !== null) {
+                  if (isset($seen[$cursor])) {
+                      fwrite(STDERR, "ERROR: navigation parent cycle detected for item ".$cursor."\n");
+                      exit(1);
+                  }
+                  $seen[$cursor] = true;
+                  $parent = $parentById[$cursor];
+                  if (!isset($menuById[$parent]) || $menuById[$parent] !== $menu) {
+                      break;
+                  }
+                  $cursor = $parent;
+              }
+          }
           $staleKeys = \Illuminate\Support\Facades\DB::table("navigation_menu_items")
               ->where("menu", "dashboard")
               ->whereIn("source_key", ["route:admin.management.index", "route:admin.page-builder.index", "route:admin.menu-builder.index", "route:admin.site-content.index", "route:admin.news_and_event"])
