@@ -86,7 +86,7 @@ class NavigationAliasReconciliationTest extends TestCase
             'area' => 'dashboard',
             'permission_key' => null,
         ]);
-        \\Illuminate\\Support\\Facades\\DB::table('navigation_menu_items')
+        \Illuminate\Support\Facades\DB::table('navigation_menu_items')
             ->where('id', $cycle->id)
             ->update(['parent_id' => $cycle->id]);
 
