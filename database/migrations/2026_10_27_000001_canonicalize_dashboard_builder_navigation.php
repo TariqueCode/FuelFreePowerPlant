@@ -257,7 +257,9 @@ return new class extends Migration
 
         $exists = collect(Schema::getIndexes('navigation_menu_items'))->contains(
             fn (array $index): bool => (bool) ($index['unique'] ?? false)
-                && array_values($index['columns'] ?? []) === ['menu', 'source_key']
+                && count($index['columns'] ?? []) === 2
+                && in_array('menu', $index['columns'] ?? [], true)
+                && in_array('source_key', $index['columns'] ?? [], true)
         );
 
         if (! $exists) {
