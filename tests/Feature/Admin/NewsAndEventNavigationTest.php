@@ -34,7 +34,7 @@ class NewsAndEventNavigationTest extends TestCase
 
     public function test_canonical_news_and_event_route_uses_hyphenated_uri(): void
     {
-        $canonical = Route::getRoutes()->getByName('admin.news_and_event');
+        $canonical = Route::getRoutes()->getByName('admin.news_and_event.index');
 
         $this->assertNotNull($canonical);
         $this->assertSame('admin/news-and-Event', $canonical->uri());
@@ -57,7 +57,7 @@ class NewsAndEventNavigationTest extends TestCase
         $this->assertNotNull($source);
         $this->assertSame('News & Event', $source['label']);
         $this->assertSame('/admin/news-and-Event', $source['url']);
-        $this->assertSame('admin.news_and_event', $source['route_name']);
+        $this->assertSame('admin.news_and_event.index', $source['route_name']);
     }
 
     public function test_dashboard_navigation_exposes_news_and_event_with_canonical_url(): void
@@ -71,6 +71,6 @@ class NewsAndEventNavigationTest extends TestCase
         $news = $website->children->firstWhere('label', 'News & Event');
         $this->assertNotNull($news);
         $this->assertSame('/admin/news-and-Event', $news->url);
-        $this->assertSame('admin.news_and_event', $news->route_name);
+        $this->assertSame('admin.news_and_event.index', $news->route_name);
     }
 }
