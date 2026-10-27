@@ -54,29 +54,28 @@ class PortalCapabilityNavigationTest extends TestCase
             ->getContent();
 
         $expectedLinks = [
-            ['Dashboard', 'admin.dashboard'],
-            ['Homepage', 'admin.homepage-builder.index'],
-            ['Slider', 'admin.sliders.index'],
-            ['Highlight Banner', 'admin.site-popups.index'],
-            ['Profile Builder', 'admin.profile-builder.index'],
-            ['News & Event', 'admin.news_and_event.index'],
-            ['Gallery', 'admin.gallery.index'],
-            ['Page Builder', 'admin.cms.index'],
-            ['Social Media', 'admin.social-links.index'],
-            ['Menu Builder', 'admin.menu-builder.index'],
-            ['Documents & Media', 'admin.documents'],
-            ['Users', 'admin.users.index'],
-            ['Audit Log', 'admin.audit'],
-            ['System Health', 'admin.health'],
-            ['Help Desk', 'admin.helpdesk'],
-            ['Mail', 'admin.mail'],
-            ['Career Applications', 'admin.career-applications.index'],
-            ['Website Inquiries', 'admin.inquiries.index'],
-            ['Settings', 'admin.settings'],
+            ['Dashboard', '/admin'],
+            ['Homepage', '/admin/homepage-builder'],
+            ['Slider', '/admin/sliders'],
+            ['Highlight Banner', '/admin/site-popups'],
+            ['Profile Builder', '/admin/profile-builder'],
+            ['News & Event', '/admin/news-and-Event'],
+            ['Gallery', '/admin/galleries'],
+            ['Page Builder', '/admin/page-builder'],
+            ['Social Media', '/admin/social-links'],
+            ['Menu Builder', '/admin/menu-builder'],
+            ['Documents & Media', '/admin/documents'],
+            ['Users', '/admin/users'],
+            ['Audit Log', '/admin/audit'],
+            ['System Health', '/admin/health'],
+            ['Help Desk', '/admin/help-desk'],
+            ['Mail', '/admin/mail'],
+            ['Career Applications', '/admin/career-applications'],
+            ['Website Inquiries', '/admin/inquiries'],
+            ['Settings', '/admin/settings'],
         ];
 
-        foreach ($expectedLinks as [$label, $routeName]) {
-            $path = parse_url(route($routeName), PHP_URL_PATH);
+        foreach ($expectedLinks as [$label, $path]) {
             $this->assertStringContainsString('href="'.$path.'"', $html, $label.' link destination');
         }
 
