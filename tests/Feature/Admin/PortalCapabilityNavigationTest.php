@@ -86,6 +86,64 @@ class PortalCapabilityNavigationTest extends TestCase
         }
     }
 
+    public function test_dashboard_restores_missing_builtin_builder_and_capability_links(): void
+    {
+        $slugs = [
+            'dashboard.view', 'website.view', 'cms.view', 'social-media.manage',
+            'documents.view', 'plants.view', 'users.view', 'audit.view',
+            'health.view', 'mail.view', 'career.view', 'inquiries.view', 'settings.manage',
+        ];
+        $permissions = collect($slugs)->map(fn (string $slug) => Permission::firstOrCreate(
+            ['slug' => $slug],
+            ['name' => ucwords(str_replace(['.', '-'], ' ', $slug))]
+        ));
+        $role = Role::create([
+            'name' => 'Complete Navigation QA',
+            'slug' => 'complete-navigation-qa',
+            'is_system' => false,
+        ]);
+        $role->permissions()->sync($permissions->pluck('id')->all());
+        $user = User::factory()->create();
+        $user->roles()->attach($role);
+
+        $html = $this->actingAs($user)
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->getContent();
+
+        $expectedLinks = [
+            ['Dashboard', 'admin.dashboard'],
+            ['Homepage', 'admin.homepage-builder.index'],
+            ['Slider', 'admin.sliders.index'],
+            ['Highlight Banner', 'admin.site-popups.index'],
+            ['Profile Builder', 'admin.profile-builder.index'],
+            ['News & Event', 'admin.news_and_event.index'],
+            ['Gallery', 'admin.gallery.index'],
+            ['Page Builder', 'admin.cms.index'],
+            ['Social Media', 'admin.social-links.index'],
+            ['Menu Builder', 'admin.menu-builder.index'],
+            ['Documents & Media', 'admin.documents'],
+            ['Projects & Our Plans', 'admin.plants.index'],
+            ['Users', 'admin.users.index'],
+            ['Audit Log', 'admin.audit'],
+            ['System Health', 'admin.health'],
+            ['Help Desk', 'admin.helpdesk'],
+            ['Mail', 'admin.mail'],
+            ['Career Applications', 'admin.career-applications.index'],
+            ['Website Inquiries', 'admin.inquiries.index'],
+            ['Settings', 'admin.settings'],
+        ];
+
+        foreach ($expectedLinks as [$label, $routeName]) {
+            $path = parse_url(route($routeName), PHP_URL_PATH);
+            $this->assertStringContainsString('href="'.$path.'"', $html, $label.' link destination');
+        }
+
+        foreach (['Dashboard', 'Website', 'Operations', 'Users &amp; Access', 'Communications'] as $label) {
+            $this->assertStringContainsString($label, $html, 'Missing navigation group or item: '.$label);
+        }
+    }
+
     public function test_user_management_navigation_is_capability_aware(): void
     {
         $view = Permission::firstOrCreate(['slug'=>'users.view'], ['name'=>'View users']);
