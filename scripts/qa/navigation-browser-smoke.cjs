@@ -14,7 +14,7 @@ async function signIn(page) {
     await page.locator('#password').fill(password);
 
     await Promise.all([
-        page.waitForURL(url => url.pathname === '/dashboard', { timeout: 15000 }),
+        page.waitForURL(url => url.pathname === '/admin', { timeout: 15000 }),
         page.locator('button[type="submit"]').click(),
     ]);
 }
