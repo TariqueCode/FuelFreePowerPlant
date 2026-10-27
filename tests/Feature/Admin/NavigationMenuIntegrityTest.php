@@ -8,6 +8,7 @@ use App\Models\NavigationMenuItem;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\DashboardNavigationService;
 use App\Services\PublicNavigationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\QueryException;
