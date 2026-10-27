@@ -27,8 +27,7 @@ class ExampleTest extends TestCase
         $this->assertStringContainsString('/about-us', $response->getContent());
         ManagementProfileFolder::create(['name' => 'Legacy About Us', 'slug' => 'about-us', 'status' => 'published', 'sort_order' => 1]);
         $response = $this->get('/sitemap.xml');
-        $aboutLocation = '<loc>'.route('site.about').'</loc>';
-        $this->assertSame(1, substr_count($response->getContent(), $aboutLocation));
+        $this->assertSame(1, substr_count($response->getContent(), '/about-us</loc>'));
     }
 
     public function test_public_career_page_is_available(): void
