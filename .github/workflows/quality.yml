@@ -136,5 +136,58 @@ jobs:
       - name: Run feature tests
         run: php artisan test tests/Feature
 
+      - name: Prepare browser QA database and account
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+          SESSION_DRIVER: file
+          CACHE_STORE: file
+          QUEUE_CONNECTION: sync
+        run: |
+          php artisan migrate --force
+          php scripts/qa/prepare-navigation-browser-user.php
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --prefix /tmp/ffp-browser-qa --no-audit --no-fund playwright@1.55.0
+          /tmp/ffp-browser-qa/node_modules/.bin/playwright install --with-deps chromium
+
+      - name: Start local Laravel server for browser QA
+        env:
+          APP_URL: http://127.0.0.1:8000
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+          SESSION_DRIVER: file
+          CACHE_STORE: file
+          QUEUE_CONNECTION: sync
+        run: |
+          APP_URL=http://127.0.0.1:8000 DB_CONNECTION=sqlite DB_DATABASE=database/database.sqlite SESSION_DRIVER=file CACHE_STORE=file QUEUE_CONNECTION=sync php artisan serve --host=127.0.0.1 --port=8000 > /tmp/ffp-laravel.log 2>&1 &
+          echo $! > /tmp/ffp-laravel.pid
+          for attempt in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:8000/up >/dev/null; then
+              echo "Local Laravel server is ready."
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/ffp-laravel.log
+          exit 1
+
+      - name: Verify desktop and mobile navigation in Chromium
+        env:
+          PLAYWRIGHT_MODULE: /tmp/ffp-browser-qa/node_modules/playwright
+          NAVIGATION_QA_BASE_URL: http://127.0.0.1:8000
+        run: node scripts/qa/navigation-browser-smoke.cjs
+
+      - name: Upload browser QA diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: navigation-browser-qa-failure
+          path: |
+            /tmp/ffp-navigation-*.png
+            /tmp/ffp-laravel.log
+          if-no-files-found: ignore
+
       - name: Verify Laravel route cache
         run: php artisan route:cache --ansi
