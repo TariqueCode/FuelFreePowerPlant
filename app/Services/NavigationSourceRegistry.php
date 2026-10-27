@@ -22,10 +22,12 @@ class NavigationSourceRegistry
 
     private const BUILDER_ROUTE_ALIASES = [
         'admin.profile-builder.index' => ['admin.profile-builder.index', 'Profile Builder'],
-        'admin.management.index' => ['admin.management.index', 'Profile Builder'],
+        'admin.management.index' => ['admin.profile-builder.index', 'Profile Builder'],
         'admin.cms.index' => ['admin.cms.index', 'Page Builder'],
+        'admin.page-builder.index' => ['admin.cms.index', 'Page Builder'],
         'admin.navigation.index' => ['admin.menu-builder.index', 'Menu Builder'],
-        'admin.site-content.index' => ['admin.news_and_event', 'News & Event'],
+        'admin.menu-builder.index' => ['admin.menu-builder.index', 'Menu Builder'],
+        'admin.site-content.index' => ['admin.news_and_event.index', 'News & Event'],
     ];
 
     /** Request-local indexes prevent repeated full route scans during admin navigation rendering. */
@@ -87,9 +89,18 @@ class NavigationSourceRegistry
             if (isset(self::BUILDER_ROUTE_ALIASES[$name])) {
                 [$canonical, $label] = self::BUILDER_ROUTE_ALIASES[$name];
                 $route = $this->routeByName($canonical);
-                if ($route && $this->eligibleRoute($route, $area)) {
-                    $source = $this->routeSource($route, $area); $source['label'] = $label; return $source;
+                $eligible = $route && $this->eligibleRoute($route, $area);
+                $dashboardMenuBuilder = $route
+                    && $area === 'dashboard'
+                    && $canonical === 'admin.menu-builder.index'
+                    && $this->isDashboardMenuBuilderRoute($route);
+
+                if ($route && ($eligible || $dashboardMenuBuilder)) {
+                    $source = $this->routeSource($route, $area);
+                    $source['label'] = $label;
+                    return $source;
                 }
+
                 return null;
             }
             $canonical = $this->canonicalCmsPageForRoute($name, $area);
@@ -190,7 +201,18 @@ class NavigationSourceRegistry
             'meta' => ['cms_page_id' => $page->id, 'slug' => $page->slug]];
     }
 
-    private function isNavigationBuilderRoute(string $name): bool { return Str::startsWith($name, ['admin.navigation.', 'admin.menu-builder.', 'admin.page-builder.']); }
+    private function isDashboardMenuBuilderRoute(Route $route): bool
+    {
+        return $route->getName() === 'admin.menu-builder.index'
+            && trim($route->uri(), '/') === 'admin/menu-builder'
+            && in_array('GET', $route->methods(), true)
+            && collect($route->gatherMiddleware())->contains('permission:website.view');
+    }
+
+    private function isNavigationBuilderRoute(string $name): bool
+    {
+        return Str::startsWith($name, ['admin.navigation.', 'admin.menu-builder.', 'admin.page-builder.']);
+    }
 
     private function routeSource(Route $route, string $area): array
     {
