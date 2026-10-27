@@ -224,9 +224,7 @@ class DashboardNavigationService
                 $existing->url = $source['url'];
                 $existing->permission_key = $permission;
 
-                if ($groupLabel !== null || $existing->parent_id === null) {
-                    $existing->parent_id = $parentId;
-                }
+                $existing->parent_id = $parentId;
 
                 if (trim((string) $existing->label_override) === '') {
                     $existing->label = $label;
