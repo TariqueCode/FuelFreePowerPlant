@@ -295,8 +295,26 @@ jobs:
               ->where("menu", "dashboard")
               ->whereIn("route_name", ["admin.management.index", "admin.page-builder.index", "admin.site-content.index", "admin.news_and_event"])
               ->count();
-          if ($staleKeys > 0 || $staleRoutes > 0) {
-              fwrite(STDERR, "ERROR: stale dashboard navigation aliases remain\n");
+          $staleBuilderUrls = \Illuminate\Support\Facades\DB::table("navigation_menu_items")
+              ->where("menu", "dashboard")
+              ->whereIn("url", ["/admin/management", "/admin/cms", "/admin/navigation", "/admin/site-content", "/admin/site-content?type=news", "/admin/news_and_Event"])
+              ->count();
+          $emptySourceKeys = \Illuminate\Support\Facades\DB::table("navigation_menu_items")
+              ->where("source_key", "")
+              ->count();
+          $duplicateRoutes = \Illuminate\Support\Facades\DB::table("navigation_menu_items")
+              ->select("menu", "route_name")
+              ->whereNotNull("route_name")
+              ->where("route_name", "!=", "")
+              ->groupBy("menu", "route_name")
+              ->havingRaw("COUNT(*) > 1")
+              ->get();
+          if ($staleKeys > 0 || $staleRoutes > 0 || $staleBuilderUrls > 0 || $emptySourceKeys > 0 || $duplicateRoutes->isNotEmpty()) {
+              fwrite(STDERR, "ERROR: stale or duplicate dashboard navigation identities remain\n");
+              if ($staleKeys > 0 || $staleRoutes > 0) fwrite(STDERR, "Legacy route aliases: keys=$staleKeys routes=$staleRoutes\n");
+              if ($staleBuilderUrls > 0) fwrite(STDERR, "Legacy builder URLs remain: $staleBuilderUrls\n");
+              if ($emptySourceKeys > 0) fwrite(STDERR, "Empty source keys remain: $emptySourceKeys\n");
+              if ($duplicateRoutes->isNotEmpty()) fwrite(STDERR, "Duplicate route names remain: ".$duplicateRoutes->count()."\n");
               exit(1);
           }
           echo "Navigation schema, uniqueness, parent integrity, and canonical aliases verified\n";

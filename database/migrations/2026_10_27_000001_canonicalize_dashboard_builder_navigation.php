@@ -25,6 +25,7 @@ return new class extends Migration
                 'routes' => ['admin.profile-builder.index', 'admin.management.index'],
                 'route' => 'admin.profile-builder.index',
                 'url' => '/admin/profile-builder',
+                'urls' => ['/admin/management', '/admin/profile-builder'],
                 'permission' => 'website.view',
             ],
             [
@@ -33,6 +34,7 @@ return new class extends Migration
                 'routes' => ['admin.cms.index', 'admin.page-builder.index'],
                 'route' => 'admin.cms.index',
                 'url' => '/admin/page-builder',
+                'urls' => ['/admin/cms', '/admin/page-builder'],
                 'permission' => 'cms.view',
             ],
             [
@@ -41,6 +43,7 @@ return new class extends Migration
                 'routes' => ['admin.navigation.index', 'admin.menu-builder.index'],
                 'route' => 'admin.menu-builder.index',
                 'url' => '/admin/menu-builder',
+                'urls' => ['/admin/navigation', '/admin/menu-builder'],
                 'permission' => 'website.view',
             ],
             [
@@ -53,6 +56,7 @@ return new class extends Migration
                 'routes' => ['admin.site-content.index', 'admin.news_and_event', 'admin.news_and_event.index'],
                 'route' => 'admin.news_and_event.index',
                 'url' => '/admin/news-and-Event',
+                'urls' => ['/admin/site-content', '/admin/site-content?type=news', '/admin/news_and_Event', '/admin/news-and-Event'],
                 'permission' => 'website.view',
             ],
         ];
@@ -77,6 +81,10 @@ return new class extends Migration
                 ->where(function ($query) use ($group): void {
                     $query->whereIn('source_key', $group['keys'])
                         ->orWhereIn('route_name', $group['routes']);
+
+                    if (! empty($group['urls'])) {
+                        $query->orWhereIn('url', $group['urls']);
+                    }
                 })
                 ->orderBy('id')
                 ->get();
@@ -117,6 +125,9 @@ return new class extends Migration
             }
             if (Schema::hasColumn('navigation_menu_items', 'permission_key')) {
                 $updates['permission_key'] = $group['permission'];
+            }
+            if (Schema::hasColumn('navigation_menu_items', 'target')) {
+                $updates['target'] = '_self';
             }
             if ($websiteFolderId !== null && Schema::hasColumn('navigation_menu_items', 'parent_id')) {
                 $updates['parent_id'] = (int) $websiteFolderId;
@@ -221,6 +232,12 @@ return new class extends Migration
                 $query->whereNull('url')->orWhere('url', '')->orWhere('url', '#');
             })
             ->update(['source_type' => 'folder']);
+
+        // Empty strings are not source identities; NULL is safe with the
+        // unique (menu, source_key) index and supports folders/custom URLs.
+        DB::table('navigation_menu_items')
+            ->where('source_key', '')
+            ->update(['source_key' => null]);
     }
 
     private function ensureParentForeignKey(): void

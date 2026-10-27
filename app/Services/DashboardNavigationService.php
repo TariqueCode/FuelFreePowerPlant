@@ -16,6 +16,23 @@ class DashboardNavigationService
         'admin.news_and_event' => 'admin.news_and_event.index',
     ];
 
+    /**
+     * Older dashboard migrations stored internal builder destinations as custom
+     * URLs. Treat those paths as canonical route sources so stale links cannot
+     * survive merely because their source_type was recorded as external_link.
+     */
+    private const LEGACY_DASHBOARD_ROUTE_URLS = [
+        '/admin/management' => 'route:admin.profile-builder.index',
+        '/admin/profile-builder' => 'route:admin.profile-builder.index',
+        '/admin/cms' => 'route:admin.cms.index',
+        '/admin/page-builder' => 'route:admin.cms.index',
+        '/admin/navigation' => 'route:admin.navigation.index',
+        '/admin/menu-builder' => 'route:admin.navigation.index',
+        '/admin/site-content' => 'route:admin.news_and_event.index',
+        '/admin/news-and-Event' => 'route:admin.news_and_event.index',
+        '/admin/news_and_Event' => 'route:admin.news_and_event.index',
+    ];
+
     private const GROUPS = [
         'Website' => 10,
         'Operations' => 20,
@@ -35,18 +52,32 @@ class DashboardNavigationService
         $items = $allItems->filter(fn (NavigationMenuItem $item): bool => (bool) $item->is_visible)->values();
         $registry = app(NavigationSourceRegistry::class);
 
-        $valid = $items->filter(function (NavigationMenuItem $item) use ($registry): bool {
+        $valid = $items->filter(function (NavigationMenuItem $item) use ($registry, $menu): bool {
             if ($item->source_type === 'folder') {
                 return true;
             }
 
             if ($item->source_type === 'external_link') {
-                if (trim((string) $item->url) === '') {
-                    return false;
+                $path = parse_url(trim((string) $item->url), PHP_URL_PATH);
+                $path = is_string($path) ? rtrim('/'.ltrim($path, '/'), '/') : '';
+                $legacySourceKey = $menu === 'dashboard'
+                    ? (self::LEGACY_DASHBOARD_ROUTE_URLS[$path] ?? null)
+                    : null;
+
+                if ($legacySourceKey === null) {
+                    if (trim((string) $item->url) === '') {
+                        return false;
+                    }
+
+                    return ! $item->permission_key
+                        || (auth()->check() && auth()->user()->hasPermission($item->permission_key));
                 }
 
-                return ! $item->permission_key
-                    || (auth()->check() && auth()->user()->hasPermission($item->permission_key));
+                // Convert old internal URLs to live route sources before checking
+                // permissions and canonical destinations.
+                $item->source_type = 'route';
+                $item->source_key = $legacySourceKey;
+                $item->target = '_self';
             }
 
             $sourceKey = $this->normalizeSourceKey($item->source_key, $item->route_name);
@@ -223,6 +254,7 @@ class DashboardNavigationService
                 $existing->route_name = $source['route_name'];
                 $existing->url = $source['url'];
                 $existing->permission_key = $permission;
+                $existing->target = '_self';
 
                 $existing->parent_id = $parentId;
 

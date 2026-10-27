@@ -341,4 +341,80 @@ class NavigationMenuIntegrityTest extends TestCase
         $this->assertSame('/executive-committee', $resolved->url);
     }
 
+
+    public function test_legacy_dashboard_builder_urls_are_canonicalized_and_stay_in_the_same_tab(): void
+    {
+        $user = $this->navigationAdmin();
+        $role = $user->roles()->firstOrFail();
+        $dashboard = Permission::firstOrCreate(['slug' => 'dashboard.view'], ['name' => 'View dashboard']);
+        $cms = Permission::firstOrCreate(['slug' => 'cms.view'], ['name' => 'View CMS']);
+        $role->permissions()->syncWithoutDetaching([$dashboard->id, $cms->id]);
+
+        $website = NavigationMenuItem::query()
+            ->where('menu', 'dashboard')
+            ->where('area', 'dashboard')
+            ->where('source_type', 'folder')
+            ->where('label', 'Website')
+            ->firstOrFail();
+
+        $legacyItems = [
+            ['Profile Builder', '/admin/management', 'website.view'],
+            ['Page Builder', '/admin/cms', 'cms.view'],
+            ['Menu Builder', '/admin/navigation', 'website.view'],
+        ];
+
+        foreach ($legacyItems as [$label, $url, $permission]) {
+            $item = NavigationMenuItem::query()
+                ->where('menu', 'dashboard')
+                ->where('area', 'dashboard')
+                ->where('label', $label)
+                ->firstOrFail();
+
+            $item->forceFill([
+                'parent_id' => $website->id,
+                'url' => $url,
+                'route_name' => null,
+                'source_key' => null,
+                'source_type' => 'external_link',
+                'target' => '_blank',
+                'permission_key' => $permission,
+                'is_visible' => true,
+            ])->save();
+        }
+
+        $this->actingAs($user);
+        $tree = app(DashboardNavigationService::class)->tree();
+        $websiteNode = $tree->first(fn (NavigationMenuItem $item): bool => $item->label === 'Website');
+        $this->assertNotNull($websiteNode);
+
+        $expected = [
+            ['Profile Builder', '/admin/profile-builder', 'admin.profile-builder.index'],
+            ['Page Builder', '/admin/page-builder', 'admin.cms.index'],
+            ['Menu Builder', '/admin/menu-builder', 'admin.menu-builder.index'],
+        ];
+
+        foreach ($expected as [$label, $url, $routeName]) {
+            $matches = $websiteNode->children->filter(
+                fn (NavigationMenuItem $item): bool => $item->label === $label
+            );
+            $this->assertCount(1, $matches, $label.' should appear once in Website navigation');
+
+            $item = $matches->first();
+            $this->assertSame($url, $item->url, $label.' canonical URL');
+            $this->assertSame($routeName, $item->route_name, $label.' canonical route');
+            $this->assertSame('route', $item->source_type, $label.' must be a live route source');
+            $this->assertSame('_self', $item->target, $label.' must stay in the current tab');
+        }
+
+        $html = $this->get(route('admin.dashboard'))->assertOk()->getContent();
+        foreach ($expected as [$label, $url]) {
+            $this->assertStringContainsString('href="'.$url.'"', $html, $label.' rendered destination');
+            $this->assertStringNotContainsString(
+                'href="'.$url.'" target="_blank"',
+                $html,
+                $label.' must not open a separate tab',
+            );
+        }
+    }
+
 }
