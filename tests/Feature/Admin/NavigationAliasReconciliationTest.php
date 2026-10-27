@@ -72,6 +72,24 @@ class NavigationAliasReconciliationTest extends TestCase
             'permission_key' => null,
         ]);
 
+        $cycle = NavigationMenuItem::create([
+            'menu' => 'dashboard',
+            'parent_id' => null,
+            'label' => 'Broken Cycle',
+            'url' => '#',
+            'route_name' => null,
+            'target' => '_self',
+            'is_visible' => true,
+            'sort_order' => 90,
+            'source_key' => null,
+            'source_type' => 'folder',
+            'area' => 'dashboard',
+            'permission_key' => null,
+        ]);
+        \\Illuminate\\Support\\Facades\\DB::table('navigation_menu_items')
+            ->where('id', $cycle->id)
+            ->update(['parent_id' => $cycle->id]);
+
         $migration = require base_path('database/migrations/2026_10_27_000001_canonicalize_dashboard_builder_navigation.php');
         $migration->up();
 
@@ -93,6 +111,10 @@ class NavigationAliasReconciliationTest extends TestCase
         $this->assertDatabaseHas('navigation_menu_items', [
             'id' => $child->id,
             'parent_id' => $website->id,
+        ]);
+        $this->assertDatabaseHas('navigation_menu_items', [
+            'id' => $cycle->id,
+            'parent_id' => null,
         ]);
     }
 }
