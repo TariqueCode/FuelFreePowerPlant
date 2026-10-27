@@ -32,7 +32,7 @@ class PortalCapabilityNavigationTest extends TestCase
     {
         $slugs = [
             'dashboard.view', 'website.view', 'cms.view', 'social-media.manage',
-            'documents.view', 'plants.view', 'users.view', 'audit.view',
+            'documents.view', 'users.view', 'audit.view',
             'health.view', 'mail.view', 'career.view', 'inquiries.view', 'settings.manage',
         ];
         $permissions = collect($slugs)->map(fn (string $slug) => Permission::firstOrCreate(
@@ -65,7 +65,6 @@ class PortalCapabilityNavigationTest extends TestCase
             ['Social Media', 'admin.social-links.index'],
             ['Menu Builder', 'admin.menu-builder.index'],
             ['Documents & Media', 'admin.documents'],
-            ['Projects & Our Plans', 'admin.plants.index'],
             ['Users', 'admin.users.index'],
             ['Audit Log', 'admin.audit'],
             ['System Health', 'admin.health'],
@@ -81,7 +80,7 @@ class PortalCapabilityNavigationTest extends TestCase
             $this->assertStringContainsString('href="'.$path.'"', $html, $label.' link destination');
         }
 
-        foreach (['Dashboard', 'Website', 'Operations', 'Users &amp; Access', 'Communications'] as $label) {
+        foreach (['Dashboard', 'Website', 'Users &amp; Access', 'Communications'] as $label) {
             $this->assertStringContainsString($label, $html, 'Missing navigation group or item: '.$label);
         }
     }
