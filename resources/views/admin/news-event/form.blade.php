@@ -4,7 +4,7 @@
 <div class="ne-wrap">
 <header class="ne-header">
     <div><div class="ne-eyebrow">WEBSITE · NEWS & EVENT</div><h1>{{ $mode === 'create' ? 'Create News / Event' : 'Edit News / Event' }}</h1><p>Build the publication exactly around the information visitors see in the News & Event list.</p></div>
-    <div class="ne-actions"><a class="ne-btn ne-btn-ghost" href="{{ route('admin.news_and_event') }}"><i class="fa-solid fa-arrow-left"></i> Back</a><button class="ne-btn ne-btn-primary" type="submit" form="news-event-form"><i class="fa-solid fa-floppy-disk"></i> Save</button></div>
+    <div class="ne-actions"><a class="ne-btn ne-btn-ghost" href="{{ route('admin.news_and_event.index') }}"><i class="fa-solid fa-arrow-left"></i> Back</a><button class="ne-btn ne-btn-primary" type="submit" form="news-event-form"><i class="fa-solid fa-floppy-disk"></i> Save</button></div>
 </header>
 @if($errors->any())<div class="ne-alert"><i class="fa-solid fa-circle-exclamation"></i><span>{{ $errors->first() }}</span></div>@endif
 <form id="news-event-form" method="POST" enctype="multipart/form-data" action="{{ $mode === 'create' ? route('admin.news_and_event.store') : route('admin.news_and_event.update',$item) }}">@csrf @if($mode === 'edit')@method('PATCH')@endif
