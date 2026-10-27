@@ -191,6 +191,8 @@ return new class extends Migration
             })
             ->update(['area' => 'dashboard']);
 
+        $this->deduplicateRouteNames();
+
         DB::table('navigation_menu_items')
             ->where(function ($query): void {
                 $query->whereNull('source_key')->orWhere('source_key', '');
@@ -244,6 +246,54 @@ return new class extends Migration
         } catch (Throwable $exception) {
             // Some legacy MySQL metadata configurations do not permit FK introspection.
             // Orphan references are still repaired and verified independently.
+        }
+    }
+
+    private function deduplicateRouteNames(): void
+    {
+        if (! Schema::hasColumn('navigation_menu_items', 'route_name')) {
+            return;
+        }
+
+        $duplicates = DB::table('navigation_menu_items')
+            ->select('menu', 'route_name')
+            ->whereNotNull('route_name')
+            ->where('route_name', '!=', '')
+            ->groupBy('menu', 'route_name')
+            ->havingRaw('COUNT(*) > 1')
+            ->get();
+
+        foreach ($duplicates as $group) {
+            $records = DB::table('navigation_menu_items')
+                ->where('menu', $group->menu)
+                ->where('route_name', $group->route_name)
+                ->orderBy('id')
+                ->get(['id', 'parent_id']);
+
+            if ($records->count() < 2) {
+                continue;
+            }
+
+            $keep = $records->first();
+            $duplicateIds = $records->skip(1)->pluck('id')->map(fn ($id): int => (int) $id)->all();
+            $targetParentId = $keep->parent_id === null ? null : (int) $keep->parent_id;
+
+            if ($targetParentId !== null && in_array($targetParentId, $duplicateIds, true)) {
+                $targetParentId = null;
+            }
+
+            foreach ($duplicateIds as $duplicateId) {
+                if (Schema::hasColumn('navigation_menu_items', 'parent_id')) {
+                    DB::table('navigation_menu_items')
+                        ->where('menu', $group->menu)
+                        ->where('parent_id', $duplicateId)
+                        ->update(['parent_id' => $targetParentId]);
+                }
+
+                DB::table('navigation_menu_items')
+                    ->where('id', $duplicateId)
+                    ->delete();
+            }
         }
     }
 
