@@ -89,11 +89,12 @@ class BoardOfDirectorsNavigationTest extends TestCase
         $this->assertContains('Profile Builder', $childLabels);
         $this->assertContains('Page Builder', $childLabels);
 
-        $profile = $website->children->firstWhere('source_key', 'route:admin.management.index');
+        $profile = $website->children->firstWhere('source_key', 'route:admin.profile-builder.index');
         $page = $website->children->firstWhere('source_key', 'route:admin.cms.index');
         $this->assertNotNull($profile);
         $this->assertNotNull($page);
-        $this->assertSame('/admin/management', $profile->url);
+        $this->assertSame('/admin/profile-builder', $profile->url);
+        $this->assertSame('admin.profile-builder.index', $profile->route_name);
         $this->assertSame('/admin/page-builder', $page->url);
     }
     public function test_published_secondary_profile_folder_has_a_public_route(): void
