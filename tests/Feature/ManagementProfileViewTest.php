@@ -13,8 +13,8 @@ class ManagementProfileViewTest extends TestCase
 
     public function test_profile_folder_slug_cannot_claim_a_reserved_public_route(): void
     {
-        $controller = app(\\App\\Http\\Controllers\\Admin\\ManagementController::class);
-        $method = new \\ReflectionMethod($controller, 'uniqueFolderSlug');
+        $controller = app(\App\Http\Controllers\Admin\ManagementController::class);
+        $method = new \ReflectionMethod($controller, 'uniqueFolderSlug');
         $method->setAccessible(true);
 
         $this->assertSame('about-us-2', $method->invoke($controller, 'About Us'));
