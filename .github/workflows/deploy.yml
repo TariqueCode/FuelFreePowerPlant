@@ -212,6 +212,72 @@ jobs:
           echo "==> Running production migrations"
           "$PHP_BIN" artisan migrate --force
 
+          echo "==> Verifying navigation schema and data integrity"
+          "$PHP_BIN" artisan tinker --execute='
+          $required = ["menu", "parent_id", "label", "label_override", "url", "route_name", "target", "icon", "is_visible", "sort_order", "source_key", "source_type", "area", "permission_key", "created_at", "updated_at"];
+          if (!\Illuminate\Support\Facades\Schema::hasTable("navigation_menu_items")) {
+              fwrite(STDERR, "ERROR: navigation_menu_items table is missing\n");
+              exit(1);
+          }
+          foreach ($required as $column) {
+              if (!\Illuminate\Support\Facades\Schema::hasColumn("navigation_menu_items", $column)) {
+                  fwrite(STDERR, "ERROR: navigation_menu_items is missing column: ".$column."\n");
+                  exit(1);
+              }
+          }
+          $indexes = collect(\Illuminate\Support\Facades\Schema::getIndexes("navigation_menu_items"));
+          $hasUniqueSourceIndex = $indexes->contains(function ($index) {
+              $columns = $index["columns"] ?? [];
+              return (bool) ($index["unique"] ?? false)
+                  && count($columns) === 2
+                  && in_array("menu", $columns, true)
+                  && in_array("source_key", $columns, true);
+          });
+          if (!$hasUniqueSourceIndex) {
+              fwrite(STDERR, "ERROR: unique (menu, source_key) index is missing\n");
+              exit(1);
+          }
+          $duplicates = \Illuminate\Support\Facades\DB::table("navigation_menu_items")
+              ->select("menu", "source_key")
+              ->whereNotNull("source_key")
+              ->where("source_key", "!=", "")
+              ->groupBy("menu", "source_key")
+              ->havingRaw("COUNT(*) > 1")
+              ->get();
+          if ($duplicates->isNotEmpty()) {
+              fwrite(STDERR, "ERROR: duplicate live navigation source keys remain\n");
+              foreach ($duplicates as $duplicate) {
+                  fwrite(STDERR, $duplicate->menu.": ".$duplicate->source_key."\n");
+              }
+              exit(1);
+          }
+          $orphans = \Illuminate\Support\Facades\DB::table("navigation_menu_items as child")
+              ->leftJoin("navigation_menu_items as parent", function ($join) {
+                  $join->on("child.parent_id", "=", "parent.id")
+                      ->on("child.menu", "=", "parent.menu");
+              })
+              ->whereNotNull("child.parent_id")
+              ->whereNull("parent.id")
+              ->count();
+          if ($orphans > 0) {
+              fwrite(STDERR, "ERROR: orphaned navigation parent references remain: ".$orphans."\n");
+              exit(1);
+          }
+          $staleKeys = \Illuminate\Support\Facades\DB::table("navigation_menu_items")
+              ->where("menu", "dashboard")
+              ->whereIn("source_key", ["route:admin.management.index", "route:admin.page-builder.index", "route:admin.menu-builder.index", "route:admin.site-content.index", "route:admin.news_and_event"])
+              ->count();
+          $staleRoutes = \Illuminate\Support\Facades\DB::table("navigation_menu_items")
+              ->where("menu", "dashboard")
+              ->whereIn("route_name", ["admin.management.index", "admin.page-builder.index", "admin.site-content.index", "admin.news_and_event"])
+              ->count();
+          if ($staleKeys > 0 || $staleRoutes > 0) {
+              fwrite(STDERR, "ERROR: stale dashboard navigation aliases remain\n");
+              exit(1);
+          }
+          echo "Navigation schema, uniqueness, parent integrity, and canonical aliases verified\n";
+          '
+
           echo "==> Refreshing package discovery"
           "$PHP_BIN" artisan package:discover --ansi
 
@@ -281,3 +347,23 @@ jobs:
           REMOTE
 
           rm -f ~/.ssh/deploy_key
+
+      - name: Verify deployed production health and homepage
+        env:
+          PRODUCTION_BASE_URL: https://fuelfreepowerplant.com
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 8); do
+            if curl -fsS --max-time 20 "$PRODUCTION_BASE_URL/up" -o /tmp/ffp-production-health.txt; then
+              break
+            fi
+            if [ "$attempt" -eq 8 ]; then
+              echo "ERROR: Production health endpoint did not return HTTP 200."
+              exit 1
+            fi
+            sleep 10
+          done
+          curl -fsS --max-time 30 "$PRODUCTION_BASE_URL/" -o /tmp/ffp-production-home.html
+          test -s /tmp/ffp-production-health.txt
+          test -s /tmp/ffp-production-home.html
+          echo "Production health endpoint and homepage both returned HTTP 200."
