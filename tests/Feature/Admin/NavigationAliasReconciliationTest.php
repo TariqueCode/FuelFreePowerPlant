@@ -82,7 +82,7 @@ class NavigationAliasReconciliationTest extends TestCase
                 ->where('source_key', 'route:admin.profile-builder.index')
                 ->count()
         );
-        $this->assertDatabaseMissing('navigation_menu_items', ['id' => $legacy->id]);
+        $this->assertDatabaseMissing('navigation_menu_items', ['id' => $canonical->id]);
         $this->assertDatabaseHas('navigation_menu_items', [
             'id' => $legacy->id,
             'source_key' => 'route:admin.profile-builder.index',
