@@ -37,6 +37,6 @@ class LegacyPowerPlantRemovalTest extends TestCase
         $this->get(route('sustainability'))
             ->assertOk()
             ->assertSeeText('Sustainability')
-            ->assertSeeText('Data unavailable');
+            ->assertSee('Data unavailable', false);
     }
 }
