@@ -87,7 +87,7 @@ class NavigationSourceRegistry
             if (isset(self::BUILDER_ROUTE_ALIASES[$name])) {
                 [$canonical, $label] = self::BUILDER_ROUTE_ALIASES[$name];
                 $route = $this->routeByName($canonical);
-                if ($route && $this->eligibleRoute($route, $area)) {
+                if ($route && $this->eligibleBuilderAliasRoute($route, $area)) {
                     $source = $this->routeSource($route, $area); $source['label'] = $label; return $source;
                 }
                 return null;
@@ -143,6 +143,28 @@ class NavigationSourceRegistry
         }
 
         return $this->routeIndex[$name] ?? null;
+    }
+
+    /**
+     * Builder routes are excluded from the general route picker to prevent
+     * recursive/self-referential menu entries, but explicitly configured
+     * dashboard sidebar aliases must still resolve.
+     */
+    private function eligibleBuilderAliasRoute(Route $route, string $area): bool
+    {
+        if ($area !== 'dashboard') return false;
+
+        $name = (string) $route->getName();
+        if (! array_key_exists($name, self::BUILDER_ROUTE_ALIASES)) return false;
+
+        if (! in_array($route->methods()[0] ?? null, ['GET', 'HEAD'], true)) return false;
+
+        $uri = ltrim($route->uri(), '/');
+        if (! str_starts_with($uri, 'admin/') || str_contains($uri, '{')) return false;
+
+        $middleware = collect($route->gatherMiddleware())->map(fn ($value): string => (string) $value);
+
+        return ! $middleware->contains(fn (string $value): bool => Str::startsWith($value, 'role:'));
     }
 
     private function eligibleRoute(Route $route, string $area): bool
