@@ -93,6 +93,24 @@ class DocumentsFileManagerTest extends TestCase
         $this->assertDatabaseCount('documents', 2);
     }
 
+    public function test_shared_download_link_does_not_expire_after_several_days(): void
+    {
+        Storage::fake('local');
+        $user = $this->admin();
+        $document = $this->document($user);
+
+        $this->actingAs($user)->post(route('admin.documents.share', $document))->assertRedirect();
+        $document->refresh();
+
+        $this->assertTrue($document->share_enabled);
+        $this->assertNull($document->share_expires_at);
+
+        $token = $document->share_token;
+        $this->travel(30)->days();
+
+        $this->get(route('documents.shared-download', $token))->assertOk();
+    }
+
     public function test_file_can_be_shared_and_revoked(): void
     {
         Storage::fake('local');
@@ -103,7 +121,7 @@ class DocumentsFileManagerTest extends TestCase
         $document->refresh();
         $this->assertTrue($document->share_enabled);
         $this->assertNotEmpty($document->share_token);
-        $this->assertNotNull($document->share_expires_at);
+        $this->assertNull($document->share_expires_at);
 
         $this->actingAs($user)->post(route('admin.documents.unshare.post', $document))->assertRedirect();
         $this->assertFalse($document->refresh()->share_enabled);
