@@ -638,7 +638,7 @@
 
             <div class="public-footer-developer">
                 Developed by
-                <a href="mailto:TariqueBN@gmail.com" aria-label="Email developer Saif Al-Islam">Saif Al-Islam</a>
+                <a href="https://saif.info.bd" target="_blank" rel="noopener noreferrer" aria-label="Visit developer Saif Al-Islam website">Saif Al-Islam</a>
             </div>
         </div>
     </div>
