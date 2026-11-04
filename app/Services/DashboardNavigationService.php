@@ -56,7 +56,11 @@ class DashboardNavigationService
         };
         $addVirtualRoute('route:admin.dashboard', 'Dashboard', 'fa-house', 0, null);
         if ($website?->getKey() !== null) {
-            $addVirtualRoute('route:admin.management.index', 'Profile Builder', 'fa-user-tie', 3, (int) $website->getKey());
+            // The profile builder may already be stored under its canonical route key.
+            // Do not inject the legacy management alias as a second sidebar item.
+            if (! $existingKeys->has('route:admin.profile-builder.index')) {
+                $addVirtualRoute('route:admin.management.index', 'Profile Builder', 'fa-user-tie', 3, (int) $website->getKey());
+            }
             $addVirtualRoute('route:admin.cms.index', 'Page Builder', 'fa-file-lines', 6, (int) $website->getKey());
         }
         $valid = $valid->concat($virtual)->sortBy(fn (NavigationMenuItem $item): array => [(int) ($item->parent_id ?? 0), (int) $item->sort_order, (int) $item->getKey()])->values();
