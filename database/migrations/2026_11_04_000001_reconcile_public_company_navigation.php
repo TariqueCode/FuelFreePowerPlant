@@ -1,9 +1,9 @@
 <?php
 
-use App\\Models\\CmsPage;
-use App\\Models\\NavigationMenuItem;
-use Illuminate\\Database\\Migrations\\Migration;
-use Illuminate\\Support\\Facades\\Schema;
+use App\Models\CmsPage;
+use App\Models\NavigationMenuItem;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -248,7 +248,7 @@ return new class extends Migration
         // Ensure the company folder remains visible and correctly ordered.
         $company->update(['parent_id' => null, 'sort_order' => 3, 'is_visible' => true]);
 
-        app(\\App\\Services\\PublicNavigationService::class)->clear('main');
+        app(\App\Services\PublicNavigationService::class)->clear('main');
     }
 
     public function down(): void
