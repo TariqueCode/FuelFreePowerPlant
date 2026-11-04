@@ -2023,4 +2023,25 @@ img{max-width:100%}
 }
 </style>
 
+<style>
+/* Mobile homepage fixes: preserve viewport scrolling so the global header can stick. */
+@media (max-width: 900px) {
+    html,
+    body {
+        overflow-x: clip !important;
+    }
+
+    body.public-site .public-header {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1000 !important;
+    }
+
+    /* The flywheel technology overview is a desktop-only visual. */
+    body.public-site .welcome-visual {
+        display: none !important;
+    }
+}
+</style>
+
 @endsection
