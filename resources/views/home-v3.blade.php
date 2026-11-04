@@ -413,7 +413,21 @@ img{max-width:100%}
 @endif
 </div>
 </div>
-</div>
+<aside class="welcome-visual" aria-label="Flywheel-based energy technology illustration">
+    <div class="welcome-visual-grid" aria-hidden="true"></div>
+    <div class="welcome-visual-top"><span><i class="fa-solid fa-circle"></i> TECHNOLOGY OVERVIEW</span><span>FFP / 01</span></div>
+    <div class="welcome-flywheel" aria-hidden="true">
+        <div class="welcome-flywheel-orbit orbit-one"></div>
+        <div class="welcome-flywheel-orbit orbit-two"></div>
+        <div class="welcome-flywheel-orbit orbit-three"></div>
+        <div class="welcome-flywheel-core"><i class="fa-solid fa-gear"></i></div>
+        <span class="welcome-flywheel-node node-a"></span>
+        <span class="welcome-flywheel-node node-b"></span>
+        <span class="welcome-flywheel-node node-c"></span>
+    </div>
+    <div class="welcome-visual-caption"><span>ENGINEERED ENERGY SYSTEMS</span><strong>Flywheel-based technology</strong><small>Mechanical energy · Engineering · Power generation</small></div>
+    <div class="welcome-visual-footer"><span><i class="fa-solid fa-bolt"></i> ENERGY INNOVATION</span><span>FUELFREE POWERPLANT</span></div>
+</aside>
 </div>
 </section>
 @endif
@@ -945,6 +959,67 @@ img{max-width:100%}
     gap:clamp(34px,5vw,72px);
 }
 .home-v3 .welcome-content{min-width:0}
+.home-v3 .welcome-visual{
+    position:relative;
+    isolation:isolate;
+    display:flex;
+    min-width:0;
+    min-height:430px;
+    flex-direction:column;
+    justify-content:space-between;
+    overflow:hidden;
+    padding:22px;
+    border:1px solid rgba(53,216,106,.2);
+    border-radius:26px;
+    background:
+        radial-gradient(ellipse at 50% 46%,rgba(22,141,255,.16),transparent 43%),
+        radial-gradient(ellipse at 50% 90%,rgba(53,216,106,.1),transparent 48%),
+        linear-gradient(145deg,rgba(5,28,25,.96),rgba(3,14,20,.98));
+    box-shadow:0 24px 70px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.035);
+}
+.home-v3 .welcome-visual-grid{
+    position:absolute;inset:0;z-index:-1;opacity:.28;
+    background-image:linear-gradient(rgba(83,218,240,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(83,218,240,.09) 1px,transparent 1px);
+    background-size:30px 30px;
+    mask-image:linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent);
+}
+.home-v3 .welcome-visual-top,.home-v3 .welcome-visual-footer{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    color:#779b8c;font-size:9px;font-weight:800;letter-spacing:.13em;
+}
+.home-v3 .welcome-visual-top span:first-child{color:#7ce6a7}
+.home-v3 .welcome-visual-top i{font-size:7px;margin-right:5px;text-shadow:0 0 10px #35d86a}
+.home-v3 .welcome-flywheel{
+    position:relative;display:grid;place-items:center;
+    width:min(100%,300px);aspect-ratio:1;margin:4px auto;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(20,88,105,.18),transparent 67%);
+}
+.home-v3 .welcome-flywheel-orbit{
+    position:absolute;inset:8%;border:1px solid rgba(83,218,240,.22);
+    border-radius:50%;box-shadow:0 0 28px rgba(22,141,255,.08),inset 0 0 24px rgba(22,141,255,.05);
+}
+.home-v3 .welcome-flywheel .orbit-one{transform:rotateX(66deg) rotate(-22deg);border-color:rgba(53,216,106,.48);animation:welcomeOrbit 16s linear infinite}
+.home-v3 .welcome-flywheel .orbit-two{inset:15%;transform:rotateY(66deg) rotate(28deg);border-color:rgba(22,141,255,.52);animation:welcomeOrbit 20s linear infinite reverse}
+.home-v3 .welcome-flywheel .orbit-three{inset:23%;border-style:dashed;border-color:rgba(83,218,240,.34);animation:welcomeOrbit 34s linear infinite}
+@keyframes welcomeOrbit{to{rotate:360deg}}
+.home-v3 .welcome-flywheel-core{
+    display:grid;place-items:center;width:36%;aspect-ratio:1;border-radius:50%;
+    border:1px solid rgba(126,240,194,.5);
+    background:radial-gradient(circle at 35% 30%,#1b5a58,#09252c 68%);
+    color:#a6f5d0;font-size:clamp(38px,4vw,58px);
+    box-shadow:0 0 0 10px rgba(53,216,106,.045),0 0 48px rgba(22,141,255,.22),inset 0 0 22px rgba(83,218,240,.16);
+}
+.home-v3 .welcome-flywheel-node{position:absolute;width:9px;height:9px;border-radius:50%;background:#7ce6a7;box-shadow:0 0 16px #35d86a}
+.home-v3 .welcome-flywheel .node-a{top:14%;left:25%}
+.home-v3 .welcome-flywheel .node-b{right:10%;top:48%;background:#63c9ff;box-shadow:0 0 16px #168dff}
+.home-v3 .welcome-flywheel .node-c{bottom:13%;left:30%;width:6px;height:6px}
+.home-v3 .welcome-visual-caption{display:grid;gap:7px;text-align:center}
+.home-v3 .welcome-visual-caption span{color:#70dca0;font-size:9px;font-weight:850;letter-spacing:.18em}
+.home-v3 .welcome-visual-caption strong{color:#effff6;font-size:clamp(17px,1.6vw,22px);letter-spacing:-.025em}
+.home-v3 .welcome-visual-caption small{color:#8ca99b;font-size:10px;line-height:1.6}
+.home-v3 .welcome-visual-footer{padding-top:15px;border-top:1px solid rgba(83,218,240,.12);font-size:8px}
+.home-v3 .welcome-visual-footer i{color:#7ce6a7;margin-right:5px}
 .home-v3 .welcome-heading{
     border-bottom:0;
     padding-bottom:20px;
