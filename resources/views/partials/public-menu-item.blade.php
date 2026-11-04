@@ -204,13 +204,35 @@
             top:-9px !important;
             left:100% !important;
             margin-left:8px !important;
-            width:250px !important;
-            min-width:250px !important;
+            width:clamp(300px, 25vw, 380px) !important;
+            min-width:0 !important;
+            max-width:calc(100vw - 32px) !important;
             max-height:min(70vh,520px) !important;
             overflow-y:auto !important;
-            overflow-x:visible !important;
+            overflow-x:hidden !important;
             padding:9px !important;
             border-left:2px solid rgba(57,230,166,.26) !important;
+            box-sizing:border-box !important;
+            scrollbar-width:thin;
+        }
+
+        /* Long CMS page titles must wrap inside the nested panel instead of
+           widening it or creating a horizontal scrollbar. */
+        .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown-panel > a {
+            display:flex !important;
+            align-items:flex-start !important;
+            width:100% !important;
+            min-width:0 !important;
+            white-space:normal !important;
+            overflow-wrap:anywhere !important;
+            word-break:normal !important;
+            line-height:1.45 !important;
+            box-sizing:border-box !important;
+        }
+
+        .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown-panel > a::before {
+            flex:0 0 4px;
+            margin-top:.48em;
         }
 
         .public-header-nav .public-menu-dropdown-panel .public-menu-dropdown-panel::before {
